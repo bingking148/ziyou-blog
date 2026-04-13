@@ -1,7 +1,7 @@
 baseURL = 'https://example.org/'
 languageCode = 'zh-CN'
 defaultContentLanguage = 'zh-CN'
-title = 'My Blog'
+title = 'ZIYOU'
 theme = 'reimu'
 hasCJKLanguage = true
 
