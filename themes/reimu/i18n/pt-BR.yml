@@ -87,3 +87,6 @@ heat_map_card:
   no_articles: Sem artigos
   words: palavra(s)
   total_articles: "$1 artigo(s), $2 palavra(s)"
+
+share_card_text: "Achou útil? Compartilhe agora"
+share_card_copied: "Link copiado para a área de transferência (*^▽^*)"

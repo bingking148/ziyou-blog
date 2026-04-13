@@ -472,6 +472,9 @@ sponsor:
 
 share:
 
+share_card:
+  enable: true
+
 home_categories:
   enable: false
   content:

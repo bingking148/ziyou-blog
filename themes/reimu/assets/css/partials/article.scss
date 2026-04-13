@@ -564,3 +564,74 @@ mjx-container {
     display: none;
   }
 }
+
+.share-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px $article-padding + 16px 0;
+  padding: 16px 24px;
+  background: var(--red-5-5);
+  border-radius: $post-radius;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow-meta);
+  user-select: none;
+
+  @media #{$mg-normal} {
+    margin: 24px 16px 0;
+  }
+
+  &:hover {
+    background: var(--red-5);
+    box-shadow: var(--shadow-meta-hover);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .share-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--red-1);
+    margin-right: 12px;
+    transition: transform 0.3s;
+  }
+
+  &:hover .share-card-icon {
+    transform: scale(1.15);
+  }
+
+  .share-card-text {
+    font-size: 15px;
+    color: var(--color-link);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+}
+
+.share-card-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--color-header-background);
+  box-shadow: var(--shadow-card);
+  border-radius: $tag-radius;
+  padding: 12px 24px;
+  color: var(--grey-7);
+  font-size: 14px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  z-index: 1000;
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+}

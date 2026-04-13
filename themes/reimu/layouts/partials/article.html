@@ -47,6 +47,7 @@
         {{ .Content | safeHTML }}
       {{- end -}}
     </div>
+    {{- partial "post/share-card.html" . -}}
     <footer class="article-footer">
       {{- if or (eq .Params.copyright true) (and (not (eq .Params.copyright false)) .Site.Params.article_copyright.enable) -}}
         {{- partial "post/copyright.html" . -}}
