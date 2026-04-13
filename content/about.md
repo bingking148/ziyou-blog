@@ -13,5 +13,7 @@ lastmod: 2025-04-13T00:00:00+08:00
 
 ## 联系方式
 
-- GitHub: 待设置
-- Email: 待设置
+- GitHub: [bingking148](https://github.com/bingking148)
+- Email: 1605726649@qq.com
+- QQ: [1605726649](https://wpa.qq.com/msgrd?v=3&uin=1605726649&site=qq&menu=yes)
+- 微信: 18239772567

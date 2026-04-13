@@ -22,7 +22,7 @@ monthFormat: "2006-01"
 dateFormat: "2006-01-02"
 timeFormat: "2006-01-02 15:04:05"
 
-author: Blog Owner
+author: ZIYOU
 email: blog@example.com
 description: "记录生活，分享技术"
 subtitle:
@@ -52,7 +52,7 @@ banner_srcset:
     - src: "images/banner.webp"
       media: "(min-width: 800px)"
 
-avatar: "avatar.webp"
+avatar: "88798328f4e66fedf4a2518539c9b35d.jpg"
 
 cover:
 toc: true
@@ -82,6 +82,7 @@ sidebar:
     show_common: true
 
 social:
+  github: https://github.com/bingking148
 
 widgets:
   - category
