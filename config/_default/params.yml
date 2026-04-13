@@ -299,12 +299,12 @@ gitalk:
   md5: false
 
 giscus:
-  enable: false
-  repo:
-  repoId:
-  category:
-  categoryId:
-  mapping: mapping
+  enable: true
+  repo: bingking148/ziyou-blog
+  repoId: R_kgDOSBFn0g
+  category: Announcements
+  categoryId: DIC_kwDOSBFn0s4C6vgO
+  mapping: pathname
   strict: 0
   reactionsEnabled: 1
   emitMetadata: 0
@@ -496,7 +496,7 @@ injector:
   sidebar_end:
 
 pjax:
-  enable: false
+  enable: true
 
 quicklink:
   enable: false
@@ -522,23 +522,23 @@ player:
   disable_on_mobile: false
   position: before_sidebar
   aplayer:
-    enable: false
+    enable: true
     options:
       audio: []
-      fixed: true
-      autoplay:
-      loop:
-      order:
-      preload:
-      volume:
-      mutex:
-      listFolded:
-      lrcType:
+      fixed: false
+      autoplay: false
+      loop: all
+      order: list
+      preload: auto
+      volume: 0.7
+      mutex: true
+      listFolded: true
+      lrcType: 3
   meting:
-    enable: false
+    enable: true
     meting_api:
     options:
-      id: 2265921590
+      id: 17897599393
       server: netease
       type: playlist
       auto:
