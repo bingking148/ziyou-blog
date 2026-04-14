@@ -1,7 +1,7 @@
 ---
 title: 'Hello World'
-date: 2025-04-13T00:00:00+08:00
-lastmod: 2025-04-13T00:00:00+08:00
+date: 2026-04-13T00:00:00+08:00
+lastmod: 2026-04-13T00:00:00+08:00
 cover: /images/covers/cover1.jpg
 ---
 
