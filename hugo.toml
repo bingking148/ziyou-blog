@@ -11,6 +11,9 @@ languageName = '简体中文'
 weight = 1
 
 [markup]
+[markup.tableOfContents]
+startLevel = 1
+endLevel = 2
 [markup.highlight]
 lineNos = true
 style = "github"

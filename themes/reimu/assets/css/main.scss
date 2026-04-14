@@ -353,6 +353,8 @@ a, .main-nav-icon, .popup-btn-close, button {
 @import "partials/share";
 {{ end }}
 
+@import "partials/weekly-toc";
+
 [data-theme="dark"] {
   ::-webkit-scrollbar, ::-webkit-scrollbar-track {
     background-color: #616161;

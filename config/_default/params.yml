@@ -9,6 +9,9 @@ menu:
   - name: archives
     url: "archives"
     icon:
+  - name: weekly
+    url: "weekly"
+    icon:
   - name: about
     url: "about"
     icon:
@@ -16,7 +19,7 @@ menu:
     url: "friend"
     icon:
 
-mainSections: ["post"]
+mainSections: ["post", "weekly"]
 yearFormat: "2006"
 monthFormat: "2006-01"
 dateFormat: "2006-01-02"

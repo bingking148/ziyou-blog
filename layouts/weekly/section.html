@@ -1,0 +1,165 @@
+{{- define "main" -}}
+  {{- $pageSize := 0 -}}
+  {{- with $.Site.Params.paginate.archive -}}
+    {{- $pageSize = . -}}
+  {{- end -}}
+  {{- $weeklyPages := where .Page.Pages "Type" "weekly" -}}
+  {{- $paginator := "" -}}
+  {{- if gt $pageSize 0 -}}
+    {{- $paginator = .Paginate $weeklyPages $pageSize -}}
+  {{- else -}}
+    {{- $paginator = .Paginate $weeklyPages -}}
+  {{- end -}}
+
+  <style>
+  .weekly-header {
+    padding: 24px 36px 0;
+  }
+  .weekly-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--color-archive-year);
+    margin: 0;
+    position: relative;
+    padding-bottom: 16px;
+  }
+  .weekly-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 2em;
+    height: 4px;
+    background: var(--color-h2-after);
+    border-radius: 2px;
+    box-shadow: var(--shadow-red-6-shadow);
+  }
+  .weekly-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 16px 20px 20px;
+  }
+  .weekly-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 16px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-h2-border);
+    transition: background 0.25s, box-shadow 0.25s;
+    border-radius: 6px;
+  }
+  .weekly-list-item:last-child {
+    border-bottom: none;
+  }
+  .weekly-list-item:hover {
+    background: var(--red-6);
+    box-shadow: var(--shadow-card);
+  }
+  .weekly-list-date {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    padding: 8px 4px;
+    background: var(--red-5);
+    border-radius: 8px;
+    line-height: 1.2;
+  }
+  .weekly-list-date-day {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--red-1);
+  }
+  .weekly-list-date-month {
+    font-size: 12px;
+    color: var(--red-1);
+    text-transform: uppercase;
+  }
+  .weekly-list-date-year {
+    font-size: 11px;
+    color: var(--grey-9);
+  }
+  .weekly-list-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .weekly-list-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--red-0);
+    margin: 0 0 6px;
+    line-height: 1.4;
+    transition: color 0.2s;
+  }
+  .weekly-list-item:hover .weekly-list-title {
+    color: var(--red-1);
+  }
+  .weekly-list-desc {
+    font-size: 14px;
+    color: var(--grey-9);
+    margin: 0;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  @media screen and (max-width: 767px) {
+    .weekly-header {
+      padding: 16px 16px 0;
+    }
+    .weekly-list {
+      padding: 12px 12px 16px;
+    }
+    .weekly-list-item {
+      gap: 12px;
+      padding: 14px 10px;
+    }
+    .weekly-list-date {
+      min-width: 46px;
+      padding: 6px 2px;
+    }
+    .weekly-list-date-day {
+      font-size: 18px;
+    }
+    .weekly-list-title {
+      font-size: 15px;
+    }
+    .weekly-list-desc {
+      font-size: 13px;
+    }
+  }
+  </style>
+
+  <div
+    class="archives-outer-wrap"
+    data-aos="{{ .Site.Params.animation.options.archive.whole }}"
+  >
+    <div class="weekly-header">
+      <h1 class="weekly-title">热点周刊</h1>
+    </div>
+
+    <div class="weekly-list">
+      {{- range $paginator.Pages -}}
+        <a href="{{ .RelPermalink }}" class="weekly-list-item" data-aos="{{ $.Site.Params.animation.options.archive.section }}">
+          <div class="weekly-list-date">
+            <span class="weekly-list-date-day">{{ .Date.Format "02" }}</span>
+            <span class="weekly-list-date-month">{{ .Date.Format "01月" }}</span>
+            <span class="weekly-list-date-year">{{ .Date.Format "2006" }}</span>
+          </div>
+          <div class="weekly-list-content">
+            <h2 class="weekly-list-title">{{ .Title }}</h2>
+            {{- with .Description -}}
+              <p class="weekly-list-desc">{{ . }}</p>
+            {{- end -}}
+          </div>
+        </a>
+      {{- end -}}
+    </div>
+  </div>
+  {{- partial "pagination.html" . -}}
+{{- end -}}
