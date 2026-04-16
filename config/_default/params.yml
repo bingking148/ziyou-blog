@@ -9,9 +9,6 @@ menu:
   - name: archives
     url: "archives"
     icon:
-  - name: weekly
-    url: "weekly"
-    icon:
   - name: about
     url: "about"
     icon:
@@ -19,7 +16,7 @@ menu:
     url: "friend"
     icon:
 
-mainSections: ["post", "weekly"]
+mainSections: ["post"]
 yearFormat: "2006"
 monthFormat: "2006-01"
 dateFormat: "2006-01-02"
@@ -30,8 +27,11 @@ email: blog@example.com
 description: "记录生活，分享技术"
 subtitle:
   typing:
-    enable: false
+    enable: true
     strings:
+      - "解答世间万物"
+      - "记录生活点滴"
+      - "分享技术心得"
     typeSpeed: 100
     backSpeed: 50
     backDelay: 2000
@@ -46,7 +46,7 @@ subtitle:
 banner: "images/banner.jpg"
 
 banner_srcset:
-  enable: false
+  enable: true
   srcset:
     - src: "images/banner-600w.webp"
       media: "(max-width: 479px)"
@@ -86,6 +86,11 @@ sidebar:
 
 social:
   github: https://github.com/bingking148
+  # 添加更多社交链接（取消注释并填入你的链接）
+  # bilibili: https://space.bilibili.com/yourname
+  # zhihu: https://zhihu.com/people/yourname
+  # email: your-email@example.com
+  # rss: /index.xml
 
 widgets:
   - category
@@ -189,7 +194,7 @@ mermaid:
   zoom: false
 
 code_block:
-  expand: true
+  expand: 15
 
 clipboard:
   success: 
@@ -394,7 +399,7 @@ animation:
 
 firework:
   enable: true
-  disable_on_mobile: false
+  disable_on_mobile: true
   options:
     excludeElements: ["a", "button"]
     particles:
@@ -442,7 +447,7 @@ top:
     mask: true
 
 outdate:
-  enable: false
+  enable: true
   daysAgo: 180
   message:
     en: This article was last updated on {time}. Please note that the content may no longer be applicable.
@@ -504,10 +509,10 @@ injector:
   sidebar_end:
 
 pjax:
-  enable: true
+  enable: false
 
 quicklink:
-  enable: false
+  enable: true
   timeout: 3000
   priority: true
   ignores: []
@@ -527,7 +532,7 @@ pace:
   enable: true
 
 player:
-  disable_on_mobile: false
+  disable_on_mobile: true
   position: before_sidebar
   aplayer:
     enable: true

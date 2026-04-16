@@ -1,1 +1,14 @@
-[]
+# 友情链接配置
+#
+# 使用格式：
+# - name: 博客名称
+#   url: https://example.com
+#   avatar: https://example.com/avatar.png
+#   description: 博客描述
+#
+# 示例：
+# - name: 示例博客
+#   url: https://example.com
+#   avatar: https://example.com/avatar.png
+#   description: 这是我的博客描述
+
