@@ -10,8 +10,12 @@
   border-radius: $post-radius;
   overflow: hidden;
   position: relative;
-  transition: 0.3s;
+  transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: var(--shadow-card);
+  background: var(--glass-background);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
   width: 60%;
 
   @media #{$mg-normal} {
@@ -19,7 +23,7 @@
   }
 
   &:hover {
-    transform: scale(1.015);
+    transform: scale(1.015) translateY(-2px);
     box-shadow: var(--shadow-card-hover);
   }
 

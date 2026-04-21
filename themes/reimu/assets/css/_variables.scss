@@ -26,7 +26,7 @@
 
   --color-h2-border: #eee;
   --color-meta-shadow: var(--red-6);
-  --color-hover-shadow: rgba(120, 120, 120, 0.15);
+  --color-hover-shadow: rgba(120, 120, 120, 0.12);
   --color-h2-after: var(--red-1);
   --color-red-6-shadow: #{$light-color-red-6-shadow};
   --color-red-3-shadow: #{$light-color-red-3-shadow};
@@ -49,13 +49,16 @@
   --highlight-addition: #{$light-highlight-addition};
   --highlight-addition-bg: #{$light-highlight-addition-bg};
 
-  --shadow-meta: 0 0 5px 2px var(--color-meta-shadow);
-  --shadow-meta-hover: 0 0 6px 4px var(--color-meta-shadow);
+  --shadow-meta: 0 2px 8px 1px var(--color-meta-shadow);
+  --shadow-meta-hover: 0 4px 16px 2px var(--color-meta-shadow);
 
-  --shadow-card: 0 0 10px 2px var(--color-hover-shadow);
-  --shadow-card-hover: 0 0 10px 4px var(--color-hover-shadow);
+  --shadow-card: 0 4px 20px 2px var(--color-hover-shadow);
+  --shadow-card-hover: 0 8px 30px 4px var(--color-hover-shadow);
 
-  --shadow-red-6-shadow: 0 0 8px var(--color-red-6-shadow);
+  --shadow-red-6-shadow: 0 0 12px var(--color-red-6-shadow);
+
+  --glass-background: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.5);
 }
 
 [data-theme="dark"] {
@@ -78,7 +81,10 @@
 
     --color-h2-border: #47474a;
     --color-meta-shadow: rgba(0, 0, 0, 0.2);
-    --color-hover-shadow: rgba(0, 0, 0, 0.2);
+    --color-hover-shadow: rgba(0, 0, 0, 0.25);
+
+    --glass-background: rgba(40, 44, 52, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
 
     --highlight-nav: #{$dark-highlight-nav};
     --highlight-scrollbar: #{$dark-highlight-scrollbar};
@@ -143,5 +149,5 @@ $mq-large: "screen and (min-width: 960px)";
 $mg-large: "screen and (max-width: 959px)";
 $mq-extra-large: "screen and (min-width: 1242px)";
 $mg-extra-large: "screen and (max-width: 1241px)";
-$post-radius: 10px;
-$tag-radius: 8px;
+$post-radius: 16px;
+$tag-radius: 10px;

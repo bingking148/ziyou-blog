@@ -1,11 +1,20 @@
 #comments {
-  background: var(--color-wrap);
+  background: var(--glass-background);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid var(--glass-border);
   padding: $article-padding $article-padding + 16px;
   border-radius: $post-radius;
   margin: 12px 0;
+  box-shadow: var(--shadow-card);
+  transition: 0.4s;
 
   @media #{$mg-normal} {
     padding: $article-padding 16px;
+  }
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
   }
 
   a {

@@ -9,9 +9,17 @@
 
 .widget-wrap {
   margin: 40px 0 0 0;
-  background: var(--color-wrap);
+  background: var(--glass-background);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid var(--glass-border);
   border-radius: $post-radius;
-  transition: 0.3s;
+  transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: var(--shadow-card);
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
 }
 
 .widget-wrapper {
@@ -80,8 +88,13 @@
   }
 
   li {
-    margin-top: 4px;
+    margin-top: 6px;
     line-height: normal;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateX(4px);
+    }
 
     &:before {
       content: "";

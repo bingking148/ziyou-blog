@@ -1,10 +1,10 @@
 #footer {
-  background-color: linear-gradient(
+  background: linear-gradient(
     to top,
-    var(--color-footer-background) 50%,
+    var(--color-footer-background) 30%,
     transparent
   );
-  padding: 40px 0 20px;
+  padding: 60px 0 24px;
   color: var(--grey-9);
   transition: 1s;
 
@@ -96,12 +96,16 @@
 }
 
 .article-copyright {
-  background: var(--red-5-5);
+  background: var(--glass-background);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-left: 6px var(--red-4) solid;
+  border: 1px solid var(--glass-border);
+  border-left-width: 6px;
   margin: 24px 0;
   border-radius: $post-radius;
-  transition: 0.3s;
-  padding: 6px 10px;
+  transition: 0.4s;
+  padding: 10px 14px;
   box-shadow: var(--shadow-meta);
   position: relative;
   overflow: hidden;

@@ -23,6 +23,7 @@
       {{- .Site.Params.injector.body_begin | safeHTML -}}
     {{- end -}}
     {{- partialCached "loader.html" . -}}
+    <canvas id="particle-canvas" aria-hidden="true"></canvas>
     <div id="container">
       <div id="wrap">
         {{- partial "header.html" . -}}

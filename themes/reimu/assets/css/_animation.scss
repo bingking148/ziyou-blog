@@ -51,3 +51,30 @@ body [data-aos="zoom-in"] {
 [data-aos^="zoom"] {
   transition-property: all !important;
 }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px 2px var(--color-red-6-shadow);
+  }
+  50% {
+    box-shadow: 0 0 15px 4px var(--color-red-3-shadow);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

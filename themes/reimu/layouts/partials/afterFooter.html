@@ -11,6 +11,8 @@
 {{- end -}}
 
 {{- partial "helpers/ts.html" (dict "source" "js/main.ts" "ctx" .) -}}
+{{- partial "helpers/ts.html" (dict "source" "js/particles.ts" "ctx" .) -}}
+{{- partial "helpers/ts.html" (dict "source" "js/click-effect.ts" "ctx" .) -}}
 
 {{- if $params.animation.enable -}}
   {{- partial "helpers/ts.html" (dict "source" "js/aos.ts" "ctx" .) -}}

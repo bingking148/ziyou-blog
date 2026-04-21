@@ -398,7 +398,7 @@ animation:
       nav: fade-up
 
 firework:
-  enable: true
+  enable: false
   disable_on_mobile: true
   options:
     excludeElements: ["a", "button"]

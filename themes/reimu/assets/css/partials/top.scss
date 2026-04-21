@@ -4,7 +4,10 @@
   right: 30px;
   width: 48px;
   height: 48px;
-  background-color: var(--color-wrap);
+  background-color: var(--glass-background);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: 50%;
   @if $icon_font {
     font-family: $font-icon;

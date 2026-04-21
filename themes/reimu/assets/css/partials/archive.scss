@@ -1,7 +1,11 @@
 .archives-outer-wrap {
-  background: var(--color-wrap);
+  background: var(--glass-background);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid var(--glass-border);
   border-radius: $post-radius;
   padding: 16px 0;
+  box-shadow: var(--shadow-card);
 }
 
 .archives-wrap {
@@ -127,11 +131,20 @@
   @if $uppercase_capsule {
     text-transform: uppercase;
   }
-  background: var(--red-5);
+  background: var(--glass-background);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid var(--glass-border);
   border-radius: $tag-radius;
   padding: 8px 16px;
   margin: 6px;
   box-shadow: var(--shadow-meta);
+  transition: 0.3s;
+
+  &:hover {
+    box-shadow: var(--shadow-meta-hover);
+    transform: translateY(-2px);
+  }
 }
 
 .archives-tag-list-link,

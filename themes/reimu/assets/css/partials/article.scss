@@ -20,10 +20,19 @@
 }
 
 .article-inner {
-  background: var(--color-wrap);
+  background: var(--glass-background);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid var(--glass-border);
   border-radius: $post-radius;
   display: flow-root;
-  transition: 0.3s;
+  transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: var(--shadow-card);
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
 }
 
 .article-meta {
@@ -241,17 +250,22 @@
   }
 
   blockquote {
-    background: var(--red-5-5);
+    background: var(--glass-background);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-left: 6px var(--red-4) solid;
     margin: 28px 0;
     border-radius: $post-radius;
-    transition: 0.3s;
+    transition: 0.4s;
     display: flow-root;
-    padding: 0 12px;
+    padding: 0 16px;
     box-shadow: var(--shadow-meta);
+    border: 1px solid var(--glass-border);
+    border-left-width: 6px;
 
     &:hover {
       box-shadow: var(--shadow-meta-hover);
+      transform: translateX(4px);
     }
 
     footer {
@@ -270,9 +284,12 @@
   details {
     padding: 16px 12px;
     border-radius: $post-radius;
-    background-color: var(--red-5-5);
+    background-color: var(--glass-background);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-meta);
-    transition: 0.3s;
+    transition: 0.4s;
 
     &:hover {
       box-shadow: var(--shadow-meta-hover);
@@ -571,10 +588,13 @@ mjx-container {
   justify-content: center;
   margin: 24px $article-padding + 16px 0;
   padding: 16px 24px;
-  background: var(--red-5-5);
+  background: var(--glass-background);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
   border-radius: $post-radius;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: var(--shadow-meta);
   user-select: none;
 
@@ -618,7 +638,10 @@ mjx-container {
   top: 20px;
   left: 50%;
   transform: translateX(-50%) translateY(-20px);
-  background: var(--color-header-background);
+  background: var(--glass-background);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-card);
   border-radius: $tag-radius;
   padding: 12px 24px;
@@ -626,7 +649,7 @@ mjx-container {
   font-size: 14px;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
 
   &.show {
