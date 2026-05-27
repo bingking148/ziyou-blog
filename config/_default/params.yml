@@ -447,7 +447,7 @@ top:
     mask: true
 
 outdate:
-  enable: true
+  enable: false
   daysAgo: 180
   message:
     en: This article was last updated on {time}. Please note that the content may no longer be applicable.
