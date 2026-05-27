@@ -11,17 +11,15 @@
   </span>
   <span class="share-card-text">{{ i18n "share_card_text" }}</span>
 </div>
-<div class="share-card-toast" id="share-card-toast">{{ i18n "share_card_copied" }}</div>
 <script>
 (function() {
   var card = document.getElementById('share-card');
-  var toast = document.getElementById('share-card-toast');
-  if (!card || !toast) return;
+  if (!card) return;
   card.addEventListener('click', function() {
     var url = card.getAttribute('data-url');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(function() {
-        showToast();
+        showCopyToast();
       }).catch(function() {
         fallbackCopy(url);
       });
@@ -38,16 +36,34 @@
     textarea.select();
     try {
       document.execCommand('copy');
-      showToast();
-    } catch(e) {
-      toast.classList.add('show');
-      setTimeout(function() { toast.classList.remove('show'); }, 1500);
-    }
+    } catch(e) {}
     document.body.removeChild(textarea);
+    showCopyToast();
   }
-  function showToast() {
-    toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 1500);
+  function showCopyToast() {
+    var toast = document.createElement('div');
+    toast.textContent = '{{ i18n "share_card_copied" }}';
+    toast.setAttribute('style', 
+      'position:fixed!important;' +
+      'top:100px!important;' +
+      'left:50%!important;' +
+      'transform:translateX(-50%)!important;' +
+      'background:#4285f4!important;' +
+      'color:#fff!important;' +
+      'border-radius:8px!important;' +
+      'padding:14px 28px!important;' +
+      'font-size:15px!important;' +
+      'font-weight:600!important;' +
+      'z-index:2147483647!important;' +
+      'box-shadow:0 4px 20px rgba(66,133,244,0.5)!important;' +
+      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif!important;'
+    );
+    document.body.appendChild(toast);
+    setTimeout(function() {
+      if (toast && toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 2500);
   }
 })();
 </script>
