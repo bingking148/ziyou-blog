@@ -24,7 +24,7 @@ timeFormat: "2006-01-02 15:04:05"
 
 author: ZIYOU
 email: blog@example.com
-description: "当你写下一行代码，就会出现一个BUG"
+description: "写代码出BUG"
 subtitle:
   typing:
     enable: true
