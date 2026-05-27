@@ -40,7 +40,7 @@ subtitle:
     showCursor: true
     cursorChar: "|"
     smartBackspace: false
-  text: "解答世间万物"
+  text: "当你写下一行代码，就会出现一个BUG"
 
 banner: "images/banner.jpg"
 
