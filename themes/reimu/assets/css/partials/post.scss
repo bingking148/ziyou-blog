@@ -38,7 +38,7 @@
 
 .post-wrap:hover {
   box-shadow: var(--shadow-card-hover);
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
 .post-wrapper {
@@ -61,10 +61,10 @@
 
   @media #{$mq-normal} {
     &:hover {
-      transform: scale(1.01);
+      transform: scale(1.02);
 
       img {
-        transform: scale(1.05);
+        transform: scale(1.08);
       }
     }
   }

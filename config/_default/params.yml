@@ -427,13 +427,13 @@ firework:
 ########################################
 
 article_copyright:
-  enable: false
+  enable: true
   content:
     author: true
     link: true
-    title: false
-    date: false
-    updated: false
+    title: true
+    date: true
+    updated: true
     license: true
     license_type: by-nc-sa
 

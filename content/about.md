@@ -13,6 +13,45 @@ lastmod: 2025-04-13T00:00:00+08:00
 
 {{< heatMapCard >}}
 
+## 技术栈
+
+<div class="tech-stack">
+
+### 编程语言
+
+<span class="tech-badge" style="--tech-color: #3776ab;">Python</span>
+<span class="tech-badge" style="--tech-color: #f7df1e;">JavaScript</span>
+<span class="tech-badge" style="--tech-color: #3178c6;">TypeScript</span>
+<span class="tech-badge" style="--tech-color: #b07219;">Java</span>
+<span class="tech-badge" style="--tech-color: #00599c;">C++</span>
+
+### 前端
+
+<span class="tech-badge" style="--tech-color: #e34c26;">HTML</span>
+<span class="tech-badge" style="--tech-color: #1572b6;">CSS</span>
+<span class="tech-badge" style="--tech-color: #61daf7;">React</span>
+<span class="tech-badge" style="--tech-color: #42b883;">Vue</span>
+
+### 后端 & 数据库
+
+<span class="tech-badge" style="--tech-color: #6db33f;">Spring Boot</span>
+<span class="tech-badge" style="--tech-color: #4479a1;">MySQL</span>
+<span class="tech-badge" style="--tech-color: #dc382d;">Redis</span>
+
+### 工具 & 平台
+
+<span class="tech-badge" style="--tech-color: #f05032;">Git</span>
+<span class="tech-badge" style="--tech-color: #2496ed;">Docker</span>
+<span class="tech-badge" style="--tech-color: #000000;">Linux</span>
+
+</div>
+
+## 兴趣爱好
+
+- 写代码出 BUG
+- 折腾各种技术
+- 分享学习心得
+
 <div class="about-social">
   <div class="about-social-link about-social-qq">
     <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12.003 2c-2.265 0-6.29 1.364-6.29 7.325v1.195S3.55 14.96 3.55 17.474c0 .665.17 1.025.281 1.025.114 0 .902-.484 1.748-2.072 0 0-.18 2.197 1.904 3.967 0 0-1.77.495-1.77 1.182 0 .686 4.078.43 6.29.43 2.21 0 6.287.257 6.287-.43 0-.687-1.768-1.182-1.768-1.182 2.085-1.77 1.905-3.967 1.905-3.967.845 1.588 1.634 2.072 1.746 2.072.111 0 .283-.36.283-1.025 0-2.514-2.166-6.954-2.166-6.954V9.325C18.29 3.364 14.268 2 12.003 2z"/></svg>
@@ -90,5 +129,31 @@ lastmod: 2025-04-13T00:00:00+08:00
   margin: 8px 0 0;
   font-size: 13px;
   color: #888;
+}
+
+.tech-stack {
+  margin: 20px 0;
+}
+.tech-stack h3 {
+  font-size: 16px;
+  margin: 16px 0 8px;
+  color: var(--color-default);
+}
+.tech-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  margin: 4px 4px 4px 0;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--tech-color, var(--red-1));
+  transition: all 0.3s;
+  cursor: default;
+}
+.tech-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
 }
 </style>
