@@ -22,6 +22,7 @@
     {{- if .Site.Params.injector.body_begin -}}
       {{- .Site.Params.injector.body_begin | safeHTML -}}
     {{- end -}}
+    <div id="reading-progress-bar" aria-hidden="true"></div>
     {{- partialCached "loader.html" . -}}
     <canvas id="particle-canvas" aria-hidden="true"></canvas>
     <div id="container">

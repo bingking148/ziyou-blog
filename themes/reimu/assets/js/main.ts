@@ -130,6 +130,14 @@ window.throttle = (func: (...args: any[]) => void, limit: number) => {
     } else {
       _$("#header-nav")?.classList.add("header-nav-hidden");
     }
+
+    // Reading progress bar
+    const progressBar = _$("#reading-progress-bar");
+    if (progressBar) {
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      progressBar.style.width = progress + "%";
+    }
   });
 
   if (window.Pace) {
