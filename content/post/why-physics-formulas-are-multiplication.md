@@ -1,7 +1,7 @@
 ---
 title: '为什么伟大的物理公式，大多是乘法，很少是加法？'
-date: 2026-05-27T00:00:00+08:00
-lastmod: 2026-05-27T00:00:00+08:00
+date: 2026-05-27T14:22:18+08:00
+lastmod: 2026-05-27T14:22:18+08:00
 cover: /images/covers/physics-formula-cover.jpg
 math: true
 tags:

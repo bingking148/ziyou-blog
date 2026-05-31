@@ -1,7 +1,7 @@
 ---
 title: '裂项相消法：从分数拆分看透数列求和的本质'
-date: 2026-05-31T10:00:00+08:00
-lastmod: 2026-05-31T10:00:00+08:00
+date: 2026-05-31T10:48:33+08:00
+lastmod: 2026-05-31T10:48:33+08:00
 cover: /images/covers/fraction-splitting-cover.jpg
 math: true
 tags:
