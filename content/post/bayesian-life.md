@@ -4,6 +4,8 @@ date: 2026-06-02T15:34:27+08:00
 lastmod: 2026-06-02T15:34:27+08:00
 cover: /images/covers/bayesian-life-cover.jpg
 math: true
+tags: ['贝叶斯', '概率论', '哲学', '思考']
+categories: ['科学']
 ---
 
 "生命是什么？"
