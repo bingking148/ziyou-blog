@@ -37,11 +37,14 @@
         {{- if reflect.IsMap $pageSidebar -}}
           {{- $pageSidebar = $pageSidebar.position -}}
         {{- end -}}
+        {{- $hideSidebar := or (eq $pageSidebar false) (eq $pageSidebar "none") -}}
         <div id="content"
           aria-label="Page content"
           {{ if or (and (eq $globalSidebar "left") (eq $pageSidebar nil)) (eq $pageSidebar "left") }}class="sidebar-left"{{ end }}
           {{ if or (and (eq $globalSidebar "right") (eq $pageSidebar nil)) (eq $pageSidebar "right") }}class="sidebar-right"{{ end }}  >
-          {{- partial "sidebar.html" . -}}
+          {{- if not $hideSidebar -}}
+            {{- partial "sidebar.html" . -}}
+          {{- end -}}
           <section id="main" aria-label="Main content">{{ block "main" . }}{{ end }}</section>
         </div>
         {{- partialCached "footer.html" . -}}

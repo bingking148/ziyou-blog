@@ -94,9 +94,10 @@
 
     draw() {
       if (!ctx) return;
+      const color = getThemeColor();
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(var(--particle-color), ${config.particleOpacity})`;
+      ctx.fillStyle = `rgba(${color}, ${config.particleOpacity})`;
       ctx.fill();
     }
   }
@@ -119,7 +120,7 @@
         if (dist < config.connectionDistance) {
           const opacity = (1 - dist / config.connectionDistance) * config.lineOpacity;
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(var(--particle-color), ${opacity})`;
+          ctx.strokeStyle = `rgba(${getThemeColor()}, ${opacity})`;
           ctx.lineWidth = 0.8;
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
@@ -135,7 +136,7 @@
         if (dist < config.mouseDistance) {
           const opacity = (1 - dist / config.mouseDistance) * config.lineOpacity * 1.5;
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(var(--particle-color), ${opacity})`;
+          ctx.strokeStyle = `rgba(${getThemeColor()}, ${opacity})`;
           ctx.lineWidth = 1;
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(mouse.x, mouse.y);
@@ -153,9 +154,6 @@
   function animate() {
     if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
-
-    const color = getThemeColor();
-    canvas.style.setProperty("--particle-color", color);
 
     particles.forEach((p) => {
       p.update();

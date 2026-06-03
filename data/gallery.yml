@@ -1,0 +1,10 @@
+items:
+  - title: "公式的形状"
+    src: "images/covers/physics-formula-cover.jpg"
+    description: "把抽象的乘法关系放回直觉里，像一张可以慢慢看懂的学习速写。"
+  - title: "自然选择笔记"
+    src: "images/covers/natural-selection-cover.png"
+    description: "一次关于进化、适应和误解的记录，适合放在展柜里慢慢翻看。"
+  - title: "贝叶斯生活"
+    src: "images/covers/bayesian-life-cover.jpg"
+    description: "概率不是冰冷的公式，也可以是日常判断里一束柔和的光。"

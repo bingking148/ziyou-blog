@@ -125,10 +125,12 @@ window.throttle = (func: (...args: any[]) => void, limit: number) => {
     const diffY = scrollTop - oldScrollTop;
     window.diffY = diffY;
     oldScrollTop = scrollTop;
-    if (diffY < 0) {
-      _$("#header-nav")?.classList.remove("header-nav-hidden");
+    const headerNav = _$("#header-nav");
+    headerNav?.classList.toggle("header-nav-scrolled", scrollTop > 24);
+    if (scrollTop < 12 || diffY < 0) {
+      headerNav?.classList.remove("header-nav-hidden");
     } else {
-      _$("#header-nav")?.classList.add("header-nav-hidden");
+      headerNav?.classList.add("header-nav-hidden");
     }
 
     // Reading progress bar

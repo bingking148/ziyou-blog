@@ -53,24 +53,18 @@
   }
 
   hr {
-    margin: 12px 0;
-    opacity: 0.3;
-    height: 4px;
-    background-image: linear-gradient(
-      to right,
-      var(--red-0) 50%,
-      transparent 0%
-    );
-    background-size: 50px 4px;
-    background-repeat: repeat-x;
+    margin: 28px 0;
+    opacity: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-card-border), transparent);
     border: none;
-    filter: drop-shadow(0px 0px 2px var(--red-1));
+    filter: none;
     transition:
       opacity 0.3s,
       color 0.3s;
 
     &:hover {
-      opacity: 0.5;
+      opacity: 1;
     }
   }
 

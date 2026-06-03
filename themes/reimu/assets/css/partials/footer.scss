@@ -1,12 +1,14 @@
 #footer {
   background: linear-gradient(
     to top,
-    var(--color-footer-background) 30%,
+    var(--color-footer-background) 36%,
     transparent
   );
-  padding: 60px 0 24px;
+  padding: 56px 0 26px;
   color: var(--grey-9);
-  transition: 1s;
+  transition:
+    background 0.6s ease,
+    color 0.3s ease;
 
   &:hover {
     .footer-line {
@@ -31,15 +33,15 @@
 }
 
 .footer-line {
-  margin: 20px 0 40px;
-  opacity: 0.3;
+  margin: 14px auto 34px;
+  opacity: 0.34;
   width: 200%;
-  height: 10px;
-  background: linear-gradient(to left, var(--red-1) 50%, transparent 0%)
-    repeat-x 0 0 / 100px 10px;
+  height: 1px;
+  background: linear-gradient(to left, transparent, var(--red-1), var(--color-accent-warm), transparent)
+    repeat-x 0 0 / 260px 1px;
   transition: opacity 0.3s;
-  animation: transform-all 3s linear infinite;
-  filter: drop-shadow(0px 0px 2px var(--red-1));
+  animation: transform-all 9s linear infinite;
+  filter: none;
 }
 
 #footer-info {
@@ -96,17 +98,17 @@
 }
 
 .article-copyright {
-  background: var(--glass-background);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-left: 6px var(--red-4) solid;
-  border: 1px solid var(--glass-border);
-  border-left-width: 6px;
+  background: var(--color-surface-muted);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-left: 4px var(--red-2) solid;
+  border: 1px solid var(--color-card-border);
+  border-left-width: 4px;
   margin: 24px 0;
   border-radius: $post-radius;
   transition: 0.4s;
   padding: 10px 14px;
-  box-shadow: var(--shadow-meta);
+  box-shadow: none;
   position: relative;
   overflow: hidden;
   word-break: break-all;
@@ -138,7 +140,7 @@
 .article-copyright-bg {
   font-size: 120px;
   color: var(--red-3);
-  opacity: 0.2;
+  opacity: 0.14;
   position: absolute;
   right: -15px;
   bottom: -40px;

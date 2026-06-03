@@ -8,7 +8,7 @@
 
 .sponsor-title {
   font-size: 18px;
-  letter-spacing: 2px;
+  letter-spacing: 0;
   color: var(--color-link);
   opacity: 0.8;
   text-decoration: none;
@@ -65,12 +65,21 @@
   position: relative;
   width: fit-content;
   justify-content: center;
-  border: 10px var(--color-red-3-shadow) double;
-  transition: border 0.5s;
+  border: 1px solid var(--color-card-border);
+  border-radius: $tag-radius;
+  background: var(--color-surface-muted);
+  transition:
+    border 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
   cursor: var(--cursor-pointer) !important;
 
   &:hover {
     border-color: var(--color-h2-after);
+    background: var(--red-5);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
   }
 
   &:hover + .sponsor-tip {
@@ -88,7 +97,7 @@
   opacity: 0;
   font-size: 14px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0;
 
   &.active {
     opacity: 0.8;

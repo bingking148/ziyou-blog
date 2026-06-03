@@ -1,0 +1,87 @@
+<h2>画廊布局与动效方向</h2>
+<p class="subtitle">选择一个最接近你心目中「美术馆展厅」感觉的方向</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 24px; background: #f8f7f4; min-height: 280px;">
+      <div style="max-width: 480px; margin: 0 auto; font-family: Georgia, serif;">
+        <div style="text-align: center; margin-bottom: 24px; color: #999; font-size: 11px; letter-spacing: 4px; text-transform: uppercase;">Gallery</div>
+        <div style="text-align: center; font-size: 28px; color: #1a1a1a; margin-bottom: 8px; font-weight: 300; letter-spacing: 2px;">光影展柜</div>
+        <div style="text-align: center; color: #888; font-size: 13px; margin-bottom: 32px;">收藏图像片段，也收藏它们背后的文字</div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <div style="aspect-ratio: 3/4; background: linear-gradient(135deg, #e8e4df, #d4cfc8); border: 1px solid #e0dcd6; display: flex; align-items: flex-end; padding: 8px;">
+            <div style="font-size: 10px; color: #666; font-family: sans-serif;">No.01</div>
+          </div>
+          <div style="aspect-ratio: 3/4; background: linear-gradient(135deg, #d4c8b8, #c4b8a8); border: 1px solid #e0dcd6; display: flex; align-items: flex-end; padding: 8px;">
+            <div style="font-size: 10px; color: #666; font-family: sans-serif;">No.02</div>
+          </div>
+          <div style="aspect-ratio: 3/4; background: linear-gradient(135deg, #c8c4bc, #b8b4ac); border: 1px solid #e0dcd6; display: flex; align-items: flex-end; padding: 8px;">
+            <div style="font-size: 10px; color: #666; font-family: sans-serif;">No.03</div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 16px; font-size: 11px; color: #aaa; font-style: italic;">← 悬停时缓慢放大，视差位移 →</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 经典美术馆</h3>
+      <p>等间距网格、温暖纸质感底色、编号标签。动效极简克制——悬停缓慢放大、淡入淡出、微视差。像在安静的展厅里一幅幅走过。与博客的 glassmorphism 风格通过共享阴影和圆角衔接。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 24px; background: #fafafa; min-height: 280px;">
+      <div style="max-width: 480px; margin: 0 auto; font-family: -apple-system, sans-serif;">
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="color: #e74c3c; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Gallery</div>
+            <div style="font-size: 24px; color: #333; font-weight: 700;">光影展柜</div>
+          </div>
+          <div style="padding: 4px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 999px; font-size: 11px; color: #666;">3 件</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
+          <div style="aspect-ratio: 4/5; background: linear-gradient(145deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2)); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 12px;">作品大图</div>
+          <div style="display: grid; gap: 12px;">
+            <div style="aspect-ratio: 1; background: linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0.15)); border: 1px solid rgba(255,255,255,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 11px;">作品</div>
+            <div style="aspect-ratio: 1; background: linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0.15)); border: 1px solid rgba(255,255,255,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 11px;">作品</div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 12px; font-size: 11px; color: #aaa;">悬停光泽跟随 · 卡片浮起 · 毛玻璃叠层</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 玻璃展厅（当前风格进化）</h3>
+      <p>保留博客现有的 glassmorphism 语言——毛玻璃卡片、光泽跟随鼠标、弹性曲线。但在排版上更克制：更大留白、更精炼的标题层级。动效增强：交错入场、弹性缩放、Reveal 遮罩动画。与博客零割裂。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 24px; background: #0a0a0a; min-height: 280px;">
+      <div style="max-width: 480px; margin: 0 auto; font-family: Georgia, serif;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="color: #555; font-size: 10px; letter-spacing: 6px; text-transform: uppercase;">Digital Collection</div>
+          <div style="color: #e0e0e0; font-size: 26px; font-weight: 300; letter-spacing: 4px; margin-top: 8px;">光 影 展 柜</div>
+        </div>
+        
+        <div style="display: flex; gap: 20px; align-items: center; justify-content: center;">
+          <div style="width: 45%; aspect-ratio: 3/4; background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid rgba(255,255,255,0.08); position: relative; display: flex; align-items: center; justify-content: center;">
+            <div style="color: rgba(255,255,255,0.3); font-size: 11px; font-style: italic;">聚焦灯光</div>
+            <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 60%; height: 60px; background: radial-gradient(ellipse, rgba(255,255,255,0.08), transparent);"></div>
+          </div>
+          <div style="width: 35%;">
+            <div style="color: rgba(255,255,255,0.5); font-size: 10px; letter-spacing: 2px; margin-bottom: 8px;">NO. 001</div>
+            <div style="color: #ccc; font-size: 16px; margin-bottom: 6px;">公式的形状</div>
+            <div style="color: #666; font-size: 11px; line-height: 1.6;">把抽象的乘法关系放回直觉里</div>
+            <div style="margin-top: 16px; width: 30px; height: 1px; background: rgba(255,255,255,0.15);"></div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 16px; font-size: 11px; color: #444;">聚光灯效果 · 滚动视差 · 暗室氛围</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · 暗室展厅</h3>
+      <p>深色背景、聚光灯聚焦每件作品、大片暗区留白。像走进一个灯光精心设计的当代艺术展。动效大胆：滚动视差、聚焦灯光跟随、图片 reveal 遮罩揭幕。视觉冲击力最强，但与博客的亮色基调反差较大。</p>
+    </div>
+  </div>
+</div>

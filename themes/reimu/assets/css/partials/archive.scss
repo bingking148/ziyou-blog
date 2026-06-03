@@ -1,11 +1,19 @@
 .archives-outer-wrap {
-  background: var(--glass-background);
-  backdrop-filter: blur(10px) saturate(1.1);
-  -webkit-backdrop-filter: blur(10px) saturate(1.1);
-  border: 1px solid var(--glass-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.62)),
+    var(--color-surface);
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  border: 1px solid var(--color-card-border);
   border-radius: $post-radius;
   padding: 16px 0;
   box-shadow: var(--shadow-card);
+}
+
+[data-theme="dark"] .archives-outer-wrap {
+  background:
+    linear-gradient(180deg, rgba(46, 52, 65, 0.78), rgba(34, 39, 50, 0.62)),
+    var(--color-surface);
 }
 
 .archives-wrap {
@@ -37,12 +45,12 @@
     content: "";
     position: absolute;
     background: var(--color-h2-after);
-    width: 1em;
-    height: 7px;
+    width: 44px;
+    height: 2px;
     bottom: -18px;
     left: 0;
-    border-radius: $tag-radius;
-    box-shadow: var(--shadow-red-6-shadow);
+    border-radius: 999px;
+    box-shadow: none;
     transition: 0.3s;
   }
 }
@@ -52,6 +60,7 @@
   color: var(--color-archive-year);
   font-weight: bold;
   font-size: 24px;
+  letter-spacing: 0;
 }
 
 .archive-article {
@@ -64,10 +73,10 @@
     display: inline-block;
     vertical-align: middle;
     width: 6px;
-    height: 15px;
+    height: 14px;
     background: var(--color-h2-after);
     margin: 1px 12px 0 -24px;
-    box-shadow: var(--shadow-red-6-shadow);
+    box-shadow: none;
     opacity: 0.5;
     transition: 0.2s;
     flex-shrink: 0;
@@ -104,7 +113,7 @@
   display: inline-block;
   text-decoration: none;
   font-weight: bold;
-  color: var(--red-0);
+  color: var(--color-text-strong);
   transition: 0.3s;
   opacity: 0.7;
   margin-left: 16px;
@@ -131,18 +140,22 @@
   @if $uppercase_capsule {
     text-transform: uppercase;
   }
-  background: var(--glass-background);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: 1px solid var(--glass-border);
+  background: var(--color-surface-muted);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--color-card-border);
   border-radius: $tag-radius;
   padding: 8px 16px;
   margin: 6px;
-  box-shadow: var(--shadow-meta);
-  transition: 0.3s;
+  box-shadow: none;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 
   &:hover {
-    box-shadow: var(--shadow-meta-hover);
+    background: var(--red-5);
+    box-shadow: var(--shadow-soft);
     transform: translateY(-2px);
   }
 }
@@ -158,7 +171,7 @@
 }
 
 .archives-category-list-item {
-  background: var(--red-5-5);
+  background: var(--color-surface-muted);
   padding: 10px 20px;
 }
 

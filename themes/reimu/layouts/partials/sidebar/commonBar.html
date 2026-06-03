@@ -62,11 +62,13 @@
 {{- if or $showMenu $mobile -}}
 <div class="sidebar-menu">
   {{- range $params.menu -}}
+    {{- $menuName := i18n .name -}}
+    {{- $menuName = $menuName | default .name -}}
     <div class="sidebar-menu-link-wrap">
       <a
         class="sidebar-menu-link-dummy"
         href="{{ .url | relLangURL }}"
-        aria-label="{{ i18n .name }}"
+        aria-label="{{ $menuName }}"
       ></a>
       {{- if ne .icon false -}}
         <div class='sidebar-menu-icon icon {{ if or (and (eq .icon "e62b") ($params.icon_font)) (and (eq .icon "f6ad") (not $params.icon_font)) (not .icon) }}rotate{{ end }}'>
@@ -85,7 +87,7 @@
           {{- end -}}
         </div>
       {{- end -}}
-      <div class="sidebar-menu-link">{{ i18n .name }}</div>
+      <div class="sidebar-menu-link">{{ $menuName }}</div>
     </div>
   {{- end -}}
 </div>
