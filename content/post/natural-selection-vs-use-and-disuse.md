@@ -2,7 +2,7 @@
 title: '自然选择，还是用进废退？——水稻冷适应研究如何动摇百年进化论共识'
 date: 2026-06-03T00:15:42+08:00
 lastmod: 2026-06-03T00:15:42+08:00
-cover: /images/covers/natural-selection-cover.png
+cover: /images/covers/natural-selection-cover-new.jpg
 math: true
 tags: ['进化论', '表观遗传学', 'DNA甲基化', '水稻', '拉马克']
 categories: ['科学']

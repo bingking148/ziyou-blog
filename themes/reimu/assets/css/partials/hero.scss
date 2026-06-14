@@ -21,7 +21,7 @@
   height: 100vh;
   z-index: 0;
   background-image: url("../images/hero-bg.png");
-  background-position: center 30%; // 略偏上，优先展示人物
+  background-position: right center; // 锚定右侧人物，保证竖屏不被裁掉
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -201,6 +201,9 @@
 
   #immersive-bg {
     background-attachment: scroll; // iOS 兼容
+    // 人物位于原图右侧 60%~100%，竖屏 cover 裁切后 right center 会把人物挤出右边。
+    // 用 78% 把人物中心拉回屏幕中央，可按实际效果在 70%~85% 间微调。
+    background-position: 78% center;
   }
 
   #hero-scroll-hint {
