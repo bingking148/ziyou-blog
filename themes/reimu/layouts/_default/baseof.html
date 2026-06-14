@@ -18,12 +18,13 @@
       {{- .Site.Params.injector.head_end | safeHTML -}}
     {{- end -}}
   </head>
-  <body>
+  <body{{ if .IsHome }} class="home"{{ end }}>
     {{- if .Site.Params.injector.body_begin -}}
       {{- .Site.Params.injector.body_begin | safeHTML -}}
     {{- end -}}
     <div id="reading-progress-bar" aria-hidden="true"></div>
     {{- partialCached "loader.html" . -}}
+    {{- if .IsHome -}}<div id="immersive-bg" aria-hidden="true"></div>{{- end -}}
     <canvas id="gravity-canvas" aria-hidden="true"></canvas>
     <div id="container">
       <div id="wrap">

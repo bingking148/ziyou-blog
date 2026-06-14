@@ -106,7 +106,7 @@
     </a>
   {{- end -}}
 </div>
-<header id="header" aria-label="Site header">
+<header id="header" class="{{ if .IsHome }}hero-home{{ end }}" aria-label="Site header">
   {{- $headerImage := .Params.banner | default .Params.cover -}}
   {{- if and $headerImage (strings.HasPrefix $headerImage "rgb") -}}
     <picture></picture>
@@ -237,4 +237,9 @@
       {{- end -}}
     </div>
   </div>
+  {{- if .IsHome -}}
+    <button id="hero-scroll-hint" type="button" aria-label="{{ i18n "scroll_down" | default "向下滚动" }}">
+      <span class="hero-scroll-mouse"><span class="hero-scroll-wheel"></span></span>
+    </button>
+  {{- end -}}
 </header>

@@ -34,6 +34,10 @@ subtitle:
     strings:
       - "当你写下一行代码"
       - "就会出现一个BUG"
+      - "BUG 是程序员的浪漫"
+      - "不是在写BUG，就是在找BUG的路上"
+      - "能跑的代码，别动"
+      - "今天又是和BUG斗智斗勇的一天"
     typeSpeed: 100
     backSpeed: 50
     backDelay: 2000
@@ -45,17 +49,10 @@ subtitle:
     smartBackspace: false
   text: "当你写下一行代码，就会出现一个BUG"
 
-banner: "images/banner.jpg"
+banner: "images/hero-bg.png"
 
 banner_srcset:
-  enable: true
-  srcset:
-    - src: "images/banner-600w.webp"
-      media: "(max-width: 479px)"
-    - src: "images/banner-800w.webp"
-      media: "(max-width: 799px)"
-    - src: "images/banner.webp"
-      media: "(min-width: 800px)"
+  enable: false
 
 avatar: "88798328f4e66fedf4a2518539c9b35d.jpg"
 

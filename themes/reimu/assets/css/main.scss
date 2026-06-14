@@ -200,6 +200,12 @@ body {
   }
 }
 
+// 首页：让出背景给 #immersive-bg 沉浸图
+body.home {
+  background: transparent;
+  background-image: none;
+}
+
 a, .main-nav-icon, .popup-btn-close, button {
   cursor: var(--cursor-pointer) !important;
 }
@@ -240,7 +246,7 @@ a, .main-nav-icon, .popup-btn-close, button {
 
 #wrap {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   top: 0;
   left: 0;
   height: 100%;
@@ -301,7 +307,7 @@ a, .main-nav-icon, .popup-btn-close, button {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   opacity: 0.7;
 }
@@ -342,6 +348,7 @@ a, .main-nav-icon, .popup-btn-close, button {
 }
 
 @import "partials/header";
+@import "partials/hero";
 @import "partials/footer";
 @import "partials/archive";
 @import "partials/post";

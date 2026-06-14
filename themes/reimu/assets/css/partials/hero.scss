@@ -1,0 +1,212 @@
+// =============================================================================
+// 沉浸式固定背景 + 首页英雄区（v2 毛玻璃方案）
+//
+// 行为：
+//  1. #immersive-bg：一张固定的全屏背景图，整站常驻，永不移动 / 永不裁切。
+//  2. 滚动时背景图自身被 CSS filter 渐变模糊（--hero-blur: 0→18px），
+//     再叠一层半透明遮罩（--hero-overlay-alpha），保证浮在上面的正文可读。
+//     —— 这就是用户要的「下滑到文章后，背景变毛玻璃」。
+//  3. 首页 #header.hero-home：首屏 100vh 展示完整背景图 + 标题/副标题/下箭头按钮。
+//     滚动时英雄区文字随进度淡出，但背景图本身始终留在原位。
+//
+// --hero-progress (0..1) 由 hero.ts 滚动驱动写入 <html>。
+// =============================================================================
+
+// ---- 1. 全局固定沉浸背景 --------------------------------------------------
+#immersive-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  background-image: url("../images/hero-bg.png");
+  background-position: center 30%; // 略偏上，优先展示人物
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  // 滚动时整体模糊，强度由 --hero-blur 控制（默认 0 = 完全清晰）
+  filter: blur(var(--hero-blur, 0px)) saturate(1.08);
+  // 模糊时图边缘会透明，放大一点点补上
+  transform: scale(calc(1 + var(--hero-blur, 0px) * 0.012));
+  transform-origin: center center;
+  will-change: filter, transform;
+}
+
+// 内容可读遮罩：随滚动由“无”渐变为“半透明纯色”，让正文区可读
+#immersive-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-background);
+  opacity: var(--hero-overlay-alpha, 0);
+  pointer-events: none;
+  transition: opacity 0.2s linear;
+}
+
+// 英雄区底部细微的氛围渐变（提升标题对比度），只在首屏可见
+#immersive-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 70% at 50% 40%, rgba(10, 18, 32, 0.32), transparent 70%);
+  opacity: calc(1 - var(--hero-progress, 0));
+  pointer-events: none;
+  transition: opacity 0.2s linear;
+}
+
+[data-theme="dark"] #immersive-bg::before {
+  background: radial-gradient(120% 70% at 50% 40%, rgba(6, 10, 18, 0.4), transparent 70%);
+}
+
+// 深色模式内容遮罩更透（底色本身已较深），同时压暗一点提升对比度
+[data-theme="dark"] #immersive-bg::after {
+  background: var(--color-background);
+  opacity: calc(var(--hero-overlay-alpha, 0) * 0.92);
+}
+
+// 内容容器：浮在背景之上
+#wrap {
+  position: relative;
+}
+
+#content,
+.sidebar-left > *,
+.sidebar-right > *,
+#main {
+  position: relative;
+  z-index: 1;
+}
+
+// 入场
+@keyframes immersive-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#immersive-bg {
+  animation: immersive-fade-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #immersive-bg {
+    animation: none;
+    filter: none;
+    transform: none;
+    background-attachment: scroll;
+  }
+}
+
+// ---- 2. 首页英雄区 --------------------------------------------------------
+#header.hero-home {
+  height: 100vh;
+  min-height: 560px;
+  // 英雄区自身不画图，透出全局固定背景
+  background: transparent;
+
+  &::before {
+    // 首页头部氛围遮罩由上面 #immersive-bg::before 负责，这里清空主题默认渐变
+    background: none;
+  }
+
+  // 隐藏主题默认 banner <img>（背景已由 #immersive-bg 提供）
+  img {
+    opacity: 0 !important;
+    visibility: hidden;
+  }
+}
+
+// 标题区：首屏居中显示，随滚动平滑淡出 + 轻微上移
+#header.hero-home #header-title {
+  top: 46%;
+  opacity: var(--hero-title-opacity, 1);
+  filter: blur(calc(8px * var(--hero-progress, 0)));
+  transform: translate(-50%, calc(-50% - 24px * var(--hero-progress, 0)));
+  transition: opacity 0.25s ease;
+}
+
+// ---- 3. 滚动提示按钮（seven-blog 风格下箭头） -----------------------------
+#hero-scroll-hint {
+  position: absolute;
+  // 用 margin 负值居中，避免 translate 与 transform 叠加导致 hover 偏移
+  left: 50%;
+  margin-left: -23px; // width / 2
+  bottom: 9vh;
+  z-index: 4;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  cursor: var(--cursor-pointer);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: var(--hero-title-opacity, 1);
+  pointer-events: auto;
+  transform-origin: center center;
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+
+  // 下箭头：用伪元素画一个 V 形，flex 居中，动画只做 translateY
+  &::after {
+    content: "";
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+    transform-origin: center center;
+    animation: hero-arrow-bounce 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.32);
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// 箭头弹跳：只在 Y 轴上下浮动，不产生 X 方向位移
+@keyframes hero-arrow-bounce {
+  0%,
+  100% {
+    transform: rotate(45deg) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(45deg) translateY(5px);
+    opacity: 0.55;
+  }
+}
+
+// ---- 4. 移动端 ------------------------------------------------------------
+@media #{$mg-normal} {
+  #header.hero-home {
+    height: 100svh;
+    min-height: 480px;
+  }
+
+  #immersive-bg {
+    background-attachment: scroll; // iOS 兼容
+  }
+
+  #hero-scroll-hint {
+    bottom: 7vh;
+    width: 42px;
+    height: 42px;
+    margin-left: -21px; // width / 2，保持居中
+  }
+}

@@ -13,6 +13,12 @@
 {{- partial "helpers/ts.html" (dict "source" "js/main.ts" "ctx" .) -}}
 {{- partial "helpers/ts.html" (dict "source" "js/gravity-field.ts" "ctx" .) -}}
 {{- partial "helpers/ts.html" (dict "source" "js/click-effect.ts" "ctx" .) -}}
+{{- if .IsHome -}}
+  {{- partial "helpers/ts.html" (dict "source" "js/hero.ts" "ctx" .) -}}
+{{- end -}}
+{{- if .IsPage -}}
+  {{- partial "helpers/ts.html" (dict "source" "js/reading-progress.ts" "ctx" .) -}}
+{{- end -}}
 
 {{- if $params.animation.enable -}}
   {{- partial "helpers/ts.html" (dict "source" "js/aos.ts" "ctx" .) -}}
