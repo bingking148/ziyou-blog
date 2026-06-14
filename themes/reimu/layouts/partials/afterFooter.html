@@ -3,8 +3,8 @@
 {{- $js := .Site.Data.vendor.js -}}
 {{- $css := .Site.Data.vendor.css -}}
 
-{{- partial "helpers/cdnJs.html" (dict "name" "lazysizes" "ctx" .) }}
-{{- partial "helpers/cdnJs.html" (dict "name" "clipboard" "ctx" .) }}
+{{- partial "helpers/cdnJs.html" (dict "name" "lazysizes" "ctx" . "defer" true) }}
+{{- partial "helpers/cdnJs.html" (dict "name" "clipboard" "ctx" . "defer" true) }}
 
 {{- if $params.material_theme.enable -}}
   {{- partial "helpers/cdnJs.html" (dict "name" "material_theme" "ctx" .) -}}
@@ -97,7 +97,7 @@
 {{- end -}}
 
 {{- if $params.quicklink.enable -}}
-  {{- partial "helpers/cdnJs.html" (dict "name" "quicklink" "ctx" .) -}}
+  {{- partial "helpers/cdnJs.html" (dict "name" "quicklink" "ctx" . "defer" true) -}}
   <script data-pjax>
     window.quicklink?.listen({
       timeout: {{ $params.quicklink.timeout }},

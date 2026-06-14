@@ -143,9 +143,9 @@
 {{- if and .Site.Params.gitalk.enable .Site.Params.gitalk.clientID .Site.Params.gitalk.clientSecret -}}
   {{- partial "helpers/cdnCss.html" (dict "name" "gitalk" "ctx" .) -}}
 {{- end -}}
-<!-- pace -->
+<!-- pace：必须 async，否则 npm.webcache.cn 不通时会同步阻塞 HTML 解析，导致 DOMContentLoaded 不触发 → 白屏转圈 -->
 {{- if .Site.Params.pace.enable -}}
-  {{- partial "helpers/cdnJs.html" (dict "name" "pace" "ctx" .) -}}
+  {{- partial "helpers/cdnJs.html" (dict "name" "pace" "ctx" . "async" true) -}}
 {{- end -}}
 <!-- aos -->
 {{- if .Site.Params.animation.enable -}}
