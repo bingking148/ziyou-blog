@@ -1,40 +1,50 @@
 /**
- * 顶部阅读进度条
+ * 右侧竖向阅读进度条
  *
- * DOM（#reading-progress-bar）和样式已在 baseof.html / main.scss 中就绪，
- * 此脚本仅负责按文章正文滚动位置更新 width。
+ * 取代旧的顶部横条。仅文章页启用。
+ *
+ * 结构（由 JS 创建并插入 body 末尾）：
+ *   <div id="reading-progress">
+ *     <div class="rp-track"><div class="rp-fill"></div></div>
+ *   </div>
  *
  * 行为：
- *  - 仅在存在文章正文（article）时启用，其它页面（首页/归档/画廊）不显示
- *  - 进度 = 已滚过的正文高度 / 正文可滚高度
- *  - 滚动事件用 rAF 节流，避免抖动
+ *  - 进度 = 整页滚动进度（已滚 / 可滚高度）
+ *  - .rp-fill 用 transform: scaleY() 缩放，比改 height 更平滑（不触发布局）
+ *  - rAF 节流
  */
 (function () {
-  const bar = document.getElementById("reading-progress-bar");
-  if (!bar) return;
+  const root = document.createElement("div");
+  root.id = "reading-progress";
+  root.setAttribute("aria-hidden", "true");
+  root.innerHTML =
+    '<div class="rp-track"><span class="rp-thumb"></span></div>';
+  document.body.appendChild(root);
+
+  const fill = document.createElement("div");
+  fill.className = "rp-fill";
+  root.querySelector(".rp-track")!.appendChild(fill);
+
+  const thumb = root.querySelector(".rp-thumb") as HTMLElement | null;
 
   let ticking = false;
 
   function update() {
     ticking = false;
-    const article = document.querySelector(".article-entry") as HTMLElement | null;
-    if (!article) {
-      // 非文章页：隐藏
-      bar.style.opacity = "0";
-      bar.style.width = "0%";
-      return;
-    }
-
-    bar.style.opacity = "1";
-
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const docHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
     if (docHeight <= 0) {
-      bar.style.width = "0%";
+      root.style.opacity = "0";
       return;
     }
+    root.style.opacity = "1";
     const progress = Math.min(Math.max(scrollTop / docHeight, 0), 1);
-    bar.style.width = progress * 100 + "%";
+    // 用 transform 缩放，避免布局抖动
+    fill.style.transform = `scaleY(${progress})`;
+    if (thumb) {
+      thumb.style.top = `${progress * 100}%`;
+    }
   }
 
   function onScroll() {
@@ -47,7 +57,6 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll, { passive: true });
 
-  // 初始化
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", update);
   } else {

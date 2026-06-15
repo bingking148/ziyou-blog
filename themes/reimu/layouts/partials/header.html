@@ -235,9 +235,44 @@
           {{- end -}}
         </h2>
       {{- end -}}
+
+      {{- /* ===== 首页英雄区扩展：头像 / CTA / 社交图标 ===== */ -}}
+      {{- if .IsHome -}}
+        {{- with .Site.Params.avatar -}}
+          <div class="hero-avatar-wrap" data-aos="zoom-in">
+            <img class="hero-avatar" src="{{ . | relURL }}" alt="{{ $.Site.Params.author }}">
+          </div>
+        {{- end -}}
+
+        <div class="hero-cta" data-aos="fade-up">
+          <button id="hero-cta-read" type="button">{{ i18n "hero_start_reading" | default "开始阅读" }}</button>
+          <a class="hero-cta-about" href="{{ "about" | relLangURL }}">{{ i18n "hero_about" | default "关于我" }}</a>
+        </div>
+
+        {{- $heroSocial := .Site.Params.hero.social -}}
+        {{- if $heroSocial -}}
+          <div class="hero-social">
+            {{- range $name, $url := $heroSocial -}}
+              <div class="icon-{{ $name }} sidebar-social-icon hero-social-icon">
+                <a href="{{ $url }}" target="_blank" aria-label="{{ $name }}" rel="noopener nofollow noreferrer"></a>
+              </div>
+            {{- end -}}
+          </div>
+        {{- end -}}
+      {{- end -}}
     </div>
   </div>
+
   {{- if .IsHome -}}
+    {{- /* 最新一篇：悬浮在底部下箭头正上方，居中 */ -}}
+    {{- with first 1 (where $.Site.RegularPages "Section" "in" $.Site.Params.mainSections) -}}
+      {{- $latest := index . 0 -}}
+      <a class="hero-latest" href="{{ $latest.RelPermalink }}" aria-label="{{ i18n "hero_latest" | default "最新一篇" }}: {{ $latest.Title }}">
+        <span class="hero-latest-label">{{ i18n "hero_latest" | default "最新一篇" }}</span>
+        <span class="hero-latest-title">{{ $latest.Title }}</span>
+        <time class="hero-latest-date">{{ $latest.Date.Format ($.Site.Params.dateFormat | default "2006-01-02") }}</time>
+      </a>
+    {{- end -}}
     <button id="hero-scroll-hint" type="button" aria-label="{{ i18n "scroll_down" | default "向下滚动" }}">
       <span class="hero-scroll-mouse"><span class="hero-scroll-wheel"></span></span>
     </button>

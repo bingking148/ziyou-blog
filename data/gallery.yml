@@ -1,10 +1,31 @@
 items:
   - title: "公式的形状"
     src: "images/covers/physics-formula-cover.jpg"
+    width: 1600
+    height: 900
     description: "把抽象的乘法关系放回直觉里，像一张可以慢慢看懂的学习速写。"
   - title: "自然选择笔记"
     src: "images/covers/natural-selection-cover.png"
+    width: 4975
+    height: 3317
     description: "一次关于进化、适应和误解的记录，适合放在展柜里慢慢翻看。"
   - title: "贝叶斯生活"
     src: "images/covers/bayesian-life-cover.jpg"
+    width: 3574
+    height: 1858
     description: "概率不是冰冷的公式，也可以是日常判断里一束柔和的光。"
+  - title: "分数的拆解"
+    src: "images/covers/fraction-splitting-cover.jpg"
+    width: 2560
+    height: 1440
+    description: "把一个整体切成看得见的几份，体会「部分与整体」的几何直觉。"
+  - title: "自然之选"
+    src: "images/covers/natural-selection-cover-new.jpg"
+    width: 3499
+    height: 1968
+    description: "重新审视选择与适应——用更克制的配色，留白给思考本身。"
+  - title: "封面习作"
+    src: "images/covers/cover1.jpg"
+    width: 3687
+    height: 2304
+    description: "早期的一张封面草图，留存它最初被画下时的温度。"

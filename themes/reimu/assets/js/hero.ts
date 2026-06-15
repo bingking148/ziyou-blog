@@ -70,6 +70,16 @@
     });
   }
 
+  // 「开始阅读」CTA：复用同样的滚动目标
+  const ctaRead = document.getElementById("hero-cta-read");
+  if (ctaRead) {
+    ctaRead.addEventListener("click", () => {
+      const target =
+        header.getBoundingClientRect().bottom + window.scrollY - 1;
+      window.scrollTo({ top: target, behavior: "smooth" });
+    });
+  }
+
   // 初始化
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", update);

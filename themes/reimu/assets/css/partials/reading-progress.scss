@@ -1,0 +1,86 @@
+// =============================================================================
+// 右侧竖向阅读进度条
+//
+// 仅文章页可见（由 reading-progress.ts 仅在 .IsPage 时加载）。
+// 结构：#reading-progress > .rp-track > .rp-fill（进度填充，transform: scaleY）
+//                                   > .rp-thumb（圆头指示器）
+// =============================================================================
+
+#reading-progress {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 90;
+  width: 4px;
+  height: 45vh;
+  max-height: 360px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none; // 不挡正文交互
+}
+
+// 轨道：凹槽
+.rp-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-card-border);
+  overflow: visible;
+}
+
+// 进度填充：从顶部向下生长，用 transform 缩放（平滑、不触发布局）
+.rp-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    var(--red-1),
+    var(--color-accent-warm)
+  );
+  transform: scaleY(0);
+  transform-origin: top center;
+  box-shadow: 0 0 8px rgba(66, 133, 244, 0.35);
+  transition: transform 0.1s linear;
+}
+
+// 圆头指示器：跟随进度顶部
+.rp-thumb {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--red-1);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px rgba(66, 133, 244, 0.5);
+  transition: top 0.1s linear;
+}
+
+// 移动端：竖条更靠边、更短，避免遮挡正文
+@media #{$mg-normal} {
+  #reading-progress {
+    right: 8px;
+    height: 38vh;
+    max-height: 280px;
+  }
+
+  .rp-thumb {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+// 深色模式：轨道更深，填充保持品牌色
+[data-theme="dark"] {
+  .rp-track {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}

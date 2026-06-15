@@ -22,7 +22,6 @@
     {{- if .Site.Params.injector.body_begin -}}
       {{- .Site.Params.injector.body_begin | safeHTML -}}
     {{- end -}}
-    <div id="reading-progress-bar" aria-hidden="true"></div>
     {{- partialCached "loader.html" . -}}
     {{- if .IsHome -}}<div id="immersive-bg" aria-hidden="true"></div>{{- end -}}
     <canvas id="gravity-canvas" aria-hidden="true"></canvas>

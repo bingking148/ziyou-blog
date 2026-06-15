@@ -27,17 +27,17 @@ timeFormat: "2006-01-02 15:04:05"
 
 author: ZIYOU
 email: blog@example.com
-description: "写代码出BUG"
+description: "在键盘上写下又一行注释"
 subtitle:
   typing:
     enable: true
     strings:
-      - "当你写下一行代码"
-      - "就会出现一个BUG"
-      - "BUG 是程序员的浪漫"
-      - "不是在写BUG，就是在找BUG的路上"
-      - "能跑的代码，别动"
-      - "今天又是和BUG斗智斗勇的一天"
+      - "在键盘上写下又一行注释"
+      - "今天也靠咖啡续命"
+      - "代码能跑，先别碰"
+      - "写过的最好的代码，是没写的那段"
+      - "先把需求理清，再谈架构"
+      - "下班前的最后一次 commit"
     typeSpeed: 100
     backSpeed: 50
     backDelay: 2000
@@ -47,7 +47,7 @@ subtitle:
     showCursor: true
     cursorChar: "|"
     smartBackspace: false
-  text: "当你写下一行代码，就会出现一个BUG"
+  text: "在键盘上写下又一行注释"
 
 banner: "images/hero-bg.png"
 
@@ -90,6 +90,11 @@ social:
   # zhihu: https://zhihu.com/people/yourname
   # email: your-email@example.com
   # rss: /index.xml
+
+# 首页英雄区专用社交图标（与侧边栏 social 独立，留空则不显示）
+hero:
+  social:
+    github: https://github.com/bingking148
 
 widgets:
   - category
@@ -255,6 +260,8 @@ comment:
     ja: コメントを残す
     pt-BR: Deixe um comentário
   default: waline
+# 注：下方的 waline 为当前启用的评论系统（匿名评论 + 文章反应表情投票）
+# giscus 配置保留但已禁用，如需切回把 giscus.enable 改 true、waline.enable 改 false 即可
 
 valine:
   enable: false
@@ -270,9 +277,12 @@ valine:
   serverURLs:
 
 waline:
-  enable: false
-  serverURL:
+  enable: true
+  # Waline 后端地址（绑自定义域名 comment.ziyou814.top + Cloudflare 加速，国内直连可达）
+  serverURL: https://comment.ziyou814.top
   locale: {}
+  # 文章反应：开箱即用的心情表情投票，每个表情独立计数、每人每表情一票、再点取消
+  reaction: true
   emoji:
     - https://unpkg.com/@waline/emojis@1.2.0/weibo
     - https://unpkg.com/@waline/emojis@1.2.0/alus
@@ -284,9 +294,9 @@ waline:
     - nick
     - mail
     - link
+  # 匿名评论：只需填昵称，邮箱/链接改为选填
   requiredMeta:
     - nick
-    - mail
   wordLimit: 0
   pageSize: 10
   pageview: true
@@ -306,7 +316,7 @@ gitalk:
   md5: false
 
 giscus:
-  enable: true
+  enable: false
   repo: bingking148/ziyou-blog
   repoId: R_kgDOSBFn0g
   category: Announcements

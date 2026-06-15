@@ -13,7 +13,7 @@
     <div class="gallery-hero-preview" aria-hidden="true">
       {{- range first 3 $items -}}
         <span class="gallery-preview-frame">
-          <img src="{{ .src | relURL }}" alt="">
+          <img data-src="{{ .src | relURL }}" data-sizes="auto" alt="" class="lazyload" />
         </span>
       {{- end -}}
     </div>
@@ -34,41 +34,47 @@
           {{- $title := $item.title | default "未命名作品" -}}
           {{- $description := $item.description | default "这张图片还没有简介。" -}}
           {{- $src := $item.src | relURL -}}
-          <button
+          {{- $width := $item.width | default 1600 -}}
+          {{- $height := $item.height | default 1000 -}}
+          {{- $delay := mul (mod $index 6) 60 -}}
+          <figure
             class="gallery-frame"
-            type="button"
-            data-gallery-item
-            data-gallery-title="{{ $title }}"
-            data-gallery-src="{{ $src }}"
-            data-gallery-description="{{ $description }}"
+            data-aos="fade-up"
+            data-aos-delay="{{ $delay }}"
             style="--gallery-delay: {{ mul $index 55 }}ms;"
           >
-            <img src="{{ $src }}" alt="{{ $title }}" loading="lazy">
-            <span class="gallery-frame-shine"></span>
-            <span class="gallery-frame-caption">
-              <strong>{{ $title }}</strong>
-              <span>查看详情</span>
-            </span>
-          </button>
+            <a
+              class="gallery-pswp"
+              href="{{ $src }}"
+              data-pswp-width="{{ $width }}"
+              data-pswp-height="{{ $height }}"
+              data-pswp-src="{{ $src }}"
+              data-pswp-title="{{ $title }}"
+              data-pswp-description="{{ $description }}"
+              target="_blank"
+              aria-label="{{ $title }}"
+            >
+              <img
+                data-src="{{ $src }}"
+                data-sizes="auto"
+                alt="{{ $title }}"
+                class="lazyload"
+                width="{{ $width }}"
+                height="{{ $height }}"
+              />
+              <span class="gallery-frame-shine"></span>
+              <span class="gallery-frame-caption">
+                <strong>{{ $title }}</strong>
+                <span>{{ $description }}</span>
+              </span>
+            </a>
+          </figure>
         {{- end -}}
       </div>
     {{- else -}}
       <div class="gallery-empty">展柜还是空的。</div>
     {{- end -}}
   </section>
-
-  <div class="gallery-lightbox" data-gallery-lightbox hidden>
-    <div class="gallery-lightbox-backdrop" data-gallery-close></div>
-    <section class="gallery-lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="gallery-lightbox-title">
-      <button class="gallery-lightbox-close" type="button" data-gallery-close aria-label="关闭"></button>
-      <img class="gallery-lightbox-image" data-gallery-lightbox-image alt="" />
-      <div class="gallery-lightbox-copy">
-        <span class="gallery-kicker">Gallery</span>
-        <h3 id="gallery-lightbox-title" data-gallery-lightbox-title></h3>
-        <p data-gallery-lightbox-description></p>
-      </div>
-    </section>
-  </div>
 </article>
 
 {{- partial "helpers/ts.html" (dict "source" "js/gallery.ts" "target" "js/gallery.js" "ctx" . "pjax" true "defer" true) -}}

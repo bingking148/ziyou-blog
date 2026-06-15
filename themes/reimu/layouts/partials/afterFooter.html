@@ -253,6 +253,105 @@
           initPswp('.article-entry', 'a.article-gallery-item');
           initPswp('.article-gallery', 'a.article-gallery-item');
         }
+        // 画廊展柜：定制 PhotoSwipe，带展签(wall label)与聚光灯氛围
+        const initGalleryPswp = () => {
+          if (_$('.gallery-cabinet a.gallery-pswp').length === 0) return;
+          const lightbox = new PhotoSwipeLightbox({
+            gallery: '.gallery-cabinet',
+            children: 'a.gallery-pswp',
+            bgOpacity: 0.94,
+            // 不设 showHideAnimationType：默认 zoom 转场，从点击的缩略图位置 morph 到中央大图
+            padding: { top: 32, bottom: 32, left: 24, right: 24 },
+            zoom: true,
+            secondaryZoomLevel: 1.5,
+            maxZoomLevel: 2.2,
+            {{- if (partial "helpers/vendorLocalCheck.html" $js.photoswipe) -}}
+            pswpModule: () => import('{{ $photoswipe }}'),
+            {{- else -}}
+            pswpModule: () => safeImport("{{ $photoswipe }}", "{{ $photoswipe_integrity }}")
+            {{- end -}}
+          });
+          lightbox.on('uiRegister', function () {
+            // 展签：标题 + 描述（衬线字 + 浅描边，美术馆质感）
+            lightbox.pswp.ui.registerElement({
+              name: 'wall-label',
+              className: 'pswp__wall-label',
+              order: 9,
+              isButton: false,
+              appendTo: 'root',
+              html: '',
+              onInit: (el, pswp) => {
+                el.innerHTML = '';
+                const title = document.createElement('div');
+                title.className = 'pswp__wall-label-title';
+                const desc = document.createElement('div');
+                desc.className = 'pswp__wall-label-desc';
+                el.appendChild(title);
+                el.appendChild(desc);
+                const update = () => {
+                  const data = pswp.currSlide?.data;
+                  title.textContent = data?.element?.dataset?.pswpTitle || '';
+                  desc.textContent = data?.element?.dataset?.pswpDescription || '';
+                  // 翻页时重放展签入场动画
+                  el.classList.remove('is-updated');
+                  void el.offsetWidth;
+                  el.classList.add('is-updated');
+                };
+                update();
+                pswp.on('change', update);
+              },
+            });
+          });
+          lightbox.on('afterInit', () => {
+            document.body.classList.add('gallery-viewing');
+            // 创建独立画框层（fixed 定位，独立元素，不影响图片）
+            const pswp = lightbox.pswp;
+            const frame = document.createElement('div');
+            frame.className = 'pswp__frame-overlay';
+            pswp.template.appendChild(frame);
+            pswp._frameEl = frame;
+          });
+          // 把画框贴合到当前图片的精确位置（转场已结束，rect 稳定）
+          const positionFrame = (retries = 8) => {
+            const pswp = lightbox.pswp;
+            if (!pswp?._frameEl) return;
+            const img = pswp.currSlide?.holderElement?.querySelector('.pswp__img:not(.pswp__img--placeholder)');
+            const el = pswp._frameEl;
+            if (!img) {
+              // img 还没插入 DOM，下一帧重试
+              if (retries > 0) requestAnimationFrame(() => positionFrame(retries - 1));
+              return;
+            }
+            const r = img.getBoundingClientRect();
+            // 尺寸还没稳定，下一帧重试
+            if (r.width < 10 || r.height < 10) {
+              if (retries > 0) requestAnimationFrame(() => positionFrame(retries - 1));
+              return;
+            }
+            el.style.left = r.left + 'px';
+            el.style.top = r.top + 'px';
+            el.style.width = r.width + 'px';
+            el.style.height = r.height + 'px';
+            el.classList.add('is-visible');
+          };
+          lightbox.on('openingAnimationEnd', () => positionFrame());
+          lightbox.on('resize', () => positionFrame(0));
+          // 切换幻灯片：先淡出，待新图就位再贴合
+          lightbox.on('change', () => {
+            const el = lightbox.pswp?._frameEl;
+            if (el) el.classList.remove('is-visible');
+            // 等下一帧，新 slide 的 img 已渲染，positionFrame 内部会重试直到尺寸稳定
+            requestAnimationFrame(() => positionFrame());
+          });
+          // 关闭：淡出画框
+          lightbox.on('close', () => {
+            const el = lightbox.pswp?._frameEl;
+            if (el) el.classList.remove('is-visible');
+            document.body.classList.remove('gallery-viewing');
+          });
+          lightbox.init();
+        }
+        initGalleryPswp();
         pswp()
       </script>
       {{- partial "post/comment.html" . -}}
