@@ -4,3 +4,4 @@ resources/_gen/
 hugo-server*.log
 .DS_Store
 Thumbs.db
+nul
