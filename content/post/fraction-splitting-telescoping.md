@@ -52,6 +52,162 @@ $$1-\frac1{n+1}$$
 
 这就是"相消"的力量。
 
+<div class="ziyou-viz" id="telescope-viz">
+  <div class="viz-caption">👇 选一个项数 n，点"播放"看中间项如何一对对相消，最后只剩首尾两项。</div>
+  <div class="viz-toolbar">
+    <label>项数 n：<input type="range" id="t-n" min="3" max="10" step="1" value="6"><span class="viz-val" id="t-n-val">6</span></label>
+    <span class="viz-btns">
+      <button id="t-play">▶ 播放</button>
+      <button id="t-step">⏭ 单步</button>
+      <button id="t-reset">↺ 重置</button>
+    </span>
+  </div>
+  <div class="viz-expr" id="t-expr"></div>
+  <div class="viz-result" id="t-result"></div>
+</div>
+<style>
+#telescope-viz{margin:1.6em 0;padding:1.2em 1.4em;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface)}
+#telescope-viz .viz-caption{color:var(--color-text-muted);font-size:.9em;margin-bottom:1em;line-height:1.5}
+#telescope-viz .viz-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:1.2em;margin-bottom:1em}
+#telescope-viz .viz-toolbar label{display:flex;align-items:center;gap:.5em;font-size:.9em;color:var(--color-text-strong)}
+#telescope-viz .viz-toolbar input[type=range]{width:120px;accent-color:var(--color-link)}
+#telescope-viz .viz-val{font-family:Menlo,Consolas,monospace;color:var(--color-link);font-weight:600}
+#telescope-viz .viz-btns{display:flex;gap:.5em}
+#telescope-viz button{padding:.35em .9em;border:1px solid var(--color-border);border-radius:8px;background:transparent;color:var(--color-text-strong);cursor:pointer;font-size:.85em;transition:all .15s}
+#telescope-viz button:hover{background:var(--color-link);color:#fff;border-color:var(--color-link)}
+#telescope-viz .viz-expr{min-height:3em;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.15em;padding:.8em;line-height:2;font-size:1.05em;overflow-x:auto}
+#telescope-viz .t-term{display:inline-flex;align-items:center;padding:.1em .2em;border-radius:5px;transition:opacity .4s ease,background .3s ease,transform .3s ease;white-space:nowrap}
+#telescope-viz .t-term.t-cancel{opacity:0;transform:scale(.6)}
+#telescope-viz .t-term.t-hi{background:var(--color-link);color:#fff}
+#telescope-viz .t-term.t-keep{font-weight:600;color:var(--color-link)}
+#telescope-viz .t-op{color:var(--color-text-muted);padding:0 .05em}
+#telescope-viz .viz-result{margin-top:.6em;text-align:center;color:var(--color-text-strong);min-height:1.6em}
+</style>
+<script>
+(function(){
+  const root=document.getElementById('telescope-viz');if(!root)return;
+  const nIn=document.getElementById('t-n'),nVal=document.getElementById('t-n-val');
+  const expr=document.getElementById('t-expr'),result=document.getElementById('t-result');
+  const playBtn=document.getElementById('t-play'),stepBtn=document.getElementById('t-step'),resetBtn=document.getElementById('t-reset');
+  let terms=[],ops=[]; // terms: 数组 {k, sign, val}; 相消按值 k 配对
+  let cancelQueue=[];  // 待相消的配对索引
+  let timer=null;
+  // 配色：用 link 色的不同亮度区分不同数值对
+  let pairColor={};
+  function readColor(){
+    const cs=getComputedStyle(document.documentElement);
+    return (cs.getPropertyValue('--color-link').trim())||'#4285f4';
+  }
+  function build(){
+    const n=parseInt(nIn.value,10);nVal.textContent=n;
+    stop();
+    expr.innerHTML='';result.textContent='';
+    // 生成展开项：1, -1/2, +1/2, -1/3, +1/3, ... -1/(n+1)
+    // 第一项 +1（1 - 1/2），之后每对 ( -1/k , +1/k )
+    pairColor={};
+    const colorBase=readColor();
+    terms=[];ops=[];
+    // 项序列：+1, -1/2, +1/2, -1/3, +1/3, ... , -1/(n+1)   (注意 +1/2 来自第二对拆分的负项)
+    // 实际：第 i 项(i=0..n) 是 (-1)^? ... 用结构化方式生成
+    // 项0: +1 ; 项 2j-1: -1/(j+1) ; 项 2j: +1/(j+1)  其中 j=1..n  共 2n+1 项? 
+    // 重列：展开 = (1 - 1/2) + (1/2 - 1/3) + ... + (1/n - 1/(n+1))
+    // 拍平：1, -1/2, +1/2, -1/3, +1/3, ..., -1/n, +1/n, -1/(n+1)
+    const seq=[];
+    seq.push({val:1,sign:1});          // +1
+    for(let k=2;k<=n+1;k++){
+      seq.push({val:1/k,sign:-1});      // -1/k
+      if(k<=n)seq.push({val:1/k,sign:1});// +1/k （最后一项 k=n+1 没有 +）
+    }
+    // 渲染
+    seq.forEach((it,i)=>{
+      if(i>0){
+        const op=document.createElement('span');op.className='t-op';
+        op.textContent=it.sign>0?'+':'−';expr.appendChild(op);
+      }else if(it.sign<0){
+        const op=document.createElement('span');op.className='t-op';op.textContent='−';expr.appendChild(op);
+      }
+      const span=document.createElement('span');span.className='t-term';
+      span.dataset.idx=i;span.dataset.val=it.val;span.dataset.sign=it.sign;
+      // 数值文本
+      const v=it.val;
+      const body=frac(v);
+      span.innerHTML=body;
+      expr.appendChild(span);
+      terms.push(span);
+    });
+    // 构造相消配对：相邻同值异号 (idx i, i+1) 其中 sign 不同 val 相同
+    cancelQueue=[];
+    const used=new Set();
+    for(let i=0;i<seq.length-1;i++){
+      if(used.has(i))continue;
+      if(seq[i].val===seq[i+1].val && seq[i].sign!==seq[i+1].sign){
+        cancelQueue.push([i,i+1]);
+        used.add(i);used.add(i+1);
+      }
+    }
+    // 给每对配不同颜色
+    cancelQueue.forEach((pair,pi)=>{
+      pairColor[pi]=shade(colorBase,-0.15+pi*0.12);
+      pair.forEach(idx=>{terms[idx].dataset.pair=pi;});
+    });
+  }
+  function frac(v){
+    // v=1/k 形式，渲染为 1/k；v=1 渲染为 1
+    if(v===1)return '1';
+    const k=Math.round(1/v);
+    return '<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:.9em"><span>1</span><span style="border-top:1px solid currentColor;width:100%;min-width:.7em"></span><span>'+k+'</span></span>';
+  }
+  function shade(hex,amt){
+    const c=hex.replace('#','');const num=parseInt(c.length===3?c.split('').map(x=>x+x).join(''):c,16);
+    let r=(num>>16)&255,g=(num>>8)&255,b=num&255;
+    r=Math.round(r+(amt>0?(255-r):r)*amt);g=Math.round(g+(amt>0?(255-g):g)*amt);b=Math.round(b+(amt>0?(255-b):b)*amt);
+    return 'rgb('+Math.max(0,Math.min(255,r))+','+Math.max(0,Math.min(255,g))+','+Math.max(0,Math.min(255,b))+')';
+  }
+  let stepAt=0;
+  function doStep(){
+    if(stepAt>=cancelQueue.length){renderResult();return false;}
+    const pair=cancelQueue[stepAt];const col=pairColor[stepAt];
+    pair.forEach(idx=>{
+      const el=terms[idx];
+      el.style.background=col;el.style.color='#fff';
+      el.classList.add('t-hi');
+    });
+    setTimeout(()=>{
+      pair.forEach(idx=>{terms[idx].classList.add('t-cancel');});
+    },350);
+    stepAt++;
+    return true;
+  }
+  function renderResult(){
+    const n=parseInt(nIn.value,10);
+    result.innerHTML='最后只剩首尾两项：';
+    const s=document.createElement('span');s.className='t-keep';s.style.color=readColor();
+    s.textContent=' 1 − 1/'+(n+1)+' ';
+    result.appendChild(s);
+    const sum=1-1/(n+1);
+    const sumspan=document.createElement('span');
+    sumspan.textContent=' = '+(Math.round(sum*1000)/1000);
+    result.appendChild(sumspan);
+  }
+  function play(){
+    stop();
+    if(stepAt>=cancelQueue.length){reset();setTimeout(play,200);return;}
+    timer=setInterval(()=>{
+      const ok=doStep();
+      if(!ok)stop();
+    },800);
+  }
+  function stop(){if(timer){clearInterval(timer);timer=null;}}
+  function reset(){stop();stepAt=0;build();}
+  playBtn.addEventListener('click',play);
+  stepBtn.addEventListener('click',()=>{stop();doStep();});
+  resetBtn.addEventListener('click',reset);
+  nIn.addEventListener('input',reset);
+  document.body.addEventListener('reimu:theme-set',()=>{build();});
+  build();
+})();
+</script>
+
 原来看起来很长的一串数列，其实只要找到拆分方式，就能瞬间变短。
 
 ---
