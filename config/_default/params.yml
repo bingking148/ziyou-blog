@@ -511,6 +511,10 @@ injector:
     #header img {
       top: -10px;
     }
+    /* 隐藏 RSS 订阅按钮（不用此功能） */
+    #nav-rss-link {
+      display: none !important;
+    }
     </style>
   body_begin:
   body_end:
