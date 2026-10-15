@@ -9,7 +9,6 @@ math: false
 mermaid: false
 comments: true
 toc: true
-draft: true
 ---
 
 2026 年 9 月 22 日是个值得记住的日子。这一天，OpenAI 发布了 GPT-6 家族的 Sol 和 Luna，GPT-6 指的是 OpenAI 大模型的第六代；同一天，Anthropic 发布了 Claude Opus 5.5，两边都有官方公告可查。十天之后，ChatGPT 免费用户的默认模型也换成了 GPT-5.6 Luna。前沿模型开始像手机系统一样按月迭代，这是眼下这个时代的新常态。
