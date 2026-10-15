@@ -53,14 +53,9 @@
 }
 
 .sidebar-wrap {
+  @include liquid-glass;
   width: 100%;
   border-radius: $post-radius;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.56)),
-    var(--color-surface);
-  backdrop-filter: blur(16px) saturate(1.14);
-  -webkit-backdrop-filter: blur(16px) saturate(1.14);
-  border: 1px solid var(--color-card-border);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -72,18 +67,12 @@
   interpolate-size: allow-keywords;
   flex: 1;
   min-height: 0;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-edge), var(--shadow-card);
   overflow: hidden;
 
   .hidden {
     display: none;
   }
-}
-
-[data-theme="dark"] .sidebar-wrap {
-  background:
-    linear-gradient(180deg, rgba(46, 52, 65, 0.78), rgba(34, 39, 50, 0.62)),
-    var(--color-surface);
 }
 
 .sidebar-author {
@@ -507,23 +496,26 @@
 }
 
 .link-active {
-  background: var(--red-0);
-  border-color: transparent;
-  box-shadow: var(--shadow-soft);
+  background: rgba(66, 133, 244, 0.18);
+  border-color: rgba(102, 168, 255, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    var(--shadow-soft);
   opacity: 1;
 
   &:hover {
     opacity: 1;
+    background: rgba(66, 133, 244, 0.26);
   }
 
   .sidebar-menu-link {
-    color: #fff;
+    color: var(--red-0);
     opacity: 1;
   }
 
   .sidebar-menu-icon {
     opacity: 1;
-    color: #fff;
+    color: var(--red-0);
   }
 }
 

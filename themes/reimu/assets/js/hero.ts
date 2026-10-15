@@ -5,8 +5,8 @@
  *  - 仅在首页（#header.hero-home 存在时）启用
  *  - 滚动时把进度（0..1）写入 <html> 的 CSS 变量：
  *      --hero-progress        : 0=完整英雄区, 1=完全进入文章区
- *      --hero-blur            : 背景模糊像素 0 → 18px
- *      --hero-overlay-alpha   : 内容遮罩透明度 0 → 0.82
+ *      --hero-blur            : 背景模糊像素 0 → 22px
+ *      --hero-overlay-alpha   : 内容遮罩透明度 0 → 0.7
  *      --hero-title-opacity   : 英雄区文字 1 → 0
  *  - 由 hero.scss 用 calc()/filter 实时驱动，零重排，过渡丝滑
  *  - 点击 #hero-scroll-hint 平滑滚到文章区
@@ -25,9 +25,9 @@
     return Math.max(h * 0.55, 320);
   };
 
-  // 终态参数
-  const MAX_BLUR = 18; // px
-  const MAX_OVERLAY = 0.82; // 浅色模式略透；深色在 CSS 里覆盖
+  // 终态参数（液态玻璃：面板更透，背景遮罩相应减轻，让背景色穿透玻璃）
+  const MAX_BLUR = 22; // px
+  const MAX_OVERLAY = 0.4; // 浅色模式略透；深色在 CSS 里覆盖
   const TITLE_FADE_END = 0.45; // 进度到 0.45 时标题完全消失
 
   let ticking = false;

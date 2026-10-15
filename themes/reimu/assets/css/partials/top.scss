@@ -4,10 +4,7 @@
   right: 30px;
   width: 48px;
   height: 48px;
-  background-color: var(--color-surface);
-  backdrop-filter: blur(10px) saturate(1.2);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2);
-  border: 1px solid var(--color-card-border);
+  @include liquid-glass;
   border-radius: 50%;
   @if $icon_font {
     font-family: $font-icon;
@@ -18,7 +15,9 @@
     left: 30px;
     right: auto;
   }
-  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-filter-strong);
+  -webkit-backdrop-filter: var(--glass-filter-strong);
+  box-shadow: var(--glass-edge), var(--shadow-card);
   z-index: 999;
   cursor: var(--cursor-pointer) !important;
   transition:

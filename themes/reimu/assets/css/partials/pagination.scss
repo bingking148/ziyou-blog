@@ -1,9 +1,6 @@
 #page-nav {
+  @include liquid-glass;
   margin: $article-padding + 16px auto;
-  background: var(--color-surface);
-  backdrop-filter: blur(14px) saturate(1.12);
-  -webkit-backdrop-filter: blur(14px) saturate(1.12);
-  border: 1px solid var(--color-card-border);
   border-radius: $post-radius;
   text-align: center;
   color: var(--grey-9);
@@ -11,7 +8,7 @@
   transition:
     transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.3s ease;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-edge), var(--shadow-card);
 
   &:hover {
     box-shadow: var(--shadow-card-hover);

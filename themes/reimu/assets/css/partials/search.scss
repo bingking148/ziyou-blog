@@ -6,7 +6,7 @@
   width: 700px;
   max-height: 80%;
   margin-left: -350px;
-  background: var(--color-surface);
+  @include liquid-glass;
   color: var(--grey-9);
   z-index: 9999;
   border-radius: $post-radius;
@@ -16,10 +16,9 @@
     opacity 0.25s ease,
     transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
     visibility 0.25s ease;
-  box-shadow: var(--shadow-card-hover);
-  border: 1px solid var(--color-card-border);
-  backdrop-filter: blur(18px) saturate(1.14);
-  -webkit-backdrop-filter: blur(18px) saturate(1.14);
+  box-shadow: var(--glass-edge), var(--shadow-card-hover);
+  backdrop-filter: var(--glass-filter-strong);
+  -webkit-backdrop-filter: var(--glass-filter-strong);
 
   &.show {
     visibility: visible;

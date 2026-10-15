@@ -1,19 +1,8 @@
 .archives-outer-wrap {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.62)),
-    var(--color-surface);
-  backdrop-filter: blur(16px) saturate(1.12);
-  -webkit-backdrop-filter: blur(16px) saturate(1.12);
-  border: 1px solid var(--color-card-border);
+  @include liquid-glass;
   border-radius: $post-radius;
   padding: 16px 0;
-  box-shadow: var(--shadow-card);
-}
-
-[data-theme="dark"] .archives-outer-wrap {
-  background:
-    linear-gradient(180deg, rgba(46, 52, 65, 0.78), rgba(34, 39, 50, 0.62)),
-    var(--color-surface);
+  box-shadow: var(--glass-edge), var(--shadow-card);
 }
 
 .archives-wrap {

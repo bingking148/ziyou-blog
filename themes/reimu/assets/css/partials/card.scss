@@ -14,11 +14,8 @@
     transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.3s ease,
     border-color 0.3s ease;
-  box-shadow: var(--shadow-card);
-  background: var(--color-surface-muted);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--color-card-border);
+  @include liquid-glass;
+  box-shadow: var(--glass-edge), var(--shadow-card);
   width: 60%;
 
   @media #{$mg-normal} {
@@ -26,9 +23,9 @@
   }
 
   &:hover {
-    border-color: rgba(66, 133, 244, 0.28);
+    --glass-rim: var(--glass-rim-accent);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-card-hover);
+    box-shadow: var(--glass-edge), var(--shadow-card-hover);
   }
 
   a {

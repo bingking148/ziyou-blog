@@ -61,10 +61,6 @@
       linear-gradient(180deg, rgba(6, 10, 18, 0.58), rgba(8, 12, 20, 0.28) 42%, rgba(31, 36, 48, 0.98) 100%),
       linear-gradient(90deg, rgba(92, 145, 230, 0.16), transparent 46%, rgba(255, 176, 141, 0.12));
   }
-
-  #header-nav:hover {
-    background: var(--color-header-background);
-  }
 }
 
 #header-nav {
@@ -78,11 +74,15 @@
   gap: 10px;
   min-height: 58px;
   padding: 6px 18px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(18px) saturate(1.35);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  background:
+    var(--glass-sheen),
+    var(--glass-background);
+  backdrop-filter: var(--glass-filter-strong);
+  -webkit-backdrop-filter: var(--glass-filter-strong);
   border-bottom: 1px solid var(--glass-border);
-  box-shadow: 0 12px 34px rgba(24, 53, 92, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 12px 34px rgba(24, 53, 92, 0.1);
   transition:
     background 0.35s ease,
     top 0.3s,
@@ -92,13 +92,21 @@
   box-sizing: border-box;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.86);
-    box-shadow: 0 16px 42px rgba(24, 53, 92, 0.13);
+    background:
+      var(--glass-sheen),
+      rgba(255, 255, 255, 0.54);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 16px 42px rgba(24, 53, 92, 0.13);
   }
 
   &.header-nav-scrolled {
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 14px 38px rgba(24, 53, 92, 0.12);
+    background:
+      var(--glass-sheen),
+      rgba(255, 255, 255, 0.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 14px 38px rgba(24, 53, 92, 0.12);
   }
 
   &.header-nav-hidden {
@@ -107,15 +115,20 @@
 }
 
 [data-theme="dark"] #header-nav {
-  background: rgba(31, 36, 46, 0.72);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
-
-  &.header-nav-scrolled {
-    background: rgba(31, 36, 46, 0.82);
-  }
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 12px 34px rgba(0, 0, 0, 0.22);
 
   &:hover {
-    background: rgba(40, 44, 52, 0.85);
+    background:
+      var(--glass-sheen),
+      rgba(38, 43, 54, 0.55);
+  }
+
+  &.header-nav-scrolled {
+    background:
+      var(--glass-sheen),
+      rgba(33, 38, 48, 0.62);
   }
 }
 

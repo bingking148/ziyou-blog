@@ -5,11 +5,14 @@
 
 .gallery-hero,
 .gallery-cabinet-section {
-  background: var(--glass-background);
-  border: 1px solid var(--color-card-border);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(18px) saturate(1.28);
-  -webkit-backdrop-filter: blur(18px) saturate(1.28);
+  background:
+    var(--glass-sheen),
+    var(--glass-background) padding-box,
+    var(--glass-rim) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--glass-edge), var(--shadow-card);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
 }
 
 /* ============ Hero ============ */
@@ -21,7 +24,7 @@
   min-height: 330px;
   margin-bottom: 24px;
   padding: 30px;
-  border-radius: 8px;
+  border-radius: 14px;
   overflow: hidden;
   isolation: isolate;
   animation: gallery-rise 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -124,7 +127,7 @@
 /* ============ Cabinet section ============ */
 .gallery-cabinet-section {
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 14px;
   animation: gallery-rise 0.68s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 

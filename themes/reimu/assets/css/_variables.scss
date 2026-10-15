@@ -25,9 +25,9 @@
   --color-sticky: #fff;
   --color-surface: rgba(255, 255, 255, 0.82);
   --color-surface-solid: #ffffff;
-  --color-surface-muted: rgba(245, 248, 255, 0.72);
+  --color-surface-muted: rgba(245, 248, 255, 0.55);
   --color-text-strong: #172033;
-  --color-text-muted: #6c7485;
+  --color-text-muted: #5b6577;
   --color-accent-warm: #ff9f7a;
   --color-accent-green: #2f9e73;
   --color-card-border: rgba(138, 166, 207, 0.22);
@@ -60,15 +60,30 @@
   --shadow-meta: 0 2px 8px 1px var(--color-meta-shadow);
   --shadow-meta-hover: 0 4px 16px 2px var(--color-meta-shadow);
 
-  --shadow-card: 0 14px 34px rgba(34, 61, 102, 0.1);
-  --shadow-card-hover: 0 24px 54px rgba(34, 61, 102, 0.16);
+  --shadow-card: 0 8px 28px rgba(34, 61, 102, 0.08);
+  --shadow-card-hover: 0 14px 40px rgba(34, 61, 102, 0.13);
   --shadow-soft: 0 10px 28px rgba(34, 61, 102, 0.08);
   --shadow-focus: 0 0 0 4px rgba(66, 133, 244, 0.16);
 
   --shadow-red-6-shadow: 0 0 12px var(--color-red-6-shadow);
 
-  --glass-background: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.58);
+  // ---- Liquid Glass（iOS 26 清透液态玻璃）----
+  // 极低底色 + 适度模糊 + 高饱和度补偿，让背景真实穿透玻璃
+  --glass-background: rgba(255, 255, 255, 0.14);
+  --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 34%, rgba(255, 255, 255, 0) 55%);
+  --glass-border: rgba(255, 255, 255, 0.28);
+  // 边缘镜面高光：顶部一条亮线 + 柔和镜面光晕，两侧次之，底部留反光线
+  --glass-edge:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 1px 6px -2px rgba(255, 255, 255, 0.45),
+    inset 1px 0 0 rgba(255, 255, 255, 0.24),
+    inset -1px 0 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
+  --glass-filter: blur(20px) saturate(2.2);
+  --glass-filter-strong: blur(24px) saturate(2.3);
+  // 边缘渐变描边：画在 border-box 上，形成「上亮下微亮、两侧收暗」的透镜边缘
+  --glass-rim: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.16) 28%, rgba(255, 255, 255, 0.16) 70%, rgba(255, 255, 255, 0.45));
+  --glass-rim-accent: linear-gradient(180deg, rgba(120, 180, 255, 0.6), rgba(66, 133, 244, 0.18) 28%, rgba(66, 133, 244, 0.18) 70%, rgba(66, 133, 244, 0.45));
 }
 
 [data-theme="dark"] {
@@ -91,9 +106,9 @@
     --color-sticky: #272b30;
     --color-surface: rgba(39, 43, 52, 0.82);
     --color-surface-solid: #272b30;
-    --color-surface-muted: rgba(50, 56, 70, 0.62);
+    --color-surface-muted: rgba(50, 56, 70, 0.48);
     --color-text-strong: #eef3ff;
-    --color-text-muted: #aeb8c9;
+    --color-text-muted: #b6c1d3;
     --color-accent-warm: #ffb08d;
     --color-accent-green: #70d6a8;
     --color-card-border: rgba(255, 255, 255, 0.1);
@@ -101,13 +116,24 @@
     --color-h2-border: #47474a;
     --color-meta-shadow: rgba(0, 0, 0, 0.2);
     --color-hover-shadow: rgba(0, 0, 0, 0.25);
-    --shadow-card: 0 16px 38px rgba(0, 0, 0, 0.28);
-    --shadow-card-hover: 0 24px 58px rgba(0, 0, 0, 0.36);
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.24);
+    --shadow-card-hover: 0 16px 44px rgba(0, 0, 0, 0.32);
     --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.22);
     --shadow-focus: 0 0 0 4px rgba(102, 157, 246, 0.2);
 
-    --glass-background: rgba(40, 44, 52, 0.76);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-background: rgba(22, 26, 34, 0.26);
+    --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01) 34%, rgba(255, 255, 255, 0) 55%);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-edge:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 1px 6px -2px rgba(255, 255, 255, 0.12),
+      inset 1px 0 0 rgba(255, 255, 255, 0.08),
+      inset -1px 0 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+    --glass-filter: blur(20px) saturate(1.8);
+    --glass-filter-strong: blur(24px) saturate(1.9);
+    --glass-rim: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.06) 28%, rgba(255, 255, 255, 0.06) 70%, rgba(255, 255, 255, 0.18));
+    --glass-rim-accent: linear-gradient(180deg, rgba(140, 190, 255, 0.4), rgba(66, 133, 244, 0.2) 28%, rgba(66, 133, 244, 0.2) 70%, rgba(66, 133, 244, 0.3));
 
     --highlight-nav: #{$dark-highlight-nav};
     --highlight-scrollbar: #{$dark-highlight-scrollbar};
@@ -145,6 +171,28 @@
   }
 }
 
+// 无 backdrop-filter 的浏览器退回近实心面板，保证正文可读
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-background: rgba(255, 255, 255, 0.94);
+  }
+
+  :root[data-theme="dark"] {
+    --glass-background: rgba(32, 36, 45, 0.94);
+  }
+}
+
+// 液态玻璃面板配方：玻璃底 + 顶部镜面光 + 渐变亮边（画在透明 border 上）
+@mixin liquid-glass {
+  background:
+    var(--glass-sheen),
+    var(--glass-background) padding-box,
+    var(--glass-rim) border-box;
+  border: 1px solid transparent;
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+}
+
 // Fonts
 $font-basic: $custom-basic-families, $basic-families, $local-basic-families;
 $font-code: $custom-code-families, $code-families, $local-code-families;
@@ -172,5 +220,5 @@ $mq-large: "screen and (min-width: 960px)";
 $mg-large: "screen and (max-width: 959px)";
 $mq-extra-large: "screen and (min-width: 1242px)";
 $mg-extra-large: "screen and (max-width: 1241px)";
-$post-radius: 8px;
-$tag-radius: 8px;
+$post-radius: 14px;
+$tag-radius: 10px;
