@@ -1,8 +1,0 @@
----
-title: 'Hello World'
-date: 2026-04-13T21:36:47+08:00
-lastmod: 2026-04-13T21:36:47+08:00
-cover: /images/covers/cover1.jpg
----
-
-这是我的第一篇博客文章，博客刚刚搭建完成，更多内容敬请期待！

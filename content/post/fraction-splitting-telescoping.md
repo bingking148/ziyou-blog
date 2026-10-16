@@ -3,6 +3,7 @@ title: '裂项相消法：从分数拆分看透数列求和的本质'
 date: 2026-05-31T10:48:33+08:00
 lastmod: 2026-05-31T10:48:33+08:00
 cover: /images/covers/fraction-splitting-cover.jpg
+description: '把 1/(n(n+1)) 拆成两个分数之差，让中间项成对抵消——从最简单的通分出发，一步步看透裂项相消求和的本质。'
 math: true
 tags:
   - 数学
