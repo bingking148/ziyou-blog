@@ -888,6 +888,7 @@ injector:
     </div>
     <style>
     .mood-knob-widget .widget-wrap { text-align: center; }
+    .mood-knob-widget { flex-shrink: 0; }
     .mk-stage {
       --mk-hue: 214;
       position: relative;
@@ -1050,6 +1051,12 @@ injector:
       // 氛围旋钮：拖动旋转全站色相（yzrt 声音控制旋钮移植）
       var stage = document.getElementById('mood-knob');
       if (!stage) return;
+      // 归位：挪进 sticky 侧栏容器，滚动时与目录卡一起钉住，避免滑上去盖住目录
+      var mkWidget = stage.closest('.mood-knob-widget');
+      var mkHost = document.querySelector('#sidebar .sidebar-wrapper-container');
+      if (mkWidget && mkHost && mkWidget.parentElement !== mkHost) {
+        mkHost.appendChild(mkWidget);
+      }
       var lampBox = document.getElementById('mk-lamp-box');
       var pointerBox = document.getElementById('mk-pointer-box');
       var pointer = document.getElementById('mk-pointer');
