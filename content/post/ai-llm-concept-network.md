@@ -2,6 +2,7 @@
 title: 'AI 大模型概念网络：把 AI、LLM、Agent、提示词和网络连起来'
 date: 2026-10-16T09:00:00+08:00
 lastmod: 2026-10-16T09:00:00+08:00
+cover: /images/covers/ai-llm-concept-network-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['人工智能', '大模型', 'Agent', '提示词工程', 'API']
 description: '把 AI、LLM、Agent、提示词、HTTP、JSON 和上下文记忆连成一张概念网络，理清大模型应用的基础关系和学习路径。'
