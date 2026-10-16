@@ -164,11 +164,11 @@ font:
   enable: true
   article:
     - Mulish
-    - Noto Serif SC
   code:
 
 local_font:
   article:
+    - "LXGW WenKai Screen"
     - "-apple-system"
     - PingFang SC
     - Microsoft YaHei
@@ -507,6 +507,10 @@ home_categories:
 injector:
   head_begin:
   head_end: |
+    <!-- 霞鹜文楷 Screen：中文正文衬线（异步加载，不阻塞首屏） -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" /></noscript>
     <style>
     #header img {
       top: -10px;

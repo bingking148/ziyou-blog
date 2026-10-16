@@ -176,6 +176,26 @@ html, body, #container {
   cursor: var(--cursor-default);
 }
 
+// 墨色滚动条 + 朱砂滑块
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--red-1) 55%, var(--color-background));
+  border-radius: 999px;
+  border: 2px solid var(--color-background);
+
+  &:hover {
+    background: var(--red-1);
+  }
+}
+
 body {
   width: 100%;
   background: var(--color-background);

@@ -102,11 +102,42 @@
 }
 
 // ---- 2. 首页英雄区 --------------------------------------------------------
+
+// 大字水印：描边空心的站名大字，浮在标题背后，随滚动淡出、随鼠标轻视差
+#hero-watermark {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  font-size: clamp(140px, 26vw, 400px);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.14);
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: var(--hero-title-opacity, 1);
+  will-change: transform, opacity;
+}
+
+[data-theme="dark"] #hero-watermark {
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.09);
+}
+
 #header.hero-home {
   height: 100vh;
   min-height: 560px;
   // 英雄区自身不画图，透出全局固定背景
   background: transparent;
+
+  // 水印压在标题背后：内容层抬到水印之上
+  #header-outer {
+    position: relative;
+    z-index: 2;
+  }
 
   &::before {
     // 首页头部氛围遮罩由上面 #immersive-bg::before 负责，这里清空主题默认渐变
@@ -118,6 +149,11 @@
     opacity: 0 !important;
     visibility: hidden;
   }
+}
+
+// 深色模式：沉浸背景整体压暗，避免亮图刺眼
+[data-theme="dark"] #immersive-bg {
+  filter: blur(var(--hero-blur, 0px)) saturate(1.05) brightness(0.62);
 }
 
 // 标题区：首屏居中显示，随滚动平滑淡出 + 轻微上移

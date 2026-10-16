@@ -81,6 +81,25 @@
     });
   }
 
+  // 大字水印：随鼠标轻微视差（尊重系统「减少动态效果」）
+  const watermark = document.getElementById("hero-watermark");
+  if (watermark && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let wmRaf = 0;
+    window.addEventListener(
+      "mousemove",
+      (e) => {
+        if (wmRaf) return;
+        wmRaf = requestAnimationFrame(() => {
+          wmRaf = 0;
+          const dx = (e.clientX / window.innerWidth - 0.5) * 18;
+          const dy = (e.clientY / window.innerHeight - 0.5) * 12;
+          watermark.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+        });
+      },
+      { passive: true }
+    );
+  }
+
   // 初始化
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", update);
