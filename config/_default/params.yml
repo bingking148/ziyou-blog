@@ -495,10 +495,10 @@ share_card:
   enable: true
 
 home_categories:
-  enable: false
+  enable: true
   content:
-    - categories:
-      cover:
+    - categories: 人工智能学习
+      cover: /images/covers/ai-seventy-years-cover.jpg
     - categories:
       cover:
 
