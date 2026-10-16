@@ -97,10 +97,9 @@ hero:
     github: https://github.com/bingking148
 
 widgets:
-  - category
-  - tag
-  - tagcloud
   - recent_posts
+  - category
+  - tagcloud
 
 category_limits: 10
 tag_limits: 10
@@ -1061,11 +1060,16 @@ injector:
       // 氛围旋钮：拖动旋转全站色相（yzrt 声音控制旋钮移植）
       var stage = document.getElementById('mood-knob');
       if (!stage) return;
-      // 归位：挪进 sticky 侧栏容器，滚动时与目录卡一起钉住，避免滑上去盖住目录
+      // 归位：插到导航/作者卡之后、widget 区之前，随 sticky 容器一起钉住
       var mkWidget = stage.closest('.mood-knob-widget');
       var mkHost = document.querySelector('#sidebar .sidebar-wrapper-container');
       if (mkWidget && mkHost && mkWidget.parentElement !== mkHost) {
-        mkHost.appendChild(mkWidget);
+        var mkAnchor = mkHost.querySelector('.sidebar-wrapper');
+        if (mkAnchor && mkAnchor.nextSibling) {
+          mkHost.insertBefore(mkWidget, mkAnchor.nextSibling);
+        } else {
+          mkHost.appendChild(mkWidget);
+        }
       }
       var lampBox = document.getElementById('mk-lamp-box');
       var pointerBox = document.getElementById('mk-pointer-box');
@@ -1231,7 +1235,7 @@ pace:
 
 player:
   disable_on_mobile: true
-  position: before_sidebar
+  position: after_widget
   aplayer:
     enable: true
     options:
