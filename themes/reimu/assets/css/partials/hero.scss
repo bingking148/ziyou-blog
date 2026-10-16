@@ -26,7 +26,7 @@
   background-repeat: no-repeat;
   background-attachment: fixed;
   // 滚动时整体模糊，强度由 --hero-blur 控制（默认 0 = 完全清晰）
-  filter: blur(var(--hero-blur, 0px)) saturate(1.08);
+  filter: blur(var(--hero-blur, 0px)) saturate(1.18);
   // 模糊时图边缘会透明，放大一点点补上
   transform: scale(calc(1 + var(--hero-blur, 0px) * 0.012));
   transform-origin: center center;
@@ -62,7 +62,7 @@
 // 深色模式内容遮罩更透（底色本身已较深），同时压暗一点提升对比度
 [data-theme="dark"] #immersive-bg::after {
   background: var(--color-background);
-  opacity: calc(var(--hero-overlay-alpha, 0) * 0.92);
+  opacity: calc(var(--hero-overlay-alpha, 0) * 0.86);
 }
 
 // 内容容器：浮在背景之上

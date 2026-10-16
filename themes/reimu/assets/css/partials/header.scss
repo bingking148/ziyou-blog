@@ -90,6 +90,16 @@
     backdrop-filter 0.3s;
   z-index: 200;
   box-sizing: border-box;
+  // 导航常驻玻璃比卡片厚一档：保证链接在鲜艳英雄图上可读（对齐 hero-latest pill）
+  --glass-background: rgba(255, 255, 255, 0.12);
+
+  &:hover {
+    --glass-background: rgba(255, 255, 255, 0.54);
+  }
+
+  &.header-nav-scrolled {
+    --glass-background: rgba(255, 255, 255, 0.6);
+  }
 
   &:hover {
     background:

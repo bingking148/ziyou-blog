@@ -16,19 +16,19 @@
   --color-default: #444;
   --color-border: var(--red-3);
   --color-link: var(--red-1);
-  --color-background: #f4f7fb;
+  --color-background: #f6f4f0;
   --color-code-background: #f8f8f8;
   --color-header-background: rgba(255, 255, 255, 0.9);
   --color-footer-background: #fff;
   --color-mobile-nav-background: #fff;
   --color-wrap: #fff;
   --color-sticky: #fff;
-  --color-surface: rgba(255, 255, 255, 0.82);
+  --color-surface: rgba(255, 255, 255, 0.72);
   --color-surface-solid: #ffffff;
-  --color-surface-muted: rgba(245, 248, 255, 0.55);
-  --color-text-strong: #172033;
+  --color-surface-muted: rgba(245, 248, 255, 0.45);
+  --color-text-strong: #20262f;
   --color-text-muted: #5b6577;
-  --color-accent-warm: #ff9f7a;
+  --color-accent-warm: #c9553f;
   --color-accent-green: #2f9e73;
   --color-card-border: rgba(138, 166, 207, 0.22);
 
@@ -60,35 +60,42 @@
   --shadow-meta: 0 2px 8px 1px var(--color-meta-shadow);
   --shadow-meta-hover: 0 4px 16px 2px var(--color-meta-shadow);
 
-  --shadow-card: 0 8px 28px rgba(34, 61, 102, 0.08);
-  --shadow-card-hover: 0 14px 40px rgba(34, 61, 102, 0.13);
-  --shadow-soft: 0 10px 28px rgba(34, 61, 102, 0.08);
-  --shadow-focus: 0 0 0 4px rgba(66, 133, 244, 0.16);
+  --shadow-card: 0 8px 28px rgba(32, 42, 54, 0.08);
+  --shadow-card-hover: 0 14px 40px rgba(32, 42, 54, 0.14);
+  --shadow-soft: 0 10px 28px rgba(32, 42, 54, 0.08);
+  --shadow-focus: 0 0 0 4px rgba(44, 83, 130, 0.18);
 
   --shadow-red-6-shadow: 0 0 12px var(--color-red-6-shadow);
 
   // ---- Liquid Glass（iOS 26 清透液态玻璃）----
-  // 极低底色 + 适度模糊 + 高饱和度补偿，让背景真实穿透玻璃
-  --glass-background: rgba(255, 255, 255, 0.14);
-  --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 34%, rgba(255, 255, 255, 0) 55%);
-  --glass-border: rgba(255, 255, 255, 0.28);
-  // 边缘镜面高光：顶部一条亮线 + 柔和镜面光晕，两侧次之，底部留反光线
+  // 配方移植自 yzrt 纯CSS液态玻璃：极透底 + 极轻磨砂 + 对角湿高光 + 模糊暗环。
+  // 水感来自背景色彩大量穿透玻璃，边缘靠「表面张力」高光收拢。
+  --glass-background: rgba(255, 255, 255, 0.06);
+  --glass-background-hover: rgba(255, 255, 255, 0.14);
+  --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03) 34%, rgba(255, 255, 255, 0) 55%);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-hover: rgba(255, 255, 255, 0.38);
+  --glass-glare-color: rgba(255, 255, 255, 0.1);
+  // 对角湿高光（左上/右下成对）+ 深色内线 = 水滴表面张力
   --glass-edge:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 1px 6px -2px rgba(255, 255, 255, 0.45),
-    inset 1px 0 0 rgba(255, 255, 255, 0.24),
-    inset -1px 0 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
-  --glass-filter: blur(20px) saturate(2.2);
-  --glass-filter-strong: blur(24px) saturate(2.3);
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.9),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.9),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset 0 0 2px rgba(20, 28, 40, 0.26);
+  --glass-ring: rgba(20, 28, 40, 0.5);
+  --glass-filter: blur(3px) saturate(1.15);
+  --glass-filter-strong: blur(5px) saturate(1.2);
   // 边缘渐变描边：画在 border-box 上，形成「上亮下微亮、两侧收暗」的透镜边缘
   --glass-rim: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.16) 28%, rgba(255, 255, 255, 0.16) 70%, rgba(255, 255, 255, 0.45));
-  --glass-rim-accent: linear-gradient(180deg, rgba(120, 180, 255, 0.6), rgba(66, 133, 244, 0.18) 28%, rgba(66, 133, 244, 0.18) 70%, rgba(66, 133, 244, 0.45));
+  --glass-rim-accent: linear-gradient(180deg, rgba(140, 175, 215, 0.6), rgba(44, 83, 130, 0.18) 28%, rgba(44, 83, 130, 0.18) 70%, rgba(44, 83, 130, 0.45));
 }
 
 [data-theme="dark"] {
   &:root {
     --red-0: var(--red-1);
+    --red-1: #82a7cc;
+    --red-2: #9dbfdd;
     --red-4: #{$dark-red-4};
     --red-5: #{$dark-red-5};
     --red-5-5: #{$dark-red-5-5};
@@ -109,7 +116,7 @@
     --color-surface-muted: rgba(50, 56, 70, 0.48);
     --color-text-strong: #eef3ff;
     --color-text-muted: #b6c1d3;
-    --color-accent-warm: #ffb08d;
+    --color-accent-warm: #d98063;
     --color-accent-green: #70d6a8;
     --color-card-border: rgba(255, 255, 255, 0.1);
 
@@ -121,17 +128,21 @@
     --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.22);
     --shadow-focus: 0 0 0 4px rgba(102, 157, 246, 0.2);
 
-    --glass-background: rgba(22, 26, 34, 0.26);
-    --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01) 34%, rgba(255, 255, 255, 0) 55%);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-background: rgba(22, 28, 40, 0.1);
+    --glass-background-hover: rgba(30, 40, 56, 0.2);
+    --glass-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 34%, rgba(255, 255, 255, 0) 55%);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-border-hover: rgba(255, 255, 255, 0.26);
+    --glass-glare-color: rgba(255, 255, 255, 0.09);
     --glass-edge:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 1px 6px -2px rgba(255, 255, 255, 0.12),
-      inset 1px 0 0 rgba(255, 255, 255, 0.08),
-      inset -1px 0 0 rgba(255, 255, 255, 0.08),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.1);
-    --glass-filter: blur(20px) saturate(1.8);
-    --glass-filter-strong: blur(24px) saturate(1.9);
+      inset 2px -2px 1px -1px rgba(255, 255, 255, 0.7),
+      inset -2px 2px 1px -1px rgba(255, 255, 255, 0.7),
+      inset 6px -6px 1px -6px rgba(255, 255, 255, 0.4),
+      inset -6px 6px 1px -6px rgba(255, 255, 255, 0.4),
+      inset 0 0 2px rgba(0, 0, 0, 0.4);
+    --glass-ring: rgba(0, 0, 0, 0.6);
+    --glass-filter: blur(3px) saturate(1.2);
+    --glass-filter-strong: blur(5px) saturate(1.25);
     --glass-rim: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.06) 28%, rgba(255, 255, 255, 0.06) 70%, rgba(255, 255, 255, 0.18));
     --glass-rim-accent: linear-gradient(180deg, rgba(140, 190, 255, 0.4), rgba(66, 133, 244, 0.2) 28%, rgba(66, 133, 244, 0.2) 70%, rgba(66, 133, 244, 0.3));
 
@@ -182,15 +193,74 @@
   }
 }
 
-// 液态玻璃面板配方：玻璃底 + 顶部镜面光 + 渐变亮边（画在透明 border 上）
+// 液态玻璃面板（配方移植自 yzrt/纯CSS液态玻璃）：
+//   1. 极透底 + 极轻磨砂 —— 背景色彩大量穿透，玻璃只是「一层水膜」
+//   2. 对角湿高光 —— 成对的斜向 inset 白影收拢在左上/右下，模拟水滴表面张力
+//   3. 模糊暗环（::before）+ 对角镜面光带（::after）—— 深色描边 blur 后自拉对比，
+//      形成清晰的「水表面」边缘；替代原方案的父级 contrast(3)，不伤正文可读性
+//   4. 指针湿 glare —— 高光跟手滑动（JS 注入 --glare-x/--glare-y）
 @mixin liquid-glass {
   background:
-    var(--glass-sheen),
-    var(--glass-background) padding-box,
-    var(--glass-rim) border-box;
-  border: 1px solid transparent;
+    radial-gradient(
+        320px circle at var(--glare-x, 50%) var(--glare-y, -20%),
+        var(--glass-glare-color),
+        transparent 60%
+      )
+      padding-box,
+    var(--glass-sheen) padding-box,
+    linear-gradient(var(--glass-background), var(--glass-background)) padding-box;
+  border: 1px solid var(--glass-border);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease;
+
+  // 液态暗环：模糊的深色描边，自拉对比后成为清晰的湿边
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: inherit;
+    border: 1px solid var(--glass-ring);
+    filter: blur(7px) contrast(1.6);
+    pointer-events: none;
+  }
+
+  // 对角镜面光带：左上/右下两条湿光，呼吸般常亮、悬停增亮
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      transparent var(--glass-tr, 24%),
+      transparent calc(100% - var(--glass-tr, 24%)),
+      rgba(255, 255, 255, 0.55) 100%
+    );
+    filter: blur(4px);
+    opacity: 0.45;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  &:hover {
+    --glass-background: var(--glass-background-hover);
+    --glass-border: var(--glass-border-hover);
+
+    &::after {
+      opacity: 0.85;
+    }
+  }
+
+  // 移动端省电：保留静态玻璃，去掉暗环模糊
+  @media (max-width: 768px) {
+    &::before {
+      display: none;
+    }
+  }
 }
 
 // Fonts
