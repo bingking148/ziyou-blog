@@ -1,4 +1,5 @@
 {{- $params := .Site.Params -}}
+{{- $isHeroHome := and .IsHome (eq .Paginator.PageNumber 1) -}}
 <div id="header-nav">
   <nav id="main-nav" aria-label="Primary navigation">
     {{- range .Site.Params.menu -}}
@@ -106,7 +107,7 @@
     </a>
   {{- end -}}
 </div>
-<header id="header" class="{{ if .IsHome }}hero-home{{ end }}" aria-label="Site header">
+<header id="header" class="{{ if $isHeroHome }}hero-home{{ end }}" aria-label="Site header">
   {{- $headerImage := .Params.banner | default .Params.cover -}}
   {{- if and $headerImage (strings.HasPrefix $headerImage "rgb") -}}
     <picture></picture>
@@ -174,7 +175,7 @@
     {{- end -}}
   {{- end -}}
 
-  {{- if .IsHome -}}
+  {{- if $isHeroHome -}}
     <div id="hero-watermark" aria-hidden="true">{{ .Site.Title }}</div>
   {{- end -}}
   <div id="header-outer">
@@ -240,7 +241,7 @@
       {{- end -}}
 
       {{- /* ===== 首页英雄区扩展：头像 / CTA / 社交图标 ===== */ -}}
-      {{- if .IsHome -}}
+      {{- if $isHeroHome -}}
         {{- with .Site.Params.avatar -}}
           <div class="hero-avatar-wrap" data-aos="zoom-in">
             <img class="hero-avatar" src="{{ . | relURL }}" alt="{{ $.Site.Params.author }}">
@@ -266,7 +267,7 @@
     </div>
   </div>
 
-  {{- if .IsHome -}}
+  {{- if $isHeroHome -}}
     {{- /* 最新一篇：悬浮在底部下箭头正上方，居中 */ -}}
     {{- with first 1 (where $.Site.RegularPages "Section" "in" $.Site.Params.mainSections) -}}
       {{- $latest := index . 0 -}}

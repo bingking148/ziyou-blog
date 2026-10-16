@@ -62,6 +62,9 @@ if (window.Pjax) {
       const isExternal =
         aLink.getAttribute("target") === "_blank" ||
         aLink.getAttribute("rel")?.includes("noopener");
+      if (aLink.dataset.pjax === "false") {
+        continue;
+      }
       if (
         isExternal ||
         aLinkHref.startsWith("mailto:") ||
