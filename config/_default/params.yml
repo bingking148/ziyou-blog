@@ -882,7 +882,7 @@ injector:
             </div>
           </div>
         </div>
-        <div class="mk-readout"><span id="mk-name">墨蓝 · 214°</span></div>
+        <div class="mk-readout"><span class="mk-dot"></span><span id="mk-name">墨蓝 · 214°</span></div>
         <p class="mk-hint">拖动旋转全站色调 · 滚轮微调 · 双击复位</p>
       </div>
     </div>
@@ -911,7 +911,7 @@ injector:
       position: absolute;
       inset: -16px;
       border-radius: 50%;
-      background: radial-gradient(circle, hsl(var(--mk-hue) 70% 55% / 0.18), transparent 68%);
+      background: radial-gradient(circle, hsl(var(--mk-hue) 78% 54% / 0.2), transparent 68%);
       pointer-events: none;
     }
     .mk-lamp-box { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
@@ -935,15 +935,15 @@ injector:
     }
     .mk-lamp-box span.act {
       position: relative;
-      background: hsl(var(--mk-hue) 75% 58%);
-      box-shadow: 0 0 5px hsl(var(--mk-hue) 75% 58%);
+      background: hsl(var(--mk-hue) 82% 55%);
+      box-shadow: 0 0 5px hsl(var(--mk-hue) 82% 55%);
     }
     .mk-lamp-box span.act::after {
       content: '';
       position: absolute;
       inset: -3px;
       border-radius: 50%;
-      background: hsl(var(--mk-hue) 75% 58% / 0.8);
+      background: hsl(var(--mk-hue) 82% 55% / 0.8);
       filter: blur(4px);
     }
     .mk-ring {
@@ -1013,6 +1013,16 @@ injector:
       font-weight: 700;
       font-size: 15px;
     }
+    .mk-dot {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: hsl(var(--mk-hue) 72% 52%);
+      box-shadow: 0 0 7px hsl(var(--mk-hue) 72% 52% / 0.65);
+      vertical-align: -1px;
+    }
     .mk-hint {
       margin: 6px 0 0;
       font-size: 12px;
@@ -1078,43 +1088,43 @@ injector:
       var snapshot = {};
       VARS.forEach(function (v) { snapshot[v] = cs.getPropertyValue(v).trim(); });
       function hsl(h, sa, l) { return 'hsl(' + h + ', ' + sa + '%, ' + l + '%)'; }
+      // 感知曲线：黄绿段（≈100°）天然显荧光，压低饱和；红/蓝两端可加浓到 66%
+      function satCap(h) {
+        var d = Math.abs(h - 100);
+        if (d > 180) d = 360 - d;
+        return 44 + Math.round((d / 180) * 22);
+      }
       function applyHue(hue) {
         var root = document.documentElement;
         var dark = root.dataset.theme === 'dark';
-        stage.style.setProperty('--mk-hue', hue);
+        mkWidget.style.setProperty('--mk-hue', hue);
+        var sat = satCap(hue);
         if (dark) {
-          root.style.setProperty('--red-0', hsl(hue, 42, 68));
-          root.style.setProperty('--red-1', hsl(hue, 42, 68));
-          root.style.setProperty('--red-2', hsl(hue, 36, 78));
-          root.style.setProperty('--red-3', hsl(hue, 24, 58));
-          root.style.setProperty('--red-4', 'hsla(' + hue + ', 35%, 72%, 0.5)');
-          root.style.setProperty('--red-5', 'hsla(' + hue + ', 35%, 72%, 0.15)');
-          root.style.setProperty('--red-5-5', 'hsla(' + hue + ', 35%, 72%, 0.05)');
-          root.style.setProperty('--red-6', 'hsla(' + hue + ', 35%, 72%, 0.2)');
+          root.style.setProperty('--red-0', hsl(hue, Math.min(sat, 54), 70));
+          root.style.setProperty('--red-1', hsl(hue, Math.min(sat, 54), 70));
+          root.style.setProperty('--red-2', hsl(hue, Math.min(sat, 50), 78));
+          root.style.setProperty('--red-3', hsl(hue, 34, 58));
+          root.style.setProperty('--red-4', 'hsla(' + hue + ', 46%, 72%, 0.5)');
+          root.style.setProperty('--red-5', 'hsla(' + hue + ', 46%, 72%, 0.16)');
+          root.style.setProperty('--red-5-5', 'hsla(' + hue + ', 46%, 72%, 0.06)');
+          root.style.setProperty('--red-6', 'hsla(' + hue + ', 46%, 72%, 0.22)');
         } else {
-          root.style.setProperty('--red-0', hsl(hue, 48, 26));
-          root.style.setProperty('--red-1', hsl(hue, 48, 34));
-          root.style.setProperty('--red-2', hsl(hue, 42, 46));
-          root.style.setProperty('--red-3', hsl(hue, 36, 62));
-          root.style.setProperty('--red-4', hsl(hue, 40, 90));
-          root.style.setProperty('--red-5', hsl(hue, 36, 95));
-          root.style.setProperty('--red-5-5', hsl(hue, 30, 97));
-          root.style.setProperty('--red-6', hsl(hue, 24, 98.5));
-          root.style.setProperty('--color-red-6-shadow', 'hsla(' + hue + ', 45%, 38%, 0.45)');
-          root.style.setProperty('--color-red-3-shadow', 'hsla(' + hue + ', 45%, 38%, 0.22)');
+          root.style.setProperty('--red-0', hsl(hue, sat, 23));
+          root.style.setProperty('--red-1', hsl(hue, Math.min(sat + 2, 68), 32));
+          root.style.setProperty('--red-2', hsl(hue, Math.min(sat, 62), 44));
+          root.style.setProperty('--red-3', hsl(hue, Math.max(sat - 10, 30), 60));
+          root.style.setProperty('--red-4', hsl(hue, 50, 88));
+          root.style.setProperty('--red-5', hsl(hue, 46, 94));
+          root.style.setProperty('--red-5-5', hsl(hue, 38, 96.5));
+          root.style.setProperty('--red-6', hsl(hue, 30, 98));
+          root.style.setProperty('--color-red-6-shadow', 'hsla(' + hue + ', 55%, 32%, 0.45)');
+          root.style.setProperty('--color-red-3-shadow', 'hsla(' + hue + ', 55%, 32%, 0.22)');
         }
       }
       function nameOf(h) {
-        if (h < 15) return '朱砂';
-        if (h < 45) return '琥珀';
-        if (h < 70) return '麦秋';
-        if (h < 105) return '青翠';
-        if (h < 150) return '竹青';
-        if (h < 195) return '黛蓝';
-        if (h < 240) return '墨蓝';
-        if (h < 280) return '绀紫';
-        if (h < 330) return '紫檀';
-        return '胭脂';
+        if (h >= 340) return '胭脂';
+        var names = ['朱砂', '橘红', '琥珀', '缃色', '苔色', '竹青', '青翠', '豆绿', '湖绿', '沧浪', '墨蓝', '黛蓝', '绀青', '绀紫', '雪青', '紫檀', '葡萄紫'];
+        return names[Math.min(16, Math.floor(h / 20))];
       }
       function update(a, save) {
         if (a < MIN) a = MIN;
@@ -1144,7 +1154,7 @@ injector:
         lamps.forEach(function (sp, idx) { sp.classList.toggle('act', idx < n); });
         pointerBox.style.rotate = angle + 'deg';
         pointer.classList.remove('off');
-        stage.style.setProperty('--mk-hue', DEFAULT_HUE);
+        mkWidget.style.setProperty('--mk-hue', DEFAULT_HUE);
         stage.setAttribute('aria-valuenow', DEFAULT_HUE);
         nameEl.textContent = '墨蓝 · 默认';
       }
