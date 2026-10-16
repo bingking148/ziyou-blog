@@ -1,0 +1,177 @@
+{{- define "main" -}}
+<div class="nf-wrap">
+  <div class="nf-scene">
+    <div class="nf-code" aria-hidden="true">404</div>
+    <div class="nf-drop" aria-hidden="true"></div>
+  </div>
+  <h2 class="nf-title">这一页，像水滴一样蒸发了</h2>
+  <p class="nf-sub">它可能被移动、删除，或者从未存在过。</p>
+  <div class="nf-actions">
+    <a class="nf-btn nf-primary" href="{{ "" | relLangURL }}">回到首页</a>
+    <a class="nf-btn" href="javascript:history.back()">返回上页</a>
+  </div>
+</div>
+<style>
+  /* ===== 404 · CSS 水滴 + Go Pro 液态按钮（yzrt 移植） ===== */
+  .nf-wrap {
+    min-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px 20px 64px;
+  }
+  .nf-scene {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .nf-code {
+    font-family: "LXGW WenKai Screen", "LXGW WenKai", serif;
+    font-size: clamp(120px, 22vw, 168px);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--red-2, #4a76a8);
+    user-select: none;
+  }
+  .nf-drop {
+    position: absolute;
+    left: 46%;
+    top: 50%;
+    width: 185px;
+    height: 185px;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    border-radius: 30% 70% 52% 48% / 50% 60% 40% 50%;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow:
+      20px 20px 28px rgba(28, 52, 84, 0.18),
+      inset 10px 10px 15px rgba(73, 94, 121, 0.28),
+      inset -10px -10px 15px rgba(255, 255, 255, 0.65);
+    animation: nf-drip 1.1s infinite alternate-reverse;
+    cursor: pointer;
+    transition: border-radius 0.3s;
+  }
+  .nf-drop::after {
+    content: "";
+    position: absolute;
+    left: 32px;
+    top: 28px;
+    width: 15px;
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30% 70% 52% 48% / 50% 60% 40% 50%;
+  }
+  .nf-drop::before {
+    content: "";
+    position: absolute;
+    left: 27px;
+    top: 60px;
+    width: 22px;
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.99);
+    border-radius: 58% 42% 48% 52% / 60% 49% 51% 40%;
+  }
+  .nf-drop:hover {
+    border-radius: 39% 61% 52% 48% / 57% 55% 45% 43%;
+  }
+  .nf-drop:hover::after {
+    left: 44px;
+    top: 34px;
+  }
+  .nf-drop:hover::before {
+    left: 31px;
+    top: 68px;
+  }
+  @keyframes nf-drip {
+    100% {
+      width: 176px;
+      height: 181px;
+    }
+  }
+  .nf-title {
+    font-family: "LXGW WenKai Screen", "LXGW WenKai", serif;
+    font-size: 1.5rem;
+    color: var(--red-0, #1c3454);
+    margin: 12px 0 8px;
+  }
+  .nf-sub {
+    color: var(--red-3, #9db4cf);
+    margin: 0 0 28px;
+  }
+  .nf-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .nf-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 11px 30px;
+    border-radius: 999px;
+    border: 1px solid var(--red-2, #4a76a8);
+    color: var(--red-1, #2c5382);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    transition: transform 0.2s;
+  }
+  .nf-btn:active {
+    transform: translateY(2px);
+  }
+  .nf-btn.nf-primary {
+    background: var(--red-0, #1c3454);
+    border-color: var(--red-0, #1c3454);
+    color: #fff;
+  }
+  .nf-btn::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 50%;
+    width: 150%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: #fff;
+    mix-blend-mode: difference;
+    transform: translate(-104%, -50%);
+    transition:
+      transform 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+      border-radius 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+    pointer-events: none;
+  }
+  .nf-btn:hover::before,
+  .nf-btn:focus-visible::before {
+    transform: translate(-2%, -50%);
+    border-radius: 0;
+  }
+  [data-theme="dark"] .nf-drop {
+    box-shadow:
+      20px 20px 28px rgba(0, 0, 0, 0.45),
+      inset 10px 10px 15px rgba(6, 16, 28, 0.5),
+      inset -10px -10px 15px rgba(200, 220, 240, 0.18);
+  }
+  [data-theme="dark"] .nf-title {
+    color: var(--red-3, #9db4cf);
+  }
+  [data-theme="dark"] .nf-btn {
+    color: var(--red-3, #9db4cf);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nf-drop {
+      animation: none;
+    }
+    .nf-btn::before {
+      transition: none;
+    }
+  }
+</style>
+{{- end -}}
