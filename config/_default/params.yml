@@ -9,6 +9,9 @@ menu:
   - name: archives
     url: "archives"
     icon:
+  - name: 人工智能学习
+    url: "categories/人工智能学习"
+    icon:
   - name: 画廊
     url: "gallery"
     icon:

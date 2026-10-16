@@ -2,7 +2,7 @@
 title: 'Ollama 本地部署大模型：从安装、选模型到 API 调用完整指南'
 date: 2026-10-16T09:01:00+08:00
 lastmod: 2026-10-16T09:01:00+08:00
-categories: ['人工智能']
+categories: ['人工智能', '人工智能学习']
 tags: ['Ollama', '本地大模型', '开源模型', 'Python', 'API']
 description: '从安装 Ollama、选择本地模型、使用常用命令，到接入 Chatbox 和用 Python 调用 OpenAI 兼容接口的完整实战指南。'
 math: false
