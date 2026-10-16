@@ -129,7 +129,7 @@ sort_order:
 
 paginate:
   archive:
-  post:
+  post: 6
 
 ########################################
 # CSS
