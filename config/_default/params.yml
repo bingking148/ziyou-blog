@@ -12,9 +12,6 @@ menu:
   - name: 人工智能学习
     url: "categories/人工智能学习"
     icon:
-  - name: 画廊
-    url: "gallery"
-    icon:
   - name: about
     url: "about"
     icon:
