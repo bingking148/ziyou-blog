@@ -122,10 +122,10 @@ rss:
 
 sort_order:
   taxonomy:
-    category: date-reverse
+    category: weight
     tag: date-reverse
   archive: date-reverse
-  home: default
+  home: date-reverse
 
 paginate:
   archive:

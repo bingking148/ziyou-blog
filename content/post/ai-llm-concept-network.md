@@ -1,5 +1,6 @@
 ---
 title: 'AI 大模型概念网络：把 AI、LLM、Agent、提示词和网络连起来'
+weight: 2
 date: 2026-10-16T09:00:00+08:00
 lastmod: 2026-10-16T09:00:00+08:00
 cover: /images/covers/ai-llm-concept-network-cover.jpg

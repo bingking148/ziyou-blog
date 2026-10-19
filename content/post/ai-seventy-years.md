@@ -1,5 +1,6 @@
 ---
 title: '人工智能七十年：从图灵之问，到 GPT-6 与机器人量产元年'
+weight: 1
 date: 2026-10-15T08:00:00+08:00
 lastmod: 2026-10-15T08:00:00+08:00
 cover: /images/covers/ai-seventy-years-cover.jpg

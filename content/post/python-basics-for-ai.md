@@ -1,5 +1,6 @@
 ---
 title: 'Python 基础：从字面量、变量到运算符，一篇讲清入门语法'
+weight: 3
 date: 2026-10-16T09:02:00+08:00
 lastmod: 2026-10-16T09:02:00+08:00
 cover: /images/covers/python-basics-for-ai-cover.jpg
