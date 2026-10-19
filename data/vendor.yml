@@ -69,11 +69,9 @@ js:
     src: webcache|quicklink@3.0.1/dist/quicklink.umd.js
     integrity: sha384-caMDqvgav/HWdEYQU1QRRHMLleigpL1YHAG0m371DhzfL8rRzUyOb+bEHtwlmYjD
   katex:
-    src: webcache|katex@0.16.24/dist/katex.min.js
-    integrity: sha384-MWNUH0WmtsYGhn2cbH6ELRCbf9LG3QDqCC+gqPB3IBNO35xjZK3Ejb6oONRpDbPg
+    src: local|katex@0.16.24/dist/katex.min.js
   katex_auto_render:
-    src: webcache|katex@0.16.24/dist/contrib/auto-render.min.js
-    integrity: sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh
+    src: local|katex@0.16.24/dist/contrib/auto-render.min.js
   mathjax:
     src: webcache|mathjax@3.2.2/es5/tex-mml-chtml.js
     integrity: sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei
@@ -106,8 +104,7 @@ css:
     src: webcache|photoswipe@5.4.4/dist/photoswipe.css
     integrity: sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE
   katex:
-    src: webcache|katex@0.16.24/dist/katex.min.css
-    integrity: sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI
+    src: local|katex@0.16.24/dist/katex.min.css
   waline:
     src: webcache|@waline/client@2.15.8/dist/waline.css
     integrity: sha384-vltfZtesCdl6NYVcFVcjEaIi5RpNvZe9t7fXvq8twVtcoy+Ub9QgnxUYJmwOhYCK
