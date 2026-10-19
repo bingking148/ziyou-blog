@@ -104,7 +104,7 @@ widgets:
 category_limits: 10
 tag_limits: 10
 recent_posts_limits: 5
-tagcloud_limits: 20
+tagcloud_limits: 30
 
 only_show_capsule_in_index: false
 uppercase_capsule: true

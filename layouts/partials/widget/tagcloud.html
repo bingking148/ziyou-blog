@@ -1,0 +1,39 @@
+{{- $posts := where .Page.Site.RegularPages "Section" "in" .Site.Params.mainSections -}}
+{{- $title := i18n "tagcloud" -}}
+
+{{- /* 分类页只显示该分类下文章实际使用过的标签，避免全站标签混入专栏。 */ -}}
+{{- if and (eq .Page.Type "categories") .Page.Data.Term -}}
+  {{- $term := .Page.Data.Term -}}
+  {{- $posts = where $posts "Params.categories" "intersect" (slice $term) -}}
+  {{- $title = "本专栏标签" -}}
+{{- end -}}
+
+{{- if len $posts -}}
+<div class="widget-wrapper">
+  <div
+    class="widget-wrap"
+    data-aos="{{ .Site.Params.animation.options.home.widget }}"
+  >
+    <h3 class="widget-title">{{ $title }}</h3>
+    <div class="widget tagcloud">
+      {{- $counter := 0 -}}
+      {{- range .Site.Taxonomies.tags -}}
+        {{- $tagPosts := where $posts "Params.tags" "intersect" (slice .Page.Title) -}}
+        {{- if and (gt (len $tagPosts) 0) (lt $counter $.Site.Params.tagcloud_limits) -}}
+          {{- $weight := 10 -}}
+          {{- if gt (len $posts) 0 -}}
+            {{- $weight = add 10 (mul 10 (div (len $tagPosts) (len $posts))) -}}
+          {{- end -}}
+          <a
+            style="font-size:{{ $weight }}px"
+            href="{{ .Page.RelPermalink }}"
+            aria-label="标签: {{ .Page.Title }}"
+            >{{ .Page.Title }}</a
+          >
+          {{- $counter = add $counter 1 -}}
+        {{- end -}}
+      {{- end -}}
+    </div>
+  </div>
+</div>
+{{- end -}}
