@@ -1,0 +1,45 @@
+{{- define "main" -}}
+  {{- /* 收集所有标记为专栏的分类（categories/<name>/_index.md 里 column: true） */ -}}
+  {{- $columns := slice -}}
+  {{- range $name, $termPages := .Site.Taxonomies.categories -}}
+    {{- $termPage := site.GetPage (printf "/categories/%s" $name) -}}
+    {{- if and $termPage $termPage.Params.column -}}
+      {{- $columns = $columns | append $termPage -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $columns = sort $columns "Params.column_order" "asc" -}}
+  <div class="archives-outer-wrap columns-wrap" data-aos="{{ .Site.Params.animation.options.archive.whole }}">
+    {{- with .Content -}}
+      <div class="columns-intro">{{ . }}</div>
+    {{- end -}}
+    {{- range $columns -}}
+      {{- $column := . -}}
+      {{- $posts := .Pages.ByWeight -}}
+      <section class="column-card">
+        <div class="column-head">
+          {{- with .Params.cover -}}
+            <a class="column-cover" href="{{ $column.RelPermalink }}" aria-label="{{ $column.Title }}">
+              <img src="{{ . | relURL }}" alt="{{ $column.Title }}" loading="lazy" />
+            </a>
+          {{- end -}}
+          <div class="column-info">
+            <h2 class="column-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+            <p class="column-meta">{{ len $posts }} 篇 · 按序号学习</p>
+            {{- with .Params.description -}}
+              <p class="column-desc">{{ . }}</p>
+            {{- end -}}
+          </div>
+        </div>
+        <ol class="column-list">
+          {{- range $idx, $p := $posts -}}
+            <li class="column-item">
+              <span class="column-item-num" aria-hidden="true">{{ printf "%02d" (add $idx 1) }}</span>
+              <a class="column-item-title" href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+              <time class="column-item-date" datetime="{{ $p.Date }}">{{ $p.Date.Format "2006-01-02" }}</time>
+            </li>
+          {{- end -}}
+        </ol>
+      </section>
+    {{- end -}}
+  </div>
+{{- end -}}

@@ -9,8 +9,8 @@ menu:
   - name: archives
     url: "archives"
     icon:
-  - name: 人工智能学习
-    url: "categories/人工智能学习"
+  - name: 专栏
+    url: "columns"
     icon:
   - name: about
     url: "about"
@@ -666,6 +666,144 @@ injector:
       }
       #hero-cta-read::before {
         transition: none;
+      }
+    }
+    </style>
+    <style>
+    /* ===== 专栏页：专栏卡片与按序号排列的篇目列表 ===== */
+    .columns-wrap {
+      padding: 20px 0 8px;
+    }
+    .columns-intro {
+      padding: 4px 36px 16px;
+      color: var(--grey-9);
+      font-size: 14.5px;
+      line-height: 1.8;
+    }
+    .columns-intro p {
+      margin: 0;
+    }
+    .column-card {
+      margin: 0 28px 28px;
+      border: 1px solid var(--color-card-border);
+      border-radius: 16px;
+      background: var(--color-surface-muted);
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+    .column-card:hover {
+      box-shadow: var(--shadow-soft);
+    }
+    .column-head {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px 20px 14px;
+    }
+    .column-cover {
+      flex-shrink: 0;
+      width: 168px;
+      height: 98px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .column-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .column-info {
+      min-width: 0;
+    }
+    .column-title {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+    .column-title a {
+      color: var(--color-text-strong);
+      text-decoration: none;
+    }
+    .column-title a:hover {
+      color: var(--red-1);
+    }
+    .column-meta {
+      margin: 0 0 8px;
+      font-size: 12.5px;
+      color: var(--grey-9);
+      letter-spacing: 0.5px;
+    }
+    .column-desc {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--grey-9);
+    }
+    .column-list {
+      list-style: none;
+      margin: 0;
+      padding: 6px 12px 14px;
+    }
+    .column-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      transition: background 0.25s ease;
+    }
+    .column-item:hover {
+      background: var(--red-5);
+    }
+    .column-item-num {
+      flex-shrink: 0;
+      min-width: 34px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 999px;
+      background: var(--red-5);
+      color: var(--red-1);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: background 0.25s ease;
+    }
+    .column-item:hover .column-item-num {
+      background: var(--red-1);
+      color: #fff;
+    }
+    .column-item-title {
+      flex: 1;
+      min-width: 0;
+      text-decoration: none;
+      color: var(--color-text-strong);
+      font-weight: 600;
+      font-size: 14.5px;
+    }
+    .column-item-date {
+      flex-shrink: 0;
+      color: var(--grey-9);
+      font-size: 12px;
+    }
+    @media (max-width: 767px) {
+      .columns-intro {
+        padding: 4px 20px 12px;
+      }
+      .column-card {
+        margin: 0 12px 20px;
+      }
+      .column-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .column-cover {
+        width: 100%;
+        height: 130px;
+      }
+      .column-item-date {
+        display: none;
       }
     }
     </style>
