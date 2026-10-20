@@ -1,6 +1,6 @@
 ---
 title: 'Transformer 与注意力机制：用小例子看懂大模型地基'
-weight: 5
+weight: 7
 date: 2026-10-19T10:00:00+08:00
 lastmod: 2026-10-19T10:00:00+08:00
 cover: /images/covers/transformer-attention-basics-cover.jpg
