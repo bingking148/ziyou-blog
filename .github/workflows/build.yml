@@ -1,0 +1,56 @@
+name: Build site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: peaceiris/action-hugo@v2
+        with:
+          # 与本地版本保持一致；升级本地 Hugo 后记得同步改这里
+          hugo-version: '0.160.1'
+          extended: true
+
+      - name: Build
+        # 生产构建必须带 --minify --gc：minify 触发主题的 CSS 压缩+指纹分支（hugo.IsProduction），
+        # 也保证产物里不会混入 hugo server 的 livereload / localhost 残留
+        run: hugo --minify --gc --cleanDestinationDir
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: public/
+          retention-days: 14
+
+  # 目前部署方式：从 Actions 页面下载 site 产物（zip），解压后上传到自己的服务器。
+  # 如果以后想自动部署到 GitHub Pages：
+  #   1. 仓库 Settings -> Pages -> Source 选 GitHub Actions
+  #   2. 取消下面整个 job 的注释
+  # deploy-pages:
+  #   needs: build
+  #   permissions:
+  #     pages: write
+  #     id-token: write
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   steps:
+  #     - name: Configure Pages
+  #       uses: actions/configure-pages@v5
+  #     - name: Upload Pages artifact
+  #       uses: actions/upload-pages-artifact@v3
+  #       with:
+  #         path: public/
+  #     - name: Deploy
+  #       id: deployment
+  #       uses: actions/deploy-pages@v4
