@@ -244,7 +244,8 @@
       {{- if $isHeroHome -}}
         {{- with .Site.Params.avatar -}}
           <div class="hero-avatar-wrap" data-aos="zoom-in">
-            <img class="hero-avatar" src="{{ . | relURL }}" alt="{{ $.Site.Params.author }}">
+            {{- /* 头像统一放在 avatar/ 目录下（与侧边栏 commonBar 的拼法保持一致），否则首页英雄区会 404 */ -}}
+            <img class="hero-avatar" src="{{ printf "avatar/%s" . | relURL }}" alt="{{ $.Site.Params.author }}">
           </div>
         {{- end -}}
 

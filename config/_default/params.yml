@@ -9,6 +9,9 @@ menu:
   - name: archives
     url: "archives"
     icon:
+  - name: search
+    url: "search"
+    icon:
   - name: 专栏
     url: "columns"
     icon:
@@ -49,10 +52,16 @@ subtitle:
     smartBackspace: false
   text: "在键盘上写下又一行注释"
 
-banner: "images/hero-bg.png"
+# 横幅：hero-bg 由原图（4975px PNG，1.9MB）压缩成三档 JPEG，配合 srcset 按屏宽取图
+banner: "images/hero-bg-1920.jpg"
 
 banner_srcset:
-  enable: false
+  enable: true
+  srcset:
+    - media: "(max-width: 767px)"
+      src: "images/hero-bg-760.jpg"
+    - media: "(max-width: 1279px)"
+      src: "images/hero-bg-1280.jpg"
 
 avatar: "88798328f4e66fedf4a2518539c9b35d.jpg"
 
@@ -63,7 +72,7 @@ open_graph:
   enable: true
   options:
 
-excerpt_link: Read More
+excerpt_link: 阅读全文
 
 copyright:
 
@@ -160,7 +169,9 @@ custom_font:
   code:
 
 font:
-  enable: true
+  # Mulish 已自托管到 /resources/mulish/（injector head_end 引入），关闭 Google Fonts 按需加载链路
+  # font.article 仍写 Mulish，SCSS 生成的 font-family 栈不变，视觉无差异
+  enable: false
   article:
     - Mulish
   code:
@@ -455,7 +466,7 @@ top:
     mask: true
 
 outdate:
-  enable: false
+  enable: true
   daysAgo: 180
   message:
     en: This article was last updated on {time}. Please note that the content may no longer be applicable.
@@ -506,10 +517,13 @@ home_categories:
 injector:
   head_begin:
   head_end: |
+    <!-- 字体全部自托管（/resources/），不再依赖 jsdelivr / Google Fonts，国内直连可达 -->
     <!-- 霞鹜文楷 Screen：中文正文衬线（异步加载，不阻塞首屏） -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" /></noscript>
+    <link rel="stylesheet" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/style.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/style.css" /></noscript>
+    <!-- Mulish：拉丁字符正文（异步加载） -->
+    <link rel="stylesheet" href="/resources/mulish/mulish.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="/resources/mulish/mulish.css" /></noscript>
     <style>
     #header img {
       top: -10px;
@@ -1389,7 +1403,9 @@ player:
       lrcType: 3
   meting:
     enable: true
-    meting_api:
+    # meting@2.0.1 默认走 api.i-meto.com（长期不稳定）；
+    # 换成 theme-shokax 社区公共 API，若哪天失效改回空串即回退默认
+    meting_api: https://meting.qjqq.cn/api
     options:
       id: 17897599393
       server: netease

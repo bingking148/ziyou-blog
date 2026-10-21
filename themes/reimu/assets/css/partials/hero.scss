@@ -20,7 +20,8 @@
   width: 100vw;
   height: 100vh;
   z-index: 0;
-  background-image: url("../images/hero-bg.png");
+  // hero-bg 原图（4975px PNG）已压缩成三档 JPEG，桌面取 1920、手机取 760
+  background-image: url("../images/hero-bg-1920.jpg");
   background-position: right center; // 锚定右侧人物，保证竖屏不被裁掉
   background-size: cover;
   background-repeat: no-repeat;
@@ -31,6 +32,12 @@
   transform: scale(calc(1 + var(--hero-blur, 0px) * 0.012));
   transform-origin: center center;
   will-change: filter, transform;
+}
+
+@media (max-width: 767px) {
+  #immersive-bg {
+    background-image: url("../images/hero-bg-760.jpg");
+  }
 }
 
 // 内容可读遮罩：随滚动由“无”渐变为“半透明纯色”，让正文区可读

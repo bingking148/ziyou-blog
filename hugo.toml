@@ -4,6 +4,7 @@ defaultContentLanguage = 'zh-CN'
 title = 'ZIYOU'
 theme = 'reimu'
 hasCJKLanguage = true
+enableRobotsTXT = true
 
 [languages]
 [languages.zh-CN]
