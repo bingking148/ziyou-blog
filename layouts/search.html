@@ -1,0 +1,218 @@
+{{- define "main" -}}
+<article class="h-entry article">
+  <div class="article-inner" data-aos="{{ .Site.Params.animation.options.article.whole }}">
+    <h1 class="search-title">搜索</h1>
+    <p class="search-hint">输入关键词，在站内文章的标题、简介、标签和正文中查找。中文直接整词匹配，英文支持模糊纠错。</p>
+    <div class="search-box">
+      <input
+        id="search-input"
+        type="search"
+        placeholder="比如：注意力、Python、贝叶斯……"
+        aria-label="搜索文章"
+        autocomplete="off"
+        autofocus
+      />
+    </div>
+    <div id="search-status" class="search-status" aria-live="polite"></div>
+    <ol id="search-results" class="search-results"></ol>
+  </div>
+</article>
+
+<script src="{{ "resources/fuse.js@7.1.0/dist/fuse.min.js" | relURL }}" defer></script>
+<style>
+  .search-title {
+    margin: 10px 0 6px;
+    font-size: 28px;
+  }
+  .search-hint {
+    margin: 0 0 18px;
+    color: var(--grey-9);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .search-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--color-text-strong);
+    background: var(--color-surface-muted);
+    border: 1px solid var(--color-card-border);
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .search-box input:focus {
+    border-color: var(--red-2);
+    box-shadow: 0 0 0 3px var(--red-5);
+  }
+  .search-status {
+    margin: 14px 2px 4px;
+    font-size: 13px;
+    color: var(--grey-9);
+  }
+  .search-results {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .search-result {
+    margin: 0 0 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-card-border);
+    border-radius: 12px;
+    background: var(--color-surface-muted);
+    transition: box-shadow 0.25s ease;
+  }
+  .search-result:hover {
+    box-shadow: var(--shadow-soft);
+  }
+  .search-result-title {
+    margin: 0 0 6px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .search-result-title a {
+    color: var(--color-text-strong);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .search-result-title a:hover {
+    color: var(--red-1);
+  }
+  .search-result-meta {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: var(--grey-9);
+  }
+  .search-result-snippet {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--grey-9);
+    word-break: break-word;
+  }
+  .search-result mark,
+  .search-result-title mark {
+    background: var(--red-4);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+  [data-theme="dark"] .search-result mark,
+  [data-theme="dark"] .search-result-title mark {
+    background: var(--red-5);
+  }
+  .search-empty {
+    margin: 24px 2px;
+    color: var(--grey-9);
+    font-size: 14px;
+  }
+</style>
+<script>
+  (function () {
+    'use strict';
+    var input = document.getElementById('search-input');
+    var statusEl = document.getElementById('search-status');
+    var resultsEl = document.getElementById('search-results');
+    if (!input) return;
+    var INDEX_URL = {{ "search/index.json" | relURL | jsonify }};
+    var docs = null, fuse = null, timer = null;
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    // 大小写不敏感地给命中片段加 <mark>
+    function highlight(text, q) {
+      var t = String(text);
+      var idx = t.toLowerCase().indexOf(q.toLowerCase());
+      if (idx === -1) return esc(t);
+      return esc(t.slice(0, idx)) + '<mark>' + esc(t.slice(idx, idx + q.length)) + '</mark>' + esc(t.slice(idx + q.length));
+    }
+    // 正文摘要：取第一处命中前后各 60 字
+    function snippet(content, q) {
+      var c = String(content || '').replace(/\s+/g, ' ').trim();
+      var idx = c.toLowerCase().indexOf(q.toLowerCase());
+      if (idx === -1) return c.slice(0, 120);
+      var start = Math.max(0, idx - 60);
+      var end = Math.min(c.length, idx + q.length + 60);
+      return (start > 0 ? '…' : '') + c.slice(start, end) + (end < c.length ? '…' : '');
+    }
+    function ensureIndex(cb) {
+      if (docs) { cb(); return; }
+      statusEl.textContent = '正在加载索引…';
+      fetch(INDEX_URL)
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          docs = d;
+          if (window.Fuse) {
+            fuse = new window.Fuse(d, {
+              keys: [
+                { name: 'title', weight: 3 },
+                { name: 'description', weight: 2 },
+                { name: 'tags', weight: 2 }
+              ],
+              threshold: 0.4,
+              ignoreLocation: true
+            });
+          }
+          cb();
+        })
+        .catch(function () {
+          statusEl.textContent = '索引加载失败，请刷新重试。';
+        });
+    }
+    function substringHits(q) {
+      var ql = q.toLowerCase();
+      var meta = [], body = [];
+      docs.forEach(function (d) {
+        var hay = (d.title + '\n' + d.description + '\n' + (d.tags || []).join('\n')).toLowerCase();
+        if (hay.indexOf(ql) !== -1) { meta.push(d); return; }
+        if (String(d.content || '').toLowerCase().indexOf(ql) !== -1) body.push(d);
+      });
+      return meta.concat(body);
+    }
+    function render(items, q) {
+      if (!q) {
+        statusEl.textContent = '';
+        resultsEl.innerHTML = '';
+        return;
+      }
+      if (!items.length) {
+        statusEl.textContent = '没有找到与「' + q + '」相关的文章。';
+        resultsEl.innerHTML = '';
+        return;
+      }
+      statusEl.textContent = '共找到 ' + items.length + ' 篇相关文章：';
+      resultsEl.innerHTML = items.slice(0, 30).map(function (d) {
+        var meta = [d.date].concat((d.tags || []).slice(0, 3).map(function (t) { return '#' + t; })).join(' · ');
+        return '<li class="search-result">'
+          + '<h2 class="search-result-title"><a href="' + d.permalink + '">' + highlight(d.title, q) + '</a></h2>'
+          + '<p class="search-result-meta">' + esc(meta) + '</p>'
+          + '<p class="search-result-snippet">' + highlight(snippet(d.content, q), q) + '</p>'
+          + '</li>';
+      }).join('');
+    }
+    function run() {
+      var q = input.value.trim();
+      if (!q) { statusEl.textContent = '输入关键词开始搜索。'; resultsEl.innerHTML = ''; return; }
+      ensureIndex(function () {
+        var hits = substringHits(q);
+        // 中文整词没命中时，交给 fuse 做英文模糊匹配
+        if (!hits.length && fuse) {
+          hits = fuse.search(q).slice(0, 20).map(function (r) { return r.item; });
+        }
+        render(hits, q);
+      });
+    }
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(run, 200);
+    });
+    statusEl.textContent = '输入关键词开始搜索。';
+  })();
+</script>
+{{- end -}}
