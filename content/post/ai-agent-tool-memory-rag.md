@@ -2,7 +2,7 @@
 title: 'AI Agent 开发入门：工具、记忆和最小 RAG'
 weight: 12
 date: 2026-10-19T10:20:00+08:00
-lastmod: 2026-10-19T10:20:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/ai-agent-tool-memory-rag-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['AI Agent', '智能体', '工具调用', 'RAG', '大模型']
@@ -159,7 +159,7 @@ SYSTEM_PROMPT = """
 
 
 def maybe_calculate(question: str) -> str | None:
-    match = re.search(r"[0-9]+\s*[+\-*/]\s*[0-9]+", question)
+    match = re.search(r"[0-9]+(?:\s*[+\-*/]\s*[0-9]+)+", question)
     if not match:
         return None
 
@@ -209,6 +209,10 @@ def build_agent_messages(question: str, memory: list[dict]) -> list[dict]:
 1. `tool_result` 是程序执行后的观察结果；
 2. `rag_result` 是检索到的资料片段，不是模型的长期记忆。
 
+顺带说一下正则 `[0-9]+(?:\s*[+\-*/]\s*[0-9]+)+`：末尾的 `+` 让“空格 运算符 空格 数字”这一组可以连续出现，所以「3 + 4 * 2」会被完整匹配出来。如果写成 `[0-9]+\s*[+\-*/]\s*[0-9]+`（少了外层分组），只能匹配到「3 + 4」，算式一长就截断，这是个很容易踩的坑。
+
+还要说明这种写法的局限：**由程序规则决定“什么时候算、什么时候查”，模型本身没有参与决策**，所以它叫路由式 Agent，适合演示骨架。工业界的做法是函数调用（function calling）：先在请求里声明每个工具的名字、用途和参数格式，模型判断需要时直接输出结构化的调用请求，程序执行后把结果回传，模型再决定下一步，如此循环。MCP 协议解决的就是工具怎么统一声明和对接的问题。思路是相通的——都是"模型决策，程序执行，结果回流"——只是决策者从写死的规则换成了模型。
+
 ## 6. 接上大模型和会话记忆
 
 下面以 OpenAI 兼容接口为例。本地 Ollama 或云端 DeepSeek 都可以套用这个结构。
@@ -227,7 +231,7 @@ def run_agent(question: str, memory: list[dict]) -> str:
     messages = build_agent_messages(question, memory)
 
     response = client.chat.completions.create(
-        model="deepseek-r1:1.5b",
+        model="qwen3.5:4b",
         messages=messages,
         temperature=0.2,
     )
@@ -262,8 +266,10 @@ if __name__ == "__main__":
 短期记忆通常是最近几轮对话：
 
 ```python
-memory = memory[-10:]
+memory[:] = memory[-10:]
 ```
+
+注意这里必须写 `memory[:] = ...` 而不是 `memory = ...`。后者只是让局部变量指向一个新列表，调用方手里的原列表纹丝不动；前者是对原列表原地截断，改动才会真正生效。这是 Python 列表的一个高频坑。
 
 长期记忆不是把所有聊天记录都塞进去，而是先总结、抽取或检索。常见做法：
 

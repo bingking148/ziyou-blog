@@ -2,7 +2,7 @@
 title: 'Streamlit AI 聊天应用：一套代码兼容 DeepSeek 与 Ollama'
 weight: 11
 date: 2026-10-19T10:25:00+08:00
-lastmod: 2026-10-19T10:25:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/streamlit-ai-chat-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Streamlit', 'Python', '大模型', 'DeepSeek', 'Ollama']
@@ -70,7 +70,7 @@ PROVIDERS = {
     "Ollama 本地模型": {
         "base_url": "http://127.0.0.1:11434/v1",
         "api_key": "ollama",
-        "model": "deepseek-r1:1.5b",
+        "model": "qwen3.5:4b",
     },
     "DeepSeek 官方 API": {
         "base_url": os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
@@ -207,7 +207,7 @@ ollama serve
 
 ```bash
 ollama list
-ollama run deepseek-r1:1.5b
+ollama run qwen3.5:4b
 ```
 
 Ollama 的安装、模型存储路径和常见错误，可以看这篇文章：[Ollama 本地部署大模型](/post/ollama-local-llm-deploy/)。

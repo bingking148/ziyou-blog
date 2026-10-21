@@ -2,7 +2,7 @@
 title: '提示词工程实战：角色、任务、要求与结构化输出'
 weight: 10
 date: 2026-10-19T10:15:00+08:00
-lastmod: 2026-10-19T10:15:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/prompt-engineering-workflow-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['提示词工程', 'Prompt', '大模型', 'Python']
@@ -153,6 +153,18 @@ print(prompt)
 3. 情感只能是“正面”“负面”“混合”之一；
 4. 如果没有问题，问题数组返回空数组。
 ```
+
+如果用的是 DeepSeek 这类支持 JSON Output 的服务，还可以在请求里加一个参数，从接口层面强制模型输出合法 JSON：
+
+```python
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=messages,
+    response_format={"type": "json_object"},
+)
+```
+
+两个注意点：提示词里必须出现 "json" 这个词（最好附上字段示例），否则接口会报错；本地 Ollama 不一定支持这个参数，所以下一节的手动解析仍然值得写。
 
 ## 6. 用 Python 解析结构化结果
 

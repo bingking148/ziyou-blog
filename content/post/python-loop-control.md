@@ -2,7 +2,7 @@
 title: 'Python 循环控制：for、range、嵌套循环与登录实战'
 weight: 5
 date: 2026-10-20T09:00:00+08:00
-lastmod: 2026-10-20T09:00:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/python-loop-control-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '循环', '流程控制']
@@ -347,7 +347,7 @@ for attempt in range(1, 6):
         continue
 
     if accounts.get(username) == password:
-        print("登录成功，进入 B 站首页～")
+        print(f"登录成功，欢迎你，{username}！")
         break
 
     print("用户名或密码错误，请重新输入！")

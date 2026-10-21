@@ -2,7 +2,7 @@
 title: 'Python 基础：从字面量、变量到运算符，一篇讲清入门语法'
 weight: 3
 date: 2026-10-16T09:02:00+08:00
-lastmod: 2026-10-16T09:02:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/python-basics-for-ai-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '大模型', '入门教程']
@@ -388,7 +388,6 @@ print(name, version)
 ```python
 balance = 10000
 
-password = input("请输入密码：")
 amount = float(input("请输入取款金额："))
 
 if amount <= balance:
@@ -666,9 +665,3 @@ else:
    条件必须同时满足用 `and`，多个条件满足任意一个即可用 `or`。
 
 掌握这些内容后，你已经能看懂大多数 Python 入门脚本，也能为后面调用大模型 API、处理 JSON、写多轮对话脚本打下基础。
-
-
-
-
-
-

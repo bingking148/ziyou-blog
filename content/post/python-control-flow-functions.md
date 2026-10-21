@@ -2,7 +2,7 @@
 title: 'Python 控制流与函数：从 if/while 到可复用小工具'
 weight: 4
 date: 2026-10-19T10:05:00+08:00
-lastmod: 2026-10-19T10:05:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/python-control-flow-functions-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '函数', '循环']
@@ -243,6 +243,8 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+代码末尾的 `if __name__ == "__main__":` 是 Python 的固定惯用写法，值得现在就记住：直接运行这个文件时，Python 会把特殊变量 `__name__` 设成字符串 `"__main__"`，条件成立，`main()` 被执行；而当这个文件被别的代码 `import` 时，`__name__` 是模块名，这段就不会自动跑。它的作用是把“程序入口”和“函数定义”分开——别的文件可以复用你的 `classify_score()`，又不会一导入就弹出满屏的 `input()`。
 
 运行方式：
 

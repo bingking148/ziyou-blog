@@ -2,7 +2,7 @@
 title: '大模型 API 与 Apifox：DeepSeek 云端调用入门'
 weight: 9
 date: 2026-10-19T10:10:00+08:00
-lastmod: 2026-10-19T10:10:00+08:00
+lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/llm-api-apifox-deepseek-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['大模型', 'API', 'DeepSeek', 'Apifox', 'OpenAI SDK']
@@ -53,15 +53,17 @@ DEEPSEEK_MODEL=deepseek-chat
 
 ## 3. 请求里最重要的几个字段
 
-OpenAI 兼容接口常见字段如下：
+先分清两层：`base_url` 和 `api_key` 是创建客户端时的**配置参数**，告诉 SDK 把请求发给谁、用什么身份发；`model`、`messages`、`temperature` 是放进**请求体**的字段，决定模型怎么回答。
 
-| 字段 | 含义 |
-|---|---|
-| `base_url` | 服务地址，例如 DeepSeek 官方 API 地址 |
-| `api_key` | 身份凭证 |
-| `model` | 模型名称 |
-| `messages` | 对话内容，包含角色和文本 |
-| `temperature` | 控制随机性，值越高越发散，越低越稳定 |
+| 字段 | 所在位置 | 含义 |
+|---|---|---|
+| `base_url` | SDK 客户端配置 | 服务地址，例如 DeepSeek 官方 API 地址 |
+| `api_key` | SDK 客户端配置 | 身份凭证 |
+| `model` | 请求体 | 模型名称 |
+| `messages` | 请求体 | 对话内容，包含角色和文本 |
+| `temperature` | 请求体 | 控制随机性，取值 0 到 2，默认 1.0；值越高越发散，越低越稳定 |
+
+`temperature` 再多说一句：0 附近每次回答几乎一样，适合写程序要稳定结果的场景；调高则更有“创意”，代价是更容易跑偏。这个系列的文章里，做工具用低值（0.2 左右），做发散头脑风暴才用高值。
 
 `messages` 常见角色有三种：
 
@@ -85,14 +87,13 @@ https://api.deepseek.com/chat/completions
 ```
 
 4. 添加请求头：
-5. 添加请求头：
 
 ```http
 Authorization: Bearer 你的APIKey
 Content-Type: application/json
 ```
 
-6. Body 选择 JSON，写入：
+5. Body 选择 JSON，写入：
 
 ```json
 {
@@ -110,8 +111,8 @@ Content-Type: application/json
 }
 ```
 
-7. 点击发送，查看状态码和响应体；
-8. 正常情况下，响应里会包含模型回答、token 用量等字段。
+6. 点击发送，查看状态码和响应体；
+7. 正常情况下，响应里会包含模型回答、token 用量等字段。
 
 如果返回 `401`，通常是 API Key 错误或格式不对；返回 `429`，通常是触发限流；返回 `400`，通常是 JSON 格式或参数有问题。
 
@@ -216,10 +217,12 @@ Ollama 的详细部署可以看这篇文章：[Ollama 本地部署大模型](/po
 4. 是否捕获了网络异常和认证异常；
 5. 提交前是否搜索过真实 Key 片段。
 
-## 8. 你应该掌握的判断题
+## 8. 学完这篇，你应该能回答
 
-1. API Key 是调用云端模型的身份凭证。
-2. PyCharm 是 IDE，不是 Python 解释器。
-3. Apifox 主要用于调试 HTTP 接口。
-4. 本地 Ollama 下载模型后，不一定必须一直联网。
-5. API Key 绝不能提交到公开仓库。
+1. `base_url` 和 `model` 分别写在哪里？为什么一个在客户端、一个在请求体？
+2. PyCharm、Python 解释器、openai 这个库，三者分别扮演什么角色？
+3. Apifox 在开发流程里解决什么问题？
+4. 本地 Ollama 和云端 API 各自的 `api_key`、`base_url` 怎么写？
+5. 为什么 API Key 绝不能提交到公开仓库？泄露后第一件事应该做什么？
+
+第 5 题补充一句实操：万一 Key 泄露，第一件事不是删代码，而是去服务商后台立刻吊销这把 Key，再生成新的。
