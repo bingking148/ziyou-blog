@@ -5,6 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # 与本地版本保持一致；升级本地 Hugo 后记得同步改这里
+  HUGO_VERSION: '0.160.1'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,12 +16,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 不再用 peaceiris/action-hugo：该仓库已无法解析（repository not found）。
+      # 直接从 gohugoio/hugo 官方 release 下载钉死版本的 extended 二进制。
       - name: Setup Hugo
-        uses: peaceiris/action-hugo@v2
-        with:
-          # 与本地版本保持一致；升级本地 Hugo 后记得同步改这里
-          hugo-version: '0.160.1'
-          extended: true
+        run: |
+          curl -fsSL -o hugo.tar.gz \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
+          tar -xzf hugo.tar.gz hugo
+          sudo install -m 755 hugo /usr/local/bin/hugo
+          hugo version
 
       - name: Build
         # 生产构建必须带 --minify --gc：minify 触发主题的 CSS 压缩+指纹分支（hugo.IsProduction），
