@@ -1,6 +1,6 @@
 ---
 title: 'Ollama 本地部署大模型：从安装、选模型到 API 调用完整指南'
-weight: 8
+weight: 9
 date: 2026-10-16T09:01:00+08:00
 lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/ollama-local-llm-deploy-cover.jpg

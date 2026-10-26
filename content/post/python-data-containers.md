@@ -2,7 +2,7 @@
 title: 'Python 数据容器：列表、字符串、元组、集合与字典'
 weight: 6
 date: 2026-10-20T09:30:00+08:00
-lastmod: 2026-10-20T09:30:00+08:00
+lastmod: 2026-10-26T10:00:00+08:00
 cover: /images/covers/python-data-containers-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '数据容器', '列表', '字典', '大模型']
@@ -886,6 +886,42 @@ students = {
 
 这个练习会同时用到字典、列表、循环、条件判断、输入输出和异常处理。写完它，你对 Python 基础语法的理解会从“知道语法”进入“能组织数据”。
 
+### 10.1 加餐练习：三个 AI 场景
+
+下面三个练习直接来自大模型开发里的真实场景，做完会发现集合和字典不是语法练习，是干活的家伙。
+
+**练习一：智能体工具权限对比（集合运算）**
+
+```python
+planner_tools = {'web_search', 'calculator', 'code_interpreter', 'web_search'}
+coder_tools = {'code_interpreter', 'file_write', 'web_search'}
+```
+
+用 `union()`、`intersection()`、`difference()` 完成：打印 planner 去重后的工具数量；两个智能体共同拥有的工具；planner 独有、coder 独有的工具；平台上出现过的全部工具（并集）。注意第一行里重复出现的 `web_search`——这正是集合自动去重派上用场的时刻。
+
+**练习二：大模型调用日志分析（字典嵌套字典）**
+
+```python
+call_log = {
+    'qwen-max': {'calls': 120, 'tokens': 480000},
+    'llama-3':  {'calls': 60,  'tokens': 150000},
+    'glm-4':    {'calls': 90,  'tokens': 270000},
+}
+```
+
+遍历打印每条调用记录；统计总调用次数和总 token 数；计算平均每次调用的 token 数（保留 2 位小数）；最后新增一个模型 `deepseek`（40 次调用、100000 token）再打印模型总数。进阶写法：统计部分分别用普通循环和列表推导式各写一遍，对比哪种更清晰。
+
+**练习三：AI 模型配置中心（字典 + while 菜单）**
+
+```python
+models = {
+    'qwen-max': {'ctx': 32000, 'price': 0.02},
+    'llama-3':  {'ctx': 8000,  'price': 0.004},
+}
+```
+
+实现一个菜单系统：添加模型配置（已存在要提示）、修改配置、删除配置、用 `get()` 查询单个模型（不存在时给出提示而不是报错）、列出全部并统计总数与平均上下文长度、退出。非法编号统一提示重新输入。这道题就是练习一、二加上 [循环控制](/post/python-loop-control/) 里的菜单循环——三层结构嵌套着练，才算是真的掌握了字典。
+
 ## 11. 学习检查表
 
 1. 列表、元组、集合、字典各自是否有序？
@@ -896,4 +932,4 @@ students = {
 6. 字典的 key 有什么限制？
 7. 大模型 API 返回的嵌套 JSON 应该怎么逐层读取？
 
-下一篇 [Transformer 与注意力机制](/post/transformer-attention-basics/) 会回到 AI 主线。数据容器和循环会继续出现：模型输入是序列，训练数据是批量集合，API 响应是嵌套字典，理解这些 Python 基础后，你会更容易看懂后面的代码示例。
+下一篇 [Python 函数详解](/post/python-functions-in-depth/) 把函数这块拼图补上：多种参数形态、变量作用域、`*args` 与 `**kwargs`，还有递归。调用大模型 API 时那些名目繁多的配置参数，答案都在那一篇里。

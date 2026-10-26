@@ -2,7 +2,7 @@
 title: 'Python 控制流与函数：从 if/while 到可复用小工具'
 weight: 4
 date: 2026-10-19T10:05:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-26T10:00:00+08:00
 cover: /images/covers/python-control-flow-functions-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '函数', '循环']
@@ -150,6 +150,8 @@ print(average([88, 92, 79], precision=1))
 ```
 
 这里的 `scores: list[float]` 说明参数应该是浮点数列表，`precision: int = 2` 表示精度默认是 2。
+
+这一篇里函数只开个头。参数的四种形态、`*args` 与 `**kwargs`、全局与局部变量、递归这些进阶内容，放在后面的 [Python 函数详解](/post/python-functions-in-depth/) 单独展开。
 
 ## 7. 异常处理：不让小错误压垮程序
 
