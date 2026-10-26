@@ -1,0 +1,130 @@
+{{- /* 文章底部前后篇导航（覆盖 themes/reimu/layouts/partials/post/nav.html）。
+       主题原版用 .PrevInSection/.NextInSection，其指针方向与「按 weight 排序的专栏」
+       阅读顺序相反（Prev 指向 weight 更大的一篇）。这里改为在合集里按下标取相邻页：
+       专栏文章（所属分类 term 标了 column: true）只在专栏内按 weight 顺序导航；
+       非专栏文章回退到本 section 的默认排序。 */ -}}
+{{- $navPages := .CurrentSection.RegularPages -}}
+{{- $columnFound := false -}}
+{{- range .GetTerms "categories" -}}
+  {{- if and .Params.column (not $columnFound) -}}
+    {{- $columnFound = true -}}
+    {{- $navPages = where $.CurrentSection.RegularPages "Params.categories" "intersect" (slice .Data.Term) -}}
+  {{- end -}}
+{{- end -}}
+{{- $prevPage := "" -}}
+{{- $nextPage := "" -}}
+{{- range $idx, $p := $navPages -}}
+  {{- if $p.Eq $ -}}
+    {{- if gt $idx 0 -}}{{- $prevPage = index $navPages (sub $idx 1) -}}{{- end -}}
+    {{- if lt (add $idx 1) (len $navPages) -}}{{- $nextPage = index $navPages (add $idx 1) -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if or $prevPage $nextPage -}}
+  <nav
+    id="article-nav"
+    aria-label="Article navigation"
+    data-aos="{{ .Site.Params.animation.options.article.nav }}"
+  >
+    {{- with $prevPage -}}
+      <div class="article-nav-link-wrap left">
+        {{- if and .Params.cover (not (strings.HasPrefix .Params.cover "rgb")) -}}
+          <img
+            data-src="{{ .Params.cover | relURL }}"
+            data-sizes="auto"
+            alt="{{ .Title }}"
+            class="lazyload"
+          />
+        {{- else -}}
+          {{- $covers := partial "helpers/randomCover.html" . -}}
+          {{- if $covers -}}
+            <img
+              data-src="{{ $covers | relURL }}"
+              data-sizes="auto"
+              alt="{{ .Title }}"
+              class="lazyload"
+            />
+          {{- else -}}
+            <img
+              data-src="{{ .Site.Params.banner | relURL }}"
+              data-sizes="auto"
+              alt="{{ .Title }}"
+              class="lazyload"
+            />
+          {{- end -}}
+        {{- end -}}
+        <a
+          href="{{ .Permalink | relURL }}"
+          aria-label="{{ i18n "newer" }}: {{- if .Title -}}
+            {{- .Title -}}
+          {{- else -}}
+            (no title)
+          {{- end -}}"
+          title="{{ i18n "newer" }}: {{- if .Title -}}
+            {{- .Title -}}
+          {{- else -}}
+            (no title)
+          {{- end -}}"
+        ></a>
+        <div class="article-nav-caption">{{ i18n "newer" }}</div>
+        <h3 class="article-nav-title">
+          {{- if .Title -}}
+            {{- .Title -}}
+          {{- else -}}
+            (no title)
+          {{- end -}}
+        </h3>
+      </div>
+    {{- end -}}
+
+    {{- with $nextPage -}}
+      <div class="article-nav-link-wrap right">
+        {{- if and .Params.cover (not (strings.HasPrefix .Params.cover "rgb")) -}}
+          <img
+            data-src="{{ .Params.cover | relURL }}"
+            data-sizes="auto"
+            alt="{{ .Title }}"
+            class="lazyload"
+          />
+        {{- else -}}
+          {{- $covers := partial "helpers/randomCover.html" . -}}
+          {{- if $covers -}}
+            <img
+              data-src="{{ $covers | relURL }}"
+              data-sizes="auto"
+              alt="{{ .Title }}"
+              class="lazyload"
+            />
+          {{- else -}}
+            <img
+              data-src="{{ .Site.Params.banner | relURL }}"
+              data-sizes="auto"
+              alt="{{ .Title }}"
+              class="lazyload"
+            />
+          {{- end -}}
+        {{- end -}}
+        <a
+          href="{{ .Permalink | relURL }}"
+          aria-label="{{ i18n "older" }}: {{- if .Title -}}
+            {{- .Title -}}
+          {{- else -}}
+            (no title)
+          {{- end -}}"
+          title="{{ i18n "older" }}: {{- if .Title -}}
+            {{- .Title -}}
+          {{- else -}}
+            (no title)
+          {{- end -}}"
+        ></a>
+        <div class="article-nav-caption">{{ i18n "older" }}</div>
+        <h3 class="article-nav-title">
+          {{- if .Title -}}
+            {{- .Title -}}
+          {{- else -}}
+            (no title)
+          {{- end -}}
+        </h3>
+      </div>
+    {{- end -}}
+  </nav>
+{{- end -}}
