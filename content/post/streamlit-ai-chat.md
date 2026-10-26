@@ -1,6 +1,6 @@
 ---
 title: 'Streamlit AI 聊天应用：一套代码兼容 DeepSeek 与 Ollama'
-weight: 12
+weight: 14
 date: 2026-10-19T10:25:00+08:00
 lastmod: 2026-10-21T10:00:00+08:00
 cover: /images/covers/streamlit-ai-chat-cover.jpg
