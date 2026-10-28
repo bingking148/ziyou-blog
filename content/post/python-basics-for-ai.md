@@ -2,7 +2,7 @@
 title: 'Python 基础：从字面量、变量到运算符，一篇讲清入门语法'
 weight: 3
 date: 2026-10-16T09:02:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/python-basics-for-ai-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '大模型', '入门教程']
@@ -323,7 +323,7 @@ print(f"大家好, 我是 {name}, 今年 {age} 岁")
 f-string 的优点是直观，花括号里可以直接放变量，甚至可以放表达式：
 
 ```python
-price = 9.9
+price = 9
 count = 3
 print(f"总价：{price * count}")
 ```
@@ -513,6 +513,9 @@ print(age == 18) # 判断
 几个常见业务判断：
 
 ```python
+# 下面是条件写法示意，num、balance 等变量在真实代码里已有赋值；
+# 直接复制整块运行会 NameError，重点看比较运算符怎么写
+
 # 判断偶数
 num % 2 == 0
 

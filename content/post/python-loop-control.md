@@ -2,7 +2,7 @@
 title: 'Python 循环控制：for、range、嵌套循环与登录实战'
 weight: 5
 date: 2026-10-20T09:00:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/python-loop-control-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '循环', '流程控制']
@@ -318,7 +318,7 @@ for n in range(1, 11):
 - `continue`：这轮跳过，下一轮继续；
 - `return`：如果写在函数里，直接结束函数。
 
-它们只能出现在循环里，不能单独写在外面。
+`break` 和 `continue` 只能出现在循环里，不能单独写在外面；`return` 则只能出现在函数里。
 
 ## 7. 实战：限制 5 次机会的登录验证
 

@@ -2,7 +2,7 @@
 title: 'Python 数据容器：列表、字符串、元组、集合与字典'
 weight: 6
 date: 2026-10-20T09:30:00+08:00
-lastmod: 2026-10-26T10:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/python-data-containers-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '数据容器', '列表', '字典', '大模型']
@@ -840,6 +840,7 @@ t = (10,)  # tuple
 优先使用 `get()`：
 
 ```python
+# config 是已经存在的字典，例如 {"model": "qwen-max", "temperature": 0.7}
 value = config.get("temperature", 0.7)
 ```
 

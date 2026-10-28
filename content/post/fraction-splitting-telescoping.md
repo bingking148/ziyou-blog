@@ -1,7 +1,7 @@
 ---
 title: '裂项相消法：从分数拆分看透数列求和的本质'
 date: 2026-05-31T10:48:33+08:00
-lastmod: 2026-10-19T11:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/fraction-splitting-cover.jpg
 categories: ['数学笔记']
 tags: ['数学', '数列', '裂项相消']
@@ -264,7 +264,7 @@ $$1\times2+2\times3+3\times4+\cdots+n(n+1)$$
 
 $$k(k+1)=\frac13\left[k(k+1)(k+2)-(k-1)k(k+1)\right]$$
 
-因为括号里两个式子相减后，中间公共的 $k(k+1)$ 会留下一个差值 3：
+因为相减时公因式 $k(k+1)$ 被保留下来，括号部分给出一个差值 3：
 
 $$k(k+1)[(k+2)-(k-1)] = 3k(k+1)$$
 
@@ -278,7 +278,7 @@ $$1\times2+2\times3+\cdots+n(n+1)=\frac13 n(n+1)(n+2)$$
 
 $$1\times2+2\times3+\cdots+99\times100=\frac13\times99\times100\times101$$
 
-这比一项一项加快得多。
+这比一项一项地加起来快得多。
 
 ## 六、平方和公式也可以这样理解
 
