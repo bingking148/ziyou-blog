@@ -2,11 +2,11 @@
 title: 'Python 面向对象入门：类、对象与魔法方法'
 weight: 9
 date: 2026-10-26T11:00:00+08:00
-lastmod: 2026-10-26T11:00:00+08:00
+lastmod: 2026-10-28T10:00:00+08:00
 cover: /images/covers/python-oop-basics-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', '面向对象', '类']
-description: 'Python 基础最后一块拼图：类与对象、__init__ 初始化属性、self 与实例方法，以及 __str__、__eq__、__lt__ 魔法方法，看懂 client.chat.completions.create 这类面向对象写法。'
+description: 'Python 面向对象入门：类与对象、__init__ 初始化属性、self 与实例方法，以及 __str__、__eq__、__lt__ 魔法方法，看懂 client.chat.completions.create 这类面向对象写法。'
 math: false
 mermaid: false
 comments: true
@@ -15,7 +15,7 @@ toc: true
 
 到这里，你已经掌握了变量、容器、循环、函数、模块（见 [Python 匿名函数与模块](/post/python-lambda-modules/)）。但有一类代码你天天见却一直没拆开过：`client.chat.completions.create(model="...")`——这个「对象.属性.方法」的链条到底是什么？
 
-答案就是**面向对象编程（OOP）**。这一篇讲它的入门三件事：怎么用 `class` 定义类、怎么创建对象并设置属性、那些双下划线开头的**魔法方法**怎么让对象获得打印、比较的能力。学完这篇，Python 基础语法的主干就完整了。
+答案就是**面向对象编程（OOP）**。这一篇讲它的入门三件事：怎么用 `class` 定义类、怎么创建对象并设置属性、那些双下划线开头的**魔法方法**怎么让对象获得打印、比较的能力。学完这篇，你就能读懂 AI 框架里最常见的类写法；类属性、多类协作和异常处理，留到[下一篇](/post/python-oop-advanced-exceptions/)收官。
 
 ## 1. 从「一堆散装变量」到「一个对象」
 
@@ -250,4 +250,4 @@ print(response.choices[0].message.content)
 5. 为什么两个属性完全相同的对象默认 `==` 是 `False`？
 6. `client.chat.completions.create(...)` 里每一层点号分别在访问什么？
 
-Python 基础系列到这里收尾。下一篇 [Transformer 与注意力机制](/post/transformer-attention-basics/) 回到 AI 主线——变量、容器、循环、函数、模块、对象六块拼图集齐之后，后面的模型代码你都能自己跑起来了。
+下一篇 [Python 面向对象进阶与异常处理](/post/python-oop-advanced-exceptions/) 把类的最后几块拼图补上：类属性与实例属性怎么区分、教务系统和购物车两个多类协作的综合案例，以及 try/except 异常处理。那一篇是 Python 基础系列的正式收官，之后再进入 [Transformer 与注意力机制](/post/transformer-attention-basics/) 回到 AI 主线。

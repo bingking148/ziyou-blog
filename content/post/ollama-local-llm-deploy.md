@@ -1,8 +1,8 @@
 ---
 title: 'Ollama 本地部署大模型：从安装、选模型到 API 调用完整指南'
-weight: 11
+weight: 12
 date: 2026-10-16T09:01:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/ollama-local-llm-deploy-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Ollama', '本地大模型', '开源模型', 'Python', 'API']
@@ -39,7 +39,7 @@ ollama run qwen3.5
 官网地址：
 
 - 官网：<https://ollama.com/>
-- 下载页：<https://ollama.com/Download>
+- 下载页：<https://ollama.com/download>
 - Models 页可以理解为模型商店；
 - Docs 是文档；
 - Download 是安装包。

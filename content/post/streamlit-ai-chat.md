@@ -1,8 +1,8 @@
 ---
 title: 'Streamlit AI 聊天应用：一套代码兼容 DeepSeek 与 Ollama'
-weight: 14
+weight: 15
 date: 2026-10-19T10:25:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/streamlit-ai-chat-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Streamlit', 'Python', '大模型', 'DeepSeek', 'Ollama']
@@ -174,13 +174,8 @@ if prompt:
         except OpenAIError as exc:
             error_message = f"调用模型失败：{exc}"
             st.error(error_message)
-
-            st.session_state.messages.append(
-                {
-                    "role": "assistant",
-                    "content": error_message,
-                }
-            )
+            # 报错只展示、不写入会话历史：
+            # 历史里的内容下一轮会原样发给模型，错误文本混进去会污染上下文
 ```
 
 ## 3. 运行应用

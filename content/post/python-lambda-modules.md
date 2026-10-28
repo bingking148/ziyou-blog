@@ -2,7 +2,7 @@
 title: 'Python 匿名函数与模块：lambda、高阶函数和代码组织'
 weight: 8
 date: 2026-10-26T10:00:00+08:00
-lastmod: 2026-10-26T10:00:00+08:00
+lastmod: 2026-10-27T12:00:00+08:00
 cover: /images/covers/python-lambda-modules-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Python', '编程基础', 'lambda', '模块']
@@ -122,7 +122,7 @@ lambda 最常见的出场地点，是内置函数 `sort()` / `max()` / `min()` �
 str_list = ["C++", "C", "C#", "Java", "Python", "Ruby", "PHP", "Go"]
 str_list.sort(key=lambda s: len(s))
 print(str_list)
-# ['C', 'C#', 'Go', 'C++', 'Java', 'Ruby', 'PHP', 'Python']
+# ['C', 'C#', 'Go', 'C++', 'PHP', 'Java', 'Ruby', 'Python']
 ```
 
 `key=lambda s: len(s)` 的意思是：排序时别按字典序，先把每个元素送进这个函数，按返回值（长度）排。
@@ -200,7 +200,7 @@ print(f"半径 {r}，面积 {area:.2f}，周长 {length:.2f}")
 print(f"用到的常量：{circle_utils.PI}")
 ```
 
-`import circle_utils` 之后，用 `模块名.变量` / `模块名.函数()` 访问里面的内容。这就是「模块使用 Python 程序的基本组织单位」的含义——你调用的 `random`、`math`、`json`，本质都是别人写好的 py 文件。
+`import circle_utils` 之后，用 `模块名.变量` / `模块名.函数()` 访问里面的内容。这就是「模块**是** Python 程序的基本组织单位」的含义——你调用的 `random`、`math`、`json`，本质都是别人写好的 py 文件。
 
 ### 4.2 import 的四种姿势（以系统模块 random 为例）
 
@@ -365,9 +365,21 @@ def calculate_order_cost(
 
 print(calculate_order_cost(("手机", 6888.88, 1), ("耳机", 399.99, 1),
                            coupon=200, score=1209, express=0.01))
+# 商品原始金额：7288.87
+# 优惠券扣减后：7088.87
+# 积分扣减后：7076.87
+# 7076.88
+
+print(calculate_order_cost(("键盘", 399.0, 2), coupon=200, score=1200, express=10))
+# 商品原始金额：798.00
+# 808.0          —— 总价不满 5000，优惠券和积分全部失效，只加运费
+
+print(calculate_order_cost(("显示器", 1499.0, 2)))
+# 商品原始金额：2998.00
+# 2998.0         —— coupon、score、express 全部用默认值
 ```
 
-一眼扫过去，这篇和前几篇的知识全在：`*args` 接收任意多商品（函数篇）、`coupon=0.0` 默认参数（函数篇）、列表推导式（容器篇）、`score // 100` 整除实现「整百抵扣」（运算符篇）。三个调用案例里特意放了一个不满 5000 的订单（优惠全部失效）、一个刚好触发两种优惠的订单——**用边界数据验证规则**，是从「会写」到「写对」的分水岭。
+一眼扫过去，这篇和前几篇的知识全在：`*args` 接收任意多商品（函数篇）、`coupon=0.0` 默认参数（函数篇）、列表推导式（容器篇）、`score // 100` 整除实现「整百抵扣」（运算符篇）。三个调用案例里特意放了一个刚好触发优惠券和积分双优惠的订单、一个不满 5000 的订单（优惠全部失效）、一个全走默认值的订单——**用边界数据验证规则**，是从「会写」到「写对」的分水岭。
 
 ## 7. 模块化在 AI 项目里的样子
 
@@ -406,4 +418,4 @@ print(calculate_order_cost(("手机", 6888.88, 1), ("耳机", 399.99, 1),
 6. `__name__` 在直接运行和被导入时分别是什么值？`if __name__ == "__main__"` 解决什么问题？
 7. 模块和包的关系是什么？`__init__.py` 的作用是什么？
 
-下一篇 [Python 面向对象入门](/post/python-oop-basics/) 是 Python 基础语法的最后一块大拼图：类、对象、`__init__` 和魔法方法。看懂了它，`OpenAI` 客户端那种 `client.chat.completions.create(...)` 的链式写法就不再神秘。
+下一篇 [Python 面向对象入门](/post/python-oop-basics/)：类、对象、`__init__` 和魔法方法。看懂了它，`OpenAI` 客户端那种 `client.chat.completions.create(...)` 的链式写法就不再神秘。
