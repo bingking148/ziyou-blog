@@ -1,10 +1,10 @@
 ---
 title: 'Python 循环控制：for、range、嵌套循环与登录实战'
-weight: 5
+weight: 3
 date: 2026-10-20T09:00:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:07:35+08:00
 cover: /images/covers/python-loop-control-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '循环', '流程控制']
 description: '深入 Python 流程控制第二部分：for 与 while 的选择、range 数字序列、嵌套循环、break/continue，并通过登录验证和猜数字游戏写出可运行的小项目。'
 math: false

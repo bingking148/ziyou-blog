@@ -1,8 +1,8 @@
 ---
 title: 'AI Agent 开发入门：工具、记忆和最小 RAG'
-weight: 16
+weight: 8
 date: 2026-10-19T10:20:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:09:45+08:00
 cover: /images/covers/ai-agent-tool-memory-rag-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['AI Agent', '智能体', '工具调用', 'RAG', '大模型']

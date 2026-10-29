@@ -1,8 +1,8 @@
 ---
 title: '提示词工程实战：角色、任务、要求与结构化输出'
-weight: 14
+weight: 6
 date: 2026-10-19T10:15:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-29T15:09:21+08:00
 cover: /images/covers/prompt-engineering-workflow-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['提示词工程', 'Prompt', '大模型', 'Python']

@@ -1,10 +1,10 @@
 ---
 title: 'Python 基础：从字面量、变量到运算符，一篇讲清入门语法'
-weight: 3
+weight: 1
 date: 2026-10-16T09:02:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:07:11+08:00
 cover: /images/covers/python-basics-for-ai-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '大模型', '入门教程']
 description: '一篇面向大模型应用入门的 Python 基础文章，讲清字面量、变量、数据类型、字符串、输入输出和运算符，并附完整示例与常见坑。'
 math: false

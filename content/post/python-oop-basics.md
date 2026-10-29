@@ -1,10 +1,10 @@
 ---
 title: 'Python 面向对象入门：类、对象与魔法方法'
-weight: 9
+weight: 7
 date: 2026-10-26T11:00:00+08:00
-lastmod: 2026-10-28T10:00:00+08:00
+lastmod: 2026-10-29T15:08:21+08:00
 cover: /images/covers/python-oop-basics-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '面向对象', '类']
 description: 'Python 面向对象入门：类与对象、__init__ 初始化属性、self 与实例方法，以及 __str__、__eq__、__lt__ 魔法方法，看懂 client.chat.completions.create 这类面向对象写法。'
 math: false

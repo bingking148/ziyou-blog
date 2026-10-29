@@ -1,10 +1,10 @@
 ---
 title: 'Python 面向对象进阶与异常处理：类属性、多类协作与 try/except'
-weight: 10
+weight: 8
 date: 2026-10-28T08:00:00+08:00
-lastmod: 2026-10-28T08:00:00+08:00
+lastmod: 2026-10-29T15:08:33+08:00
 cover: /images/covers/python-oop-advanced-exceptions-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '面向对象', '异常处理']
 description: 'Python 基础系列收官篇：类属性与实例属性的归属之争、教务系统与购物车两个多类协作案例，以及 try/except 异常处理的完整用法。'
 math: false

@@ -1,8 +1,8 @@
 ---
 title: '大模型 API 与 Apifox：DeepSeek 云端调用入门'
-weight: 13
+weight: 5
 date: 2026-10-19T10:10:00+08:00
-lastmod: 2026-10-21T10:00:00+08:00
+lastmod: 2026-10-29T15:09:09+08:00
 cover: /images/covers/llm-api-apifox-deepseek-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['大模型', 'API', 'DeepSeek', 'Apifox', 'OpenAI SDK']

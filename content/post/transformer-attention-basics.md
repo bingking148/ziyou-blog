@@ -1,8 +1,8 @@
 ---
 title: 'Transformer 与注意力机制：用小例子看懂大模型地基'
-weight: 11
+weight: 3
 date: 2026-10-19T10:00:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:08:45+08:00
 cover: /images/covers/transformer-attention-basics-cover.jpg
 categories: ['人工智能', '人工智能学习']
 tags: ['Transformer', '注意力机制', '大模型', 'Python']

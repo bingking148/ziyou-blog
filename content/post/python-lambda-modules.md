@@ -1,10 +1,10 @@
 ---
 title: 'Python 匿名函数与模块：lambda、高阶函数和代码组织'
-weight: 8
+weight: 6
 date: 2026-10-26T10:00:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:08:09+08:00
 cover: /images/covers/python-lambda-modules-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', 'lambda', '模块']
 description: '从函数进阶到代码组织：高阶函数、lambda 匿名函数、变量类型注解，以及模块与包的导入方式（import、from、as、__all__、__name__），并结合排序、随机点名和自定义工具库练习。'
 math: false

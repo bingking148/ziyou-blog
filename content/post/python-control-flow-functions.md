@@ -1,10 +1,10 @@
 ---
 title: 'Python 控制流与函数：从 if/while 到可复用小工具'
-weight: 4
+weight: 2
 date: 2026-10-19T10:05:00+08:00
-lastmod: 2026-10-26T10:00:00+08:00
+lastmod: 2026-10-29T15:07:23+08:00
 cover: /images/covers/python-control-flow-functions-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '函数', '循环']
 description: '补齐 Python 基础之后的控制流知识：if 分支、while/for 循环、函数封装、异常处理，并写一个可运行的成绩统计小工具。'
 math: false

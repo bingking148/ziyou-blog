@@ -1,10 +1,10 @@
 ---
 title: 'Python 函数详解：参数、作用域与递归'
-weight: 7
+weight: 5
 date: 2026-10-24T10:00:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:07:58+08:00
 cover: /images/covers/python-functions-in-depth-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '函数', '递归']
 description: '系统讲透 Python 函数：定义与调用、多返回值解包、说明文档、类型标注、全局与局部变量、四种参数形态、*args 与 **kwargs，以及用递归实现阶乘，最后完成班级成绩统计案例。'
 math: false

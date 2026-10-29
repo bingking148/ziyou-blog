@@ -1,10 +1,10 @@
 ---
 title: 'Python 数据容器：列表、字符串、元组、集合与字典'
-weight: 6
+weight: 4
 date: 2026-10-20T09:30:00+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+lastmod: 2026-10-29T15:07:47+08:00
 cover: /images/covers/python-data-containers-cover.jpg
-categories: ['人工智能', '人工智能学习']
+categories: ['人工智能', 'Python基础']
 tags: ['Python', '数据容器', '列表', '字典', '大模型']
 description: '系统整理 Python 数据存储容器：列表、字符串、元组、集合、字典的定义、常用操作、差异对比和选择方法，并结合大模型消息、工具注册表和购物车系统练习。'
 math: false

@@ -507,8 +507,8 @@ home_categories:
   content:
     - categories: 人工智能学习
       cover: /images/covers/ai-seventy-years-cover.jpg
-    - categories:
-      cover:
+    - categories: Python基础
+      cover: /images/covers/python-basics-for-ai-cover.jpg
 
 ########################################
 # Experimental features
