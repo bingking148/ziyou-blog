@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('post');
+  const names = new Set<string>();
+  for (const p of posts) for (const t of p.data.tags) names.add(t);
+  return [...names].map((name) => ({
+    params: { tag: slugifyTaxonomy(name) },
+    props: { name },
+  }));
+}
+
+const { name } = Astro.props;
+const posts = (await getCollection('post'))
+  .filter((p) => p.data.tags.includes(name))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<Base title={`标签：${name}`} description={`标签「${name}」下的文章`}>
+  <div class="tax-term-wrap" data-reveal>
+    <h1 class="page-title">#{name}</h1>
+    <p class="page-sub">共 {posts.length} 篇</p>
+    <ul class="post-list">
+      {posts.map((p) => (
+        <li>
+          <a class="list-item card" href={postUrl(p)}>
+            {p.data.cover && <img src={p.data.cover} alt="" loading="lazy" />}
+            <div>
+              <h3>{p.data.title}</h3>
+              <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .tax-term-wrap { max-width: 860px; margin: 0 auto; padding: 40px 0; }
+  .page-title { margin: 0 0 6px; font-size: 34px; letter-spacing: 2px; }
+  .page-sub { margin: 0 0 28px; color: var(--color-text-muted); font-size: 14px; }
+  .post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 18px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .list-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+  .list-item img { width: 120px; height: 72px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+  .list-item h3 { margin: 0 0 6px; font-size: 16px; color: var(--color-text-strong); }
+  .list-item time { font-size: 12.5px; color: var(--color-text-muted); }
+</style>

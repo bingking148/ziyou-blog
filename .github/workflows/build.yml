@@ -38,6 +38,37 @@ jobs:
           path: public/
           retention-days: 14
 
+  # Astro 新站（astro/ 子目录）与 Hugo 并存构建，产物为 site-astro；
+  # 定稿切换后再考虑移除上面的 Hugo job
+  build-astro:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: astro
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: astro/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload Astro site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-astro
+          path: astro/dist/
+          retention-days: 14
+
   # 目前部署方式：从 Actions 页面下载 site 产物（zip），解压后上传到自己的服务器。
   # 如果以后想自动部署到 GitHub Pages：
   #   1. 仓库 Settings -> Pages -> Source 选 GitHub Actions

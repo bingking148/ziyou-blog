@@ -1,0 +1,97 @@
+---
+// 封面主色驱动：从文章封面提取主色，重写 --red-* 变量，让链接/玻璃高光跟随封面氛围
+// 移植自 params.yml injector.body_end（选择器约定：文章页 hero 图容器 #header img，src 含 /covers/）
+---
+
+<script>
+  (function () {
+    'use strict';
+    var cached = null;
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+      var h, s, l = (max + min) / 2;
+      if (max === min) { h = s = 0; } else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) { h = (g - b) / d + (g < b ? 6 : 0); }
+        else if (max === g) { h = (b - r) / d + 2; }
+        else { h = (r - g) / d + 4; }
+        h /= 6;
+      }
+      return [h * 360, s, l];
+    }
+    function hsl(h, s, l) { return 'hsl(' + h.toFixed(1) + ', ' + s.toFixed(1) + '%, ' + l.toFixed(1) + '%)'; }
+    function pickAccent(ctx, w, h) {
+      var data = ctx.getImageData(0, 0, w, h).data;
+      var buckets = {}, best = null, total = 0;
+      for (var i = 0; i < data.length; i += 4) {
+        var r = data[i], g = data[i + 1], b = data[i + 2];
+        var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+        var sat = mx === 0 ? 0 : (mx - mn) / mx;
+        var lum = (mx + mn) / 510;
+        if (lum < 0.12 || lum > 0.94 || sat < 0.2) continue;
+        var key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5);
+        var e = buckets[key] = buckets[key] || { n: 0, r: 0, g: 0, b: 0 };
+        e.n++; e.r += r; e.g += g; e.b += b; total++;
+        if (!best || e.n > best.n) best = e;
+      }
+      if (!best || total < (data.length / 4) * 0.02) return null;
+      return rgbToHsl(best.r / best.n, best.g / best.n, best.b / best.n);
+    }
+    function extract(img) {
+      var s = 32, c = document.createElement('canvas');
+      c.width = s; c.height = s;
+      var x = c.getContext('2d', { willReadFrequently: true });
+      try { x.drawImage(img, 0, 0, s, s); } catch (e) { return null; }
+      return pickAccent(x, s, s);
+    }
+    function applyVars(a) {
+      var root = document.documentElement;
+      var dark = root.dataset.theme === 'dark';
+      var hue = a[0], sat = Math.max(a[1] * 100, 30);
+      var s1 = Math.min(sat, 48), s2 = Math.min(sat, 42);
+      if (dark) {
+        root.style.setProperty('--red-0', hsl(hue, s2, 68));
+        root.style.setProperty('--red-1', hsl(hue, s2, 68));
+        root.style.setProperty('--red-2', hsl(hue, Math.min(sat, 36), 78));
+        root.style.setProperty('--red-3', hsl(hue, 24, 58));
+        root.style.setProperty('--red-4', 'hsla(' + hue + ', 35%, 72%, 0.5)');
+        root.style.setProperty('--red-5', 'hsla(' + hue + ', 35%, 72%, 0.15)');
+        root.style.setProperty('--red-5-5', 'hsla(' + hue + ', 35%, 72%, 0.05)');
+        root.style.setProperty('--red-6', 'hsla(' + hue + ', 35%, 72%, 0.2)');
+      } else {
+        root.style.setProperty('--red-0', hsl(hue, Math.min(sat, 50), 26));
+        root.style.setProperty('--red-1', hsl(hue, s1, 34));
+        root.style.setProperty('--red-2', hsl(hue, s2, 46));
+        root.style.setProperty('--red-3', hsl(hue, Math.min(sat, 36), 62));
+        root.style.setProperty('--red-4', hsl(hue, 40, 90));
+        root.style.setProperty('--red-5', hsl(hue, 36, 95));
+        root.style.setProperty('--red-5-5', hsl(hue, 30, 97));
+        root.style.setProperty('--red-6', hsl(hue, 24, 98.5));
+        root.style.setProperty('--color-red-6-shadow', 'hsla(' + hue + ', 45%, 38%, 0.45)');
+        root.style.setProperty('--color-red-3-shadow', 'hsla(' + hue + ', 45%, 38%, 0.22)');
+      }
+      root.dataset.coverAccent = 'on';
+    }
+    function run() {
+      if (cached) { applyVars(cached); return; }
+      var img = document.querySelector('#header img');
+      if (!img) return;
+      var src = img.currentSrc || img.src || '';
+      if (src.indexOf('/covers/') === -1) return;
+      var go = function () {
+        var a = extract(img);
+        if (a) { cached = a; applyVars(a); }
+      };
+      if (img.complete && img.naturalWidth > 0) { go(); }
+      else { img.addEventListener('load', go, { once: true }); }
+    }
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', run); }
+    else { run(); }
+    window.addEventListener('load', run);
+    new MutationObserver(function () {
+      if (cached) { applyVars(cached); }
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+</script>

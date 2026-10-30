@@ -1,0 +1,75 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { postUrl } from '../utils/columns.ts';
+
+type Post = CollectionEntry<'post'>;
+
+interface Props {
+  prev?: Post; // 上一篇（专栏内按 weight 升序的上一篇；非专栏按日期倒序的上一篇）
+  next?: Post;
+}
+const { prev, next } = Astro.props;
+---
+
+{(prev || next) && (
+  <nav class="post-nav" aria-label="文章导航">
+    {prev ? (
+      <a class="post-nav-link prev" href={postUrl(prev)}>
+        <span class="post-nav-dir">← 上一篇</span>
+        <span class="post-nav-title">{prev.data.title}</span>
+      </a>
+    ) : <span class="post-nav-link placeholder" />}
+    {next ? (
+      <a class="post-nav-link next" href={postUrl(next)}>
+        <span class="post-nav-dir">下一篇 →</span>
+        <span class="post-nav-title">{next.data.title}</span>
+      </a>
+    ) : <span class="post-nav-link placeholder" />}
+  </nav>
+)}
+
+<style>
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 40px;
+  }
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-card-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .post-nav-link:hover {
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
+  }
+  .post-nav-link.next { text-align: right; }
+  .post-nav-link.placeholder {
+    border: none;
+    background: transparent;
+    pointer-events: none;
+  }
+  .post-nav-dir {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+  }
+  .post-nav-title {
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--color-text-strong);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (max-width: 767px) {
+    .post-nav { grid-template-columns: 1fr; }
+    .post-nav-link.next { text-align: left; }
+  }
+</style>

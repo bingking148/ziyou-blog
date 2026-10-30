@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="页面走丢了">
+  <div class="nf-wrap" data-reveal>
+    <p class="nf-code">404</p>
+    <h1 class="nf-title">这一页不存在</h1>
+    <p class="nf-desc">链接可能已过期，或者内容被移动了。</p>
+    <div class="nf-actions">
+      <a class="hero-cta nf-cta" href="/">回到首页</a>
+      <a class="hero-cta nf-cta ghost" href="/archives/">看看归档</a>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .nf-wrap {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .nf-code {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(96px, 20vw, 180px);
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--red-1), var(--red-2) 60%, var(--color-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 6px 24px var(--color-red-3-shadow));
+  }
+  .nf-title { margin: 12px 0 8px; font-size: 24px; }
+  .nf-desc { margin: 0 0 32px; color: var(--color-text-muted); }
+  .nf-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .hero-cta {
+    display: inline-block;
+    padding: 12px 34px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  .nf-cta { background: var(--red-1); color: #fff; }
+  .nf-cta:hover { background: var(--red-2); color: #fff; }
+  .nf-cta.ghost {
+    background: transparent;
+    border: 1px solid var(--color-card-border);
+    color: var(--color-text);
+  }
+  .nf-cta.ghost:hover { background: var(--red-5); color: var(--red-1); }
+</style>

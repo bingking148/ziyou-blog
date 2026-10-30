@@ -1,0 +1,344 @@
+---
+// 氛围旋钮：拖动旋转全站色相（移植自 params.yml injector.sidebar_end）
+// localStorage 键 yzrt-mood-hue，与旧站共享同一持久化
+---
+
+<div class="mood-knob-widget widget-wrap card">
+  <h3 class="widget-title">氛围旋钮</h3>
+  <div class="mk-stage" id="mood-knob" role="slider" tabindex="0"
+       aria-label="站点氛围色相" aria-valuemin="0" aria-valuemax="360" aria-valuenow="214">
+    <div class="mk-lamp-box" id="mk-lamp-box" aria-hidden="true"></div>
+    <div class="mk-ring" aria-hidden="true">
+      <div class="mk-ring-inner">
+        <div class="mk-knob">
+          <div class="mk-pointer-box" id="mk-pointer-box"><div class="mk-pointer" id="mk-pointer"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mk-readout"><span class="mk-dot"></span><span id="mk-name">墨蓝 · 214°</span></div>
+  <p class="mk-hint">拖动旋转全站色调 · 滚轮微调 · 双击复位</p>
+</div>
+
+<style>
+  .mood-knob-widget {
+    text-align: center;
+    padding: 18px 16px 20px;
+  }
+  .widget-title {
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: var(--color-text-strong);
+  }
+  .mk-stage {
+    --mk-hue: 214;
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 16px auto 12px;
+    border-radius: 50%;
+    touch-action: none;
+    cursor: grab;
+    background-image: linear-gradient(90deg, #e7edf5, #c8d3e0);
+    box-shadow: 0 0 2px rgba(28, 52, 84, 0.35);
+    outline: none;
+  }
+  .mk-stage:active { cursor: grabbing; }
+  .mk-stage:focus-visible {
+    box-shadow: 0 0 0 3px var(--red-4, #d8e2ee), 0 0 2px rgba(28, 52, 84, 0.35);
+  }
+  .mk-stage::before {
+    content: '';
+    position: absolute;
+    inset: -16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, hsl(var(--mk-hue) 78% 54% / 0.2), transparent 68%);
+    pointer-events: none;
+  }
+  .mk-lamp-box { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .mk-lamp-box > div {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 126px;
+    transform: translateX(-50%) translateY(-50%) rotate(calc(-125deg + 12.6deg * var(--i)));
+  }
+  .mk-lamp-box span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #8fa2b5;
+    transition: background 0.25s;
+  }
+  .mk-lamp-box span.act {
+    position: relative;
+    background: hsl(var(--mk-hue) 82% 55%);
+    box-shadow: 0 0 5px hsl(var(--mk-hue) 82% 55%);
+  }
+  .mk-lamp-box span.act::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: hsl(var(--mk-hue) 82% 55% / 0.8);
+    filter: blur(4px);
+  }
+  .mk-ring {
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1px solid rgba(28, 52, 84, 0.18);
+    background-image: linear-gradient(90deg, #eef2f8, #b9c7d8);
+    box-shadow:
+      inset 1px 1px 2px rgba(255, 255, 255, 0.6),
+      inset -1px -1px 1px rgba(28, 52, 84, 0.12);
+  }
+  .mk-ring-inner {
+    position: absolute;
+    inset: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(28, 52, 84, 0.16);
+    background-image: linear-gradient(90deg, #dfe7f0, #c0cddd);
+    box-shadow:
+      inset 1px 1px 2px rgba(255, 255, 255, 0.5),
+      inset -1px -1px 1px rgba(28, 52, 84, 0.1);
+  }
+  .mk-knob {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background-image: linear-gradient(90deg, #dbe4ee, #b3c4d6);
+    box-shadow:
+      -8px 0 10px rgba(255, 255, 255, 0.4),
+      3px 0 6px rgba(20, 40, 66, 0.1),
+      14px 0 18px rgba(20, 40, 66, 0.45),
+      inset -2px 0 2px rgba(12, 30, 50, 0.35),
+      inset 2px 0 2px rgba(255, 255, 255, 0.45);
+  }
+  .mk-pointer-box { position: absolute; inset: 0; border-radius: 50%; }
+  .mk-pointer {
+    position: absolute;
+    left: 50%;
+    top: 16%;
+    transform: translateX(-50%) translateY(-50%);
+    width: 5px;
+    height: 15px;
+    border-radius: 99px;
+    background-image: linear-gradient(0deg, rgba(255, 255, 255, 0.6), #fff, rgba(255, 255, 255, 0.6));
+    box-shadow: 0 0 5px #fff;
+  }
+  .mk-pointer::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 11px;
+    height: 13px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    filter: blur(3px);
+  }
+  .mk-pointer.off {
+    background-image: none;
+    background: #8fa2b5;
+    box-shadow: none;
+  }
+  .mk-pointer.off::after { background: transparent; box-shadow: none; }
+  .mk-readout {
+    color: var(--red-1);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .mk-dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: hsl(var(--mk-hue) 72% 52%);
+    box-shadow: 0 0 7px hsl(var(--mk-hue) 72% 52% / 0.65);
+    vertical-align: -1px;
+  }
+  .mk-hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--red-3);
+    line-height: 1.6;
+  }
+  [data-theme="dark"] .mk-stage { background-image: linear-gradient(90deg, #2a3442, #1d2530); }
+  [data-theme="dark"] .mk-ring {
+    background-image: linear-gradient(90deg, #333e4d, #232c38);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.05), inset -1px -1px 1px rgba(0, 0, 0, 0.4);
+  }
+  [data-theme="dark"] .mk-ring-inner {
+    background-image: linear-gradient(90deg, #2c3644, #212a36);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.04), inset -1px -1px 1px rgba(0, 0, 0, 0.45);
+  }
+  [data-theme="dark"] .mk-knob {
+    background-image: linear-gradient(90deg, #38455a, #2a3546);
+    box-shadow:
+      -8px 0 10px rgba(0, 0, 0, 0.25),
+      3px 0 6px rgba(0, 0, 0, 0.2),
+      14px 0 18px rgba(0, 0, 0, 0.55),
+      inset -2px 0 2px rgba(0, 0, 0, 0.5),
+      inset 2px 0 2px rgba(255, 255, 255, 0.08);
+  }
+  [data-theme="dark"] .mk-lamp-box span { background: #4a586a; }
+  @media (prefers-reduced-motion: reduce) {
+    .mk-lamp-box span { transition: none; }
+    .mk-lamp-box span.act::after { filter: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+    var stage = document.getElementById('mood-knob');
+    if (!stage) return;
+    var mkWidget = stage.closest('.mood-knob-widget');
+    var lampBox = document.getElementById('mk-lamp-box');
+    var pointerBox = document.getElementById('mk-pointer-box');
+    var pointer = document.getElementById('mk-pointer');
+    var nameEl = document.getElementById('mk-name');
+    var MIN = -112.5, MAX = 112.5, TOTAL = 19, DEFAULT_HUE = 214;
+    var angle = 0, moodHue = null;
+    var lamps = [];
+    var i;
+    for (i = 0; i < TOTAL; i++) {
+      var d = document.createElement('div');
+      d.style.setProperty('--i', String(i));
+      var s = document.createElement('span');
+      d.appendChild(s);
+      lampBox.appendChild(d);
+      lamps.push(s);
+    }
+    var VARS = ['--red-0', '--red-1', '--red-2', '--red-3', '--red-4', '--red-5', '--red-5-5', '--red-6', '--color-red-6-shadow', '--color-red-3-shadow'];
+    var cs = getComputedStyle(document.documentElement);
+    var snapshot = {};
+    VARS.forEach(function (v) { snapshot[v] = cs.getPropertyValue(v).trim(); });
+    function hsl(h, sa, l) { return 'hsl(' + h + ', ' + sa + '%, ' + l + '%)'; }
+    // 感知曲线：黄绿段（≈100°）天然显荧光，压低饱和；红/蓝两端可加浓到 66%
+    function satCap(h) {
+      var d = Math.abs(h - 100);
+      if (d > 180) d = 360 - d;
+      return 44 + Math.round((d / 180) * 22);
+    }
+    function applyHue(hue) {
+      var root = document.documentElement;
+      var dark = root.dataset.theme === 'dark';
+      mkWidget.style.setProperty('--mk-hue', String(hue));
+      var sat = satCap(hue);
+      if (dark) {
+        root.style.setProperty('--red-0', hsl(hue, Math.min(sat, 54), 70));
+        root.style.setProperty('--red-1', hsl(hue, Math.min(sat, 54), 70));
+        root.style.setProperty('--red-2', hsl(hue, Math.min(sat, 50), 78));
+        root.style.setProperty('--red-3', hsl(hue, 34, 58));
+        root.style.setProperty('--red-4', 'hsla(' + hue + ', 46%, 72%, 0.5)');
+        root.style.setProperty('--red-5', 'hsla(' + hue + ', 46%, 72%, 0.16)');
+        root.style.setProperty('--red-5-5', 'hsla(' + hue + ', 46%, 72%, 0.06)');
+        root.style.setProperty('--red-6', 'hsla(' + hue + ', 46%, 72%, 0.22)');
+      } else {
+        root.style.setProperty('--red-0', hsl(hue, sat, 23));
+        root.style.setProperty('--red-1', hsl(hue, Math.min(sat + 2, 68), 32));
+        root.style.setProperty('--red-2', hsl(hue, Math.min(sat, 62), 44));
+        root.style.setProperty('--red-3', hsl(hue, Math.max(sat - 10, 30), 60));
+        root.style.setProperty('--red-4', hsl(hue, 50, 88));
+        root.style.setProperty('--red-5', hsl(hue, 46, 94));
+        root.style.setProperty('--red-5-5', hsl(hue, 38, 96.5));
+        root.style.setProperty('--red-6', hsl(hue, 30, 98));
+        root.style.setProperty('--color-red-6-shadow', 'hsla(' + hue + ', 55%, 32%, 0.45)');
+        root.style.setProperty('--color-red-3-shadow', 'hsla(' + hue + ', 55%, 32%, 0.22)');
+      }
+    }
+    function nameOf(h) {
+      if (h >= 340) return '胭脂';
+      var names = ['朱砂', '橘红', '琥珀', '缃色', '苔色', '竹青', '青翠', '豆绿', '湖绿', '沧浪', '墨蓝', '黛蓝', '绀青', '绀紫', '雪青', '紫檀', '葡萄紫'];
+      return names[Math.min(16, Math.floor(h / 20))];
+    }
+    function update(a, save) {
+      if (a < MIN) a = MIN;
+      if (a > MAX) a = MAX;
+      angle = a;
+      var p = (a - MIN) / (MAX - MIN);
+      var n = Math.round(p * TOTAL);
+      lamps.forEach(function (sp, idx) { sp.classList.toggle('act', idx < n); });
+      pointerBox.style.rotate = a + 'deg';
+      pointer.classList.toggle('off', a <= MIN);
+      moodHue = Math.round(p * 360);
+      applyHue(moodHue);
+      stage.setAttribute('aria-valuenow', String(moodHue));
+      nameEl.textContent = nameOf(moodHue) + ' · ' + moodHue + '°';
+      if (save !== false) {
+        try { localStorage.setItem('yzrt-mood-hue', String(moodHue)); } catch (e) {}
+      }
+    }
+    function reset() {
+      var root = document.documentElement;
+      VARS.forEach(function (v) { root.style.setProperty(v, snapshot[v]); });
+      moodHue = null;
+      try { localStorage.removeItem('yzrt-mood-hue'); } catch (e) {}
+      angle = MIN + (DEFAULT_HUE / 360) * (MAX - MIN);
+      var p = (angle - MIN) / (MAX - MIN);
+      var n = Math.round(p * TOTAL);
+      lamps.forEach(function (sp, idx) { sp.classList.toggle('act', idx < n); });
+      pointerBox.style.rotate = angle + 'deg';
+      pointer.classList.remove('off');
+      mkWidget.style.setProperty('--mk-hue', String(DEFAULT_HUE));
+      stage.setAttribute('aria-valuenow', String(DEFAULT_HUE));
+      nameEl.textContent = '墨蓝 · 默认';
+    }
+    var dragging = false, startY = 0, startA = 0;
+    stage.addEventListener('pointerdown', function (e) {
+      dragging = true;
+      startY = e.clientY;
+      startA = angle;
+      if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      update(startA + (startY - e.clientY) / 2);
+    });
+    stage.addEventListener('pointerup', function () { dragging = false; });
+    stage.addEventListener('pointercancel', function () { dragging = false; });
+    stage.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      update(angle + (e.deltaY > 0 ? -5 : 5));
+    }, { passive: false });
+    stage.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); update(angle + 4.5); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); update(angle - 4.5); }
+      else if (e.key === 'Home') { e.preventDefault(); reset(); }
+    });
+    stage.addEventListener('dblclick', reset);
+    function restore() {
+      var saved = null;
+      try { saved = localStorage.getItem('yzrt-mood-hue'); } catch (e) {}
+      if (saved !== null) {
+        var hue = Math.min(360, Math.max(0, parseInt(saved, 10) || 0));
+        update(MIN + (hue / 360) * (MAX - MIN), false);
+      } else {
+        reset();
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { setTimeout(restore, 0); });
+    } else {
+      setTimeout(restore, 0);
+    }
+    window.addEventListener('load', function () {
+      setTimeout(function () { if (moodHue !== null) applyHue(moodHue); }, 0);
+    });
+    new MutationObserver(function () {
+      if (moodHue !== null) applyHue(moodHue);
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+</script>

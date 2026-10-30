@@ -1,0 +1,553 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import MoodKnob from '../components/MoodKnob.astro';
+import { columnOf, columnPosts, postUrl } from '../utils/columns.ts';
+import { SITE_TITLE, SITE_DESCRIPTION, TYPING_STRINGS, SOCIAL } from '../consts.ts';
+
+const posts = (await getCollection('post')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+const columns = (await getCollection('columns')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const recent = posts.slice(0, 8);
+const featured = posts.filter((p) => p.data.cover).slice(0, 4);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<Base>
+  <!-- ===== Hero：大视觉 + 逐字入场 + 打字副标题 ===== -->
+  <section id="header" class="hero-home">
+    <picture>
+      <source media="(max-width: 767px)" srcset="/images/hero-bg-760.jpg" />
+      <source media="(max-width: 1279px)" srcset="/images/hero-bg-1280.jpg" />
+      <img class="hero-bg" src="/images/hero-bg-1920.jpg" alt="" aria-hidden="true" />
+    </picture>
+    <div class="hero-veil" aria-hidden="true"></div>
+    <div class="hero-content">
+      <h1 id="hero-title" class="hero-title">{SITE_TITLE}</h1>
+      <p class="hero-typing">
+        <span id="typing-text"></span><span class="typing-cursor" aria-hidden="true">|</span>
+      </p>
+      <p class="hero-desc">{SITE_DESCRIPTION}</p>
+      <div class="hero-actions">
+        <a id="hero-cta-read" class="hero-cta hero-cta-primary" href="#timeline">开始阅读</a>
+        <a class="hero-cta hero-cta-about" href="/about/">关于我</a>
+        {SOCIAL.github && (
+          <a class="hero-cta hero-cta-ghost" href={SOCIAL.github} rel="noopener" target="_blank">GitHub</a>
+        )}
+      </div>
+    </div>
+    <a class="hero-scroll-hint" href="#timeline" aria-label="向下滚动">
+      <span></span>
+    </a>
+  </section>
+
+  <!-- ===== 精选：大图卡片 ===== -->
+  <section class="featured" aria-label="精选文章">
+    {featured.map((p, i) => (
+      <a class="featured-card card" href={postUrl(p)} data-reveal style={`--i:${i}`}>
+        <img src={p.data.cover} alt={p.data.title} loading="lazy" />
+        <div class="featured-meta">
+          <h3>{p.data.title}</h3>
+          <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+        </div>
+      </a>
+    ))}
+  </section>
+
+  <div class="home-grid">
+    <div class="home-main">
+      <!-- ===== 滚动叙事时间线 ===== -->
+      <section id="timeline" class="timeline" aria-label="最新文章">
+        <h2 class="section-title" data-reveal>最新文章</h2>
+        <ol class="timeline-list">
+          {recent.map((p, i) => {
+            const column = columnOf(p, columns);
+            return (
+              <li class="timeline-item" data-reveal style={`--i:${i % 4}`}>
+                <div class="timeline-dot" aria-hidden="true"></div>
+                <a class="post-card card" href={postUrl(p)}>
+                  {p.data.cover && (
+                    <div class="post-card-cover">
+                      <img src={p.data.cover} alt="" loading="lazy" />
+                    </div>
+                  )}
+                  <div class="post-card-body">
+                    <div class="post-card-meta">
+                      <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+                      {column && (
+                        <span class="post-card-column">
+                          {column.data.title}
+                          {p.data.weight ? ` · 第 ${p.data.weight} 篇` : ''}
+                        </span>
+                      )}
+                    </div>
+                    <h3 class="post-card-title">{p.data.title}</h3>
+                    {p.data.description && (
+                      <p class="post-card-desc">{p.data.description}</p>
+                    )}
+                    <div class="post-card-tags">
+                      {p.data.tags.slice(0, 3).map((t) => <span>#{t}</span>)}
+                    </div>
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+        <p class="timeline-more" data-reveal>
+          <a class="hero-cta hero-cta-primary" href="/archives/">查看全部 {posts.length} 篇 →</a>
+        </p>
+      </section>
+    </div>
+
+    <aside class="home-sidebar">
+      <div class="sidebar-sticky">
+        <!-- 专栏卡片 -->
+        <section class="widget-wrap card" data-reveal>
+          <h3 class="widget-title">专栏</h3>
+          {columns.map((c) => (
+            <a class="side-column" href={`/categories/${c.data.category.toLowerCase()}/`}>
+              <img src={c.data.cover} alt="" loading="lazy" />
+              <div>
+                <strong>{c.data.title}</strong>
+                <span>{columnPosts(c, posts).length} 篇</span>
+              </div>
+            </a>
+          ))}
+          <a class="side-all" href="/columns/">全部专栏 →</a>
+        </section>
+        <div data-reveal><MoodKnob /></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 打字机副标题（原生实现，替代 typed.js） -->
+  <script define:vars={{ strings: TYPING_STRINGS }}>
+    (function () {
+      'use strict';
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.getElementById('typing-text').textContent = strings[0];
+        return;
+      }
+      var el = document.getElementById('typing-text');
+      var order = strings.slice();
+      // shuffle
+      for (var i = order.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = order[i]; order[i] = order[j]; order[j] = t;
+      }
+      var idx = 0, pos = 0, deleting = false;
+      var TYPE = 100, BACK = 50, DELAY = 2000, START = 300;
+      function tick() {
+        var s = order[idx];
+        if (!deleting) {
+          pos++;
+          el.textContent = s.slice(0, pos);
+          if (pos >= s.length) { deleting = true; setTimeout(tick, DELAY); return; }
+          setTimeout(tick, TYPE);
+        } else {
+          pos--;
+          el.textContent = s.slice(0, pos);
+          if (pos <= 0) { deleting = false; idx = (idx + 1) % order.length; setTimeout(tick, 400); return; }
+          setTimeout(tick, BACK);
+        }
+      }
+      setTimeout(tick, START);
+    })();
+  </script>
+
+  <!-- Hero 标题逐字入场 -->
+  <script>
+    (function () {
+      'use strict';
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var h = document.getElementById('hero-title');
+      if (!h || h.dataset.lettersDone) return;
+      var walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      var i = 0;
+      nodes.forEach(function (n) {
+        var frag = document.createDocumentFragment();
+        n.nodeValue.split('').forEach(function (ch) {
+          if (/\s/.test(ch)) { frag.appendChild(document.createTextNode(ch)); return; }
+          var s = document.createElement('span');
+          s.className = 'hero-letter';
+          s.style.setProperty('--i', String(i++));
+          s.textContent = ch;
+          frag.appendChild(s);
+        });
+        if (n.parentNode) n.parentNode.replaceChild(frag, n);
+      });
+      h.dataset.lettersDone = '1';
+    })();
+  </script>
+</Base>
+
+<style>
+  /* ===== Hero ===== */
+  .hero-home {
+    position: relative;
+    height: min(88vh, 760px);
+    min-height: 480px;
+    margin: 24px 0 48px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lift);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: hero-zoom 18s ease-out both;
+  }
+  @keyframes hero-zoom {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
+  }
+  .hero-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(200deg, rgba(12, 24, 40, 0.15) 0%, rgba(12, 24, 40, 0.55) 62%, rgba(12, 24, 40, 0.82) 100%);
+  }
+  .hero-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 24px;
+    color: #fff;
+  }
+  .hero-title {
+    margin: 0;
+    font-size: clamp(56px, 11vw, 128px);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, 0.55));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.35));
+  }
+  .hero-title .hero-letter {
+    display: inline-block;
+    animation: hero-letter-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i) * 80ms + 150ms);
+    transition: transform 0.3s ease;
+  }
+  .hero-title .hero-letter:hover { transform: translateY(-0.08em); }
+  @keyframes hero-letter-in {
+    0% { opacity: 0; transform: translateY(0.55em) rotate(6deg) scale(0.92); filter: blur(10px); }
+    100% { opacity: 1; transform: none; filter: blur(0); }
+  }
+  .hero-typing {
+    margin: 18px 0 0;
+    min-height: 1.8em;
+    font-family: var(--font-serif);
+    font-size: clamp(16px, 2.2vw, 22px);
+    letter-spacing: 2px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+  .typing-cursor {
+    animation: blink 1s step-end infinite;
+    opacity: 0.8;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .hero-desc {
+    margin: 8px 0 0;
+    font-size: 13.5px;
+    letter-spacing: 3px;
+    opacity: 0.65;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 34px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero-cta {
+    display: inline-block;
+    padding: 12px 34px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+  }
+  .hero-cta-primary {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: #fff;
+    color: #1c3454;
+  }
+  .hero-cta-primary::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 50%;
+    width: 150%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: #fff;
+    mix-blend-mode: difference;
+    transform: translate(-104%, -50%);
+    transition:
+      transform 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+      border-radius 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+    pointer-events: none;
+  }
+  .hero-cta-primary:hover::before,
+  .hero-cta-primary:focus-visible::before {
+    transform: translate(-2%, -50%);
+    border-radius: 0;
+  }
+  .hero-cta-primary:active { transform: translateY(2px); }
+  .hero-cta-about, .hero-cta-ghost {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    color: #fff;
+    backdrop-filter: blur(6px);
+  }
+  .hero-cta-about:hover, .hero-cta-ghost:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+  .hero-cta-about:active { transform: scale(0.94); }
+  .hero-scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 42px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 14px;
+  }
+  .hero-scroll-hint span {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 4px;
+    height: 8px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: #fff;
+    animation: scroll-hint 1.8s ease-in-out infinite;
+  }
+  @keyframes scroll-hint {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    70% { transform: translateY(12px); opacity: 0; }
+  }
+
+  /* ===== 精选 ===== */
+  .featured {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 56px;
+  }
+  .featured-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    display: block;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lift);
+  }
+  .featured-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .featured-card:hover img { transform: scale(1.06); }
+  .featured-meta {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 14px 16px;
+    background: linear-gradient(180deg, transparent, rgba(12, 24, 40, 0.82));
+    color: #fff;
+  }
+  .featured-meta h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    color: #fff;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .featured-meta time { font-size: 12px; opacity: 0.75; }
+
+  /* ===== 主区 + 侧栏 ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 36px;
+    align-items: start;
+  }
+  .sidebar-sticky {
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .widget-wrap { padding: 18px; }
+  .widget-title {
+    margin: 0 0 14px;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: var(--color-text-strong);
+  }
+  .side-column {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 12px;
+    transition: background 0.25s ease;
+  }
+  .side-column:hover { background: var(--red-5); }
+  .side-column img {
+    width: 64px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .side-column strong {
+    display: block;
+    font-size: 14px;
+    color: var(--color-text-strong);
+  }
+  .side-column span { font-size: 12px; color: var(--color-text-muted); }
+  .side-all {
+    display: block;
+    margin-top: 10px;
+    text-align: right;
+    font-size: 13px;
+  }
+
+  /* ===== 时间线 ===== */
+  .section-title {
+    margin: 0 0 28px;
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+  .timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 20px;
+    position: relative;
+  }
+  .timeline-list::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--red-2), var(--red-4));
+    border-radius: 2px;
+  }
+  .timeline-item { position: relative; margin-bottom: 22px; }
+  .timeline-dot {
+    position: absolute;
+    left: -20px;
+    top: 26px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--red-2);
+    box-shadow: 0 0 0 4px var(--red-5), 0 0 12px var(--red-2);
+  }
+  .post-card {
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+  .post-card-cover {
+    flex-shrink: 0;
+    width: 240px;
+    overflow: hidden;
+  }
+  .post-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .post-card:hover .post-card-cover img { transform: scale(1.05); }
+  .post-card-body { padding: 22px 26px; min-width: 0; }
+  .post-card-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .post-card-column { color: var(--red-2); font-weight: 600; }
+  .post-card-title {
+    margin: 0 0 10px;
+    font-size: 19px;
+    color: var(--color-text-strong);
+    transition: color 0.25s ease;
+  }
+  .post-card:hover .post-card-title { color: var(--red-1); }
+  .post-card-desc {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post-card-tags { display: flex; gap: 10px; font-size: 12px; color: var(--red-2); }
+  .timeline-more { text-align: center; margin-top: 36px; }
+  .timeline-more .hero-cta-primary {
+    background: var(--red-1);
+    color: #fff;
+  }
+  .timeline-more .hero-cta-primary::before { background: #fff; }
+
+  @media (max-width: 1023px) {
+    .home-grid { grid-template-columns: 1fr; }
+    .home-sidebar .sidebar-sticky { position: static; }
+    .featured { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 767px) {
+    .hero-home { height: 72vh; min-height: 420px; margin-top: 12px; }
+    .post-card { flex-direction: column; }
+    .post-card-cover { width: 100%; height: 160px; }
+    .featured { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg { animation: none; }
+    .hero-title .hero-letter { animation: none; }
+    .hero-cta-primary::before { transition: none; }
+    .typing-cursor { animation: none; }
+    .hero-scroll-hint span { animation: none; }
+  }
+</style>

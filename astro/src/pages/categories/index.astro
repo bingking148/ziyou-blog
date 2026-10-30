@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { slugifyTaxonomy } from '../../utils/columns.ts';
+
+const posts = await getCollection('post');
+const counts = new Map<string, number>();
+for (const p of posts) {
+  for (const c of p.data.categories) counts.set(c, (counts.get(c) ?? 0) + 1);
+}
+const cats = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<Base title="分类" description="文章分类">
+  <div class="tax-wrap" data-reveal>
+    <h1 class="page-title">分类</h1>
+    <div class="tax-grid">
+      {cats.map(([name, count]) => (
+        <a class="tax-card card" href={`/categories/${slugifyTaxonomy(name)}/`}>
+          <strong>{name}</strong>
+          <span>{count} 篇</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .tax-wrap { max-width: 860px; margin: 0 auto; padding: 40px 0; }
+  .page-title { margin: 0 0 28px; font-size: 34px; letter-spacing: 4px; }
+  .tax-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .tax-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .tax-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+  .tax-card strong { color: var(--color-text-strong); font-size: 15.5px; }
+  .tax-card span { font-size: 12.5px; color: var(--color-text-muted); }
+</style>

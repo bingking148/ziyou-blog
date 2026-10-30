@@ -1,0 +1,46 @@
+---
+import { WALINE } from '../consts.ts';
+
+interface Props {
+  /** 必须带尾斜杠，与 Hugo 时代路径一致，保住既有评论线程 */
+  path: string;
+}
+const { path } = Astro.props;
+---
+
+<section class="comments-wrap">
+  <h2 class="comments-title">说些什么吧！</h2>
+  <link rel="stylesheet" href="/resources/waline/waline.css" />
+  <div id="waline"></div>
+</section>
+
+<script type="module" define:vars={{ path, walineEmoji: WALINE.emoji, serverURL: WALINE.serverURL }}>
+  import { init } from '/resources/waline/waline.mjs';
+  init({
+    el: '#waline',
+    serverURL,
+    path,
+    reaction: true,
+    pageview: true,
+    meta: ['nick', 'mail', 'link'],
+    requiredMeta: ['nick'],
+    emoji: walineEmoji,
+    dark: 'html[data-theme="dark"]',
+    pageSize: 10,
+    wordLimit: 0,
+    lang: 'zh-CN',
+    commentSorting: 'latest',
+  });
+</script>
+
+<style>
+  .comments-wrap {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-card-border);
+  }
+  .comments-title {
+    margin: 0 0 20px;
+    font-size: 20px;
+  }
+</style>

@@ -1,0 +1,256 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Comments from '../../components/Comments.astro';
+import PostNav from '../../components/PostNav.astro';
+import Toc from '../../components/Toc.astro';
+import AccentColor from '../../components/AccentColor.astro';
+import MoodKnob from '../../components/MoodKnob.astro';
+import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
+import { AUTHOR, OUTDATE_DAYS, DEFAULT_COVER } from '../../consts.ts';
+
+type Post = CollectionEntry<'post'>;
+
+export async function getStaticPaths() {
+  const posts = await getCollection('post');
+  const columns = await getCollection('columns');
+  const byDate = [...posts].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+  return posts.map((post) => {
+    // 前后篇导航：专栏文章只在专栏内按 weight 走；非专栏按全局日期
+    const column = columnOf(post, columns);
+    let prev: Post | undefined, next: Post | undefined;
+    if (column) {
+      const siblings = columnPosts(column, posts);
+      const i = siblings.findIndex((p) => p.id === post.id);
+      prev = siblings[i - 1];
+      next = siblings[i + 1];
+    } else {
+      const i = byDate.findIndex((p) => p.id === post.id);
+      prev = byDate[i + 1]; // 日期倒序：i+1 是更早的一篇
+      next = byDate[i - 1];
+    }
+    return { params: { slug: post.id }, props: { post, column, prev, next } };
+  });
+}
+
+const { post, column, prev, next } = Astro.props;
+const { Content, headings } = await render(post);
+
+const cover = post.data.cover || DEFAULT_COVER;
+const url = postUrl(post);
+const updated = post.data.updatedDate;
+const isOutdated =
+  Date.now() - (updated ?? post.data.date).getTime() > OUTDATE_DAYS * 86400_000;
+
+// CJK 字数：非空白字符数；阅读时长按 300 字/分钟
+const wordCount = (post.body ?? '').replace(/\s/g, '').length;
+const readingMinutes = Math.max(1, Math.round(wordCount / 300));
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<Base title={post.data.title} description={post.data.description} cover={cover}>
+  {post.data.math && <link slot="head" rel="stylesheet" href="/resources/katex/katex.min.css" />}
+
+  <article class="post-layout">
+    <header id="header" class="post-hero">
+      <img class="post-cover" src={cover} alt={post.data.title} crossorigin="anonymous" />
+      <div class="post-hero-overlay">
+        <div class="post-hero-meta">
+          {column && (
+            <a class="post-column-badge" href={`/categories/${slugifyTaxonomy(column.data.category)}/`}>
+              {column.data.title}
+            </a>
+          )}
+          <h1 class="post-title">{post.data.title}</h1>
+          <div class="post-meta">
+            <time datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+            {updated && updated.getTime() !== post.data.date.getTime() && (
+              <span class="meta-sep">更新于 {fmt(updated)}</span>
+            )}
+            <span class="meta-sep">{wordCount} 字 · 约 {readingMinutes} 分钟</span>
+            <span class="meta-sep waline-pageview-count" data-path={url}>0</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="post-body-grid">
+      <div class="post-main">
+        {isOutdated && (
+          <p class="outdate-warn">
+            本文最后更新于 {fmt(updated ?? post.data.date)}，距今已超过 {OUTDATE_DAYS} 天，内容可能与现状有所出入。
+          </p>
+        )}
+
+        <div class="post-inner card">
+          <div class="prose">
+            <Content />
+          </div>
+
+          <footer class="article-footer">
+            <div class="post-tags">
+              {post.data.tags.map((t) => (
+                <a class="tag-chip" href={`/tags/${slugifyTaxonomy(t)}/`}>{t}</a>
+              ))}
+            </div>
+            <div class="article-copyright">
+              <p><strong>{post.data.title}</strong></p>
+              <p>作者：{AUTHOR} · 发布于 {fmt(post.data.date)}</p>
+              <p>本文链接：<a href={url}>{new URL(url, Astro.site)}</a></p>
+              <p>版权声明：采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="license noopener">BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+            </div>
+          </footer>
+        </div>
+
+        <PostNav prev={prev} next={next} />
+
+        {post.data.comments && <Comments path={url} />}
+      </div>
+
+      <aside class="post-sidebar">
+        <div class="sidebar-sticky">
+          {post.data.toc && <Toc headings={headings} />}
+          <MoodKnob />
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  <AccentColor />
+
+  {post.data.mermaid && (
+    <script type="module">
+      import mermaid from '/resources/mermaid/mermaid.min.js';
+      const run = () => {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default',
+        });
+        mermaid.run({ querySelector: 'pre.mermaid:not([data-processed])' });
+      };
+      run();
+      new MutationObserver(run).observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-theme'],
+      });
+    </script>
+  )}
+</Base>
+
+<style>
+  .post-hero {
+    position: relative;
+    margin: 24px 0 36px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lift);
+  }
+  .post-cover {
+    width: 100%;
+    height: clamp(260px, 42vw, 460px);
+    object-fit: cover;
+    display: block;
+  }
+  .post-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    background: linear-gradient(180deg, transparent 30%, rgba(12, 24, 40, 0.78) 100%);
+  }
+  .post-hero-meta {
+    padding: 28px 36px;
+    width: 100%;
+  }
+  .post-column-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 12.5px;
+    letter-spacing: 1px;
+  }
+  .post-column-badge:hover { background: rgba(255, 255, 255, 0.28); color: #fff; }
+  .post-title {
+    margin: 0 0 12px;
+    font-size: clamp(24px, 3.4vw, 38px);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+  }
+  .post-meta {
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .meta-sep::before { content: '·'; margin: 0 8px; opacity: 0.6; }
+  .waline-pageview-count::after { content: ' 次阅读'; }
+
+  .post-body-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 36px;
+    align-items: start;
+  }
+  .sidebar-sticky {
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .post-inner { padding: 36px 44px; }
+
+  .outdate-warn {
+    margin: 0 0 20px;
+    padding: 12px 18px;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+    color: var(--color-text);
+    font-size: 14px;
+  }
+
+  .article-footer { margin-top: 40px; }
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .tag-chip {
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: var(--red-5);
+    color: var(--red-1);
+    font-size: 12.5px;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .tag-chip:hover { background: var(--red-1); color: #fff; }
+
+  .article-copyright {
+    padding: 18px 22px;
+    border-radius: 12px;
+    background: var(--color-surface-muted);
+    border: 1px dashed var(--color-card-border);
+    font-size: 13.5px;
+    color: var(--color-text-muted);
+  }
+  .article-copyright p { margin: 4px 0; }
+  .article-copyright strong { color: var(--color-text-strong); }
+
+  @media (max-width: 1023px) {
+    .post-body-grid { grid-template-columns: 1fr; }
+    .post-sidebar { display: none; }
+  }
+  @media (max-width: 767px) {
+    .post-hero-meta { padding: 20px; }
+    .post-inner { padding: 24px 20px; }
+  }
+</style>

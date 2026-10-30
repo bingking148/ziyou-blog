@@ -1,0 +1,183 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="搜索" description="站内搜索">
+  <div class="search-wrap" data-reveal>
+    <h1 class="page-title">搜索</h1>
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input
+        id="search-input"
+        type="search"
+        placeholder="输入关键词…支持中文模糊匹配"
+        autocomplete="off"
+        autofocus
+      />
+    </div>
+    <p id="search-status" class="search-status">正在加载索引…</p>
+    <ul id="search-results" class="search-results"></ul>
+  </div>
+</Base>
+
+<script is:inline src="/resources/fuse.js/fuse.min.js"></script>
+<script>
+  (function () {
+    'use strict';
+    var input = document.getElementById('search-input');
+    var results = document.getElementById('search-results');
+    var status = document.getElementById('search-status');
+    var index = null;
+    var fuse = null;
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function render(items, query) {
+      if (!query) {
+        results.innerHTML = '';
+        status.textContent = index ? '共收录 ' + index.length + ' 篇文章' : '';
+        return;
+      }
+      if (!items.length) {
+        results.innerHTML = '';
+        status.textContent = '没有找到「' + query + '」相关的文章';
+        return;
+      }
+      status.textContent = '找到 ' + items.length + ' 篇';
+      results.innerHTML = items
+        .map(function (it) {
+          return (
+            '<li><a class="result-item card" href="' + esc(it.permalink) + '">' +
+            '<h3>' + esc(it.title) + '</h3>' +
+            (it.description ? '<p>' + esc(it.description.slice(0, 120)) + '</p>' : '') +
+            '<time>' + esc(it.date) + '</time>' +
+            '</a></li>'
+          );
+        })
+        .join('');
+    }
+
+    var CJK = /[一-鿿]/;
+
+    function search(q) {
+      if (!index) return;
+      if (CJK.test(q)) {
+        // 中文：子串匹配（标题/描述/标签加权靠前）
+        var lower = q.toLowerCase();
+        var hits = index
+          .map(function (it) {
+            var score =
+              (it.title.toLowerCase().includes(lower) ? 4 : 0) +
+              ((it.description || '').toLowerCase().includes(lower) ? 2 : 0) +
+              (it.tags.some(function (t) { return t.toLowerCase().includes(lower); }) ? 2 : 0) +
+              ((it.content || '').toLowerCase().includes(lower) ? 1 : 0);
+            return score > 0 ? { it: it, score: score } : null;
+          })
+          .filter(Boolean)
+          .sort(function (a, b) { return b.score - a.score; })
+          .map(function (h) { return h.it; });
+        render(hits, q);
+      } else if (fuse) {
+        // 拉丁文：fuse 模糊匹配
+        render(fuse.search(q, { limit: 20 }).map(function (r) { return r.item; }), q);
+      }
+    }
+
+    fetch('/search.json')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        index = data;
+        if (window.Fuse) {
+          fuse = new window.Fuse(data, {
+            keys: [
+              { name: 'title', weight: 3 },
+              { name: 'description', weight: 2 },
+              { name: 'tags', weight: 2 },
+              { name: 'content', weight: 1 },
+            ],
+            threshold: 0.35,
+            ignoreLocation: true,
+          });
+        }
+        status.textContent = '共收录 ' + data.length + ' 篇文章';
+        if (input.value.trim()) search(input.value.trim());
+      })
+      .catch(function () {
+        status.textContent = '索引加载失败，请刷新重试';
+      });
+
+    var timer = null;
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { search(input.value.trim()); }, 180);
+    });
+  })();
+</script>
+
+<style>
+  .search-wrap { max-width: 760px; margin: 0 auto; padding: 40px 0; }
+  .page-title { margin: 0 0 24px; font-size: 34px; letter-spacing: 4px; }
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 18px;
+    border: 1px solid var(--color-card-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .search-box:focus-within {
+    border-color: var(--red-2);
+    box-shadow: 0 0 0 3px var(--red-4);
+  }
+  .search-icon { color: var(--color-text-muted); flex-shrink: 0; }
+  #search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 14px 0;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--color-text-strong);
+  }
+  .search-status {
+    margin: 16px 4px;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+  .search-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .search-results :global(.result-item) {
+    display: block;
+    padding: 18px 22px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .search-results :global(.result-item:hover) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+  .search-results :global(.result-item h3) {
+    margin: 0 0 6px;
+    font-size: 16.5px;
+    color: var(--color-text-strong);
+  }
+  .search-results :global(.result-item p) {
+    margin: 0 0 8px;
+    font-size: 13.5px;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .search-results :global(.result-item time) {
+    font-size: 12px;
+    color: var(--red-2);
+    font-family: var(--font-code);
+  }
+</style>

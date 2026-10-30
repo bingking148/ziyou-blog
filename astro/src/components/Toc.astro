@@ -1,0 +1,88 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+const { headings } = Astro.props;
+// Hugo 配置 startLevel=1, endLevel=2 → 只保留 h1/h2；文章内一般是 h2/h3，兼容两种
+const minDepth = Math.min(...headings.map((h) => h.depth));
+const items = headings.filter((h) => h.depth <= Math.max(2, minDepth + 1));
+---
+
+{items.length > 0 && (
+  <nav class="toc-widget widget-wrap card" aria-label="文章目录">
+    <h3 class="widget-title">目录</h3>
+    <ul class="toc-list">
+      {items.map((h) => (
+        <li class:list={['toc-item', `toc-depth-${h.depth}`]}>
+          <a href={`#${h.slug}`} class="toc-link" data-toc-slug={h.slug}>{h.text}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .toc-widget { padding: 18px 16px; }
+  .widget-title {
+    margin: 0 0 10px;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: var(--color-text-strong);
+  }
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .toc-item { margin: 2px 0; }
+  .toc-item[class*="depth-3"] .toc-link { padding-left: 16px; font-size: 13px; }
+  .toc-link {
+    display: block;
+    padding: 5px 10px;
+    border-left: 2px solid transparent;
+    border-radius: 0 8px 8px 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .toc-link:hover { color: var(--red-1); background: var(--red-5); }
+  .toc-link.is-active {
+    color: var(--red-1);
+    border-left-color: var(--red-1);
+    background: var(--red-5);
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+    var links = document.querySelectorAll('.toc-link');
+    if (!links.length || !('IntersectionObserver' in window)) return;
+    var map = {};
+    links.forEach(function (l) {
+      var slug = l.getAttribute('data-toc-slug');
+      if (slug) map[slug] = l;
+    });
+    var headings = document.querySelectorAll('.prose h2[id], .prose h3[id], .prose h1[id]');
+    if (!headings.length) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var link = map[en.target.id];
+        if (!link) return;
+        if (en.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('is-active'); });
+          link.classList.add('is-active');
+        }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px' });
+    headings.forEach(function (h) { io.observe(h); });
+  })();
+</script>

@@ -1,0 +1,196 @@
+/* ============================================================
+   设计令牌：墨蓝 × 朱砂（移植自 params.yml internal_theme）
+   --red-* 变量名不可改：封面取色与氛围旋钮脚本都写这组变量
+   ============================================================ */
+:root {
+  --red-0: #1c3454;
+  --red-1: #2c5382;
+  --red-2: #4a76a8;
+  --red-3: #9db4cf;
+  --red-4: #d8e2ee;
+  --red-5: #edf2f8;
+  --red-5-5: #f2f6fa;
+  --red-6: #f7fafc;
+  --color-red-6-shadow: rgba(44, 83, 130, 0.5);
+  --color-red-3-shadow: rgba(44, 83, 130, 0.25);
+
+  /* 语义色 */
+  --color-bg: #f7fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: var(--red-5-5);
+  --color-text: #3a4454;
+  --color-text-strong: #1c2430;
+  --color-text-muted: #7a879a;
+  --color-card-border: rgba(44, 83, 130, 0.12);
+  --color-accent: #bf4136; /* 朱砂点睛 */
+  --shadow-soft: 0 6px 28px rgba(44, 83, 130, 0.12);
+  --shadow-lift: 0 14px 48px rgba(44, 83, 130, 0.18);
+
+  /* 字体 */
+  --font-article: "Mulish", "LXGW WenKai Screen", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif: "LXGW WenKai Screen", "Mulish", -apple-system, "PingFang SC", serif;
+  --font-code: Menlo, Monaco, Consolas, monospace;
+
+  /* 布局 */
+  --max-width: 1350px;
+  --radius: 16px;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --red-4: rgba(130, 167, 204, 0.5);
+  --red-5: rgba(130, 167, 204, 0.15);
+  --red-5-5: rgba(130, 167, 204, 0.05);
+  --red-6: rgba(130, 167, 204, 0.2);
+
+  --color-bg: #14181f;
+  --color-surface: #1e232c;
+  --color-surface-muted: #232933;
+  --color-text: #b8c2d0;
+  --color-text-strong: #e6edf5;
+  --color-text-muted: #7a879a;
+  --color-card-border: rgba(130, 167, 204, 0.14);
+  --color-accent: #d98063;
+  --shadow-soft: 0 6px 28px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 14px 48px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   基础排版
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-article);
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--color-text);
+  background: var(--color-bg);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  color: var(--color-text-strong);
+  line-height: 1.35;
+}
+
+a {
+  color: var(--red-1);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+a:hover { color: var(--color-accent); }
+
+img { max-width: 100%; height: auto; }
+
+::selection { background: #bf4136; color: #fff; }
+[data-theme="dark"] ::selection { background: #c9553f; }
+
+/* Shiki 双主题代码块：CSS 变量切换，无需 JS */
+[data-theme="dark"] .astro-code,
+[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* 文章排版 */
+.prose {
+  font-family: var(--font-article);
+  font-size: 16.5px;
+  line-height: 1.9;
+}
+.prose h2, .prose h3, .prose h4 {
+  margin: 2em 0 0.8em;
+  scroll-margin-top: 90px;
+}
+.prose p { margin: 1em 0; }
+.prose blockquote {
+  margin: 1.5em 0;
+  padding: 0.6em 1.2em;
+  border-left: 4px solid var(--red-2);
+  background: var(--red-5);
+  border-radius: 0 10px 10px 0;
+  color: var(--color-text-muted);
+}
+.prose pre {
+  padding: 16px 18px;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: var(--font-code);
+  font-size: 14px;
+  line-height: 1.65;
+  border: 1px solid var(--color-card-border);
+}
+.prose code { font-family: var(--font-code); }
+.prose :not(pre) > code {
+  padding: 0.15em 0.45em;
+  border-radius: 6px;
+  background: var(--red-5);
+  color: var(--red-1);
+  font-size: 0.88em;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 14.5px;
+}
+.prose th, .prose td {
+  padding: 10px 14px;
+  border: 1px solid var(--color-card-border);
+  text-align: left;
+}
+.prose th { background: var(--red-5); color: var(--color-text-strong); }
+.prose img { border-radius: 10px; }
+
+/* 首字下沉（编辑排版） */
+.prose > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3em;
+  line-height: 1;
+  padding: 0.04em 0.14em 0.02em 0;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--red-1);
+}
+
+/* ============================================================
+   通用卡片与滚动显现
+   ============================================================ */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

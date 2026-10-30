@@ -9,6 +9,7 @@ This is a **Hugo static blog** using the `hugo-theme-reimu` theme. Chinese langu
 **仓库结构要点（历史文档曾写过 `pblog/` 前缀，已过时）：**
 
 - 站点根目录就是仓库根目录（`hugo.toml` 在根下），没有 `pblog/` 这一层。
+- **`astro/` 子目录是进行中的 Astro 5 迁移新站**（2026-10-30 启动，新旧并存，见 `astro/README.md`）；在切站完成前，Hugo 一侧仍为线上版本，不要动 Hugo 的配置与内容文件。
 - `themes/reimu/` **不是 git submodule**，是直接 vendor 进主仓库的普通目录；修改主题文件直接改，但要意识到升级主题时会产生冲突。
 - 站点级覆盖放在根目录 `layouts/`（如 `layouts/partials/header.html`、`layouts/columns/section.html`），优先级高于主题。
 - `layouts/partials/post/nav.html` 覆盖主题的文章底部前后篇导航：主题原版 `.PrevInSection/.NextInSection` 的方向与「按 weight 排序的专栏」相反；覆盖版让所属分类 term 标了 `column: true` 的文章只在专栏内按 weight 顺序导航，非专栏文章回退到 section 默认排序。匹配用 `.Data.Term`（不能用 term 页的 `title`，专栏 `_index.md` 的 title 带「专栏」后缀会对不上）。
