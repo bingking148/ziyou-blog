@@ -1,105 +1,91 @@
 ---
-title: '为什么伟大的物理公式，大多是乘法，很少是加法？'
-date: 2026-05-27T14:22:18+08:00
-lastmod: 2026-10-27T12:00:00+08:00
+title: '物理公式里为什么乘法这么多：耦合、量纲和守恒'
+date: 2026-06-04T10:12:00+08:00
+lastmod: 2026-10-30T16:00:00+08:00
 cover: /images/covers/physics-formula-cover.jpg
-categories: ['随笔']
-tags: ['物理', '数学', '思考']
-description: '牛顿第二定律、万有引力、质能方程……伟大的物理公式内核几乎全是乘法。因为乘法代表因果耦合、维度相乘与共同贡献，而加法只是同类叠加。看懂这一点，公式就不用背了。'
+categories: ['科学']
+tags: ['物理', '量纲分析', '数学', '学习方法']
+description: '从量纲相乘、耦合关系和守恒律三个角度解释物理公式里的乘法和加法各自负责什么，附几个常见误读的澄清。'
 math: true
 mermaid: false
 comments: true
 toc: true
 ---
 
-> **乘法代表"因果耦合、共同贡献、维度相乘"，加法只代表"同类叠加、简单堆砌"，而宇宙底层规律是不同物理量互相影响、耦合生效，不是简单堆在一起。**
+翻物理书会发现一个现象：牛顿第二定律、万有引力、库仑定律、质能方程、理想气体状态方程，形式几乎都是乘除。
 
-你有没有想过，翻开任何一本物理教材，那些刻在人类文明丰碑上的公式——牛顿第二定律、万有引力、质能方程、库仑定律、理想气体状态方程……它们的内核几乎全是乘法。
+$$F = ma, \quad F = G\frac{Mm}{r^2}, \quad E = mc^2, \quad PV = nRT$$
 
-$$F = ma, \quad E = mc^2, \quad F = G\frac{Mm}{r^2}$$
+但只看到这一层会得出错误结论。物理里同样到处都是加法：
 
-为什么？为什么宇宙不爱用加法，偏偏钟情乘法？
+$$E = E_k + E_p, \quad F = F_1 + F_2 + \cdots + F_n, \quad \sum p_i = \text{const}$$
 
-这背后藏着一个关于"世界如何运转"的深层秘密。
+同一个学科，一边几乎全是乘法，另一边几乎全是加法。这不是巧合，两类公式在回答不同的问题。
 
-## 一、加法：只是"同类东西堆数量"
+## 1. 乘法在这里干什么
 
-加法的本质极其朴素：同维度、同性质的量，简单累加。
+### 1.1 量纲相乘，才能得到新单位
 
-1 个苹果 + 2 个苹果 = 3 个苹果。三岁小孩都懂。
+最基础的原因跟物理无关，是单位制的规矩。
 
-在物理世界里，加法确实也有它的位置：几个力的合力叠加、系统总能量的求和、分段路程相加……但这些场景有一个共同特征——**彼此独立、互不影响**。你加进去一个力，它不会让这个力本身变强或变弱；你把两段路程拼起来，第二段路不会因为第一段路的存在而改变性质。
+同一量纲的量可以相加：$3\,\text{m} + 5\,\text{m} = 8\,\text{m}$，结果还是米。但**不同量纲不能相加**，$3\,\text{kg} + 2\,\text{m/s}$ 是没有意义的表达式。
 
-加法只是在说："东西变多了。"
+要得到一个从未出现过的新物理量，就只能让不同量纲相乘：
 
-但宇宙底层的法则，从来都不是"东西变多了"这么简单。如果世界的终极规律只是加法，那物理学就成了一门记账学——左边一堆量，右边一堆量，两边对一对，齐活。
+- 长度 × 长度 = 面积（$\text{m}^2$）
+- 长度 × 面积 = 体积（$\text{m}^3$）
+- 力 × 距离 = 功（$\text{N}\cdot\text{m} = \text{J}$）
+- 电压 × 电流 = 功率（$\text{V}\cdot\text{A} = \text{W}$）
 
-显然不是。
+$PV = nRT$ 是最好的例子。左边是压强乘体积，$\text{Pa}\cdot\text{m}^3 = \text{J}$，单位是能量；右边摩尔数乘温度乘常数，量纲也恰是能量。**两边能画等号，前提是量纲一致，而这里的一致靠乘法凑出来。**
+
+加法做不到这件事。无论加多少次米，得到的还是米。
 
 <figure style="text-align:center;margin:2.5rem 0 2rem;">
-<svg class="addmul-svg" viewBox="0 0 680 264" style="max-width:100%;height:auto;">
+<svg class="dim-svg" viewBox="0 0 680 300" style="max-width:100%;height:auto;">
   <style>
-    .addmul-svg { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; }
-    [data-theme="dark"] .addmul-svg { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; }
-    .addmul-svg .serif { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+    .dim-svg { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; }
+    [data-theme="dark"] .dim-svg { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; }
+    .dim-svg .serif { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
   </style>
-  <defs>
-    <clipPath id="amClip"><rect x="46" y="56" width="272" height="152"/></clipPath>
-  </defs>
-  <line x1="340" y1="24" x2="340" y2="240" stroke="currentColor" stroke-width="1" opacity="0.14"/>
-  <text x="182" y="34" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.5" letter-spacing="3">加法 · 各自独立</text>
-  <text x="498" y="34" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.5" letter-spacing="3">乘法 · 互相耦合</text>
-  <g clip-path="url(#amClip)">
-    <path d="M-84,132 Q-64,68 -44,132 Q-24,196 -4,132 Q16,68 36,132 Q56,196 76,132 Q96,68 116,132 Q136,196 156,132 Q176,68 196,132 Q216,196 236,132 Q256,68 276,132 Q296,196 316,132 Q336,68 356,132" fill="none" stroke="var(--blue)" stroke-width="2.4" opacity="0.85">
-      <animateTransform attributeName="transform" type="translate" values="0,0;80,0" dur="6.2s" repeatCount="indefinite"/>
-    </path>
-    <path d="M-84,132 Q-64,88 -44,132 Q-24,176 -4,132 Q16,88 36,132 Q56,176 76,132 Q96,88 116,132 Q136,176 156,132 Q176,88 196,132 Q216,176 236,132 Q256,88 276,132 Q296,176 316,132 Q336,88 356,132" fill="none" stroke="var(--amber)" stroke-width="2.4" opacity="0.85">
-      <animateTransform attributeName="transform" type="translate" values="0,0;80,0" dur="9.7s" repeatCount="indefinite"/>
-    </path>
+  <text x="24" y="32" font-size="11" fill="currentColor" opacity="0.5" letter-spacing="3">维度相乘</text>
+  <line x1="48" y1="64" x2="82" y2="64" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
+  <text x="92" y="68" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.4">+</text>
+  <line x1="102" y1="64" x2="136" y2="64" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
+  <text x="146" y="68" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.4">=</text>
+  <line x1="156" y1="64" x2="226" y2="64" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+  <text x="137" y="88" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.4">L + L：仍是一维</text>
+  <line x1="150" y1="236" x2="530" y2="236" stroke="currentColor" stroke-width="1" opacity="0.16"/>
+  <line x1="200" y1="233" x2="440" y2="233" stroke="var(--blue)" stroke-width="6" stroke-linecap="round"/>
+  <text x="454" y="238" class="serif" font-size="16" fill="var(--blue)">L</text>
+  <line x1="197" y1="96" x2="197" y2="230" stroke="var(--amber)" stroke-width="6" stroke-linecap="round"/>
+  <text x="186" y="88" text-anchor="end" class="serif" font-size="16" fill="var(--amber)">W</text>
+  <rect x="203" y="232" width="234" height="4" fill="var(--blue)" opacity="0.1">
+    <animate attributeName="y" values="232;232;102;102;232" keyTimes="0;0.12;0.52;0.85;0.86" dur="8s" repeatCount="indefinite"/>
+    <animate attributeName="height" values="4;4;134;134;4" keyTimes="0;0.12;0.52;0.85;0.86" dur="8s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="196" y="230.5" width="248" height="3.5" rx="1.75" fill="var(--blue)" opacity="0.9">
+    <animateTransform attributeName="transform" type="translate" values="0,0;0,0;0,-130;0,-130;0,0" keyTimes="0;0.12;0.52;0.85;0.86" dur="8s" repeatCount="indefinite"/>
+  </rect>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.52;0.58;0.82;0.88;1" dur="8s" repeatCount="indefinite"/>
+    <text x="320" y="166" text-anchor="middle" class="serif" font-size="18" fill="currentColor">S = L &#183; W</text>
+    <text x="320" y="190" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.5">面积：一个全新维度</text>
   </g>
-  <text x="52" y="74" class="serif" font-size="12" fill="var(--blue)">x&#8321;(t)</text>
-  <text x="52" y="92" class="serif" font-size="12" fill="var(--amber)">x&#8322;(t)</text>
-  <g transform="translate(452,146)">
-    <g>
-      <animateTransform attributeName="transform" type="rotate" values="0;360" dur="7.5s" repeatCount="indefinite"/>
-      <circle r="30" fill="none" stroke="currentColor" stroke-width="8" pathLength="100" stroke-dasharray="5.6 4.4" opacity="0.75"/>
-      <circle r="17" fill="currentColor" opacity="0.06"/>
-      <line x1="0" y1="-17" x2="0" y2="17" stroke="currentColor" stroke-width="1.4" opacity="0.22"/>
-      <line x1="-17" y1="0" x2="17" y2="0" stroke="currentColor" stroke-width="1.4" opacity="0.22"/>
-      <circle cx="0" cy="-30" r="3.2" fill="var(--blue)"/>
-    </g>
-    <circle r="5" fill="currentColor" opacity="0.5"/>
-  </g>
-  <g transform="translate(503,146)">
-    <g>
-      <animateTransform attributeName="transform" type="rotate" values="0;-360" dur="5s" repeatCount="indefinite"/>
-      <circle r="20" fill="none" stroke="currentColor" stroke-width="7" pathLength="100" stroke-dasharray="5.6 4.4" opacity="0.75"/>
-      <circle cx="0" cy="-20" r="3" fill="var(--amber)"/>
-    </g>
-    <circle r="4" fill="currentColor" opacity="0.5"/>
-  </g>
-  <text x="182" y="254" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.5">两列波各走各的，永远不合拍</text>
-  <text x="498" y="254" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.5">一个转，另一个必须跟着转</text>
+  <text x="340" y="278" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.5">一条线扫过另一条线，二维就此诞生 —— 功、功率、磁通，皆是如此</text>
 </svg>
 </figure>
 
-## 二、乘法：不同维度的"互相作用、绑定因果"
+> [!NOTE]
+> 反过来说，这个约束也提供了检验公式的工具。看到一个式子，先算两边的量纲，对不上就一定错了——量纲分析能在不推导的情况下排除大量错误。
 
-乘法的物理本质，至少有三层。而所有伟大的公式，至少占了其中一层，往往三层全占。
+### 1.2 乘法表达「共同决定」，加法表达「各自独立」
 
-### ① 两个因素"共同决定"一个结果
+$F = ma$ 里两个量是乘的，含义是：质量为零、或者加速度为零，力就是零。两个条件缺一不可。
 
-牛顿第二定律：$F = ma$
+写成 $F = m + a$ 会怎样？那意味着质量大的物体即使静止不动也在施力，加速度大的物体即使没有质量也在施力——显然不对。更要紧的是，量纲对不上，这个式子从单位制上就不成立。
 
-力由"质量"和"加速度"共同乘积决定。不是 $F = m + a$。为什么？
-
-因为如果你写成加法，质量和加速度就成了两个互不相干的贡献者：既拼不出量纲（千克加上米每秒没有意义），也表达不出“缺一不可”的绑定关系。一个物体的惯性（质量）和它运动状态的变化率（加速度）必须共同决定结果，只有乘法才能表达这种“共同贡献、耦合生效”的关系。
-
-再看动能公式：$E_k = \frac{1}{2}mv^2$
-
-质量和速度耦合决定动能。一辆卡车以 10 km/h 行驶，和一颗子弹以 1000 m/s 飞行，它们的动能不是"质量加上速度"那么简单，而是速度以平方的形式与质量耦合放大。
-
-加法的世界里，一个变量变了，另一个岿然不动；乘法的世界里，双方一起放大效果，一荣俱荣，一损俱损。
+物理里凡是形如「A 由 B 和 C 共同决定」的关系，写出来就是乘法。势能 $mgh$、动能 $\frac12 mv^2$、电功率 $UI$、电阻的 $I^2R$，都是这个模式。
 
 <figure style="text-align:center;margin:2.5rem 0 2rem;">
 <svg class="fma-svg" viewBox="0 0 680 336" style="max-width:100%;height:auto;">
@@ -144,104 +130,15 @@ $$F = ma, \quad E = mc^2, \quad F = G\frac{Mm}{r^2}$$
 </svg>
 </figure>
 
-### ② 维度相乘，诞生全新的物理概念
+而加法出现的地方，通常是**同一类量在累加**：几个力合成、几段路程相加、几部分能量求和。加法的每个加项都是独立的，改一个不影响另一个。
 
-这是乘法最迷人的地方：它能跨维度创造新意义。
+$$F_{\text{合}} = F_1 + F_2$$
 
-- 长度 × 长度 = 面积
-- 长度 × 面积 = 体积
-- 力 × 距离 = 功
-- 电压 × 电流 = 功率
+两个力各自作用，合成时才相加。每个力本身不受另一个力影响——这是加法的语义。
 
-加法永远在同一个维度里打转：长度加长度还是长度，能量加能量还是能量。它无法凭空创造出一个全新的物理量。
+### 1.3 速度为什么是平方
 
-但乘法可以。它像一种炼金术，把两个不同性质的量放在一起，相互作用，诞生出一个前所未有的新概念。面积不是"更长的长度"，功不是"更大的力"，它们是全新的存在。
-
-宇宙之所以丰富，不是因为同类东西堆得多，而是因为不同属性互相碰撞、耦合、涌现出新的层次。
-
-<figure style="text-align:center;margin:2.5rem 0 2rem;">
-<svg class="dim-svg" viewBox="0 0 680 300" style="max-width:100%;height:auto;">
-  <style>
-    .dim-svg { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; }
-    [data-theme="dark"] .dim-svg { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; }
-    .dim-svg .serif { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
-  </style>
-  <text x="24" y="32" font-size="11" fill="currentColor" opacity="0.5" letter-spacing="3">维度相乘</text>
-  <line x1="48" y1="64" x2="82" y2="64" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
-  <text x="92" y="68" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.4">+</text>
-  <line x1="102" y1="64" x2="136" y2="64" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
-  <text x="146" y="68" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.4">=</text>
-  <line x1="156" y1="64" x2="226" y2="64" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
-  <text x="137" y="88" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.4">L + L：仍是一维</text>
-  <line x1="150" y1="236" x2="530" y2="236" stroke="currentColor" stroke-width="1" opacity="0.16"/>
-  <line x1="200" y1="233" x2="440" y2="233" stroke="var(--blue)" stroke-width="6" stroke-linecap="round"/>
-  <text x="454" y="238" class="serif" font-size="16" fill="var(--blue)">L</text>
-  <line x1="197" y1="96" x2="197" y2="230" stroke="var(--amber)" stroke-width="6" stroke-linecap="round"/>
-  <text x="186" y="88" text-anchor="end" class="serif" font-size="16" fill="var(--amber)">W</text>
-  <rect x="203" y="232" width="234" height="4" fill="var(--blue)" opacity="0.1">
-    <animate attributeName="y" values="232;232;102;102;232" keyTimes="0;0.12;0.52;0.85;0.86" dur="8s" repeatCount="indefinite"/>
-    <animate attributeName="height" values="4;4;134;134;4" keyTimes="0;0.12;0.52;0.85;0.86" dur="8s" repeatCount="indefinite"/>
-  </rect>
-  <rect x="196" y="230.5" width="248" height="3.5" rx="1.75" fill="var(--blue)" opacity="0.9">
-    <animateTransform attributeName="transform" type="translate" values="0,0;0,0;0,-130;0,-130;0,0" keyTimes="0;0.12;0.52;0.85;0.86" dur="8s" repeatCount="indefinite"/>
-  </rect>
-  <g opacity="0">
-    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.52;0.58;0.82;0.88;1" dur="8s" repeatCount="indefinite"/>
-    <text x="320" y="166" text-anchor="middle" class="serif" font-size="18" fill="currentColor">S = L &#183; W</text>
-    <text x="320" y="190" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.5">面积：一个全新维度</text>
-  </g>
-  <text x="340" y="278" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.5">一条线扫过另一条线，二维就此诞生 —— 功、功率、磁通，皆是如此</text>
-</svg>
-</figure>
-
-### ③ 正比关系："你大，我也跟着大"
-
-宇宙大量规律都是正比例关系，而正比例在数学上天然就是乘法。
-
-- 万有引力：$F = G\frac{Mm}{r^2}$——两个质量相乘
-- 库仑力：$F = k\frac{q_1q_2}{r^2}$——两个电荷相乘
-- 质能方程：$E = mc^2$——质量乘光速平方
-
-这些公式都在说同一件事：一个量翻倍，整体就跟着翻倍（或按平方翻倍）。这是因果关系的直接体现。太阳的质量越大，地球的引力就越强；电荷越多，作用力就越猛。
-
-加法做不到这种"联动响应"。乘法才是因果的数学语言。
-
-## 三、为什么"加法型公式"这么少见
-
-加法能干什么？说白了就三件小事：
-
-- 几个力往同一方向推，合力是多少
-- 系统总能量，各部分加起来
-- 路程一段一段量，最后加起来
-
-这些都是**事后算账，不是规律本身**。
-
-真正决定世界怎么运转的，从来不是"堆在一起"。引力要两个质量互相拉扯，电磁力要两个电荷互相作用，动能要质量和速度绑在一起。这种"你中有我、我中有你"的关系，加法写不出来，只有乘法能写。
-
-## 四、补充：除法、平方，本质上都是乘法
-
-$a / b$ 是 $a$ 乘以 $b$ 的倒数；$v^2$ 是 $v \times v$。
-
-所以你看：
-
-- 万有引力公式里的 $r^2$ 在分母？本质是乘了 $r^{-2}$。
-- 动能公式里的 $v^2$？本质是 $v \times v$。
-- 电功率公式 $P = UI$、熵的统计定义、理想气体状态方程 $PV = nRT$……
-
-内核全是乘法逻辑。
-
-## 五、给记公式困难的人一点启发
-
-如果你总觉得物理公式记不住、背了就忘，问题可能不在记忆力，而在你没看懂公式在说什么。
-
-试着换个思路——不要死记符号，先问自己：**这几个量之间是什么关系？**
-
-- 是"各管各的，最后加起来"？那大概是加法。
-- 是"互相牵扯，一个变另一个跟着变"？那肯定是乘法。
-
-比如看到 $F = ma$，别急着背字母顺序。想想：力是质量和加速度"绑在一起"才产生的，质量再大、加速度为零，力也是零；加速度再高、质量为零，力也是零。两个条件缺一不可，这就是乘法的直觉。
-
-再看 $E_k = \frac{1}{2}mv^2$，动能不是质量"加上"速度，而是质量"碰上"速度、速度还平方了——说明速度的影响比质量更猛。一颗子弹能穿透钢板，靠的不是质量，是速度。
+动能 $E_k = \frac12 mv^2$ 里速度是二次的，这个细节比公式本身更有信息量。
 
 <figure style="text-align:center;margin:2.5rem 0 2rem;">
 <svg class="ke-svg" viewBox="0 0 680 348" style="max-width:100%;height:auto;">
@@ -310,6 +207,54 @@ $a / b$ 是 $a$ 乘以 $b$ 的倒数；$v^2$ 是 $v \times v$。
 </svg>
 </figure>
 
-**记住这个规律：公式里谁在乘谁，就是在说"谁离不开谁"。**
+同样的动能增量，速度翻倍和翻四倍的差别，就来自这个平方。
 
-搞懂了这层关系，公式自然刻在脑子里。不是背下来的，是想明白的。
+## 2. 加法在物理里不是配角
+
+如果只讲乘法，会漏掉物理学一半的结构。
+
+**守恒律几乎都是加法的形式。** 能量守恒说总能量不变，而总能量是各部分的**和**。动量守恒、电荷守恒、角动量守恒，全部是「加总之后不变」。这类定律的地位不比 $F=ma$ 低，它甚至是更基本的——诺特定理指出，每一种连续对称性都对应一个守恒量，而守恒量天然是加起来的标量。
+
+**叠加原理也是加法。** 力的合成、电场叠加、波的干涉，都是把各部分的贡献直接相加。为什么可以简单相加？因为这些系统是线性的，各部分互不干扰。这个"互不干扰"正是加法的适用条件。
+
+**热力学第一定律**：$\Delta U = Q - W$。内能变化等于吸收的热减去对外做的功，纯加减。
+
+所以更准确的说法不是"宇宙偏爱乘法"，而是：
+
+> **耦合关系写成乘法，独立叠加写成加法。**
+
+这两条规则各自覆盖一大类物理情形，没有谁更基本。
+
+## 3. 一个容易被忽略的细节：量纲不等于规律
+
+有人从「乘法能创造新量纲」推出「乘法更本质」，这个推理跳了一步。
+
+量纲分析告诉你的只是**形式上可能成立**，不告诉你**实际成立的系数**。$F = ma$ 和 $F = 2ma$ 量纲都对，是实验判定前者正确。同理，$E = mc^2$ 里的那个 $c^2$ 也不是从量纲推出来的：量纲只要求它是速度的平方，具体是 $c^2$ 还是 $(2c)^2$，只能靠实验或理论推导确定。
+
+这也是物理公式背不下来的真实原因——**记住符号没有用，得记住每一项在物理上代表什么约束**。
+
+## 4. 用这个视角重新看几个公式
+
+**$F = G\frac{Mm}{r^2}$**
+
+分子上两个质量相乘：引力由双方共同决定，任何一方质量为零就没有引力。分母上距离平方：随距离衰减，且是平方衰减而不是线性，这一点牛顿从开普勒第三定律和向心加速度推出来的，不是猜的。
+
+**$PV = nRT$**
+
+压强乘体积等于物质的量乘温度乘常数。可以改写成 $P = \frac{nRT}{V}$——压强与温度成正比、与体积成反比。理想气体模型的核心假设是分子间无相互作用，正因为无相互作用，各分子对压强的贡献才能简单叠加，状态方程才会这么简洁。
+
+**$E_k = \frac12 mv^2$**
+
+那个 $\frac12$ 来自积分：$\int_0^v mv'\,dv' = \frac12 mv^2$。它是从 $F=ma$ 出发、对位移积分得到的必然结果，不是凑出来的系数。
+
+## 5. 记公式的一点方法
+
+背不住的公式，通常是因为只记住了符号串。换成问三个问题：
+
+**一、这个式子里，哪些量是耦合的？** 相乘的量之间是「共同决定」的关系。看到 $m$ 和 $a$ 相乘，就知道没有加速度就没有力，这比背字母顺序有用。
+
+**二、量纲对不对？** 两边单位凑不出来的式子一定是错的，这一条能挡住大部分记忆错误。
+
+**三、它从哪来？** 是定义，是守恒律的推论，还是实验拟合？来源决定了它的适用范围。$PV = nRT$ 在高压缩比下失效，是因为"分子间无相互作用"这个前提破了，不是因为公式写错了。
+
+三个问题答得出来，公式基本就记住了——不是背下来的，是理解了它为什么长这样。
