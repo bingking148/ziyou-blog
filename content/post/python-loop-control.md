@@ -1,243 +1,189 @@
 ---
-title: 'Python 循环控制：for、range、嵌套循环与登录实战'
-weight: 3
+title: 'Python 第 4 篇：range、嵌套循环与石头剪刀布'
+weight: 4
 date: 2026-10-20T09:00:00+08:00
-lastmod: 2026-10-29T15:07:35+08:00
+lastmod: 2026-10-30T10:00:00+08:00
 cover: /images/covers/python-loop-control-cover.jpg
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '循环', '流程控制']
-description: '深入 Python 流程控制第二部分：for 与 while 的选择、range 数字序列、嵌套循环、break/continue，并通过登录验证和猜数字游戏写出可运行的小项目。'
+description: '把循环讲透：range 的三种形式与五个易错点、嵌套循环怎么控制行列、累加与计数两类经典循环模式，最后用它们写出石头剪刀布游戏。'
 math: false
 mermaid: false
 comments: true
 toc: true
 ---
 
-上一篇 [Python 控制流与函数](/post/python-control-flow-functions/) 已经写过 `if`、`while`、`for` 和函数的基本用法。这一篇继续把“循环”这一块补深：什么时候用 `while`，什么时候用 `for`；`range()` 怎么生成数字序列；嵌套循环怎么控制行和列；`break`、`continue` 如何改变循环的执行路线。
+上一篇的猜数字游戏里，你已经会写 `while True` 和 `for i in range(3)` 了。那这一篇讲什么？
 
-循环看起来是语法问题，实际是程序设计问题。大模型应用里也经常用到它：批量处理一组提示词、遍历 API 返回的多条消息、重试失败请求、给一组文档做切分和检索，都离不开循环。
+讲**那些"能跑但会写错"的地方**。
 
-## 1. 先分清 while 和 for
+循环是入门阶段最容易出微妙 bug 的语法：`range(1, 100)` 少了 100、嵌套循环内外层变量搞混、累加器没初始化。这些错误不会报错，只会给你一个错误的结果——比报错更难发现。
 
-`while` 关心的是**条件**：只要条件成立，就一直执行。
+所以这篇换个打法：先把循环的零件彻底拆清楚，再用它们造一个**石头剪刀布**。这个游戏正好需要四样东西：`range` 做回合、嵌套循环打印战绩表、累加器算胜率、`while` 做「再来一局」。
 
-```python
-count = 0
+## 1. range：你以为懂了，但有五个坑
 
-while count < 3:
-    print("当前次数：", count)
-    count += 1
-```
+`range()` 生成一串数字。它有三个形式，全都记在下面这张表里：
 
-`for` 关心的是**遍历对象**：从字符串、列表、`range()` 等数据集中逐个取出元素。
-
-```python
-message = "AI"
-
-for char in message:
-    print(char)
-```
-
-两者可以这样选：
-
-| 场景 | 更自然的写法 | 原因 |
+| 写法 | 生成 | 例子 |
 |---|---|---|
-| 不知道要循环多少次，只知道继续条件 | `while` | 例如一直等待用户输入，直到密码正确 |
-| 遍历列表、字符串、字典、文件行 | `for` | 数据集已经存在 |
-| 已知循环次数 | `for + range()` | 次数明确，代码更短 |
-| 请求失败后重试，最多重试 3 次 | `for + range()` 或 `while + 计数器` | 有上限，也有条件 |
+| `range(end)` | `0` 到 `end-1` | `range(3)` → `0 1 2` |
+| `range(start, end)` | `start` 到 `end-1` | `range(2, 6)` → `2 3 4 5` |
+| `range(start, end, step)` | 从 `start` 开始，每次加 `step` | `range(0, 10, 3)` → `0 3 6 9` |
 
-新手更容易误用 `while` 写计数循环，例如：
+三条记忆规则：
 
-```python
-i = 0
-while i < 5:
-    print(i)
-    i += 1
-```
+1. **开始位置默认 0**；
+2. **结束位置永远取不到**（左闭右开）；
+3. **步长默认 1**，可以是负数。
 
-能运行，但要自己维护初始值、条件和更新语句。等价写法更简洁：
+现在看五个真实的坑。
+
+### 坑一：想包含 100，却写了 range(1, 100)
 
 ```python
-for i in range(5):
-    print(i)
+for i in range(1, 100):
+    pass
+print(i)      # 99 ← 不是 100！
 ```
 
-## 2. for 循环的完整结构
+想包含 100 就得写 `range(1, 101)`。**这是入门阶段最高频的 off-by-one 错误。**
 
-`for` 的基本语法是：
-
-```python
-for 元素 in 待处理数据集:
-    对元素做处理
-```
-
-例如遍历字符串：
-
-```python
-message = "Hello-Python"
-
-for char in message:
-    print(char)
-else:
-    print("循环结束")
-```
-
-`else` 是可选的。它有一点特殊：**循环正常结束时执行；如果被 `break` 提前打断，则不执行**。
-
-```python
-for n in [3, 7, 9]:
-    if n % 2 == 0:
-        print("发现偶数，提前结束")
-        break
-else:
-    print("没有发现偶数")
-```
-
-这个写法常用于“查找型循环”：找遍了都没找到，才走 `else`。
-
-## 3. range：生成数字序列
-
-`range()` 不是列表，而是一个按需生成数字的对象。它有三个常用形式。
-
-### 形式一：range(end)
-
-从 0 开始，到 `end` 前面一个数结束。
-
-```python
-for i in range(5):
-    print(i)
-```
-
-输出：
-
-```text
-0
-1
-2
-3
-4
-```
-
-注意：**不包含 5**。
-
-### 形式二：range(start, end)
-
-从 `start` 开始，到 `end` 前面一个数结束。
-
-```python
-for i in range(2, 8):
-    print(i)
-```
-
-输出：`2, 3, 4, 5, 6, 7`。
-
-### 形式三：range(start, end, step)
-
-`step` 是步长，也就是每次增加多少。
-
-```python
-for i in range(0, 10, 2):
-    print(i)
-```
-
-输出：
-
-```text
-0
-2
-4
-6
-8
-```
-
-步长也可以是负数，用于倒序：
+### 坑二：步长为负时，起止也要反过来
 
 ```python
 for i in range(5, 0, -1):
-    print(i)
+    print(i)      # 5 4 3 2 1
 ```
 
-输出：`5, 4, 3, 2, 1`。
+如果你写成 `range(0, 5, -1)`，什么都不会输出——因为从 0 开始往负数走，永远到不了 5。**方向反了，range 直接给你空序列，不报错。**
 
-### range 的三条记忆规则
-
-1. 开始位置默认是 `0`；
-2. 结束位置永远取不到；
-3. 步长默认是 `1`，正数递增，负数递减。
-
-## 4. 案例：用 for 和 range 做数值统计
-
-### 案例 1：计算 1~100 所有奇数之和
-
-要包含 100，结束位置必须写 `101`。
+### 坑三：range 不是列表
 
 ```python
-total = 0
+print(range(5))          # range(0, 5)  ← 不是 [0,1,2,3,4]
+print(list(range(5)))    # [0, 1, 2, 3, 4]
+```
 
+`range` 是一个「按需生成」的对象，你用 `for` 遍历它时才一个个算出来。好处是省内存——`range(100000000)` 几乎不占内存，但 `list(range(100000000))` 会直接把你电脑撑爆。
+
+知道这一点就行，日常用 `for` 遍历不需要转换。
+
+### 坑四：range 里只能是整数
+
+```python
+range(0, 1, 0.1)     # TypeError
+```
+
+想要小数序列，用列表推导式或 `while`：
+
+```python
+x = 0.0
+while x < 1.0:
+    print(round(x, 1))
+    x += 0.1
+```
+
+（列表推导式在第 5 篇讲。）
+
+### 坑五：循环里改了列表，range 不会跟着变
+
+```python
+items = [1, 2, 3, 4]
+for i in range(len(items)):
+    if items[i] % 2 == 0:
+        items.pop(i)      # 边遍历边删，索引全乱套了
+```
+
+这是个经典陷阱，第 5 篇处理列表时会给出正确写法。现在只要记住：**遍历的时候不要修改正在遍历的东西**。
+
+## 2. 两种经典循环模式
+
+90% 的循环都在做这两件事之一：**累加**和**计数**。认清模式，写起来就不会漏东西。
+
+### 2.1 累加模式：准备一个「桶」
+
+```python
+total = 0                    # ① 桶先清空
 for n in range(1, 101):
     if n % 2 == 1:
-        total += n
-
-print("1~100 的奇数和：", total)
+        total += n           # ② 符合条件就往里倒
+print(total)                 # 2500
 ```
 
-也可以直接让步长为 2：
+三步不能少：**初始化 → 遍历 → 累加**。少了第一步会报 `NameError`。
+
+还能更省事——既然只要奇数，直接让步长是 2，连 `if` 都省了：
 
 ```python
 total = 0
-
 for n in range(1, 101, 2):
     total += n
-
-print("1~100 的奇数和：", total)
+print(total)                 # 2500
 ```
 
-第二种更好，因为它少做了一半无意义的判断。
+**判断一个循环写得好不好，就看它有没有做无用功。** 上面第二种写法少跑 50 次循环、少做 50 次判断。
 
-### 案例 2：计算 100~500 之间所有 3 的倍数之和
+### 2.2 计数模式：满足条件就 +1
 
 ```python
-total = 0
+scores = [88, 95, 61, 72, 59, 90]
+pass_count = 0
 
-for n in range(102, 501, 3):
-    total += n
+for s in scores:
+    if s >= 60:
+        pass_count += 1
 
-print("100~500 之间 3 的倍数之和：", total)
+print(f"及格 {pass_count} 人，及格率 {pass_count / len(scores):.0%}")
 ```
 
-这里从 `102` 开始，因为 102 是 100 之后第一个 3 的倍数。写成下面这样也可以：
+`len(scores)` 是列表长度。`:0%` 是 f-string 的百分比格式，`0.667` 会显示成 `67%`。
+
+### 2.3 找最大值：不用 max() 怎么写
+
+这是计数模式的变体，面试常考，也最能检验你是否真的理解循环：
 
 ```python
-total = 0
+scores = [88, 95, 61, 72, 59, 90]
 
-for n in range(100, 501):
-    if n % 3 == 0:
-        total += n
+biggest = scores[0]        # 先假设第一个最大
+for s in scores:
+    if s > biggest:        # 遇到更大的就更新
+        biggest = s
 
-print(total)
+print(biggest)             # 95
 ```
 
-区别在于：第一种直接生成需要的数字，第二种生成所有数字再筛选。数据量小没有明显差别，数据量大时第一种更高效。
+注意 `biggest` 千万别初始化成 `0`——如果全是负数，结果就错了。**初始化成第一个元素才是安全的。**
 
-## 5. 嵌套循环：外层控制行，内层控制列
+## 3. 嵌套循环：外层管行，内层管列
 
-嵌套循环是“循环里面再套循环”。常见结构：
+嵌套循环就是循环里再套一个循环。理解它的关键在于：**外层每转一圈，内层要完整转完一圈。**
 
 ```python
-for 外层元素 in 外层数据集:
-    做外层的事
-    for 内层元素 in 内层数据集:
-        做内层的事
+for i in range(1, 4):          # 外层：i = 1, 2, 3
+    for j in range(1, 4):      # 内层：每次 j 从 1 到 3 跑一遍
+        print(f"({i},{j})", end=" ")
+    print()                    # 内层跑完，换行
 ```
 
-最容易踩的坑是缩进。写在 `for` 里面的代码才会被重复执行；写在外面，就只执行一次。
+输出：
 
-### 案例：打印 3 行 4 列星号
+```text
+(1,1) (1,2) (1,3)
+(2,1) (2,2) (2,3)
+(3,1) (3,2) (3,3)
+```
+
+一共执行 3 × 3 = 9 次内层循环。**总次数是外层次数乘内层次数**，这一点在做大数据量处理时要留意——两层各 1000 次就是一百万次。
+
+`print(..., end=" ")` 的作用是「打印后不换行，用空格结尾」。默认 `print` 打完会换行，加了 `end` 就能在同一行连续打。
+
+### 3.1 经典练习：打印三角形
 
 ```python
-for row in range(1, 4):
-    for col in range(1, 5):
+for i in range(1, 6):
+    for j in range(i):        # 内层次数跟着外层变
         print("*", end="")
     print()
 ```
@@ -245,268 +191,241 @@ for row in range(1, 4):
 输出：
 
 ```text
+*
+**
+***
 ****
-****
-****
+*****
 ```
 
-理解方式：
+内层写 `range(i)` 而不是 `range(5)`，这就是「外层控制行数，内层控制每行几个」。**内层的范围依赖外层的变量，是嵌套循环最核心的技巧。**
 
-- 外层循环执行 3 次，对应 3 行；
-- 每执行一行，内层循环打印 4 个星号；
-- 内层结束后，`print()` 换行。
-
-### 案例：九九乘法表
+### 3.2 带缩进的三角形
 
 ```python
-for row in range(1, 10):
-    for col in range(1, row + 1):
-        print(f"{col}*{row}={row * col}", end="\t")
+n = 5
+for i in range(1, n + 1):
+    for _ in range(n - i):       # 先打空格
+        print(" ", end="")
+    for _ in range(2 * i - 1):   # 再打星号
+        print("*", end="")
     print()
 ```
 
-这里 `row` 表示第二个乘数，`col` 表示第一个乘数。第一行只有 `1*1`，第二行有 `1*2`、`2*2`，所以内层范围是 `range(1, row + 1)`。
-
-### 嵌套循环练习
-
-以下三个练习建议自己写一遍：
-
-1. 输入直角边长度，打印等腰直角三角形；
-2. 输入层数，打印数字金字塔；
-3. 打印 8×8 国际象棋棋盘，交替输出黑白格。
-
-它们训练的都是同一种能力：**把二维图形拆成行和列的循环关系**。
-
-## 6. break 和 continue
-
-`break` 用于结束整个循环：
-
-```python
-for n in range(1, 11):
-    if n == 8:
-        break
-    print(n)
-```
-
-输出到 7 就停止。
-
-`continue` 只跳过本轮循环，继续下一轮：
-
-```python
-for n in range(1, 11):
-    if n == 4:
-        continue
-    if n == 8:
-        break
-    print(n)
-```
-
-输出：
-
 ```text
-1
-2
-3
-5
-6
-7
+    *
+   ***
+  *****
+ *******
+*********
 ```
 
-可以这么记：
+注意这里用了 `_` 作为循环变量。`_` 表示「这个变量我用不到，只是要循环这么多次」，是 Python 的惯用写法。
 
-- `break`：我不玩了，直接结束；
-- `continue`：这轮跳过，下一轮继续；
-- `return`：如果写在函数里，直接结束函数。
+## 4. 组装：石头剪刀布
 
-`break` 和 `continue` 只能出现在循环里，不能单独写在外面；`return` 则只能出现在函数里。
+现在用上所有零件。需求：
 
-## 7. 实战：限制 5 次机会的登录验证
-
-需求：
-
-1. 正确账号有 `admin/666888`、`zhangsan/123456`、`taoge/888666`；
-2. 用户最多输入 5 次；
-3. 用户名和密码不能为空；
-4. 登录成功输出欢迎语；
-5. 5 次都失败则锁定本次操作。
-
-```python
-accounts = {
-    "admin": "666888",
-    "zhangsan": "123456",
-    "taoge": "888666",
-}
-
-for attempt in range(1, 6):
-    username = input("请输入用户名：").strip()
-    password = input("请输入密码：").strip()
-
-    if not username or not password:
-        print("用户名和密码不能为空。")
-        print(f"剩余机会：{5 - attempt}")
-        continue
-
-    if accounts.get(username) == password:
-        print(f"登录成功，欢迎你，{username}！")
-        break
-
-    print("用户名或密码错误，请重新输入！")
-    print(f"剩余机会：{5 - attempt}")
-else:
-    print("错误次数过多，暂时不允许继续操作。")
-```
-
-这里用到四个知识点：
-
-1. `for + range(1, 6)` 控制最多 5 次；
-2. `continue` 处理空输入，不消耗正常登录判断；
-3. `break` 在登录成功后退出；
-4. `for...else` 在没有被 `break` 打断时输出锁定提示。
-
-注意：这里使用 `accounts.get(username) == password`，比先取 `accounts[username]` 再比较更安全。因为用户名不存在时，`get()` 返回 `None`，不会抛出 `KeyError`。
-
-## 8. 实战：猜数字游戏
-
-需求：
-
-1. 系统随机生成一个数字；
-2. 用户不断输入猜测值；
-3. 猜大、猜小都给出提示；
-4. 猜对后结束游戏。
+1. 玩家和电脑各出石头/剪刀/布；
+2. 每局判定胜负，累计比分；
+3. 打满 5 局，输出战绩表；
+4. 问要不要再来一局。
 
 ```python
 import random
 
-answer = random.randint(1, 100)
-count = 0
+# 用数字代表手势：0=石头 1=剪刀 2=布
+NAMES = {0: "石头", 1: "剪刀", 2: "布"}
 
-while True:
-    raw = input("请输入 1~100 之间的整数：")
+# 规律：玩家赢的组合。石头(0)赢剪刀(1)，剪刀(1)赢布(2)，布(2)赢石头(0)
+WIN_CASES = {(0, 1), (1, 2), (2, 0)}
 
-    if not raw:
-        print("输入不能为空。")
-        continue
 
-    try:
-        guess = int(raw)
-    except ValueError:
-        print("请输入有效整数。")
-        continue
+def get_player_choice():
+    """询问玩家，返回 0/1/2，输入不合法就重问"""
+    while True:
+        print("\n0=石头  1=剪刀  2=布")
+        raw = input("请出手：").strip()
+        if raw in ("0", "1", "2"):
+            return int(raw)
+        print("只能输入 0、1 或 2")
 
-    if guess < 1 or guess > 100:
-        print("数字必须在 1~100 之间。")
-        continue
 
-    count += 1
+def judge(player, computer):
+    """判定一局，返回 'win' / 'lose' / 'draw'"""
+    if player == computer:
+        return "draw"
+    if (player, computer) in WIN_CASES:
+        return "win"
+    return "lose"
 
-    if guess < answer:
-        print("猜小了。")
-    elif guess > answer:
-        print("猜大了。")
+
+def play_round(round_no):
+    """打一局，返回结果字符串"""
+    player = get_player_choice()
+    computer = random.randint(0, 2)
+
+    print(f"你出 {NAMES[player]}，电脑出 {NAMES[computer]}")
+    result = judge(player, computer)
+
+    if result == "win":
+        print(f"第 {round_no} 局：你赢了！")
+    elif result == "lose":
+        print(f"第 {round_no} 局：你输了")
     else:
-        print(f"猜对了！答案是 {answer}，你用了 {count} 次。")
-        break
+        print(f"第 {round_no} 局：平局")
+
+    return result
+
+
+def main():
+    wins = loses = draws = 0
+
+    print("===== 石头剪刀布，五局三胜 =====")
+
+    for r in range(1, 6):
+        result = play_round(r)
+        if result == "win":
+            wins += 1
+        elif result == "lose":
+            loses += 1
+        else:
+            draws += 1
+        print(f"当前比分  {wins} : {loses}  （平 {draws}）")
+
+    # 战后总结
+    print("\n===== 最终战绩 =====")
+    print(f"胜 {wins} 局，负 {loses} 局，平 {draws} 局")
+    print(f"胜率：{wins / 5:.0%}")
+
+    if wins > loses:
+        print("总体评价：你赢了 🎉")
+    elif wins < loses:
+        print("总体评价：电脑赢了，再来？")
+    else:
+        print("总体评价：势均力敌")
+
+
+if __name__ == "__main__":
+    main()
 ```
 
-这个例子使用 `while True`，因为程序不知道用户会猜多少次。退出条件不是固定次数，而是“猜对”。
+### 4.1 这段代码里的三个设计点
 
-## 9. 循环在 AI 应用里的典型场景
-
-### 场景 1：批量发送提示词
+**第一，用字典 `NAMES` 把数字翻译成中文。**
 
 ```python
-questions = [
-    "用一句话解释 Transformer。",
-    "用比喻解释注意力机制。",
-    "总结 Python 循环的用法。",
-]
-
-for i, question in enumerate(questions, start=1):
-    print(f"任务 {i}：{question}")
+NAMES = {0: "石头", 1: "剪刀", 2: "布"}
+NAMES[0]     # "石头"
 ```
 
-### 场景 2：遍历多轮对话历史
+否则你每处都要写 `if choice == 0: print("石头")`。这是「数据驱动」的思路，第 5 篇讲字典时会展开。
+
+**第二，用集合 `WIN_CASES` 表达胜负规则。**
 
 ```python
-messages = [
-    {"role": "system", "content": "你是一个耐心的 Python 老师。"},
-    {"role": "user", "content": "for 和 while 有什么区别？"},
-    {"role": "assistant", "content": "for 适合遍历，while 适合条件循环。"},
-]
-
-for message in messages:
-    print(message["role"], ":", message["content"])
+WIN_CASES = {(0, 1), (1, 2), (2, 0)}
+if (player, computer) in WIN_CASES:
 ```
 
-### 场景 3：失败重试
+如果不这样写，就得写一长串 `if`：
 
 ```python
-for attempt in range(1, 4):
-    print(f"第 {attempt} 次请求模型接口")
-
-    # 这里放真实请求逻辑
-    # 如果成功，用 break 结束
-    # 如果失败，继续下一轮
+if (player == 0 and computer == 1) or \
+   (player == 1 and computer == 2) or \
+   (player == 2 and computer == 0):
 ```
 
-真正的 API 项目还会加入等待时间、异常捕获和日志，但主干仍然是循环。
+两相对比，集合写法一眼就能看出规则。**好的数据结构能让复杂的条件变简单。**
 
-## 10. 常见错误清单
+**第三，把「问输入」和「判胜负」拆成两个函数。**
 
-### 1. while 条件永远成立
+`get_player_choice` 只管拿合法输入，`judge` 只管判断。这样你想换成「让用户输入文字『石头』」，只改第一个函数；想改规则，只改第二个。
+
+### 4.2 三种改法，检验理解
+
+**改法一：加一个「三局两胜」模式**
+
+谁先赢两局就结束，不用打满五局。
+
+提示：把 `for r in range(1, 6)` 换成 `while wins < 2 and loses < 2`，注意循环变量 `r` 要自己维护。
+
+**改法二：加战绩表**
+
+用嵌套循环打印最近 5 局的明细，一行一局：
+
+```text
+局次  你    电脑   结果
+1     石头  布     输
+2     剪刀  剪刀   平
+...
+```
+
+提示：先把每局结果存进列表（第 5 篇的内容），再遍历打印。也可以直接在循环里用 `f"{r:<5}{...}"` 对齐——`:<5` 表示左对齐占 5 个字符宽。
+
+**改法三：让电脑变聪明**
+
+电脑不是纯随机，而是有 50% 概率学习你上一次出的手势然后出能赢它的那个。
+
+提示：在 `main` 里记一个 `last_player`，传给 `play_round`。
+
+## 5. 循环的性能直觉
+
+循环是性能问题的高发区。现在不要求你优化，但要有两个直觉：
+
+**直觉一：嵌套循环的代价是乘法级的。**
 
 ```python
-i = 1
-while i < 5:
-    print(i)
+for i in range(1000):
+    for j in range(1000):
+        ...
 ```
 
-缺少 `i += 1`，程序会一直执行。开发中可按 `Ctrl + C` 中断。
+这是一百万次。再加一层就是十亿次，程序会直接卡死。以后看到三层嵌套循环要警觉。
 
-### 2. range 结束值写错
+**直觉二：能放在循环外的，别放在循环里。**
 
 ```python
-for i in range(1, 100):
-    print(i)
+# 慢
+for item in items:
+    total = len(items)        # 每次都重新算一遍长度
+    ...
+
+# 快
+total = len(items)            # 只算一次
+for item in items:
+    ...
 ```
 
-这段代码不包含 100。要包含 100，应写 `range(1, 101)`。
+在 Python 里这个差别不明显（`len()` 很快），但换成「每次循环都读一次文件」「每次循环都请求一次网络」就是灾难了。
 
-### 3. 嵌套循环缩进错误
+## 6. 常见错误清单
+
+1. **`range(1, 100)` 以为包含 100**——不包含，要写 101；
+2. **步长为负但起止没反过来**——`range(0, 5, -1)` 是空的；
+3. **累加器没初始化**——`total += n` 前忘了 `total = 0`；
+4. **找最大值初始化成 0**——全是负数时结果错误；
+5. **嵌套循环内外层用了同一个变量名**——外层的值会被内层覆盖；
+6. **边遍历边删列表元素**——索引会错乱；
+7. **`while` 条件永远为真又没有 `break`**——死循环。
+
+第 5 条特别隐蔽：
 
 ```python
-for row in range(3):
-    for col in range(4):
-        print("*", end="")
-print()
+for i in range(3):
+    for i in range(2):     # 用了同一个 i！
+        print(i)
+    print("外层", i)        # 打印的不是 0/1/2，而是 1
 ```
 
-`print()` 写在了外层循环外，只会换行一次，无法得到三行。
+内层循环跑完后，`i` 被改成了内层最后的值。**内外层一定要用不同的变量名。**
 
-### 4. 混淆 break 和 continue
+## 7. 本篇小结
 
-`break` 结束整个循环；`continue` 只结束当前这一轮。
+1. **`range` 左闭右开**，三种形式记牢，五个坑至少踩过一次才算真懂；
+2. **累加**和**计数**是两种最基础的循环模式，初始化那一步最容易被忘；
+3. **嵌套循环**外层管行、内层管列，总次数是乘法关系；
+4. **内层范围依赖外层变量**是嵌套的精髓，九九表、三角形都靠它；
+5. **好的数据结构能让条件变简单**——石头剪刀布里那个 `WIN_CASES` 集合就是例子。
 
-### 5. for...else 被误解
-
-`for...else` 的 `else` 不是“循环失败”，而是“循环没有被 `break` 打断，正常走完了”。
-
-## 11. 课后练习
-
-1. 计算 1~1000 之间所有 5 的倍数之和；
-2. 统计字符串 `"akiwksjakdiklowiqaamnvbamvaxnsjdsjkaaxkjd"` 中字母 `a` 和 `k` 的数量；
-3. 打印九九乘法表；
-4. 写一个限制 5 次机会的登录程序；
-5. 写一个猜数字游戏，并统计用户猜测次数。
-
-## 12. 学习检查表
-
-读完这篇，你应该能清楚回答：
-
-1. `while` 和 `for` 分别适合什么场景？
-2. `range(1, 101)` 会生成哪些数字？
-3. 嵌套循环中，外层和内层分别控制什么？
-4. `break`、`continue`、`return` 有什么区别？
-5. `for...else` 什么时候执行？
-
-下一篇 [Python 数据容器](/post/python-data-containers/) 会把数据组织方式补上。你会看到列表、字符串、元组、集合和字典如何配合循环处理批量数据，这也是读写 API 返回 JSON 的前置知识。
+下一篇 [第 5 篇：五类数据容器](/post/python-data-containers/) 会解决一个循环解决不了的问题：**一次处理一批数据**。列表、字典这些容器，才是让程序真正能干活的东西。

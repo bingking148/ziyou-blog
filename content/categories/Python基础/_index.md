@@ -1,9 +1,27 @@
 ---
 title: 'Python 基础专栏'
-description: '从字面量、变量与运算符讲起，依次覆盖控制流、循环、数据容器、函数详解、匿名函数与模块、面向对象，最后到面向对象进阶与异常处理，按学习顺序排列的 Python 入门专栏。'
+description: '写给完全没写过代码的人：从装环境、跑出第一个程序开始，一路做到 BMI 计算器、猜数字、记账本、聊天机器人，每篇一个能跑的小项目，按学习顺序排列。'
 column: true
 column_order: 2
 cover: /images/covers/python-basics-for-ai-cover.jpg
 ---
 
-收录于[专栏](/columns/)。这里汇总面向大模型开发的 Python 入门文章，按学习顺序从零开始：先认识字面量、变量与运算符，再进入 if/while 控制流，随后是 for/range/嵌套循环，接着是列表、字符串、元组、集合、字典五类数据容器，然后是函数的参数、作用域与递归，以及 lambda 匿名函数与模块组织，最后用面向对象入门和进阶（类属性、多类协作、异常处理）收官。
+收录于[专栏](/columns/)。
+
+这套教程按**零基础**写：不需要你学过任何编程语言，不需要数学很好，只需要一台电脑。每一篇都从一个具体的小项目出发，缺什么语法就补什么语法——你不会读到「本节讲变量，下节讲常量」这种脱离用处的排列。
+
+九篇走完，你会亲手做出九个能运行的程序：
+
+| 篇目 | 项目 |
+|---|---|
+| [第 1 篇：装好环境](/post/python-zero-setup/) | Hello World |
+| [第 2 篇：变量、类型与运算](/post/python-basics-for-ai/) | BMI 计算器 |
+| [第 3 篇：判断、循环与函数](/post/python-control-flow-functions/) | 猜数字游戏 |
+| [第 4 篇：range 与嵌套循环](/post/python-loop-control/) | 石头剪刀布 |
+| [第 5 篇：五类数据容器](/post/python-data-containers/) | 记账本 |
+| [第 6 篇：函数详解](/post/python-functions-in-depth/) | 成绩分析工具箱 |
+| [第 7 篇：lambda 与模块](/post/python-lambda-modules/) | 可复用的工具包 |
+| [第 8 篇：面向对象入门](/post/python-oop-basics/) | 聊天机器人 |
+| [第 9 篇：类属性与异常处理](/post/python-oop-advanced-exceptions/) | 智能助手 |
+
+学完想转向大模型，接着看 [人工智能学习专栏](/categories/人工智能学习/)。
