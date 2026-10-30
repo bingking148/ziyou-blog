@@ -1,5 +1,5 @@
 ---
-title: 'Streamlit AI 聊天应用：一套代码兼容 DeepSeek 与 Ollama'
+title: 'AI 第 7 篇：Streamlit 聊天应用——一套代码兼容 DeepSeek 与 Ollama'
 weight: 7
 date: 2026-10-19T10:25:00+08:00
 lastmod: 2026-10-29T15:09:33+08:00
@@ -12,6 +12,10 @@ mermaid: false
 comments: true
 toc: true
 ---
+
+现在你手上已经有三样东西了：能调模型（第 5 篇）、能写好提示词（第 6 篇）、能选服务商（第 4 篇）。
+
+但它们全都躺在命令行里。缺的是一层网页界面，把命令行里的东西变成别人打开浏览器就能用的应用。
 
 Streamlit 适合快速把 Python 脚本变成网页应用。做 AI 学习项目时，它很有用：不需要先系统学习 HTML、CSS 和 JavaScript，就能搭出一个聊天页面。这篇会写一个完整示例，支持两种模式：
 
@@ -205,7 +209,7 @@ ollama list
 ollama run qwen3.5:4b
 ```
 
-Ollama 的安装、模型存储路径和常见错误，可以看这篇文章：[Ollama 本地部署大模型](/post/ollama-local-llm-deploy/)。
+Ollama 的安装、模型存储路径和常见错误，见 [第 4 篇：Ollama 本地部署](/post/ollama-local-llm-deploy/)。
 
 ## 4. 代码结构解释
 
@@ -222,15 +226,29 @@ Ollama 的安装、模型存储路径和常见错误，可以看这篇文章：[
 
 重点是 `messages`。模型本身没有天然长期记忆，页面看起来“记得上文”，是因为每次请求都把历史消息一起发给了模型。
 
-## 5. DeepSeek 和 Ollama 的参数差异
+## 5. 两个服务怎么在代码里共存
 
-| 参数 | DeepSeek 官方 API | Ollama 本地模型 |
-|---|---|---|
-| `base_url` | `https://api.deepseek.com` | `http://127.0.0.1:11434/v1` |
-| `api_key` | 真实 API Key | 通常写 `ollama` 即可 |
-| 联网 | 需要联网 | 下载模型后可离线 |
-| 费用 | 按量计费 | 消耗本机资源 |
-| 隐私 | 请求发送到云端 | 数据留在本机 |
+上面 `PROVIDERS` 那个字典就是全部秘密：两个服务只是三行配置的差别，切换时不需要改任何逻辑代码。
+
+```python
+PROVIDERS = {
+    "Ollama 本地模型": {
+        "base_url": "http://127.0.0.1:11434/v1",
+        "api_key": "ollama",              # 本地不校验，但不能空
+        "model": "qwen3.5:4b",
+    },
+    "DeepSeek 官方 API": {
+        "base_url": os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
+        "api_key": os.getenv("DEEPSEEK_API_KEY", ""),
+        "model": os.getenv("DEEPSEEK_MODEL", "deepseek-chat"),
+    },
+}
+```
+
+把「会变的配置」和「不变的逻辑」分开，好处不只是整洁。以后要加第三个服务商（本地跑 vLLM，或者换一家云厂商），只要往字典里加一项，界面下拉框会自动多出一个选项——因为下拉框是拿 `PROVIDERS` 的键生成的，而 `config = PROVIDERS[provider_name]` 之后的所有代码都不认识「DeepSeek」或「Ollama」这两个词。
+
+> [!NOTE]
+> 联网、计费、隐私、性能这些层面上的取舍，[第 4 篇](/post/ollama-local-llm-deploy/)已经讲全，这里只讲代码怎么写。
 
 ## 6. 常见问题
 
@@ -270,3 +288,5 @@ http://127.0.0.1:11434
 6. 保存多个会话。
 
 学到这一步，你已经把 Python、模型 API、提示词和网页界面连成了一条完整链路。
+
+最后一篇 [第 8 篇：Agent 开发入门](/post/ai-agent-tool-memory-rag/) 给它装上工具和记忆。上面这个应用只会聊天，不会算数、不会查资料、不能替你做事——差别就在这里。

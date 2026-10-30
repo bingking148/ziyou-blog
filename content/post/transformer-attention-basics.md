@@ -1,5 +1,5 @@
 ---
-title: 'Transformer 与注意力机制：用小例子看懂大模型地基'
+title: 'AI 第 3 篇：Transformer 与注意力机制——用小例子看懂大模型地基'
 weight: 3
 date: 2026-10-19T10:00:00+08:00
 lastmod: 2026-10-29T15:08:45+08:00
@@ -13,7 +13,9 @@ comments: true
 toc: true
 ---
 
-2017 年 Google 发表了《Attention Is All You Need》，提出了 Transformer 架构。后来很多大语言模型，包括 GPT、DeepSeek、Kimi、GLM 等，都在这条路线或它的变体上继续发展。你不需要一开始就看懂论文里的每一个公式，但应该先抓住一件事：**Transformer 的核心能力，是让模型在处理一个词时，能够动态关注上下文里其他重要的词。**
+上一篇说过，LLM 的核心能力是「根据上文预测下一个词」。这句话里藏着一个没展开的环节：模型凭什么知道下一个词该是哪个。
+
+2017 年 Google 发表了《Attention Is All You Need》，提出了 Transformer 架构，答案就在里面。后来很多大语言模型，包括 GPT、DeepSeek、Kimi、GLM 等，都在这条路线或它的变体上继续发展。论文里的公式不用一开始就全看懂，先抓住一件事：**Transformer 的核心能力，是让模型在处理一个词时，能够动态关注上下文里其他重要的词。**
 
 ## 1. 为什么注意力很重要
 
@@ -190,3 +192,7 @@ print(output)
 
 - 原论文：[Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - 相关文章：[AI 大模型概念网络](/post/ai-llm-concept-network/)
+
+---
+
+原理到此为止。[第 4 篇：Ollama 本地部署](/post/ollama-local-llm-deploy/) 开始动手，在自己电脑上装一个开源模型跑起来。

@@ -1,5 +1,5 @@
 ---
-title: '大模型 API 与 Apifox：DeepSeek 云端调用入门'
+title: 'AI 第 5 篇：大模型 API 与 Apifox——DeepSeek 云端调用入门'
 weight: 5
 date: 2026-10-19T10:10:00+08:00
 lastmod: 2026-10-29T15:09:09+08:00
@@ -13,7 +13,11 @@ comments: true
 toc: true
 ---
 
-调用大模型服务时，本质上是在向一个 HTTP 接口发送 JSON 数据。很多服务都兼容 OpenAI Chat Completions 的格式，所以学会一次，后面迁移到其他模型会比较容易。这篇讲三件事：API 是什么、怎么用 Apifox 调试、怎么用 Python 正式调用 DeepSeek。
+上一篇你在自己电脑上跑起了模型。它免费、离线、隐私好——但受你电脑的限制，能力跟云端旗舰差得远。
+
+这一篇把调用方式搬到云端。**结构完全一样，只换两个参数。**
+
+调用大模型服务，本质上是在向一个 HTTP 接口发送 JSON 数据。很多服务都兼容 OpenAI Chat Completions 的格式，学会一次，换一家模型基本不用重学。
 
 ## 1. 先分清 API、SDK、IDE
 
@@ -188,26 +192,20 @@ python deepseek_api.py
 
 代码里的 `base_url` 指向 DeepSeek 官方 API。模型名称以你所用服务商当前文档为准。
 
-## 6. 云端 API 和本地 Ollama 的区别
+## 6. 同一个 SDK，换两个地址
 
-本地 Ollama 的 OpenAI 兼容地址通常是：
+上面的代码调的是云端 DeepSeek。把 `base_url` 和 `api_key` 换一换，同一份代码就能调本地模型——这正是上篇强调「OpenAI 兼容」的意义。
 
-```text
-http://127.0.0.1:11434/v1
-```
-
-两者差异如下：
-
-| 对比点 | DeepSeek 官方 API | 本地 Ollama |
+| 参数 | 调云端 DeepSeek | 调本地 Ollama |
 |---|---|---|
-| 是否需要 API Key | 需要 | 一般不需要 |
-| `base_url` | 服务商地址 | `http://127.0.0.1:11434/v1` |
-| 是否联网 | 需要联网 | 下载模型后可离线运行 |
-| 费用 | 按量计费 | 本机资源消耗为主 |
-| 数据位置 | 请求发送到云端 | 数据留在本机 |
-| 性能 | 通常受服务商算力支持 | 受本机 CPU/GPU 和内存限制 |
+| `base_url` | `https://api.deepseek.com` | `http://127.0.0.1:11434/v1` |
+| `api_key` | 真实的 `sk-` 开头密钥 | 随便填个非空值，例如 `"ollama"` |
+| `model` | 服务商文档里的模型名 | 以 `ollama list` 的输出为准 |
 
-Ollama 的详细部署可以看这篇文章：[Ollama 本地部署大模型](/post/ollama-local-llm-deploy/)。
+联网、计费、隐私、性能这些**非代码层面**的差异，[第 4 篇](/post/ollama-local-llm-deploy/)已经讲全了，这里不重复。
+
+> [!TIP]
+> 为什么本地也要填 `api_key`？因为 OpenAI 格式要求这个字段必须存在。Ollama 不校验它的真假，但**不能为空**，否则 SDK 会在发请求前就报错——这个坑很多人踩过。
 
 ## 7. 项目里的安全检查清单
 
@@ -226,3 +224,5 @@ Ollama 的详细部署可以看这篇文章：[Ollama 本地部署大模型](/po
 5. 为什么 API Key 绝不能提交到公开仓库？泄露后第一件事应该做什么？
 
 第 5 题补充一句实操：万一 Key 泄露，第一件事不是删代码，而是去服务商后台立刻吊销这把 Key，再生成新的。
+
+接口通了，剩下的是内容问题。[第 6 篇：提示词工程实战](/post/prompt-engineering-workflow/) 讲怎么把需求说清楚——这一步没有代码可写，但效果差别比换模型大得多。
