@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ziyou814.top/sitemap-index.xml
+# Astro 的 sitemap 入口是 sitemap-index.xml（Hugo 时代为 sitemap.xml）

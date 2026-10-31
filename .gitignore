@@ -1,5 +1,5 @@
-public/
-resources/_gen/
+/public/
+/resources/_gen/
 .hugo_build.lock
 hugo-server*.log
 debug.log
