@@ -52,29 +52,42 @@ const fmt = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 ---
 
-<Base title={post.data.title} description={post.data.description} cover={cover}>
+<Base title={post.data.title} description={post.data.description} cover={cover} pageClass="is-post">
   {post.data.math && <link slot="head" rel="stylesheet" href="/resources/katex/katex.min.css" />}
+
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
 
   <article class="post-layout">
     <header id="header" class="post-hero">
-      <img class="post-cover" src={cover} alt={post.data.title} crossorigin="anonymous" />
-      <div class="post-hero-overlay">
-        <div class="post-hero-meta">
-          {column && (
-            <a class="post-column-badge" href={`/categories/${slugifyTaxonomy(column.data.category)}/`}>
-              {column.data.title}
-            </a>
-          )}
-          <h1 class="post-title">{post.data.title}</h1>
-          <div class="post-meta">
-            <time datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
-            {updated && updated.getTime() !== post.data.date.getTime() && (
-              <span class="meta-sep">更新于 {fmt(updated)}</span>
-            )}
-            <span class="meta-sep">{wordCount} 字 · 约 {readingMinutes} 分钟</span>
-            <span class="meta-sep waline-pageview-count" data-path={url}>0</span>
-          </div>
+      <div class="post-hero-media">
+        <img class="post-cover" src={cover} alt={post.data.title} crossorigin="anonymous" fetchpriority="high" />
+      </div>
+      <div class="post-hero-shade" aria-hidden="true"></div>
+      <div class="post-hero-content">
+        <div class="post-kicker">
+          <span>ZIYOU / {column ? 'SERIES' : 'ESSAY'}</span>
+          <i></i>
+          <span>{fmt(post.data.date).replaceAll('-', '.')}</span>
         </div>
+        {column && (
+          <a class="post-column-badge" href={`/categories/${slugifyTaxonomy(column.data.category)}/`}>
+            {column.data.title}
+          </a>
+        )}
+        <h1 class="post-title">{post.data.title}</h1>
+        <p class="post-description">{post.data.description}</p>
+        <div class="post-meta">
+          <span>文 / {AUTHOR}</span>
+          <span>{wordCount} 字</span>
+          <span>约 {readingMinutes} 分钟</span>
+          <span><span class="waline-pageview-count" data-path={url}>0</span> 次阅读</span>
+          {updated && updated.getTime() !== post.data.date.getTime() && <span>更新于 {fmt(updated)}</span>}
+        </div>
+      </div>
+      <div class="post-hero-foot" aria-hidden="true">
+        <span>READING NOTES</span>
+        <span class="hero-foot-line"></span>
+        <span>SCROLL TO EXPLORE ↓</span>
       </div>
     </header>
 
@@ -86,22 +99,90 @@ const fmt = (d: Date) =>
           </p>
         )}
 
-        <div class="post-inner card">
+        <div class="post-inner">
           <div class="prose">
             <Content />
           </div>
 
+          <script is:inline>
+            /* 代码块包装：语言栏 + 复制按钮；无 JS 时仍是普通代码卡片。 */
+            (function () {
+              var pres = document.querySelectorAll('.prose pre.astro-code');
+              for (var i = 0; i < pres.length; i++) {
+                var pre = pres[i];
+                if (pre.closest('.code-shell')) continue;
+                var shell = document.createElement('figure');
+                shell.className = 'code-shell';
+                var bar = document.createElement('figcaption');
+                bar.className = 'code-bar';
+                var dots = document.createElement('span');
+                dots.className = 'code-dots';
+                dots.setAttribute('aria-hidden', 'true');
+                dots.innerHTML = '<i></i><i></i><i></i>';
+                var lang = document.createElement('span');
+                lang.className = 'code-lang';
+                lang.textContent = (pre.getAttribute('data-language') || 'code').toUpperCase();
+                var copy = document.createElement('button');
+                copy.className = 'code-copy';
+                copy.type = 'button';
+                copy.textContent = '复制';
+                copy.setAttribute('aria-label', '复制代码');
+                copy.addEventListener('click', function () {
+                  var button = this;
+                  var code = button.closest('.code-shell').querySelector('pre code');
+                  var done = function () {
+                    button.textContent = '已复制';
+                    button.classList.add('is-copied');
+                    setTimeout(function () {
+                      button.textContent = '复制';
+                      button.classList.remove('is-copied');
+                    }, 1600);
+                  };
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(code.innerText).then(done).catch(function () {
+                      button.textContent = '复制失败';
+                    });
+                  } else {
+                    var helper = document.createElement('textarea');
+                    helper.value = code.innerText;
+                    helper.setAttribute('readonly', '');
+                    helper.style.position = 'fixed';
+                    helper.style.left = '-9999px';
+                    document.body.appendChild(helper);
+                    helper.select();
+                    try {
+                      if (!document.execCommand('copy')) throw new Error('copy failed');
+                      done();
+                    } catch (e) {
+                      button.textContent = '复制失败';
+                    }
+                    document.body.removeChild(helper);
+                  }
+                });
+                bar.appendChild(dots);
+                bar.appendChild(lang);
+                bar.appendChild(copy);
+                pre.parentNode.insertBefore(shell, pre);
+                shell.appendChild(bar);
+                shell.appendChild(pre);
+              }
+            })();
+          </script>
+
           <footer class="article-footer">
             <div class="post-tags">
               {post.data.tags.map((t) => (
-                <a class="tag-chip" href={`/tags/${slugifyTaxonomy(t)}/`}>{t}</a>
+                <a class="tag-chip" href={`/tags/${slugifyTaxonomy(t)}/`}>#{t}</a>
               ))}
             </div>
             <div class="article-copyright">
-              <p><strong>{post.data.title}</strong></p>
-              <p>作者：{AUTHOR} · 发布于 {fmt(post.data.date)}</p>
-              <p>本文链接：<a href={url}>{new URL(url, Astro.site)}</a></p>
-              <p>版权声明：采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="license noopener">BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+              <span class="copyright-mark" aria-hidden="true">©</span>
+              <div>
+                <p><strong>{post.data.title}</strong></p>
+                <p>作者：{AUTHOR} · 发布于 {fmt(post.data.date)}</p>
+                <p>本文链接：<a href={url}>{new URL(url, Astro.site)}</a></p>
+                <p>采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="license noopener">BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+              </div>
             </div>
           </footer>
         </div>
@@ -113,14 +194,39 @@ const fmt = (d: Date) =>
 
       <aside class="post-sidebar">
         <div class="sidebar-sticky">
+          <span class="sidebar-label">IN THIS ARTICLE</span>
           {post.data.toc && <Toc headings={headings} />}
-          <MoodKnob />
+          <div class="sidebar-mood">
+            <span class="sidebar-label">SET THE MOOD</span>
+            <MoodKnob />
+          </div>
         </div>
       </aside>
     </div>
   </article>
 
   <AccentColor />
+
+  <script>
+    (function () {
+      'use strict';
+      var bar = document.querySelector('.reading-progress span');
+      var article = document.querySelector('.post-main');
+      var ticking = false;
+      function update() {
+        ticking = false;
+        var start = article.offsetTop;
+        var length = Math.max(1, article.offsetHeight - window.innerHeight);
+        var progress = Math.max(0, Math.min(1, (window.scrollY - start) / length));
+        bar.style.transform = 'scaleX(' + progress + ')';
+      }
+      window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+  </script>
 
   {post.data.mermaid && (
     <script type="module">
@@ -141,116 +247,123 @@ const fmt = (d: Date) =>
 </Base>
 
 <style>
-  .post-hero {
-    position: relative;
-    margin: 24px 0 36px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: var(--shadow-lift);
-  }
-  .post-cover {
-    width: 100%;
-    height: clamp(260px, 42vw, 460px);
-    object-fit: cover;
-    display: block;
-  }
-  .post-hero-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: flex-end;
-    background: linear-gradient(180deg, transparent 30%, rgba(12, 24, 40, 0.78) 100%);
-  }
-  .post-hero-meta {
-    padding: 28px 36px;
-    width: 100%;
-  }
-  .post-column-badge {
-    display: inline-block;
-    padding: 4px 14px;
-    margin-bottom: 12px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: 12.5px;
-    letter-spacing: 1px;
-  }
-  .post-column-badge:hover { background: rgba(255, 255, 255, 0.28); color: #fff; }
-  .post-title {
-    margin: 0 0 12px;
-    font-size: clamp(24px, 3.4vw, 38px);
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
-  }
-  .post-meta {
-    font-size: 13.5px;
-    color: rgba(255, 255, 255, 0.85);
-  }
-  .meta-sep::before { content: '·'; margin: 0 8px; opacity: 0.6; }
-  .waline-pageview-count::after { content: ' 次阅读'; }
+  .reading-progress { position: fixed; z-index: 200; left: 0; right: 0; top: 0; height: 2px; pointer-events: none; }
+  .reading-progress span { display: block; width: 100%; height: 100%; background: var(--red-2); transform: scaleX(0); transform-origin: left; }
+  .post-hero { position: relative; height: min(88svh, 900px); min-height: 620px; overflow: hidden; color: #fff; background: #172334; }
+  .post-hero-media { position: absolute; inset: 0; }
+  .post-cover { width: 100%; height: 100%; object-fit: cover; object-position: center; animation: cover-enter 1.8s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes cover-enter { from { opacity: .2; transform: scale(1.07); } to { opacity: 1; transform: scale(1); } }
+  .post-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(9,17,28,.78) 0%, rgba(9,17,28,.38) 55%, rgba(9,17,28,.13)), linear-gradient(0deg, rgba(8,16,26,.72), transparent 55%), linear-gradient(180deg, rgba(8,16,26,.3), transparent 30%); }
+  .post-hero-content { position: absolute; left: clamp(32px,8vw,140px); bottom: clamp(100px,15vh,160px); width: min(900px, 80vw); }
+  .post-kicker { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; font-size: 10px; letter-spacing: .28em; color: rgba(255,255,255,.75); animation: post-rise .8s .15s both; }
+  .post-kicker i { width: 32px; height: 1px; background: rgba(255,255,255,.55); }
+  .post-column-badge { display: inline-block; margin-bottom: 18px; color: rgba(255,255,255,.85); font-size: 12px; letter-spacing: .18em; }
+  .post-column-badge:hover { color: #fff; }
+  .post-title { max-width: 960px; margin: 0; font-size: clamp(36px,4.8vw,70px); font-weight: 500; line-height: 1.42; letter-spacing: .035em; color: #fff; text-wrap: balance; text-shadow: 0 2px 24px rgba(0,0,0,.2); animation: post-rise 1s .28s both; }
+  .post-description { max-width: 660px; margin: 24px 0 0; font-size: 14px; line-height: 1.9; letter-spacing: .04em; color: rgba(255,255,255,.78); animation: post-rise 1s .4s both; }
+  .post-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 30px; font-size: 11px; letter-spacing: .1em; color: rgba(255,255,255,.65); animation: post-rise 1s .5s both; }
+  @keyframes post-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  .post-hero-foot { position: absolute; left: clamp(32px,8vw,140px); right: clamp(32px,8vw,140px); bottom: 36px; display: flex; align-items: center; gap: 22px; font-size: 8px; letter-spacing: .3em; color: rgba(255,255,255,.55); }
+  .hero-foot-line { flex: 1; height: 1px; background: rgba(255,255,255,.2); }
 
-  .post-body-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
-    gap: 36px;
-    align-items: start;
-  }
-  .sidebar-sticky {
-    position: sticky;
-    top: 90px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .post-inner { padding: 36px 44px; }
+  .post-body-grid { display: grid; grid-template-columns: minmax(0, 790px) 220px; justify-content: center; gap: clamp(60px,7vw,110px); align-items: start; max-width: 1260px; margin: 0 auto; padding: 100px clamp(24px,4vw,56px) 80px; }
+  .sidebar-sticky { position: sticky; top: 48px; }
+  .sidebar-label { display: block; margin-bottom: 18px; font-size: 9px; letter-spacing: .22em; color: var(--color-text-muted); }
+  .sidebar-mood { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--color-card-border); }
+  .post-sidebar :global(.toc-widget) { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+  .post-sidebar :global(.widget-title) { display: none; }
+  .post-sidebar :global(.toc-link) { padding-left: 13px; border-left-width: 1px; border-radius: 0; font-size: 12px; line-height: 1.7; white-space: normal; }
+  .post-sidebar :global(.toc-link.is-active) { background: transparent; font-weight: 500; }
+  .post-sidebar :global(.toc-link:hover) { background: transparent; }
+  .post-sidebar :global(.mood-knob-widget) { border: 0; box-shadow: none; background: transparent; }
 
-  .outdate-warn {
-    margin: 0 0 20px;
-    padding: 12px 18px;
-    border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
-    border-left-width: 4px;
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
-    color: var(--color-text);
-    font-size: 14px;
-  }
+  .post-inner :global(.prose) { font-size: 17px; line-height: 2.05; }
+  .post-inner :global(.prose > p:first-of-type) { font-size: 18px; }
+  .post-inner :global(.prose h2) { position: relative; margin-top: 2.8em; padding-top: .4em; font-size: 28px; font-weight: 500; letter-spacing: .035em; }
+  .post-inner :global(.prose h2::before) { content: ''; position: absolute; top: -.25em; left: 0; width: 32px; height: 2px; background: var(--red-2); }
+  .post-inner :global(.prose h3) { margin-top: 2.2em; font-size: 21px; font-weight: 500; }
+  .post-inner :global(.prose blockquote) { margin: 2em 0; padding: .8em 0 .8em 1.6em; border-left: 2px solid var(--red-2); border-radius: 0; background: transparent; font-family: var(--font-serif); font-size: 18px; color: var(--color-text); }
+  .post-inner :global(.prose img) { border-radius: 0; }
 
-  .article-footer { margin-top: 40px; }
-  .post-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
+  /* 代码块：恢复旧站的独立卡片层次；有 JS 时再补语言栏与复制。 */
+  .post-inner :global(.prose pre.astro-code) {
+    margin: 2em 0; padding: 20px 22px 24px;
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    box-shadow: var(--shadow-soft);
+    font-size: 14.5px; line-height: 1.78;
   }
-  .tag-chip {
-    padding: 4px 14px;
-    border-radius: 999px;
-    background: var(--red-5);
-    color: var(--red-1);
-    font-size: 12.5px;
-    transition: background 0.25s ease, color 0.25s ease;
+  .post-inner :global(.prose pre.astro-code code) { display: block; min-width: max-content; font-size: inherit; }
+  .post-inner :global(.prose .code-shell) {
+    margin: 2em 0; border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: #f6f8fb; box-shadow: var(--shadow-lift); overflow: hidden;
   }
-  .tag-chip:hover { background: var(--red-1); color: #fff; }
+  .post-inner :global(.prose .code-shell > pre.astro-code) {
+    margin: 0; padding: 20px 22px 24px; border: none; border-radius: 0; box-shadow: none;
+  }
+  .post-inner :global(.prose .code-bar) {
+    display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 14px;
+    border-bottom: 1px solid rgba(44,83,130,.16);
+    background: linear-gradient(180deg,#fbfcfe,#eef3f9);
+  }
+  .post-inner :global(.prose .code-dots) { display: flex; gap: 7px; }
+  .post-inner :global(.prose .code-dots i) { width: 9px; height: 9px; border-radius: 50%; }
+  .post-inner :global(.prose .code-dots i:nth-child(1)) { background: #ff5f56; }
+  .post-inner :global(.prose .code-dots i:nth-child(2)) { background: #ffbd2e; }
+  .post-inner :global(.prose .code-dots i:nth-child(3)) { background: #27c93f; }
+  .post-inner :global(.prose .code-lang) { font-size: 10px; letter-spacing: .2em; color: var(--color-text-muted); }
+  .post-inner :global(.prose .code-copy) {
+    margin-left: auto; padding: 4px 10px; border: 1px solid rgba(44,83,130,.22); border-radius: 999px;
+    background: rgba(255,255,255,.72); color: var(--color-text); font-size: 11px; letter-spacing: .08em;
+    cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+  }
+  .post-inner :global(.prose .code-copy:hover) { color: var(--red-1); border-color: var(--red-3); }
+  .post-inner :global(.prose .code-copy.is-copied) { color: #2f9e73; border-color: rgba(47,158,115,.4); }
+  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar) { height: 8px; }
+  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-thumb) { border-radius: 99px; background: rgba(44,83,130,.28); }
+  :global([data-theme='dark']) .post-inner :global(.prose .code-shell) { background: #1d222b; border-color: rgba(130,167,204,.2); }
+  :global([data-theme='dark']) .post-inner :global(.prose .code-bar) { border-bottom-color: rgba(130,167,204,.16); background: linear-gradient(180deg,#242a34,#1b2028); }
+  :global([data-theme='dark']) .post-inner :global(.prose .code-copy) { border-color: rgba(130,167,204,.24); background: rgba(130,167,204,.12); }
 
-  .article-copyright {
-    padding: 18px 22px;
-    border-radius: 12px;
-    background: var(--color-surface-muted);
-    border: 1px dashed var(--color-card-border);
-    font-size: 13.5px;
-    color: var(--color-text-muted);
+  /* 块级公式：独立公式卡，行内公式不受影响。 */
+  .post-inner :global(.prose .katex-display) {
+    position: relative; display: block; margin: 1.4em 0; padding: 30px 22px 32px;
+    border: 1px solid var(--color-card-border); border-left: 2px solid var(--red-2); border-radius: 4px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--red-1) 4%, var(--color-surface)), var(--color-surface));
+    box-shadow: var(--shadow-soft); overflow-x: auto; overflow-y: hidden;
   }
-  .article-copyright p { margin: 4px 0; }
-  .article-copyright strong { color: var(--color-text-strong); }
+  .post-inner :global(.prose .katex-display::before) {
+    content: 'FORMULA'; position: absolute; left: 16px; top: 12px;
+    font-family: var(--font-article); font-size: 9px; letter-spacing: .26em; color: var(--red-2);
+  }
+  .post-inner :global(.prose .katex-display::-webkit-scrollbar) { height: 4px; }
+  .post-inner :global(.prose .katex-display::-webkit-scrollbar-thumb) { border-radius: 99px; background: rgba(44,83,130,.25); }
 
-  @media (max-width: 1023px) {
-    .post-body-grid { grid-template-columns: 1fr; }
+  .outdate-warn { margin: 0 0 32px; padding: 14px 18px; border-left: 2px solid var(--color-accent); background: color-mix(in srgb, var(--color-accent) 7%, transparent); color: var(--color-text); font-size: 13px; }
+  .article-footer { margin-top: 70px; padding-top: 30px; border-top: 1px solid var(--color-card-border); }
+  .post-tags { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-bottom: 36px; }
+  .tag-chip { font-size: 12px; letter-spacing: .05em; color: var(--red-1); }
+  .article-copyright { display: flex; gap: 22px; color: var(--color-text-muted); font-size: 12px; line-height: 1.8; }
+  .article-copyright p { margin: 3px 0; overflow-wrap: anywhere; }
+  .article-copyright strong { color: var(--color-text-strong); font-weight: 500; }
+  .copyright-mark { flex-shrink: 0; font-family: Georgia,serif; font-size: 44px; line-height: 1; color: var(--red-3); }
+
+  @media (max-width: 1100px) {
+    .post-body-grid { grid-template-columns: minmax(0,760px); }
     .post-sidebar { display: none; }
   }
-  @media (max-width: 767px) {
-    .post-hero-meta { padding: 20px; }
-    .post-inner { padding: 24px 20px; }
+  @media (max-width: 760px) {
+    .post-hero { height: 82svh; min-height: 600px; }
+    .post-hero-content { left: 24px; bottom: 96px; width: calc(100% - 48px); }
+    .post-title { font-size: clamp(30px,8vw,44px); line-height: 1.5; }
+    .post-description { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .post-kicker { font-size: 8px; letter-spacing: .2em; }
+    .post-meta { gap: 8px 16px; font-size: 10px; }
+    .post-hero-foot { left: 24px; right: 24px; bottom: 28px; }
+    .post-body-grid { padding: 64px 24px 50px; }
+    .post-inner :global(.prose) { font-size: 16px; }
+    .post-inner :global(.prose h2) { font-size: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .post-cover, .post-kicker, .post-title, .post-description, .post-meta { animation: none; }
   }
 </style>

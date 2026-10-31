@@ -2,7 +2,7 @@
 title: 'Python 第 8 篇：面向对象入门，写一个聊天机器人'
 weight: 8
 date: 2026-10-26T11:00:00+08:00
-updatedDate: 2026-10-30T10:00:00+08:00
+updatedDate: 2026-10-31T15:30:00+08:00
 cover: /images/covers/python-oop-basics-cover.jpg
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '面向对象', '类']
@@ -392,15 +392,24 @@ def send(self, text):
 
 ## 7. 面向对象在 AI 应用里的样子
 
-现在回到文章开头那个问题：`client.chat.completions.create(...)` 到底是什么？
+现在可以回答那个悬着的问题了：`client.chat.completions.create(...)` 到底是什么？
+
+真实项目里调用大模型的核心就这几行（以 DeepSeek 为例，密钥从环境变量读，**不要写死在代码里**）：
 
 ```python
-from openai import OpenAI
+import os
+from openai import OpenAI          # pip install openai
 
-client = OpenAI(api_key="sk-xxx")
+client = OpenAI(
+    api_key=os.environ["DEEPSEEK_API_KEY"],
+    base_url="https://api.deepseek.com",
+)
 response = client.chat.completions.create(
     model="deepseek-chat",
-    messages=[{"role": "user", "content": "你好"}],
+    messages=[
+        {"role": "system", "content": "你是一个AI智能助手，上知天文下知地理。"},
+        {"role": "user", "content": "你好"},
+    ],
 )
 print(response.choices[0].message.content)
 ```
@@ -409,13 +418,27 @@ print(response.choices[0].message.content)
 
 | 代码 | 含义 |
 |---|---|
-| `OpenAI(api_key=...)` | 调用 `__init__`，创建客户端对象，api_key 存到对象里 |
+| `OpenAI(api_key=..., base_url=...)` | 调用 `__init__`，创建客户端对象，参数都存进对象里 |
 | `client.chat` | 访问 client 对象的 `chat` 属性（它也是个对象） |
 | `.completions` | chat 对象的 `completions` 属性 |
 | `.create(...)` | 调用实例方法，方法内部用 `self` 拿到当初存的 api_key |
 | `response.choices[0].message.content` | 一层层剥属性取值 |
 
-**这就是「对象.属性.方法」链式调用的本质。**
+**这就是「对象.属性.方法」链式调用的本质。**`response.choices[0].message.content` 这一长串，就是一路「剥」下去：`response` 是对象 → `choices` 是列表 → `[0]` 取第一个 → `message` 又是对象 → `content` 是它的属性。`messages` 那个「列表套字典」的结构，正是第 5 篇练过的容器组合。
+
+本地跑模型用的是另一套库 `ollama`，写法几乎一模一样：
+
+```python
+from ollama import chat            # pip install ollama，本机要先跑着 Ollama 服务
+
+response = chat(
+    model="deepseek-r1:1.5b",
+    messages=[{"role": "user", "content": "你是谁？"}],
+)
+print(response.message.content)    # 照样一层层剥到正文
+```
+
+两套 SDK 长一个样不是巧合——写它们的作者都懂面向对象，`response` 都是响应对象，取正文都是「对象.属性.属性」。
 
 再看几个你以后一定会遇到的：
 

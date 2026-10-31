@@ -1,20 +1,38 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+
+const posts = await getCollection('post');
+const counts = new Map<string, number>();
+for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([t]) => t);
 ---
 
 <Base title="搜索" description="站内搜索">
-  <div class="search-wrap" data-reveal>
-    <h1 class="page-title">搜索</h1>
-    <div class="search-box">
-      <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  <div class="ed-wrap search-page">
+    <div class="search-top" data-reveal>
+      <span class="ed-label">02 / SEARCH</span>
+      <p class="search-hint">在 {posts.length} 篇文字里，找到你想读的那一篇。</p>
+    </div>
+
+    <div class="search-field" data-reveal>
       <input
         id="search-input"
         type="search"
-        placeholder="输入关键词…支持中文模糊匹配"
+        placeholder="输入关键词…"
         autocomplete="off"
         autofocus
+        aria-label="搜索文章"
       />
+      <svg class="search-icon" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="search-underline" aria-hidden="true"></span>
     </div>
+
+    <div class="search-suggest" data-reveal>
+      <span>试试：</span>
+      {hotTags.map((t) => <button type="button" class="suggest-btn" data-keyword={t}>{t}</button>)}
+    </div>
+
     <p id="search-status" class="search-status">正在加载索引…</p>
     <ul id="search-results" class="search-results"></ul>
   </div>
@@ -49,12 +67,16 @@ import Base from '../layouts/Base.astro';
       }
       status.textContent = '找到 ' + items.length + ' 篇';
       results.innerHTML = items
-        .map(function (it) {
+        .map(function (it, i) {
           return (
-            '<li><a class="result-item card" href="' + esc(it.permalink) + '">' +
+            '<li><a class="ed-row result-row" href="' + esc(it.permalink) + '">' +
+            '<span class="row-no">' + String(i + 1).padStart(2, '0') + '</span>' +
+            '<span class="result-body">' +
             '<h3>' + esc(it.title) + '</h3>' +
-            (it.description ? '<p>' + esc(it.description.slice(0, 120)) + '</p>' : '') +
+            (it.description ? '<p>' + esc(it.description.slice(0, 110)) + '</p>' : '') +
+            '</span>' +
             '<time>' + esc(it.date) + '</time>' +
+            '<span class="row-arrow">↗</span>' +
             '</a></li>'
           );
         })
@@ -115,69 +137,82 @@ import Base from '../layouts/Base.astro';
       clearTimeout(timer);
       timer = setTimeout(function () { search(input.value.trim()); }, 180);
     });
+
+    // 推荐关键词：填入并立即搜索
+    document.querySelectorAll('.suggest-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        input.value = btn.getAttribute('data-keyword') || '';
+        input.focus();
+        clearTimeout(timer);
+        search(input.value.trim());
+      });
+    });
   })();
 </script>
 
 <style>
-  .search-wrap { max-width: 760px; margin: 0 auto; padding: 40px 0; }
-  .page-title { margin: 0 0 24px; font-size: 34px; letter-spacing: 4px; }
-  .search-box {
+  .search-page { max-width: 960px; }
+  .search-top { padding: 88px 0 0; }
+  .search-hint { margin: 18px 0 0; font-size: 14px; color: var(--color-text-muted); }
+  .search-field {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 4px 18px;
-    border: 1px solid var(--color-card-border);
-    border-radius: 999px;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-soft);
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    gap: 18px;
+    margin-top: 56px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--red-3);
   }
-  .search-box:focus-within {
-    border-color: var(--red-2);
-    box-shadow: 0 0 0 3px var(--red-4);
-  }
-  .search-icon { color: var(--color-text-muted); flex-shrink: 0; }
   #search-input {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     background: transparent;
-    padding: 14px 0;
-    font-size: 16px;
-    font-family: inherit;
+    padding: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(26px, 3.6vw, 42px);
+    letter-spacing: .04em;
     color: var(--color-text-strong);
   }
-  .search-status {
-    margin: 16px 4px;
-    font-size: 13px;
-    color: var(--color-text-muted);
+  #search-input::placeholder { color: var(--color-text-muted); opacity: .55; }
+  .search-icon { flex-shrink: 0; color: var(--red-2); transition: transform .4s ease; }
+  .search-field:focus-within .search-icon { transform: rotate(90deg); }
+  .search-underline {
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    background: var(--red-1);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .5s cubic-bezier(.2,.8,.2,1);
   }
-  .search-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-  .search-results :global(.result-item) {
-    display: block;
-    padding: 18px 22px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  .search-field:focus-within .search-underline { transform: scaleX(1); }
+  .search-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 24px; font-size: 13px; color: var(--color-text-muted); }
+  .suggest-btn {
+    border: none; background: none; padding: 2px 0; cursor: pointer;
+    font-family: inherit; font-size: 13px; letter-spacing: .05em;
+    color: var(--red-1); border-bottom: 1px solid var(--red-3);
+    transition: border-color .25s ease;
   }
-  .search-results :global(.result-item:hover) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lift);
+  .suggest-btn:hover { border-color: var(--red-1); }
+  .search-status { margin: 56px 0 20px; font-size: 12px; letter-spacing: .12em; color: var(--color-text-muted); }
+  .search-results { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
+  .search-results :global(.result-row) { align-items: flex-start; }
+  .search-results :global(.result-row .row-no) { padding-top: 6px; }
+  .search-results :global(.result-body) { flex: 1; min-width: 0; }
+  .search-results :global(.result-body h3) {
+    margin: 0 0 8px; font-family: var(--font-serif); font-size: 19px; font-weight: 500;
+    letter-spacing: .03em; color: var(--color-text-strong);
+    transition: color .3s ease;
   }
-  .search-results :global(.result-item h3) {
-    margin: 0 0 6px;
-    font-size: 16.5px;
-    color: var(--color-text-strong);
+  .search-results :global(.result-row:hover .result-body h3) { color: var(--red-1); }
+  .search-results :global(.result-body p) {
+    margin: 0; font-size: 13px; line-height: 1.8; color: var(--color-text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .search-results :global(.result-item p) {
-    margin: 0 0 8px;
-    font-size: 13.5px;
-    color: var(--color-text-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .search-results :global(.result-item time) {
-    font-size: 12px;
-    color: var(--red-2);
-    font-family: var(--font-code);
+  .search-results :global(.result-row time) { flex-shrink: 0; padding-top: 6px; font-size: 11px; letter-spacing: .06em; color: var(--color-text-muted); }
+  .search-results :global(.result-row .row-arrow) { padding-top: 4px; }
+  @media (max-width: 760px) {
+    .search-top { padding-top: 48px; }
+    .search-field { margin-top: 40px; }
+    .search-results :global(.result-row time) { display: none; }
   }
 </style>

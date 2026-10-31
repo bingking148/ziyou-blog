@@ -39,6 +39,7 @@ const { prev, next } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
     padding: 16px 18px;
     border: 1px solid var(--color-card-border);
     border-radius: 14px;
@@ -61,6 +62,8 @@ const { prev, next } = Astro.props;
     color: var(--color-text-muted);
   }
   .post-nav-title {
+    min-width: 0;
+    max-width: 100%;
     font-weight: 600;
     font-size: 14.5px;
     color: var(--color-text-strong);

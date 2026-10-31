@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
 import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
 
 const posts = await getCollection('post');
@@ -12,35 +13,40 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 ---
 
 <Base title="专栏" description="成系列的专题文章合集">
-  <div class="columns-wrap">
-    <h1 class="page-title" data-reveal>专栏</h1>
-    <p class="columns-intro" data-reveal>成系列的专题文章合集，按学习顺序编排。</p>
+  <div class="ed-wrap">
+    <PageHero
+      index="05"
+      label="SERIES"
+      title="专栏"
+      lede="成系列的专题，按学习顺序编排，慢慢读完。"
+      meta={[{ value: String(columns.length), label: '个专栏' }]}
+    />
 
     {columns.map((c, ci) => {
       const list = columnPosts(c, posts);
+      const url = `/categories/${slugifyTaxonomy(c.data.category)}/`;
       return (
-        <section class="column-card card" data-reveal style={`--i:${ci}`}>
-          <div class="column-head">
-            <a class="column-cover" href={`/categories/${slugifyTaxonomy(c.data.category)}/`}>
-              <img src={c.data.cover} alt={c.data.title} loading="lazy" />
-            </a>
-            <div class="column-info">
-              <h2 class="column-title">
-                <a href={`/categories/${slugifyTaxonomy(c.data.category)}/`}>{c.data.title}</a>
-              </h2>
-              <p class="column-meta">共 {list.length} 篇 · 按序号阅读</p>
-              <p class="column-desc">{c.data.description}</p>
-            </div>
+        <section class={`column-block column-block-${ci % 2}`} data-reveal>
+          <a class="column-cover" href={url}>
+            <img src={c.data.cover} alt={c.data.title} loading="lazy" />
+            <span class="column-badge">SERIES {num(ci + 1)}</span>
+          </a>
+          <div class="column-body">
+            <h2 class="column-title"><a href={url}>{c.data.title}</a></h2>
+            <p class="column-desc">{c.data.description}</p>
+            <ol class="column-list">
+              {list.map((p) => (
+                <li>
+                  <a class="ed-row" href={postUrl(p)}>
+                    <span class="row-no">{num(p.data.weight)}</span>
+                    <span class="row-title">{p.data.title}</span>
+                    <time class="row-meta" datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            <a class="column-more" href={url}>进入专栏 <span>↗</span></a>
           </div>
-          <ol class="column-list">
-            {list.map((p) => (
-              <li class="column-item">
-                <span class="column-item-num">{num(p.data.weight)}</span>
-                <a class="column-item-title" href={postUrl(p)}>{p.data.title}</a>
-                <time class="column-item-date" datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
-              </li>
-            ))}
-          </ol>
         </section>
       );
     })}
@@ -48,65 +54,33 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 </Base>
 
 <style>
-  .columns-wrap { max-width: 960px; margin: 0 auto; padding: 40px 0 8px; }
-  .page-title { margin: 0 0 6px; font-size: 34px; letter-spacing: 4px; }
-  .columns-intro { margin: 0 0 28px; color: var(--color-text-muted); font-size: 14.5px; }
-  .column-card { margin-bottom: 28px; overflow: hidden; transition: box-shadow 0.3s ease; }
-  .column-card:hover { box-shadow: var(--shadow-lift); }
-  .column-head { display: flex; align-items: center; gap: 18px; padding: 20px 20px 14px; }
-  .column-cover {
-    flex-shrink: 0;
-    width: 168px;
-    height: 98px;
-    border-radius: 10px;
-    overflow: hidden;
+  .column-block {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: clamp(28px, 4vw, 56px);
+    align-items: start;
+    margin-bottom: 88px;
   }
-  .column-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .column-info { min-width: 0; }
-  .column-title { margin: 0 0 6px; font-size: 20px; }
+  .column-block-1 { margin-left: 6%; }
+  .column-cover { position: relative; display: block; overflow: hidden; aspect-ratio: 1.1; background: var(--red-4); }
+  .column-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.2,.7,.2,1); }
+  .column-cover:hover img { transform: scale(1.05); }
+  .column-badge { position: absolute; left: 16px; bottom: 14px; font-size: 9px; letter-spacing: .3em; color: rgba(255,255,255,.9); text-shadow: 0 1px 8px rgba(0,0,0,.5); }
+  .column-title { margin: 0 0 12px; font-size: clamp(24px, 2.6vw, 32px); font-weight: 500; letter-spacing: .04em; }
   .column-title a { color: var(--color-text-strong); }
   .column-title a:hover { color: var(--red-1); }
-  .column-meta { margin: 0 0 8px; font-size: 12.5px; color: var(--color-text-muted); letter-spacing: 0.5px; }
-  .column-desc { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--color-text-muted); }
-  .column-list { list-style: none; margin: 0; padding: 6px 12px 14px; }
-  .column-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 9px 10px;
-    border-radius: 10px;
-    transition: background 0.25s ease;
-  }
-  .column-item:hover { background: var(--red-5); }
-  .column-item-num {
-    flex-shrink: 0;
-    min-width: 34px;
-    height: 22px;
-    line-height: 22px;
-    text-align: center;
-    border-radius: 999px;
-    background: var(--red-5);
-    color: var(--red-1);
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    transition: background 0.25s ease;
-  }
-  .column-item:hover .column-item-num { background: var(--red-1); color: #fff; }
-  .column-item-title {
-    flex: 1;
-    min-width: 0;
-    color: var(--color-text-strong);
-    font-weight: 600;
-    font-size: 14.5px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .column-item-date { flex-shrink: 0; color: var(--color-text-muted); font-size: 12px; }
-  @media (max-width: 767px) {
-    .column-head { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .column-cover { width: 100%; height: 130px; }
-    .column-item-date { display: none; }
+  .column-desc { margin: 0 0 24px; font-size: 14px; line-height: 1.9; color: var(--color-text-muted); }
+  .column-list { list-style: none; margin: 0; padding: 0; }
+  .column-list .ed-row { padding: 14px 0; }
+  .column-list .row-title { font-size: 15px; }
+  .column-more { display: inline-flex; align-items: center; gap: 12px; margin-top: 22px; padding-bottom: 6px; border-bottom: 1px solid var(--red-3); font-size: 13px; letter-spacing: .1em; color: var(--red-1); }
+  .column-more:hover { border-color: var(--red-1); }
+  .column-more span { transition: transform .3s ease; }
+  .column-more:hover span { transform: translate(3px,-3px); }
+  @media (max-width: 900px) {
+    .column-block { grid-template-columns: 1fr; gap: 24px; margin-bottom: 64px; }
+    .column-block-1 { margin-left: 0; }
+    .column-cover { aspect-ratio: 1.8; }
+    .column-list .row-meta { display: none; }
   }
 </style>

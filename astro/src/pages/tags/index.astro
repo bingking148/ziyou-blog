@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
 import { slugifyTaxonomy } from '../../utils/columns.ts';
 
 const posts = await getCollection('post');
@@ -13,14 +14,14 @@ const max = Math.max(...tags.map(([, c]) => c));
 ---
 
 <Base title="标签" description="文章标签">
-  <div class="tax-wrap" data-reveal>
-    <h1 class="page-title">标签</h1>
-    <div class="tag-cloud">
+  <div class="ed-wrap">
+    <PageHero index="07" label="TAGS" title="标签" lede="按关键词，找到同一主题的文字。" meta={[{ value: String(tags.length), label: '个标签' }]} />
+    <div class="tag-cloud" data-reveal>
       {tags.map(([name, count]) => (
         <a
-          class="cloud-tag"
+          class="ed-tag cloud-tag"
           href={`/tags/${slugifyTaxonomy(name)}/`}
-          style={`font-size: ${13 + (count / max) * 8}px`}
+          style={`font-size: ${14 + (count / max) * 8}px`}
         >
           {name}<sup>{count}</sup>
         </a>
@@ -30,21 +31,7 @@ const max = Math.max(...tags.map(([, c]) => c));
 </Base>
 
 <style>
-  .tax-wrap { max-width: 860px; margin: 0 auto; padding: 40px 0; }
-  .page-title { margin: 0 0 28px; font-size: 34px; letter-spacing: 4px; }
-  .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: baseline; }
-  .cloud-tag {
-    padding: 6px 16px;
-    border-radius: 999px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-card-border);
-    color: var(--red-1);
-    transition: all 0.25s ease;
-  }
-  .cloud-tag:hover {
-    background: var(--red-1);
-    color: #fff;
-    transform: translateY(-2px);
-  }
-  .cloud-tag sup { margin-left: 4px; font-size: 10px; opacity: 0.7; }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: baseline; }
+  .cloud-tag { font-weight: 400; }
+  .cloud-tag sup { margin-left: 5px; font-size: 10px; opacity: .6; }
 </style>

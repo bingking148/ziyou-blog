@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
 import { slugifyTaxonomy } from '../../utils/columns.ts';
 
 const posts = await getCollection('post');
@@ -12,31 +13,19 @@ const cats = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
 <Base title="分类" description="文章分类">
-  <div class="tax-wrap" data-reveal>
-    <h1 class="page-title">分类</h1>
-    <div class="tax-grid">
-      {cats.map(([name, count]) => (
-        <a class="tax-card card" href={`/categories/${slugifyTaxonomy(name)}/`}>
-          <strong>{name}</strong>
-          <span>{count} 篇</span>
-        </a>
+  <div class="ed-wrap">
+    <PageHero index="06" label="CATEGORIES" title="分类" lede="按主题翻阅。" meta={[{ value: String(cats.length), label: '个分类' }]} />
+    <ol class="ed-list" data-reveal>
+      {cats.map(([name, count], i) => (
+        <li>
+          <a class="ed-row" href={`/categories/${slugifyTaxonomy(name)}/`}>
+            <span class="row-no">{String(i + 1).padStart(2, '0')}</span>
+            <span class="row-title">{name}</span>
+            <span class="row-meta">{count} 篇</span>
+            <span class="row-arrow">↗</span>
+          </a>
+        </li>
       ))}
-    </div>
+    </ol>
   </div>
 </Base>
-
-<style>
-  .tax-wrap { max-width: 860px; margin: 0 auto; padding: 40px 0; }
-  .page-title { margin: 0 0 28px; font-size: 34px; letter-spacing: 4px; }
-  .tax-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-  .tax-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 22px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .tax-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
-  .tax-card strong { color: var(--color-text-strong); font-size: 15.5px; }
-  .tax-card span { font-size: 12.5px; color: var(--color-text-muted); }
-</style>

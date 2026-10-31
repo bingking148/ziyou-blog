@@ -1,0 +1,57 @@
+---
+interface Props {
+  index: string;
+  label: string;
+  title: string;
+  lede?: string;
+  meta?: { value: string; label: string }[];
+}
+const { index, label, title, lede, meta } = Astro.props;
+---
+
+<header class="page-hero" data-reveal>
+  <div class="hero-top">
+    <span class="hero-index">{index}</span>
+    <span class="hero-label">/ {label}</span>
+    <span class="hero-rule" aria-hidden="true"></span>
+  </div>
+  <div class="hero-main">
+    <h1 class="hero-title">{title}</h1>
+    {lede && <p class="hero-lede">{lede}</p>}
+  </div>
+  {meta && meta.length > 0 && (
+    <dl class="hero-meta">
+      {meta.map((m) => (
+        <div class="hero-meta-item">
+          <dt>{m.label}</dt>
+          <dd>{m.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+</header>
+
+<style>
+  .page-hero { padding: 88px 0 48px; }
+  .hero-top { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .hero-index { font-size: 11px; color: var(--red-2); letter-spacing: .1em; }
+  .hero-label { font-size: 10px; letter-spacing: .28em; color: var(--color-text-muted); }
+  .hero-rule { flex: 1; height: 1px; background: var(--color-card-border); }
+  .hero-main { display: flex; align-items: baseline; gap: clamp(20px,4vw,56px); flex-wrap: wrap; }
+  .hero-title {
+    margin: 0; font-size: clamp(40px, 5vw, 68px); font-weight: 500;
+    letter-spacing: .05em; line-height: 1.25;
+  }
+  .hero-lede { max-width: 380px; margin: 0; font-size: 14px; line-height: 1.95; color: var(--color-text-muted); }
+  .hero-meta { display: flex; gap: 36px; margin: 36px 0 0; padding: 0; }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 6px; }
+  .hero-meta-item dt { font-size: 10px; letter-spacing: .2em; color: var(--color-text-muted); }
+  .hero-meta-item dd {
+    margin: 0; font-family: var(--font-serif); font-size: 26px; line-height: 1;
+    color: var(--color-text-strong);
+  }
+  @media (max-width: 760px) {
+    .page-hero { padding: 56px 0 32px; }
+    .hero-meta { gap: 24px; }
+  }
+</style>
