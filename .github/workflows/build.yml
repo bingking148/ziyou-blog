@@ -10,36 +10,7 @@ env:
   HUGO_VERSION: '0.160.1'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # 不再用 peaceiris/action-hugo：该仓库已无法解析（repository not found）。
-      # 直接从 gohugoio/hugo 官方 release 下载钉死版本的 extended 二进制。
-      - name: Setup Hugo
-        run: |
-          curl -fsSL -o hugo.tar.gz \
-            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
-          tar -xzf hugo.tar.gz hugo
-          sudo install -m 755 hugo /usr/local/bin/hugo
-          hugo version
-
-      - name: Build
-        # 生产构建必须带 --minify --gc：minify 触发主题的 CSS 压缩+指纹分支（hugo.IsProduction），
-        # 也保证产物里不会混入 hugo server 的 livereload / localhost 残留
-        run: hugo --minify --gc --cleanDestinationDir
-
-      - name: Upload site artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: site
-          path: public/
-          retention-days: 14
-
-  # Astro 新站（astro/ 子目录）与 Hugo 并存构建，产物为 site-astro；
-  # 定稿切换后再考虑移除上面的 Hugo job
+  # 线上版本：Astro 新站（2026-10-31 起上线），部署上传 site 产物
   build-astro:
     runs-on: ubuntu-latest
     defaults:
@@ -62,19 +33,49 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upload Astro site artifact
+      - name: Upload site artifact
         uses: actions/upload-artifact@v4
         with:
-          name: site-astro
+          name: site
           path: astro/dist/
           retention-days: 14
 
-  # 目前部署方式：从 Actions 页面下载 site 产物（zip），解压后上传到自己的服务器。
+  # Hugo 旧站：已下线，仅保留构建作为回滚产物（新版出问题时重新上传即可整体回滚）
+  build-hugo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 不再用 peaceiris/action-hugo：该仓库已无法解析（repository not found）。
+      # 直接从 gohugoio/hugo 官方 release 下载钉死版本的 extended 二进制。
+      - name: Setup Hugo
+        run: |
+          curl -fsSL -o hugo.tar.gz \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
+          tar -xzf hugo.tar.gz hugo
+          sudo install -m 755 hugo /usr/local/bin/hugo
+          hugo version
+
+      - name: Build
+        # 生产构建必须带 --minify --gc：minify 触发主题的 CSS 压缩+指纹分支（hugo.IsProduction），
+        # 也保证产物里不会混入 hugo server 的 livereload / localhost 残留
+        run: hugo --minify --gc --cleanDestinationDir
+
+      - name: Upload Hugo legacy artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-hugo-legacy
+          path: public/
+          retention-days: 14
+
+  # 部署方式不变：从 Actions 页面下载产物（zip），解压后上传到自己的服务器。
+  # 上线站 = site（Astro）；回滚 = site-hugo-legacy（Hugo）。
   # 如果以后想自动部署到 GitHub Pages：
   #   1. 仓库 Settings -> Pages -> Source 选 GitHub Actions
-  #   2. 取消下面整个 job 的注释
+  #   2. 取消下面整个 job 的注释，并把 path 改为 astro/dist/
   # deploy-pages:
-  #   needs: build
+  #   needs: build-astro
   #   permissions:
   #     pages: write
   #     id-token: write
@@ -88,7 +89,7 @@ jobs:
   #     - name: Upload Pages artifact
   #       uses: actions/upload-pages-artifact@v3
   #       with:
-  #         path: public/
+  #         path: astro/dist/
   #     - name: Deploy
   #       id: deployment
   #       uses: actions/deploy-pages@v4

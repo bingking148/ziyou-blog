@@ -4,57 +4,53 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Hugo static blog** using the `hugo-theme-reimu` theme. Chinese language (zh-CN), deployed to https://ziyou814.top/.
+Personal blog at https://ziyou814.top/，中文（zh-CN）。**线上版本是 `astro/` 下的 Astro 5 站点**（2026-10-31 完成切站上线）；仓库根的 Hugo 站（`hugo-theme-reimu` 主题）已下线，源码保留作回滚备份。
 
 **仓库结构要点（历史文档曾写过 `pblog/` 前缀，已过时）：**
 
 - 站点根目录就是仓库根目录（`hugo.toml` 在根下），没有 `pblog/` 这一层。
-- **`astro/` 子目录是进行中的 Astro 5 迁移新站**（2026-10-30 启动，新旧并存，详见下方「Astro 迁移新站」一节与 `astro/README.md`）；在切站完成前，Hugo 一侧仍为线上版本。
+- **`astro/` 子目录是线上版本**（Astro 5 迁移 2026-10-30 启动、2026-10-31 完成切站，详见下方「Astro 站点」一节与 `astro/README.md`）。Hugo 已下线：配置/主题/布局冻结不动，只作回滚备份；新功能与样式一律改 Astro 侧。
 - `themes/reimu/` **不是 git submodule**，是直接 vendor 进主仓库的普通目录；修改主题文件直接改，但要意识到升级主题时会产生冲突。
 - 站点级覆盖放在根目录 `layouts/`（如 `layouts/partials/header.html`、`layouts/columns/section.html`），优先级高于主题。
 - `layouts/partials/post/nav.html` 覆盖主题的文章底部前后篇导航：主题原版 `.PrevInSection/.NextInSection` 的方向与「按 weight 排序的专栏」相反；覆盖版让所属分类 term 标了 `column: true` 的文章只在专栏内按 weight 顺序导航，非专栏文章回退到 section 默认排序。匹配用 `.Data.Term`（不能用 term 页的 `title`，专栏 `_index.md` 的 title 带「专栏」后缀会对不上）。
 - 设计文档放 `docs/superpowers/specs/`（按日期命名，如首页闪卡效果设计）。
 
-## Astro 迁移新站（astro/）
+## Astro 站点（astro/，线上版本）
 
 细节见 `astro/README.md`，要点：
 
-- **双站并存**：切站前 Hugo 为线上版本，Hugo 的配置/主题/布局（`config/`、`themes/`、`layouts/`）不动；**文章内容目前双写**——`content/post/` 与 `astro/src/content/post/` 同步增改。
+- **切站已完成（2026-10-31）**：Hugo 的配置/主题/布局（`config/`、`themes/`、`layouts/`）冻结不动，仅作回滚备份；**文章内容继续双写**——`content/post/` 与 `astro/src/content/post/` 同步增改，用 `python -I scripts/sync_post.py` 一键同步（`--check` 查漂移、`--reverse` 反向）。
 - **URL 必须与 Hugo 完全一致**（`/post/<slug>/` 带尾斜杠、CJK 分类目录名小写化规则），否则 Waline 评论线程与不蒜子计数脱钩。`astro.config.mjs` 的 `trailingSlash: 'always'` + `build.format: 'directory'` 就是为此；分类/标签 slug 用 `src/utils/columns.ts` 的 `slugifyTaxonomy` 对齐 Hugo URLize。
 - **`--red-*` CSS 变量名不可改**：封面取色与氛围旋钮脚本都写这组变量；localStorage 键 `yzrt-mood-hue`、`theme` 与旧站共享。
 - 内容集合在 `src/content.config.ts`：frontmatter 同 Hugo，仅 `lastmod` → `updatedDate`；专栏内篇号用 `weight`（从 1 起，0 会被排到最后，和 Hugo 同款坑）。专栏定义在 `src/content/columns/*.md`，`category` 字段与文章 categories 项精确匹配。
 - 站点常量（菜单、Waline、打字机文案）移植在 `src/consts.ts`；Hugo `data/*.yml` 对应 `src/data/*.ts`（如 `friends.ts`）。
 - `PostNav.astro` 移植了 Hugo 侧前后篇导航的逻辑：专栏文章按 weight、非专栏按日期。
 - 全部第三方资源 vendored 在 `astro/public/resources/`，零公共 CDN（Waline 表情包 unpkg 按需加载除外）。
-- CI 同时产出 `site`（Hugo，也是回滚用产物）和 `site-astro` 两个 artifact，部署都是手动上传服务器。
+- CI 同时产出 `site`（Astro，**部署上传这个**）和 `site-hugo-legacy`（Hugo，回滚用）两个 artifact，部署都是手动上传服务器。
 
 ## Common Development Commands
 
 ```bash
-# 开发（Hugo，线上站）
-hugo server
-
-# 生产构建（部署必须用这个，不要部署 hugo server 的产物）
-hugo --minify --gc --cleanDestinationDir
-
-# 新文章（记得按双写约定同步到 astro/src/content/post/）
-hugo new content post/my-new-post.md
-
-# Astro 新站（在 astro/ 目录下执行；首次先 npm install）
+# 开发（Astro，线上站；在 astro/ 目录下执行，首次先 npm install）
 npm run dev       # http://localhost:4321
-npm run build     # 产物 → astro/dist/
+npm run build     # 生产构建，产物 → astro/dist/
 npm run preview
 
+# 新文章：先写在 Hugo 侧（archetype 入口），再一键同步到 Astro
+hugo new content post/my-new-post.md
+python -I scripts/sync_post.py my-new-post.md   # 不带参数 = 同步全部文章
+python -I scripts/sync_post.py --check          # 只检查两边是否漂移，不写文件
+
 # 构建产物体检：扫全部页面的站内引用是否有 404、远程依赖、关键功能点
-python -I scripts/verify_build.py              # Hugo 产物（public/）
-python -I scripts/verify_build.py astro/dist   # Astro 产物
+python -I scripts/verify_build.py astro/dist   # Astro 产物（线上）
+python -I scripts/verify_build.py              # Hugo 产物（回滚备份用）
 ```
 
 `--minify` 不只是压缩 HTML：主题的 CSS 管线（`helpers/scss.html`）以 `hugo.IsProduction` 为开关做 minify + fingerprint，`hugo server` 产物里是未压缩 CSS、livereload 脚本和 localhost URL，绝不能上线。
 
 ## CI
 
-`.github/workflows/build.yml`：push 到 main 自动构建（Hugo 版本已钉死，升级本地 Hugo 后同步修改），产出 `site`（Hugo）和 `site-astro`（Astro）两个 artifact 供下载部署。GitHub Pages 自动部署的 job 已写好但注释着。
+`.github/workflows/build.yml`：push 到 main 自动构建（Hugo 版本已钉死，升级本地 Hugo 后同步修改），产出 `site`（Astro，部署上传这个）和 `site-hugo-legacy`（Hugo，回滚用）两个 artifact 供下载部署。GitHub Pages 自动部署的 job 已写好但注释着。
 
 ## 资源本地化（重要约定）
 

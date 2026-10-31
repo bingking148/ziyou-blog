@@ -1,3 +1,5 @@
+# [已下线 2026-10-31] 线上版本已切换为 astro/ 子目录下的 Astro 5 站点（同域名同 URL 无缝接管）。
+# 本 Hugo 站冻结作回滚备份：CI 产物为 site-hugo-legacy artifact，新版故障时重新上传即可整体回滚。
 baseURL = 'https://ziyou814.top/'
 languageCode = 'zh-CN'
 defaultContentLanguage = 'zh-CN'
