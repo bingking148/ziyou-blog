@@ -105,43 +105,43 @@ const fmt = (d: Date) =>
           </div>
 
           <script is:inline>
-            /* 代码块包装：语言栏 + 复制按钮；无 JS 时仍是普通代码卡片。 */
+            /* 代码块包装：杂志式编辑排版 —— 顶部语言小标 + 行号 + 文字化复制按钮。
+               无 JS 时仍是干净的代码卡片。 */
             (function () {
               var pres = document.querySelectorAll('.prose pre.astro-code');
               for (var i = 0; i < pres.length; i++) {
                 var pre = pres[i];
                 if (pre.closest('.code-shell')) continue;
+
                 var shell = document.createElement('figure');
                 shell.className = 'code-shell';
+
+                /* 顶部：语言名（letter-spaced 小标） + 复制 */
                 var bar = document.createElement('figcaption');
                 bar.className = 'code-bar';
-                var dots = document.createElement('span');
-                dots.className = 'code-dots';
-                dots.setAttribute('aria-hidden', 'true');
-                dots.innerHTML = '<i></i><i></i><i></i>';
                 var lang = document.createElement('span');
                 lang.className = 'code-lang';
-                lang.textContent = (pre.getAttribute('data-language') || 'code').toUpperCase();
+                lang.textContent = (pre.getAttribute('data-language') || 'CODE').toUpperCase();
                 var copy = document.createElement('button');
                 copy.className = 'code-copy';
                 copy.type = 'button';
-                copy.textContent = '复制';
+                copy.innerHTML = '<span class="copy-mark" aria-hidden="true">⧉</span><span class="copy-text">复制</span>';
                 copy.setAttribute('aria-label', '复制代码');
                 copy.addEventListener('click', function () {
                   var button = this;
+                  var text = button.querySelector('.copy-text');
                   var code = button.closest('.code-shell').querySelector('pre code');
                   var done = function () {
-                    button.textContent = '已复制';
+                    text.textContent = '已复制';
                     button.classList.add('is-copied');
                     setTimeout(function () {
-                      button.textContent = '复制';
+                      text.textContent = '复制';
                       button.classList.remove('is-copied');
                     }, 1600);
                   };
+                  var fail = function () { text.textContent = '复制失败'; };
                   if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(code.innerText).then(done).catch(function () {
-                      button.textContent = '复制失败';
-                    });
+                    navigator.clipboard.writeText(code.innerText).then(done).catch(fail);
                   } else {
                     var helper = document.createElement('textarea');
                     helper.value = code.innerText;
@@ -153,15 +153,28 @@ const fmt = (d: Date) =>
                     try {
                       if (!document.execCommand('copy')) throw new Error('copy failed');
                       done();
-                    } catch (e) {
-                      button.textContent = '复制失败';
-                    }
+                    } catch (e) { fail(); }
                     document.body.removeChild(helper);
                   }
                 });
-                bar.appendChild(dots);
                 bar.appendChild(lang);
                 bar.appendChild(copy);
+
+                /* 行号：按物理行数生成 */
+                var codeEl = pre.querySelector('code');
+                var raw = codeEl ? codeEl.textContent : '';
+                var lineCount = raw.replace(/\n$/, '').split('\n').length;
+                if (lineCount > 1) {
+                  var gutter = document.createElement('span');
+                  gutter.className = 'code-gutter';
+                  gutter.setAttribute('aria-hidden', 'true');
+                  var nums = '';
+                  for (var n = 1; n <= lineCount; n++) nums += n + '\n';
+                  gutter.textContent = nums;
+                  pre.insertBefore(gutter, pre.firstChild);
+                  pre.classList.add('has-gutter');
+                }
+
                 pre.parentNode.insertBefore(shell, pre);
                 shell.appendChild(bar);
                 shell.appendChild(pre);
@@ -285,58 +298,138 @@ const fmt = (d: Date) =>
   .post-inner :global(.prose blockquote) { margin: 2em 0; padding: .8em 0 .8em 1.6em; border-left: 2px solid var(--red-2); border-radius: 0; background: transparent; font-family: var(--font-serif); font-size: 18px; color: var(--color-text); }
   .post-inner :global(.prose img) { border-radius: 0; }
 
-  /* 代码块：恢复旧站的独立卡片层次；有 JS 时再补语言栏与复制。 */
-  .post-inner :global(.prose pre.astro-code) {
-    margin: 2em 0; padding: 20px 22px 24px;
-    border: 1px solid var(--color-card-border); border-radius: 4px;
-    box-shadow: var(--shadow-soft);
-    font-size: 14.5px; line-height: 1.78;
-  }
-  .post-inner :global(.prose pre.astro-code code) { display: block; min-width: max-content; font-size: inherit; }
+  /* ============ 代码块：杂志代码页 ============
+     编辑排版延续 —— 浅色亚麻底、顶部细线 + letter-spaced 语言小标、
+     左侧行号、文字化复制按钮；与全站 ed-label / ed-row 同源。 */
   .post-inner :global(.prose .code-shell) {
-    margin: 2em 0; border: 1px solid var(--color-card-border); border-radius: 4px;
-    background: #f6f8fb; box-shadow: var(--shadow-lift); overflow: hidden;
+    margin: 2.4em 0;
+    background: var(--red-5-5);
+    border: 1px solid var(--color-card-border);
+    border-radius: 6px;
+    overflow: hidden;
   }
-  .post-inner :global(.prose .code-shell > pre.astro-code) {
-    margin: 0; padding: 20px 22px 24px; border: none; border-radius: 0; box-shadow: none;
-  }
+  /* 顶部条：一条细线 + 左侧语言名 + 右侧复制 */
   .post-inner :global(.prose .code-bar) {
-    display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 14px;
-    border-bottom: 1px solid rgba(44,83,130,.16);
-    background: linear-gradient(180deg,#fbfcfe,#eef3f9);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--color-card-border);
+    background: transparent;
   }
-  .post-inner :global(.prose .code-dots) { display: flex; gap: 7px; }
-  .post-inner :global(.prose .code-dots i) { width: 9px; height: 9px; border-radius: 50%; }
-  .post-inner :global(.prose .code-dots i:nth-child(1)) { background: #ff5f56; }
-  .post-inner :global(.prose .code-dots i:nth-child(2)) { background: #ffbd2e; }
-  .post-inner :global(.prose .code-dots i:nth-child(3)) { background: #27c93f; }
-  .post-inner :global(.prose .code-lang) { font-size: 10px; letter-spacing: .2em; color: var(--color-text-muted); }
+  .post-inner :global(.prose .code-lang) {
+    font-size: 10px; letter-spacing: .28em; font-weight: 500;
+    color: var(--red-2);
+  }
   .post-inner :global(.prose .code-copy) {
-    margin-left: auto; padding: 4px 10px; border: 1px solid rgba(44,83,130,.22); border-radius: 999px;
-    background: rgba(255,255,255,.72); color: var(--color-text); font-size: 11px; letter-spacing: .08em;
-    cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0; border: none; background: transparent;
+    color: var(--color-text-muted);
+    font-size: 11px; letter-spacing: .12em;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: color .25s ease, border-color .25s ease;
   }
-  .post-inner :global(.prose .code-copy:hover) { color: var(--red-1); border-color: var(--red-3); }
-  .post-inner :global(.prose .code-copy.is-copied) { color: #2f9e73; border-color: rgba(47,158,115,.4); }
-  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar) { height: 8px; }
-  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-thumb) { border-radius: 99px; background: rgba(44,83,130,.28); }
-  :global([data-theme='dark']) .post-inner :global(.prose .code-shell) { background: #1d222b; border-color: rgba(130,167,204,.2); }
-  :global([data-theme='dark']) .post-inner :global(.prose .code-bar) { border-bottom-color: rgba(130,167,204,.16); background: linear-gradient(180deg,#242a34,#1b2028); }
-  :global([data-theme='dark']) .post-inner :global(.prose .code-copy) { border-color: rgba(130,167,204,.24); background: rgba(130,167,204,.12); }
+  .post-inner :global(.prose .code-copy .copy-mark) {
+    font-size: 12px; line-height: 1;
+  }
+  .post-inner :global(.prose .code-copy:hover) {
+    color: var(--red-1); border-bottom-color: var(--red-2);
+  }
+  .post-inner :global(.prose .code-copy.is-copied) {
+    color: #2f9e73; border-bottom-color: #2f9e73;
+  }
+  /* 主体：行号 + 代码 */
+  .post-inner :global(.prose pre.astro-code) {
+    margin: 0; padding: 18px 22px;
+    background: transparent;
+    border: none; border-radius: 0; box-shadow: none;
+    font-size: 13.5px; line-height: 1.75;
+    color: var(--color-text-strong);
+    overflow-x: auto;
+    display: flex;
+  }
+  .post-inner :global(.prose pre.astro-code .code-gutter) {
+    flex-shrink: 0;
+    margin-right: 18px; padding-right: 14px;
+    border-right: 1px solid var(--color-card-border);
+    text-align: right;
+    color: var(--color-text-muted);
+    font-size: 12px; line-height: inherit;
+    user-select: none;
+    opacity: .6;
+  }
+  .post-inner :global(.prose pre.astro-code code) {
+    flex: 1; min-width: max-content;
+    background: transparent; padding: 0; color: inherit;
+    font-size: inherit;
+  }
+  /* 浅色模式下，让 Shiki 的浅色变量保持原样，仅统一字体颜色基调 */
+  .post-inner :global(.prose pre.astro-code),
+  .post-inner :global(.prose pre.astro-code span) {
+    background-color: transparent !important;
+  }
+  /* 滚动条 */
+  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar) { height: 6px; }
+  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-track) { background: transparent; }
+  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-thumb) {
+    border-radius: 99px; background: rgba(44,83,130,.18);
+  }
+  .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-thumb:hover) {
+    background: rgba(44,83,130,.32);
+  }
+  /* 暗色模式：翻成墨蓝表面，行号分隔线/文字颜色跟随主题变量 */
+  :global([data-theme='dark']) .post-inner :global(.prose .code-shell) {
+    background: var(--color-surface-muted);
+    border-color: rgba(130,167,204,.18);
+  }
+  :global([data-theme='dark']) .post-inner :global(.prose .code-bar) {
+    border-bottom-color: rgba(130,167,204,.14);
+  }
+  :global([data-theme='dark']) .post-inner :global(.prose pre.astro-code .code-gutter) {
+    border-right-color: rgba(130,167,204,.16);
+  }
+  :global([data-theme='dark']) .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-thumb) {
+    background: rgba(130,167,204,.24);
+  }
+  :global([data-theme='dark']) .post-inner :global(.prose pre.astro-code::-webkit-scrollbar-thumb:hover) {
+    background: rgba(130,167,204,.4);
+  }
 
-  /* 块级公式：独立公式卡，行内公式不受影响。 */
+  /* ============ 块级公式：杂志分节线式居中 ============
+     参考 Distill.pub / 3Blue1Brown —— 公式浮在纸面上，上下细线做分节，
+     无卡片容器、无标签、无竖线，让 KaTeX 字形成为主角。 */
   .post-inner :global(.prose .katex-display) {
-    position: relative; display: block; margin: 1.4em 0; padding: 30px 22px 32px;
-    border: 1px solid var(--color-card-border); border-left: 2px solid var(--red-2); border-radius: 4px;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--red-1) 4%, var(--color-surface)), var(--color-surface));
-    box-shadow: var(--shadow-soft); overflow-x: auto; overflow-y: hidden;
+    position: relative;
+    display: block;
+    margin: 3em 0;
+    padding: 1.8em 1em;
+    overflow-x: auto; overflow-y: hidden;
+    text-align: center;
   }
-  .post-inner :global(.prose .katex-display::before) {
-    content: 'FORMULA'; position: absolute; left: 16px; top: 12px;
-    font-family: var(--font-article); font-size: 9px; letter-spacing: .26em; color: var(--red-2);
+  /* 上下各一条细线，营造编辑排版的「分节线」感 */
+  .post-inner :global(.prose .katex-display)::before,
+  .post-inner :global(.prose .katex-display)::after {
+    content: '';
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 56px; height: 1px;
+    background: var(--red-3);
+    opacity: .55;
+  }
+  .post-inner :global(.prose .katex-display)::before { top: 0; }
+  .post-inner :global(.prose .katex-display)::after { bottom: 0; }
+  /* 公式本体：稍微放大、加深 */
+  .post-inner :global(.prose .katex-display > .katex) {
+    display: inline-block;
+    font-size: 1.12em;
+    color: var(--color-text-strong);
+    letter-spacing: .01em;
   }
   .post-inner :global(.prose .katex-display::-webkit-scrollbar) { height: 4px; }
-  .post-inner :global(.prose .katex-display::-webkit-scrollbar-thumb) { border-radius: 99px; background: rgba(44,83,130,.25); }
+  .post-inner :global(.prose .katex-display::-webkit-scrollbar-track) { background: transparent; }
+  .post-inner :global(.prose .katex-display::-webkit-scrollbar-thumb) {
+    border-radius: 99px; background: rgba(44,83,130,.18);
+  }
+  /* 行内公式与正文同重 */
+  .post-inner :global(.prose .katex) { color: var(--color-text-strong); }
 
   .outdate-warn { margin: 0 0 32px; padding: 14px 18px; border-left: 2px solid var(--color-accent); background: color-mix(in srgb, var(--color-accent) 7%, transparent); color: var(--color-text); font-size: 13px; }
   .article-footer { margin-top: 70px; padding-top: 30px; border-top: 1px solid var(--color-card-border); }

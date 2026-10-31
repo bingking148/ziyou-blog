@@ -206,9 +206,9 @@ def f(a=1, b):      # ✗ SyntaxError: non-default argument follows default argu
 
 为什么？因为调用 `f(10)` 时，Python 不知道该把 10 给 a 还是 b。
 
-### 4.4 默认参数的大坑：可变对象
+### 4.4 默认参数写成可变对象
 
-这个坑必须单独讲，因为它**不报错，只是静默地给出错误结果**，极难排查。
+这个问题必须单独讲，因为它**不报错，只是静默地给出错误结果**，极难排查。
 
 ```python
 def add_item(item, basket=[]):      # 危险！
