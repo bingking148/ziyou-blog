@@ -10,7 +10,7 @@ env:
   HUGO_VERSION: '0.160.1'
 
 jobs:
-  # 线上版本：Astro 新站（2026-10-31 起上线），部署上传 site 产物
+  # 线上版本：Astro 新站（2026-10-31 起上线），部署走 Cloudflare Pages，此 artifact 为手动备份
   build-astro:
     runs-on: ubuntu-latest
     defaults:
@@ -40,7 +40,7 @@ jobs:
           path: astro/dist/
           retention-days: 14
 
-  # Hugo 旧站：已下线，仅保留构建作为回滚产物（新版出问题时重新上传即可整体回滚）
+  # Hugo 旧站：已下线，仅保留构建作应急备份（回滚优先用 Pages 部署历史一键回退）
   build-hugo:
     runs-on: ubuntu-latest
     steps:
@@ -69,8 +69,8 @@ jobs:
           path: public/
           retention-days: 14
 
-  # 部署方式不变：从 Actions 页面下载产物（zip），解压后上传到自己的服务器。
-  # 上线站 = site（Astro）；回滚 = site-hugo-legacy（Hugo）。
+  # 线上部署走 Cloudflare Pages（连接本仓库，push main 自动构建上线），
+  # 这两个 artifact 仅作手动备份：上线站 = site（Astro）；应急 = site-hugo-legacy（Hugo）。
   # 如果以后想自动部署到 GitHub Pages：
   #   1. 仓库 Settings -> Pages -> Source 选 GitHub Actions
   #   2. 取消下面整个 job 的注释，并把 path 改为 astro/dist/

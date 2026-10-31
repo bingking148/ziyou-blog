@@ -38,4 +38,6 @@ cd .. && python -I scripts/verify_build.py astro/dist
 
 ## 部署
 
-CI（`.github/workflows/build.yml`）产出 `site` artifact（Astro），下载后按原流程手动上传服务器。回滚 = 重新上传 `site-hugo-legacy`（Hugo）artifact。
+**自动部署**：Cloudflare Pages 项目 `ziyou-blog` 连接本仓库并绑定 ziyou814.top，push main 自动构建上线。构建配置存在 CF 后台：根目录 `astro`、构建命令 `npm ci && npm run build`、输出 `dist`、环境变量 `NODE_VERSION=22`。
+
+**回滚** = Pages 部署历史一键回退；GitHub Actions 的 `site` artifact 仅作手动备份。

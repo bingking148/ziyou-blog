@@ -26,7 +26,7 @@ Personal blog at https://ziyou814.top/，中文（zh-CN）。**线上版本是 `
 - 站点常量（菜单、Waline、打字机文案）移植在 `src/consts.ts`；Hugo `data/*.yml` 对应 `src/data/*.ts`（如 `friends.ts`）。
 - `PostNav.astro` 移植了 Hugo 侧前后篇导航的逻辑：专栏文章按 weight、非专栏按日期。
 - 全部第三方资源 vendored 在 `astro/public/resources/`，零公共 CDN（Waline 表情包 unpkg 按需加载除外）。
-- CI 同时产出 `site`（Astro，**部署上传这个**）和 `site-hugo-legacy`（Hugo，回滚用）两个 artifact，部署都是手动上传服务器。
+- **线上部署 = Cloudflare Pages 自动部署**：Pages 项目 `ziyou-blog` 连接本仓库，绑定 ziyou814.top 与 ziyou-blog.pages.dev，push main 自动构建上线。构建配置存在 CF 后台（根目录 `astro`、构建命令 `npm ci && npm run build`、输出 `dist`、环境变量 `NODE_VERSION=22`）。回滚优先用 Pages 部署历史一键回退；GitHub Actions 仍产出 `site`（Astro）与 `site-hugo-legacy`（Hugo）artifact 作手动备份。
 
 ## Common Development Commands
 
@@ -50,7 +50,7 @@ python -I scripts/verify_build.py              # Hugo 产物（回滚备份用�
 
 ## CI
 
-`.github/workflows/build.yml`：push 到 main 自动构建（Hugo 版本已钉死，升级本地 Hugo 后同步修改），产出 `site`（Astro，部署上传这个）和 `site-hugo-legacy`（Hugo，回滚用）两个 artifact 供下载部署。GitHub Pages 自动部署的 job 已写好但注释着。
+`.github/workflows/build.yml`：push 到 main 自动构建（Hugo 版本已钉死，升级本地 Hugo 后同步修改），产出 `site`（Astro）和 `site-hugo-legacy`（Hugo）两个 artifact。**真正的上线在 Cloudflare Pages 自动部署**（见上节），这里 artifact 仅作手动备份；GitHub Pages 自动部署 job 仍注释着未启用。
 
 ## 资源本地化（重要约定）
 
