@@ -12,7 +12,10 @@ const columns = (await getCollection('columns')).sort((a, b) => a.data.order - b
 const latest = posts[0];
 const heroIndex = posts.slice(0, 3);
 const recent = posts.slice(1, 8);
-const essays = posts.filter((p) => !columnOf(p, columns)).slice(0, 2);
+// 随想位：从「人工智能学习」专栏随机抽一篇（构建时随机；dev 下每次刷新都换）
+const aiColumn = columns.find((c) => c.data.category === '人工智能学习');
+const aiPool = aiColumn ? columnPosts(aiColumn, posts) : [];
+const essays = aiPool.length ? [aiPool[Math.floor(Math.random() * aiPool.length)]] : [];
 const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
 
 const fmt = (d: Date) =>

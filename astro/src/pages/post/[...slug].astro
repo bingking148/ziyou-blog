@@ -55,7 +55,23 @@ const fmt = (d: Date) =>
 <Base title={post.data.title} description={post.data.description} cover={cover} pageClass="is-post">
   {post.data.math && <link slot="head" rel="stylesheet" href="/resources/katex/katex.min.css" />}
 
-  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <!-- 页边阅读标尺：只负责进度，章节跳转交给左侧目录 -->
+  <div class="reading-ruler is-on-hero" role="progressbar" aria-label="文章阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="ruler-readout"><output class="ruler-percent">00</output><span class="ruler-unit">%</span></div>
+    <span class="ruler-caption">READ</span>
+    <div class="ruler-scale" aria-hidden="true">
+      <span class="ruler-fill"></span>
+      <ol class="ruler-ticks">
+        {Array.from({ length: 21 }, (_, i) => (
+          <li class:list={{ 'is-major': i % 5 === 0 }}>
+            {i % 5 === 0 && <span>{String(i * 5).padStart(2, '0')}</span>}
+          </li>
+        ))}
+      </ol>
+      <span class="ruler-cursor"></span>
+    </div>
+    <span class="ruler-end" aria-hidden="true">100 / END</span>
+  </div>
 
   <article class="post-layout">
     <header id="header" class="post-hero">
@@ -92,6 +108,13 @@ const fmt = (d: Date) =>
     </header>
 
     <div class="post-body-grid">
+      <aside class="post-toc-aside">
+        <div class="toc-sticky">
+          <span class="sidebar-label">IN THIS ARTICLE</span>
+          {post.data.toc && <Toc headings={headings} />}
+        </div>
+      </aside>
+
       <div class="post-main">
         {isOutdated && (
           <p class="outdate-warn">
@@ -205,14 +228,10 @@ const fmt = (d: Date) =>
         {post.data.comments && <Comments path={url} />}
       </div>
 
-      <aside class="post-sidebar">
-        <div class="sidebar-sticky">
-          <span class="sidebar-label">IN THIS ARTICLE</span>
-          {post.data.toc && <Toc headings={headings} />}
-          <div class="sidebar-mood">
-            <span class="sidebar-label">SET THE MOOD</span>
-            <MoodKnob />
-          </div>
+      <aside class="post-mood-aside">
+        <div class="mood-sticky">
+          <span class="sidebar-label">SET THE MOOD</span>
+          <MoodKnob />
         </div>
       </aside>
     </div>
@@ -223,20 +242,42 @@ const fmt = (d: Date) =>
   <script>
     (function () {
       'use strict';
-      var bar = document.querySelector('.reading-progress span');
       var article = document.querySelector('.post-main');
+      var ruler = document.querySelector('.reading-ruler');
+      if (!article || !ruler) return;
+
+      var fill = ruler.querySelector('.ruler-fill');
+      var cursor = ruler.querySelector('.ruler-cursor');
+      var percent = ruler.querySelector('.ruler-percent');
+      var ticks = Array.from(ruler.querySelectorAll('.ruler-ticks li'));
+      var lastPct = -1;
       var ticking = false;
+
       function update() {
         ticking = false;
-        var start = article.offsetTop;
+        var start = article.getBoundingClientRect().top + window.scrollY;
         var length = Math.max(1, article.offsetHeight - window.innerHeight);
         var progress = Math.max(0, Math.min(1, (window.scrollY - start) / length));
-        bar.style.transform = 'scaleX(' + progress + ')';
+        var pct = Math.round(progress * 100);
+
+        fill.style.height = (progress * 100) + '%';
+        cursor.style.top = (progress * 100) + '%';
+        ruler.classList.toggle('is-on-hero', window.scrollY < start - window.innerHeight * .55);
+        if (pct !== lastPct) {
+          percent.textContent = String(pct).padStart(2, '0');
+          ruler.setAttribute('aria-valuenow', String(pct));
+          for (var i = 0; i < ticks.length; i++) {
+            ticks[i].classList.toggle('is-read', i <= progress * (ticks.length - 1));
+          }
+          lastPct = pct;
+        }
       }
+
       window.addEventListener('scroll', function () {
         if (!ticking) { ticking = true; requestAnimationFrame(update); }
       }, { passive: true });
       window.addEventListener('resize', update);
+      window.addEventListener('load', update);
       update();
     })();
   </script>
@@ -260,8 +301,64 @@ const fmt = (d: Date) =>
 </Base>
 
 <style>
-  .reading-progress { position: fixed; z-index: 200; left: 0; right: 0; top: 0; height: 2px; pointer-events: none; }
-  .reading-progress span { display: block; width: 100%; height: 100%; background: var(--red-2); transform: scaleX(0); transform-origin: left; }
+  /* ============ 页边阅读标尺 ============
+     像杂志页边的计量刻度，而不是悬浮的发光进度条。
+     左侧走墨线、右侧读数；阅读时指针与数字同步，完成后翻成 FIN。 */
+  .reading-ruler {
+    --ruler-ink: var(--color-text-muted);
+    --ruler-faint: color-mix(in srgb, var(--color-text-muted) 28%, transparent);
+    position: fixed; z-index: 110;
+    right: clamp(16px, 2.5vw, 40px); top: 50%;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 15px;
+    color: var(--ruler-ink); pointer-events: none;
+    transform: translateY(-50%);
+  }
+  .reading-ruler.is-on-hero { --ruler-ink: rgba(255,255,255,.72); --ruler-faint: rgba(255,255,255,.28); }
+  .ruler-readout { display: flex; align-items: baseline; margin-right: -5px; color: var(--color-accent); font-family: var(--font-code); font-variant-numeric: tabular-nums; }
+  .is-on-hero .ruler-readout { color: rgba(255,255,255,.94); }
+  .ruler-percent { font-size: 25px; font-weight: 400; line-height: 1; letter-spacing: -.08em; }
+  .ruler-unit { margin-left: 6px; font-size: 9px; }
+  .ruler-caption { position: absolute; top: 12px; left: -25px; font-size: 7px; letter-spacing: .25em; writing-mode: vertical-rl; }
+  .ruler-scale { position: relative; width: 38px; height: min(48vh, 430px); margin-right: 4px; }
+  .ruler-scale::before, .ruler-fill { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: var(--ruler-faint); }
+  .ruler-fill { height: 0; background: var(--color-accent); }
+  .is-on-hero .ruler-fill { background: rgba(255,255,255,.8); }
+  .ruler-ticks { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
+  .ruler-ticks li { position: absolute; right: 0; height: 1px; width: 4px; background: var(--ruler-faint); transition: width .2s, background .2s; }
+  .ruler-ticks li:nth-child(1) { top: 0; } .ruler-ticks li:nth-child(2) { top: 5%; }
+  .ruler-ticks li:nth-child(3) { top: 10%; } .ruler-ticks li:nth-child(4) { top: 15%; }
+  .ruler-ticks li:nth-child(5) { top: 20%; } .ruler-ticks li:nth-child(6) { top: 25%; }
+  .ruler-ticks li:nth-child(7) { top: 30%; } .ruler-ticks li:nth-child(8) { top: 35%; }
+  .ruler-ticks li:nth-child(9) { top: 40%; } .ruler-ticks li:nth-child(10) { top: 45%; }
+  .ruler-ticks li:nth-child(11) { top: 50%; } .ruler-ticks li:nth-child(12) { top: 55%; }
+  .ruler-ticks li:nth-child(13) { top: 60%; } .ruler-ticks li:nth-child(14) { top: 65%; }
+  .ruler-ticks li:nth-child(15) { top: 70%; } .ruler-ticks li:nth-child(16) { top: 75%; }
+  .ruler-ticks li:nth-child(17) { top: 80%; } .ruler-ticks li:nth-child(18) { top: 85%; }
+  .ruler-ticks li:nth-child(19) { top: 90%; } .ruler-ticks li:nth-child(20) { top: 95%; }
+  .ruler-ticks li:nth-child(21) { top: 100%; }
+  .ruler-ticks li.is-major { width: 9px; background: var(--ruler-ink); }
+  .ruler-ticks li.is-read { width: 6px; background: var(--color-accent); }
+  .ruler-ticks li.is-major.is-read { width: 13px; }
+  .is-on-hero .ruler-ticks li.is-read { background: rgba(255,255,255,.85); }
+  .ruler-ticks li span { position: absolute; right: 24px; top: -4px; font: 7px/1 var(--font-code); color: var(--ruler-ink); }
+  .ruler-cursor { position: absolute; z-index: 1; top: 0; right: -4px; width: 21px; height: 1px; background: var(--color-accent); }
+  .ruler-cursor::before { content: ''; position: absolute; left: -3px; top: -3px; width: 7px; height: 7px; background: var(--color-accent); transform: rotate(45deg); }
+  .is-on-hero .ruler-cursor, .is-on-hero .ruler-cursor::before { background: #fff; }
+  .ruler-end { font: 7px/1.5 var(--font-code); letter-spacing: .08em; }
+
+  @media (max-width: 1350px) {
+    .reading-ruler { right: 10px; }
+    .ruler-ticks li span, .ruler-caption { display: none; }
+    .ruler-scale { width: 20px; }
+  }
+  @media (max-width: 1100px) {
+    .post-body-grid { grid-template-columns: minmax(0,760px); }
+    .post-toc-aside, .post-mood-aside { display: none; }
+    .reading-ruler { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ruler-ticks li { transition: none; }
+  }
   .post-hero { position: relative; height: min(88svh, 900px); min-height: 620px; overflow: hidden; color: #fff; background: #172334; }
   .post-hero-media { position: absolute; inset: 0; }
   .post-cover { width: 100%; height: 100%; object-fit: cover; object-position: center; animation: cover-enter 1.8s cubic-bezier(.2,.7,.2,1) both; }
@@ -279,16 +376,19 @@ const fmt = (d: Date) =>
   .post-hero-foot { position: absolute; left: clamp(32px,8vw,140px); right: clamp(32px,8vw,140px); bottom: 36px; display: flex; align-items: center; gap: 22px; font-size: 8px; letter-spacing: .3em; color: rgba(255,255,255,.55); }
   .hero-foot-line { flex: 1; height: 1px; background: rgba(255,255,255,.2); }
 
-  .post-body-grid { display: grid; grid-template-columns: minmax(0, 790px) 220px; justify-content: center; gap: clamp(60px,7vw,110px); align-items: start; max-width: 1260px; margin: 0 auto; padding: 100px clamp(24px,4vw,56px) 80px; }
-  .sidebar-sticky { position: sticky; top: 48px; }
+  .post-body-grid { display: grid; grid-template-columns: 200px minmax(0, 790px) 200px; justify-content: center; gap: clamp(40px,5vw,80px); align-items: start; max-width: 1500px; margin: 0 auto; padding: 100px clamp(24px,4vw,56px) 80px; }
+  /* sticky 直接以整篇正文为滚动容器；aside 不能被内容高度截短 */
+  .post-toc-aside, .post-mood-aside { align-self: stretch; min-height: 0; }
+  .toc-sticky { position: sticky; top: 48px; max-height: calc(100svh - 96px); }
+  .mood-sticky { position: sticky; top: 48px; }
   .sidebar-label { display: block; margin-bottom: 18px; font-size: 9px; letter-spacing: .22em; color: var(--color-text-muted); }
   .sidebar-mood { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--color-card-border); }
-  .post-sidebar :global(.toc-widget) { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
-  .post-sidebar :global(.widget-title) { display: none; }
-  .post-sidebar :global(.toc-link) { padding-left: 13px; border-left-width: 1px; border-radius: 0; font-size: 12px; line-height: 1.7; white-space: normal; }
-  .post-sidebar :global(.toc-link.is-active) { background: transparent; font-weight: 500; }
-  .post-sidebar :global(.toc-link:hover) { background: transparent; }
-  .post-sidebar :global(.mood-knob-widget) { border: 0; box-shadow: none; background: transparent; }
+  .post-toc-aside :global(.toc-widget) { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+  .post-toc-aside :global(.widget-title) { display: none; }
+  .post-toc-aside :global(.toc-link) { padding-left: 13px; border-left-width: 1px; border-radius: 0; font-size: 12px; line-height: 1.7; white-space: normal; }
+  .post-toc-aside :global(.toc-link.is-active) { background: transparent; font-weight: 500; }
+  .post-toc-aside :global(.toc-link:hover) { background: transparent; }
+  .post-mood-aside :global(.mood-knob-widget) { border: 0; box-shadow: none; background: transparent; }
 
   .post-inner :global(.prose) { font-size: 17px; line-height: 2.05; }
   .post-inner :global(.prose > p:first-of-type) { font-size: 18px; }
@@ -440,10 +540,6 @@ const fmt = (d: Date) =>
   .article-copyright strong { color: var(--color-text-strong); font-weight: 500; }
   .copyright-mark { flex-shrink: 0; font-family: Georgia,serif; font-size: 44px; line-height: 1; color: var(--red-3); }
 
-  @media (max-width: 1100px) {
-    .post-body-grid { grid-template-columns: minmax(0,760px); }
-    .post-sidebar { display: none; }
-  }
   @media (max-width: 760px) {
     .post-hero { height: 82svh; min-height: 600px; }
     .post-hero-content { left: 24px; bottom: 96px; width: calc(100% - 48px); }

@@ -37,6 +37,10 @@ export default defineConfig({
   // 与 Hugo 产物 URL 完全一致：/post/<slug>/ 带尾斜杠、目录式 index.html
   trailingSlash: 'always',
   build: { format: 'directory' },
+  vite: {
+    // 本地预览时关闭热更新自动刷新；要恢复就删掉这段 vite 配置
+    server: { hmr: false },
+  },
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/search/'),
