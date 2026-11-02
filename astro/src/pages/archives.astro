@@ -28,6 +28,11 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
       lede="写下的每一篇，都留在这里。"
       meta={[{ value: String(posts.length), label: '篇文章' }, { value: String(years.length), label: '个年份' }]}
     />
+    <nav class="archive-discovery" aria-label="按主题浏览">
+      <a href="/categories/">按分类浏览</a>
+      <a href="/tags/">按标签浏览</a>
+      <a href="/search/">关键词搜索</a>
+    </nav>
 
     {years.map((y) => (
       <section class="archive-year" data-reveal>
@@ -51,6 +56,8 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
 
 <style>
   .archive-year { margin-bottom: 56px; }
+  .archive-discovery { display:flex;flex-wrap:wrap;gap:12px 24px;margin:-12px 0 56px;font-size:13px; }
+  .archive-discovery a { color:var(--color-link);border-bottom:1px solid var(--red-3);padding-bottom:3px; }
   .archive-year-title { display: flex; align-items: center; gap: 24px; margin: 0 0 20px; }
   .archive-year-title span { font-size: clamp(32px, 3.6vw, 46px); font-weight: 500; color: var(--red-1); letter-spacing: .06em; }
   .archive-year-title i { flex: 1; height: 1px; background: var(--color-card-border); }

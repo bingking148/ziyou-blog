@@ -51,35 +51,36 @@ $$1-\frac1{n+1}$$
 中间项两两抵消，这是裂项相消的全部原理。
 
 <div class="ziyou-viz" id="telescope-viz">
-  <div class="viz-caption">👇 选一个项数 n，点"播放"看中间项如何一对对相消，最后只剩首尾两项。</div>
+  <div class="viz-caption">选一个项数 n，点“播放”看中间项如何一对对相消，最后只剩首尾两项。也可以点“单步”逐项观察。</div>
   <div class="viz-toolbar">
-    <label>项数 n：<input type="range" id="t-n" min="3" max="10" step="1" value="6"><span class="viz-val" id="t-n-val">6</span></label>
+    <label for="t-n">项数 n：</label><input type="range" id="t-n" min="3" max="10" step="1" value="6" aria-valuetext="6 项"><output class="viz-val" id="t-n-val" for="t-n">6</output>
     <span class="viz-btns">
-      <button id="t-play">▶ 播放</button>
-      <button id="t-step">⏭ 单步</button>
-      <button id="t-reset">↺ 重置</button>
+      <button type="button" id="t-play" aria-pressed="false">▶ 播放</button>
+      <button type="button" id="t-step">⏭ 单步</button>
+      <button type="button" id="t-reset">↺ 重置</button>
     </span>
   </div>
-  <div class="viz-expr" id="t-expr"></div>
-  <div class="viz-result" id="t-result"></div>
+  <div class="viz-expr" id="t-expr" aria-label="裂项展开式"></div>
+  <div class="viz-result" id="t-result" role="status" aria-live="polite" aria-atomic="true"></div>
 </div>
 <style>
-#telescope-viz{margin:1.6em 0;padding:1.2em 1.4em;border:1px solid var(--color-border);border-radius:12px;background:var(--color-surface)}
+#telescope-viz{margin:1.6em 0;padding:1.2em 1.4em;border:1px solid var(--color-card-border);border-radius:12px;background:var(--color-surface)}
 #telescope-viz .viz-caption{color:var(--color-text-muted);font-size:.9em;margin-bottom:1em;line-height:1.5}
 #telescope-viz .viz-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:1.2em;margin-bottom:1em}
 #telescope-viz .viz-toolbar label{display:flex;align-items:center;gap:.5em;font-size:.9em;color:var(--color-text-strong)}
 #telescope-viz .viz-toolbar input[type=range]{width:120px;accent-color:var(--color-link)}
 #telescope-viz .viz-val{font-family:Menlo,Consolas,monospace;color:var(--color-link);font-weight:600}
-#telescope-viz .viz-btns{display:flex;gap:.5em}
-#telescope-viz button{padding:.35em .9em;border:1px solid var(--color-border);border-radius:8px;background:transparent;color:var(--color-text-strong);cursor:pointer;font-size:.85em;transition:all .15s}
+#telescope-viz .viz-btns{display:flex;gap:.5em;flex-wrap:wrap}
+#telescope-viz button{padding:.45em .9em;min-height:44px;border:1px solid var(--color-card-border);border-radius:8px;background:transparent;color:var(--color-text-strong);cursor:pointer;font-size:.85em;transition:background .15s,color .15s,border-color .15s}
 #telescope-viz button:hover{background:var(--color-link);color:#fff;border-color:var(--color-link)}
 #telescope-viz .viz-expr{min-height:3em;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.15em;padding:.8em;line-height:2;font-size:1.05em;overflow-x:auto}
 #telescope-viz .t-term{display:inline-flex;align-items:center;padding:.1em .2em;border-radius:5px;transition:opacity .4s ease,background .3s ease,transform .3s ease;white-space:nowrap}
 #telescope-viz .t-term.t-cancel{opacity:0;transform:scale(.6)}
-#telescope-viz .t-term.t-hi{background:var(--color-link);color:#fff}
+#telescope-viz .t-term.t-hi{outline:2px solid currentColor;outline-offset:2px}
 #telescope-viz .t-term.t-keep{font-weight:600;color:var(--color-link)}
 #telescope-viz .t-op{color:var(--color-text-muted);padding:0 .05em}
 #telescope-viz .viz-result{margin-top:.6em;text-align:center;color:var(--color-text-strong);min-height:1.6em}
+@media (prefers-reduced-motion:reduce){#telescope-viz .t-term{transition:none}#telescope-viz .t-term.t-cancel{transform:none;opacity:.35}}
 </style>
 <script>
 (function(){
@@ -87,9 +88,10 @@ $$1-\frac1{n+1}$$
   const nIn=document.getElementById('t-n'),nVal=document.getElementById('t-n-val');
   const expr=document.getElementById('t-expr'),result=document.getElementById('t-result');
   const playBtn=document.getElementById('t-play'),stepBtn=document.getElementById('t-step'),resetBtn=document.getElementById('t-reset');
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   let terms=[],ops=[]; // terms: 数组 {k, sign, val}; 相消按值 k 配对
   let cancelQueue=[];  // 待相消的配对索引
-  let timer=null;
+  let timer=null,stepAt=0;
   // 配色：用 link 色的不同亮度区分不同数值对
   let pairColor={};
   function readColor(){
@@ -97,9 +99,9 @@ $$1-\frac1{n+1}$$
     return (cs.getPropertyValue('--color-link').trim())||'#4285f4';
   }
   function build(){
-    const n=parseInt(nIn.value,10);nVal.textContent=n;
+    const n=parseInt(nIn.value,10);nVal.textContent=n;nIn.setAttribute('aria-valuetext',n+' 项');
     stop();
-    expr.innerHTML='';result.textContent='';
+    stepAt=0;expr.innerHTML='';result.textContent='';
     // 生成展开项：1, -1/2, +1/2, -1/3, +1/3, ... -1/(n+1)
     // 第一项 +1（1 - 1/2），之后每对 ( -1/k , +1/k )
     pairColor={};
@@ -146,8 +148,12 @@ $$1-\frac1{n+1}$$
     // 给每对配不同颜色
     cancelQueue.forEach((pair,pi)=>{
       pairColor[pi]=shade(colorBase,-0.15+pi*0.12);
-      pair.forEach(idx=>{terms[idx].dataset.pair=pi;});
+      pair.forEach(idx=>{
+        terms[idx].dataset.pair=pi;
+        terms[idx].setAttribute('aria-label',(seq[idx].sign>0?'正':'负')+' 1/'+Math.round(1/seq[idx].val)+'，第 '+(pi+1)+' 对相消项');
+      });
     });
+    result.textContent='共 '+cancelQueue.length+' 对中间项等待相消。';
   }
   function frac(v){
     // v=1/k 形式，渲染为 1/k；v=1 渲染为 1
@@ -155,24 +161,31 @@ $$1-\frac1{n+1}$$
     const k=Math.round(1/v);
     return '<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:.9em"><span>1</span><span style="border-top:1px solid currentColor;width:100%;min-width:.7em"></span><span>'+k+'</span></span>';
   }
-  function shade(hex,amt){
-    const c=hex.replace('#','');const num=parseInt(c.length===3?c.split('').map(x=>x+x).join(''):c,16);
-    let r=(num>>16)&255,g=(num>>8)&255,b=num&255;
+  function shade(color,amt){
+    // 支持 #rgb/#rrggbb 与 rgb()/rgba()；CSS 变量在明暗主题下都可能变化。
+    let r,g,b;
+    const rgb=color.match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
+    if(rgb){r=+rgb[1];g=+rgb[2];b=+rgb[3];}else{
+      const c=color.replace('#','');
+      if(!/^(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(c))return color;
+      const num=parseInt(c.length===3?c.split('').map(x=>x+x).join(''):c,16);
+      r=(num>>16)&255;g=(num>>8)&255;b=num&255;
+    }
     r=Math.round(r+(amt>0?(255-r):r)*amt);g=Math.round(g+(amt>0?(255-g):g)*amt);b=Math.round(b+(amt>0?(255-b):b)*amt);
     return 'rgb('+Math.max(0,Math.min(255,r))+','+Math.max(0,Math.min(255,g))+','+Math.max(0,Math.min(255,b))+')';
   }
-  let stepAt=0;
   function doStep(){
-    if(stepAt>=cancelQueue.length){renderResult();return false;}
+    if(stepAt>=cancelQueue.length){stop();renderResult();return false;}
     const pair=cancelQueue[stepAt];const col=pairColor[stepAt];
     pair.forEach(idx=>{
       const el=terms[idx];
       el.style.background=col;el.style.color='#fff';
       el.classList.add('t-hi');
     });
+    result.textContent='正在相消第 '+stepAt+' 对中间项。';
     setTimeout(()=>{
       pair.forEach(idx=>{terms[idx].classList.add('t-cancel');});
-    },350);
+    },reduced.matches?0:350);
     stepAt++;
     return true;
   }
@@ -188,20 +201,26 @@ $$1-\frac1{n+1}$$
     result.appendChild(sumspan);
   }
   function play(){
-    stop();
-    if(stepAt>=cancelQueue.length){reset();setTimeout(play,200);return;}
+    // 减少动画偏好下不自动连续播放；单步仍可完整观察每一对相消。
+    if(reduced.matches){stop();doStep();return;}
+    if(timer){stop();return;}
+    if(stepAt>=cancelQueue.length)build();
+    playBtn.textContent='⏸ 暂停';playBtn.setAttribute('aria-pressed','true');
     timer=setInterval(()=>{
       const ok=doStep();
       if(!ok)stop();
     },800);
   }
-  function stop(){if(timer){clearInterval(timer);timer=null;}}
-  function reset(){stop();stepAt=0;build();}
+  function stop(){
+    if(timer){clearInterval(timer);timer=null;}
+    playBtn.textContent='▶ 播放';playBtn.setAttribute('aria-pressed','false');
+  }
+  function reset(){stop();build();}
   playBtn.addEventListener('click',play);
   stepBtn.addEventListener('click',()=>{stop();doStep();});
   resetBtn.addEventListener('click',reset);
   nIn.addEventListener('input',reset);
-  document.body.addEventListener('reimu:theme-set',()=>{build();});
+  new MutationObserver(()=>{build();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   build();
 })();
 </script>

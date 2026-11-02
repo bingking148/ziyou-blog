@@ -2,11 +2,13 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Comments from '../components/Comments.astro';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { FRIENDS } from '../data/friends.ts';
 import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
 ---
 
 <Base title="友情链接" description="友情链接与交换方式">
+  <link slot="head" rel="stylesheet" href="/resources/waline/waline.css" />
   <div class="ed-wrap">
     <PageHero
       index="03"
@@ -36,7 +38,7 @@ import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
         {FRIENDS.map((f, i) => (
           <a class="friend-row" href={f.url} target="_blank" rel="noopener">
             <span class="friend-no">{String(i + 1).padStart(2, '0')}</span>
-            <img class="friend-avatar" src={f.image} alt={f.name} loading="lazy" />
+            <ResponsiveImage class="friend-avatar" src={f.image} alt={f.name} sizes="84px" loading="lazy" />
             <span class="friend-info">
               <strong>{f.name}</strong>
               <span class="friend-desc">{f.desc}</span>

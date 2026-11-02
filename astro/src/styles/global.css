@@ -14,13 +14,17 @@
   --color-red-6-shadow: rgba(44, 83, 130, 0.5);
   --color-red-3-shadow: rgba(44, 83, 130, 0.25);
 
-  /* 语义色 */
+  /* 语义色：正文与链接必须稳定可读，不随氛围旋钮漂移 */
   --color-bg: #f7fafc;
   --color-surface: #ffffff;
   --color-surface-muted: var(--red-5-5);
   --color-text: #3a4454;
   --color-text-strong: #1c2430;
-  --color-text-muted: #7a879a;
+  --color-text-muted: #5d6b7e;
+  --color-text-faint: #7a879a;
+  --color-link: #2c5382;
+  --color-link-hover: #bf4136;
+  --color-focus: #bf4136;
   --color-card-border: rgba(44, 83, 130, 0.12);
   --color-accent: #bf4136; /* 朱砂点睛 */
   --shadow-soft: 0 6px 28px rgba(44, 83, 130, 0.12);
@@ -49,7 +53,11 @@
   --color-surface-muted: #232933;
   --color-text: #b8c2d0;
   --color-text-strong: #e6edf5;
-  --color-text-muted: #7a879a;
+  --color-text-muted: #a3b0c2;
+  --color-text-faint: #7a879a;
+  --color-link: #82a7d6;
+  --color-link-hover: #d98063;
+  --color-focus: #d98063;
   --color-card-border: rgba(130, 167, 204, 0.14);
   --color-accent: #d98063;
   --shadow-soft: 0 6px 28px rgba(0, 0, 0, 0.35);
@@ -85,16 +93,38 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: var(--red-1);
+  color: var(--color-link);
   text-decoration: none;
   transition: color 0.25s ease;
 }
-a:hover { color: var(--color-accent); }
+a:hover { color: var(--color-link-hover); }
 
 img { max-width: 100%; height: auto; }
 
 ::selection { background: #bf4136; color: #fff; }
 [data-theme="dark"] ::selection { background: #c9553f; }
+
+/* 键盘导航的一致性焦点；视觉隐藏元素不可进入 Tab 顺序 */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-140%);
+  transition: transform .25s ease;
+}
+.skip-link:focus-visible { transform: translateY(0); }
 
 /* Shiki 双主题代码块：CSS 变量切换，无需 JS */
 [data-theme="dark"] .astro-code,
@@ -138,6 +168,19 @@ img { max-width: 100%; height: auto; }
   background: var(--red-5);
   color: var(--red-1);
   font-size: 0.88em;
+}
+.prose .table-scroll {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  border-radius: 8px;
+}
+.prose .table-scroll:focus-visible { outline-offset: 2px; }
+.prose .table-scroll table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 14.5px;
 }
 .prose table {
   width: 100%;
@@ -207,10 +250,10 @@ img { max-width: 100%; height: auto; }
   display: inline-block;
   padding: 4px 2px;
   border-bottom: 1px solid var(--red-3);
-  color: var(--red-1);
+  color: var(--color-link);
   transition: border-color .25s ease, color .25s ease;
 }
-.ed-tag:hover { border-color: var(--red-1); }
+.ed-tag:hover { border-color: var(--color-link); }
 
 @media (max-width: 760px) {
   .ed-wrap { padding-bottom: 64px; }
@@ -229,20 +272,18 @@ img { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   reveal —— 只 fade，不位移不模糊不缩放
-   参考 Josh Comeau / Linear / Vercel Blog：内容出现就是出现，
-   300-500ms 的 ease-out 淡入足够，惊喜放在 hover 而不是入场。
+   reveal —— 渐进增强：无 JS 时内容默认可见，只有脚本确认启动后才动画
    ============================================================ */
-[data-reveal] {
+html.js [data-reveal] {
   opacity: 0;
   transition: opacity .5s ease-out;
   transition-delay: calc(var(--i, 0) * 40ms);
 }
-[data-reveal].is-visible { opacity: 1; }
+html.js [data-reveal].is-visible { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  [data-reveal] { opacity: 1; transition: none; }
+  [data-reveal] { opacity: 1 !important; transition: none !important; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;

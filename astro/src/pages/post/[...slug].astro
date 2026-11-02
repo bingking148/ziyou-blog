@@ -37,6 +37,13 @@ export async function getStaticPaths() {
 
 const { post, column, prev, next } = Astro.props;
 const { Content, headings } = await render(post);
+// KaTeX 是否加载只看「正文里是否真有 $...$ 公式」，不再信任 frontmatter 的 math 开关
+// —— 之前有文章标了 math:false 但正文里有 $-CH_3$，结果公式不渲染。
+const bodyText = post.body ?? '';
+const needsKatex =
+  post.data.math ||
+  /\$\$[\s\S]+?\$\$/.test(bodyText) ||
+  /(^|[^\\$\d])\$[^$\n]+\$(?!\d)/m.test(bodyText);
 
 const cover = post.data.cover || DEFAULT_COVER;
 const url = postUrl(post);
@@ -52,8 +59,37 @@ const fmt = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 ---
 
-<Base title={post.data.title} description={post.data.description} cover={cover} pageClass="is-post">
-  {post.data.math && <link slot="head" rel="stylesheet" href="/resources/katex/katex.min.css" />}
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  cover={cover}
+  pageClass="is-post"
+  type="article"
+  publishedTime={post.data.date}
+  modifiedTime={updated}
+  tags={post.data.tags}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.data.title,
+    description: post.data.description,
+    image: new URL(cover, Astro.site).href,
+    datePublished: post.data.date.toISOString(),
+    ...(updated ? { dateModified: updated.toISOString() } : {}),
+    author: { '@type': 'Person', name: AUTHOR },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': new URL(url, Astro.site).href },
+    keywords: post.data.tags.join(', '),
+    wordCount: wordCount,
+    inLanguage: 'zh-CN',
+  }}
+>
+  {needsKatex && <link slot="head" rel="stylesheet" href="/resources/katex/katex.min.css" />}
+  {post.data.comments && <link slot="head" rel="stylesheet" href="/resources/waline/waline.css" />}
+
+  <!-- 移动端顶部细进度条（页边标尺在窄屏隐藏，这个是它的替代） -->
+  <div class="mobile-progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <span class="mobile-progress-fill"></span>
+  </div>
 
   <!-- 页边阅读标尺：只负责进度，章节跳转交给左侧目录 -->
   <div class="reading-ruler is-on-hero" role="progressbar" aria-label="文章阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -116,6 +152,26 @@ const fmt = (d: Date) =>
       </aside>
 
       <div class="post-main">
+        {/* 移动端原生折叠目录：桌面 sticky 侧边栏在窄屏隐藏，这个是替代。
+            details/summary 不需要 JS 也能开合；挂载时把内容从 aside 里的 ul 克隆过来。 */}
+        {post.data.toc && headings.length > 0 && (
+          <details class="mobile-toc">
+            <summary>
+              <span class="mobile-toc-label">目录</span>
+              <span class="mobile-toc-caret" aria-hidden="true"></span>
+            </summary>
+            <ul class="mobile-toc-list">
+              {headings
+                .filter((h) => h.depth <= 3)
+                .map((h) => (
+                  <li class={`mobile-toc-item mobile-toc-depth-${h.depth}`}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+            </ul>
+          </details>
+        )}
+
         {isOutdated && (
           <p class="outdate-warn">
             本文最后更新于 {fmt(updated ?? post.data.date)}，距今已超过 {OUTDATE_DAYS} 天，内容可能与现状有所出入。
@@ -244,28 +300,49 @@ const fmt = (d: Date) =>
       'use strict';
       var article = document.querySelector('.post-main');
       var ruler = document.querySelector('.reading-ruler');
-      if (!article || !ruler) return;
+      var mprogress = document.querySelector('.mobile-progress');
+      var hero = document.querySelector('.post-hero');
+      if (!article) return;
 
-      var fill = ruler.querySelector('.ruler-fill');
-      var cursor = ruler.querySelector('.ruler-cursor');
-      var percent = ruler.querySelector('.ruler-percent');
-      var ticks = Array.from(ruler.querySelectorAll('.ruler-ticks li'));
+      var fill = ruler && ruler.querySelector('.ruler-fill');
+      var cursor = ruler && ruler.querySelector('.ruler-cursor');
+      var percent = ruler && ruler.querySelector('.ruler-percent');
+      var ticks = ruler ? Array.from(ruler.querySelectorAll('.ruler-ticks li')) : [];
+      var mfill = mprogress && mprogress.querySelector('.mobile-progress-fill');
       var lastPct = -1;
       var ticking = false;
+      var heroVisible = true;
+      // 正文容器尺寸/位置缓存：图片异步加载会撑开高度，用 ResizeObserver 重新校准
+      var articleTop = 0, articleHeight = 1;
+      function measure() {
+        var r = article.getBoundingClientRect();
+        articleTop = r.top + window.scrollY;
+        articleHeight = article.offsetHeight;
+      }
+      measure();
+
+      // 封面是否还在视口里：决定标尺走白（hero 上）还是走墨（正文上）
+      if (hero && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          heroVisible = entries[0].isIntersecting;
+          if (ruler) ruler.classList.toggle('is-on-hero', heroVisible);
+        }, { rootMargin: '-15% 0px 0px 0px' }).observe(hero);
+      }
 
       function update() {
         ticking = false;
-        var start = article.getBoundingClientRect().top + window.scrollY;
-        var length = Math.max(1, article.offsetHeight - window.innerHeight);
-        var progress = Math.max(0, Math.min(1, (window.scrollY - start) / length));
+        var length = Math.max(1, articleHeight - window.innerHeight);
+        var progress = Math.max(0, Math.min(1, (window.scrollY - articleTop) / length));
         var pct = Math.round(progress * 100);
-
-        fill.style.height = (progress * 100) + '%';
-        cursor.style.top = (progress * 100) + '%';
-        ruler.classList.toggle('is-on-hero', window.scrollY < start - window.innerHeight * .55);
+        if (fill) {
+          fill.style.height = (progress * 100) + '%';
+          cursor.style.top = (progress * 100) + '%';
+        }
+        if (mfill) mfill.style.transform = 'scaleX(' + progress + ')';
         if (pct !== lastPct) {
-          percent.textContent = String(pct).padStart(2, '0');
-          ruler.setAttribute('aria-valuenow', String(pct));
+          if (percent) percent.textContent = String(pct).padStart(2, '0');
+          if (ruler) ruler.setAttribute('aria-valuenow', String(pct));
+          if (mprogress) mprogress.setAttribute('aria-valuenow', String(pct));
           for (var i = 0; i < ticks.length; i++) {
             ticks[i].classList.toggle('is-read', i <= progress * (ticks.length - 1));
           }
@@ -276,9 +353,67 @@ const fmt = (d: Date) =>
       window.addEventListener('scroll', function () {
         if (!ticking) { ticking = true; requestAnimationFrame(update); }
       }, { passive: true });
-      window.addEventListener('resize', update);
-      window.addEventListener('load', update);
+      window.addEventListener('resize', function () { measure(); update(); });
+      window.addEventListener('load', function () { measure(); update(); });
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(function () { measure(); update(); }).observe(article);
+      }
       update();
+    })();
+  </script>
+
+  {/* SMIL/SVG 动画控制：
+      1. prefers-reduced-motion 时直接 pauseAnimations()，让第一帧成为静止画面；
+      2. 视口外的 SVG 暂停，回视口再恢复——既不烧 CPU 也不让用户看到「半路启动」的错乱；
+      3. 没有 <title> 的 <svg> 补一个「动画示意图」 role/description，给屏幕阅读器一个最低限度的名字。 */}
+  <script is:inline>
+    (function () {
+      'use strict';
+      var svgs = document.querySelectorAll('.prose svg');
+      if (!svgs.length) return;
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function hasAnimation(svg) {
+        return !!(svg.querySelector('animate, animateTransform, animateMotion, set'));
+      }
+      function applyState(svg) {
+        if (typeof svg.pauseAnimations !== 'function') return;
+        if (reduced.matches) {
+          svg.pauseAnimations();
+          svg.setCurrentTime(0);
+        } else if (svg.__inView !== false) {
+          svg.unpauseAnimations();
+        }
+      }
+      svgs.forEach(function (svg) {
+        if (!hasAnimation(svg)) return;
+        // a11y：没写 <title> 的动画 SVG 给一个通用名字，比沉默强
+        if (!svg.querySelector('title')) {
+          var t = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+          t.textContent = svg.getAttribute('aria-label') || '动画示意图';
+          svg.insertBefore(t, svg.firstChild);
+        }
+        if (!svg.hasAttribute('role')) svg.setAttribute('role', 'img');
+        svg.__inView = true;
+        applyState(svg);
+      });
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            var svg = en.target;
+            svg.__inView = en.isIntersecting;
+            if (typeof svg.pauseAnimations !== 'function') return;
+            if (en.isIntersecting) {
+              if (!reduced.matches) svg.unpauseAnimations();
+            } else {
+              svg.pauseAnimations();
+            }
+          });
+        }, { rootMargin: '0px' });
+        svgs.forEach(function (svg) { if (hasAnimation(svg)) io.observe(svg); });
+      }
+      reduced.addEventListener && reduced.addEventListener('change', function () {
+        svgs.forEach(function (svg) { if (hasAnimation(svg)) applyState(svg); });
+      });
     })();
   </script>
 
@@ -290,7 +425,12 @@ const fmt = (d: Date) =>
           startOnLoad: false,
           theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default',
         });
-        mermaid.run({ querySelector: 'pre.mermaid:not([data-processed])' });
+        mermaid.run({ querySelector: 'pre.mermaid:not([data-processed])' }).catch(function (err) {
+          console.warn('Mermaid 渲染失败：', err);
+          document.querySelectorAll('pre.mermaid:not([data-processed])').forEach(function (el) {
+            el.setAttribute('data-mermaid-error', '图表渲染失败，已保留源代码');
+          });
+        });
       };
       run();
       new MutationObserver(run).observe(document.documentElement, {
@@ -301,6 +441,60 @@ const fmt = (d: Date) =>
 </Base>
 
 <style>
+  /* ============ 移动端顶部细进度条 ============ */
+  .mobile-progress {
+    display: none;
+    position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 200;
+    background: transparent;
+    pointer-events: none;
+  }
+  .mobile-progress-fill {
+    display: block; height: 100%; width: 100%;
+    background: var(--color-accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+  @media (max-width: 1100px) { .mobile-progress { display: block; } }
+
+  /* ============ 移动端原生折叠目录 ============ */
+  .mobile-toc {
+    display: none;
+    margin: 0 0 32px;
+    border: 1px solid var(--color-card-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .mobile-toc summary {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; min-height: 44px;
+    cursor: pointer; user-select: none;
+    font-size: 13px; letter-spacing: .12em; color: var(--color-text-strong);
+    list-style: none;
+  }
+  .mobile-toc summary::-webkit-details-marker { display: none; }
+  .mobile-toc-caret {
+    width: 8px; height: 8px;
+    border-right: 1.5px solid var(--color-text-muted);
+    border-bottom: 1.5px solid var(--color-text-muted);
+    transform: rotate(45deg);
+    transition: transform .25s ease;
+  }
+  .mobile-toc[open] .mobile-toc-caret { transform: rotate(225deg); }
+  .mobile-toc-list {
+    list-style: none; margin: 0; padding: 4px 16px 14px;
+    max-height: 50vh; overflow-y: auto;
+    border-top: 1px solid var(--color-card-border);
+  }
+  .mobile-toc-item { padding: 4px 0; }
+  .mobile-toc-item a {
+    display: block; padding: 6px 0;
+    color: var(--color-text-muted); font-size: 13.5px; line-height: 1.55;
+  }
+  .mobile-toc-item a:hover { color: var(--color-link); }
+  .mobile-toc-depth-3 a { padding-left: 16px; font-size: 13px; }
+  @media (max-width: 1100px) { .mobile-toc { display: block; } }
+
   /* ============ 页边阅读标尺 ============
      像杂志页边的计量刻度，而不是悬浮的发光进度条。
      左侧走墨线、右侧读数；阅读时指针与数字同步，完成后翻成 FIN。 */
@@ -421,7 +615,9 @@ const fmt = (d: Date) =>
   }
   .post-inner :global(.prose .code-copy) {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 0; border: none; background: transparent;
+    padding: 8px 10px; margin: -8px -10px;
+    min-height: 36px; min-width: 44px;
+    border: none; background: transparent;
     color: var(--color-text-muted);
     font-size: 11px; letter-spacing: .12em;
     cursor: pointer;
@@ -541,9 +737,9 @@ const fmt = (d: Date) =>
   .copyright-mark { flex-shrink: 0; font-family: Georgia,serif; font-size: 44px; line-height: 1; color: var(--red-3); }
 
   @media (max-width: 760px) {
-    .post-hero { height: 82svh; min-height: 600px; }
+    .post-hero { height: 82svh; min-height: 540px; }
     .post-hero-content { left: 24px; bottom: 96px; width: calc(100% - 48px); }
-    .post-title { font-size: clamp(30px,8vw,44px); line-height: 1.5; }
+    .post-title { font-size: clamp(28px,7.4vw,40px); line-height: 1.5; }
     .post-description { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .post-kicker { font-size: 8px; letter-spacing: .2em; }
     .post-meta { gap: 8px 16px; font-size: 10px; }
@@ -551,6 +747,21 @@ const fmt = (d: Date) =>
     .post-body-grid { padding: 64px 24px 50px; }
     .post-inner :global(.prose) { font-size: 16px; }
     .post-inner :global(.prose h2) { font-size: 24px; }
+  }
+  /* 矮屏手机（横屏 / 较老的 16:9 屏）：进一步收紧 hero，让标题/meta 完整可见 */
+  @media (max-width: 760px) and (max-height: 620px) {
+    .post-hero { min-height: 480px; }
+    .post-hero-content { bottom: 80px; }
+    .post-title { font-size: clamp(24px,6.4vw,32px); }
+    .post-description { -webkit-line-clamp: 2; margin-top: 14px; }
+    .post-kicker { margin-bottom: 16px; }
+    .post-meta { margin-top: 18px; }
+  }
+  /* 横屏：高度更宝贵 */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .post-hero { height: 100svh; min-height: 420px; }
+    .post-title { font-size: clamp(22px,3.6vw,32px); }
+    .post-description { -webkit-line-clamp: 2; }
   }
   @media (prefers-reduced-motion: reduce) {
     .post-cover, .post-kicker, .post-title, .post-description, .post-meta { animation: none; }

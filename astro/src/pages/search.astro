@@ -8,7 +8,7 @@ for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t)
 const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([t]) => t);
 ---
 
-<Base title="搜索" description="站内搜索">
+<Base title="搜索" description="站内搜索" noindex>
   <div class="ed-wrap search-page">
     <div class="search-top" data-reveal>
       <span class="ed-label">02 / SEARCH</span>
@@ -33,8 +33,12 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
       {hotTags.map((t) => <button type="button" class="suggest-btn" data-keyword={t}>{t}</button>)}
     </div>
 
-    <p id="search-status" class="search-status">正在加载索引…</p>
+    <p id="search-status" class="search-status" role="status" aria-live="polite">输入关键词开始搜索；也可以 <a href="/archives/">直接浏览全部归档</a>。</p>
     <ul id="search-results" class="search-results"></ul>
+
+    <noscript>
+      <p class="search-noscript">当前浏览器未启用 JavaScript，无法使用站内搜索。可以先到 <a href="/archives/">归档页</a> 或 <a href="/categories/">分类页</a> 浏览全部文章。</p>
+    </noscript>
   </div>
 </Base>
 
@@ -45,8 +49,10 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
     var input = document.getElementById('search-input');
     var results = document.getElementById('search-results');
     var status = document.getElementById('search-status');
-    var index = null;
-    var fuse = null;
+    var index = null;         // search.json 内容
+    var fuse = null;          // 拉丁查询用 fuse，首次命中拉丁字符才初始化
+    var loading = false;
+    var loadFailed = false;
 
     function esc(s) {
       return String(s).replace(/[&<>"']/g, function (c) {
@@ -54,18 +60,23 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
       });
     }
 
+    function setStatus(html, isError) {
+      status.innerHTML = html;
+      status.classList.toggle('is-error', !!isError);
+    }
+
     function render(items, query) {
       if (!query) {
         results.innerHTML = '';
-        status.textContent = index ? '共收录 ' + index.length + ' 篇文章' : '';
+        setStatus(index ? '共收录 ' + index.length + ' 篇文章' : '输入关键词开始搜索');
         return;
       }
       if (!items.length) {
         results.innerHTML = '';
-        status.textContent = '没有找到「' + query + '」相关的文章';
+        setStatus('没有找到「' + esc(query) + '」相关的文章');
         return;
       }
-      status.textContent = '找到 ' + items.length + ' 篇';
+      setStatus('找到 ' + items.length + ' 篇');
       results.innerHTML = items
         .map(function (it, i) {
           return (
@@ -85,7 +96,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
 
     var CJK = /[一-鿿]/;
 
-    function search(q) {
+    function runSearch(q) {
       if (!index) return;
       if (CJK.test(q)) {
         // 中文：子串匹配（标题/描述/标签加权靠前）
@@ -103,18 +114,10 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
           .sort(function (a, b) { return b.score - a.score; })
           .map(function (h) { return h.it; });
         render(hits, q);
-      } else if (fuse) {
-        // 拉丁文：fuse 模糊匹配
-        render(fuse.search(q, { limit: 20 }).map(function (r) { return r.item; }), q);
-      }
-    }
-
-    fetch('/search.json')
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        index = data;
-        if (window.Fuse) {
-          fuse = new window.Fuse(data, {
+      } else {
+        // 拉丁文首次查询时才真正建 fuse 实例——中文用户不需要付这部分初始化成本
+        if (!fuse && window.Fuse) {
+          fuse = new window.Fuse(index, {
             keys: [
               { name: 'title', weight: 3 },
               { name: 'description', weight: 2 },
@@ -125,17 +128,80 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
             ignoreLocation: true,
           });
         }
-        status.textContent = '共收录 ' + data.length + ' 篇文章';
-        if (input.value.trim()) search(input.value.trim());
-      })
-      .catch(function () {
-        status.textContent = '索引加载失败，请刷新重试';
-      });
+        if (fuse) render(fuse.search(q, { limit: 20 }).map(function (r) { return r.item; }), q);
+      }
+    }
+
+    function syncUrl(q, push) {
+      try {
+        var url = new URL(window.location.href);
+        if (q) url.searchParams.set('q', q);
+        else url.searchParams.delete('q');
+        window.history[push ? 'pushState' : 'replaceState'](null, '', url);
+      } catch (e) {}
+    }
+
+    function loadIndex(then) {
+      if (index) { if (then) then(); return; }
+      if (loading) return;
+      loading = true;
+      loadFailed = false;
+      setStatus('正在加载索引…');
+      fetch('/search.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (data) {
+          index = data;
+          loading = false;
+          if (then) then();
+          else setStatus('共收录 ' + data.length + ' 篇文章');
+        })
+        .catch(function () {
+          loading = false;
+          loadFailed = true;
+          setStatus('索引加载失败。<button type="button" class="search-retry" id="search-retry">点击重试</button>', true);
+          var retry = document.getElementById('search-retry');
+          if (retry) retry.addEventListener('click', function () { loadIndex(then); });
+        });
+    }
 
     var timer = null;
-    input.addEventListener('input', function () {
+    function trigger(immediate, push) {
+      var q = input.value.trim();
+      syncUrl(q, push);
+      if (!q) { render([], ''); return; }
+      if (!index) {
+        loadIndex(function () { runSearch(q); });
+        return;
+      }
       clearTimeout(timer);
-      timer = setTimeout(function () { search(input.value.trim()); }, 180);
+      if (immediate) { runSearch(q); return; }
+      timer = setTimeout(function () { runSearch(q); }, 180);
+    }
+
+    input.addEventListener('input', function () { trigger(false); });
+
+    // 浏览器前进/后退：跟随 URL 里的 ?q= 还原查询
+    window.addEventListener('popstate', function () {
+      var q = '';
+      try { q = new URL(window.location.href).searchParams.get('q') || ''; } catch (e) {}
+      input.value = q;
+      if (q) trigger(true); else render([], '');
+    });
+
+    // 站内跳转回搜索页（SPA 式 history 导航后 pageshow 触发，bfcache 返回也会走到）
+    window.addEventListener('pageshow', function () {
+      var q = '';
+      try { q = new URL(window.location.href).searchParams.get('q') || ''; } catch (e) {}
+      if (q && q !== input.value) {
+        input.value = q;
+        trigger(true);
+      } else if (q && !index) {
+        // 首次以 ?q= 进入时 trigger 已被下方初始逻辑调过；这里处理「脚本后于 URL 变化就绪」的边角
+        trigger(true);
+      }
     });
 
     // 推荐关键词：填入并立即搜索
@@ -143,10 +209,17 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
       btn.addEventListener('click', function () {
         input.value = btn.getAttribute('data-keyword') || '';
         input.focus();
-        clearTimeout(timer);
-        search(input.value.trim());
+        trigger(true, true);
       });
     });
+
+    // 进入页面：URL 已有 ?q= 就直接搜索（分享链接场景）；否则只在用户首次输入时才拉索引
+    var initialQ = '';
+    try { initialQ = new URL(window.location.href).searchParams.get('q') || ''; } catch (e) {}
+    if (initialQ) {
+      input.value = initialQ;
+      trigger(true);
+    }
   })();
 </script>
 
@@ -194,6 +267,21 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
   }
   .suggest-btn:hover { border-color: var(--red-1); }
   .search-status { margin: 56px 0 20px; font-size: 12px; letter-spacing: .12em; color: var(--color-text-muted); }
+  .search-status.is-error { color: var(--color-accent); }
+  .search-status a { color: var(--color-link); border-bottom: 1px solid var(--red-3); }
+  .search-retry {
+    margin-left: 10px; padding: 2px 10px;
+    border: 1px solid var(--color-card-border); border-radius: 999px;
+    background: var(--color-surface); color: var(--color-link);
+    font-size: 12px; cursor: pointer;
+  }
+  .search-retry:hover { background: var(--red-5); }
+  .search-noscript {
+    margin: 32px 0 0; padding: 14px 18px;
+    border-left: 2px solid var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+    font-size: 13.5px; line-height: 1.8;
+  }
   .search-results { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
   .search-results :global(.result-row) { align-items: flex-start; }
   .search-results :global(.result-row .row-no) { padding-top: 6px; }

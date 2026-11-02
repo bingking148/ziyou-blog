@@ -14,5 +14,7 @@ description: '记录这个博客自己的建站过程与后续教程：不租服
 |---|---|
 | [这个博客用了哪些服务，一年花多少钱](/post/how-this-blog-is-built/) | 整套架构：技术选型、push 到上线的流程、URL 与资源的约束、一年开销 |
 | [从零到上线：十分钟拿到自己的博客地址](/post/blog-launch-from-zero/) | 动手第一课：注册 GitHub、装 Node、生成站点、推仓库、连上 Cloudflare Pages |
+| [绑定自己的域名](/post/custom-domain-setup/) | 买域名、换 NS、Pages 认领、等证书、www 与裸域统一、改站点地址 |
+| [接上评论区](/post/waline-comments-setup/) | Waline 部署到 Vercel、LeanCloud 存数据、绑评论域名、接进文章页、进后台 |
 
-后续篇目随进度更新：从注册 GitHub 到绑定域名、接入评论，每写一篇就补进上表。
+四篇走完，站是自己的、更新的、能互动的，除域名续费外不花别的钱。

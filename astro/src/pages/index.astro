@@ -2,6 +2,8 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import MoodKnob from '../components/MoodKnob.astro';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
+import { responsive } from '../utils/images.ts';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
 import { TYPING_STRINGS, SOCIAL, AUTHOR } from '../consts.ts';
 
@@ -29,12 +31,12 @@ const shortTitle = (t: string) => t.split('——')[0];
     <div class="scene-pin">
       <div class="scene-card">
         <div class="scene-media">
-          <img
+          <ResponsiveImage
             class="scene-image"
             src="/images/hero-bg-1920.jpg"
-            srcset="/images/hero-bg-760.jpg 760w, /images/hero-bg-1280.jpg 1280w, /images/hero-bg-1920.jpg 1920w"
             sizes="100vw"
             alt="夕阳下延伸至云海的山路"
+            loading="eager"
             fetchpriority="high"
           />
         </div>
@@ -45,7 +47,7 @@ const shortTitle = (t: string) => t.split('——')[0];
       <div class="scene-shards" aria-hidden="true">
         {Array.from({ length: 7 }, (_, i) => (
           <div class="scene-shard" style={`--slice:${i}`}>
-            <img src="/images/hero-bg-1920.jpg" alt="" loading="eager" />
+            <ResponsiveImage src="/images/hero-bg-1920.jpg" sizes="100vw" alt="" loading="eager" />
           </div>
         ))}
       </div>
@@ -59,7 +61,7 @@ const shortTitle = (t: string) => t.split('——')[0];
 
       <a class="scene-focus" href={postUrl(latest)} aria-label={`阅读最新文章：${latest.data.title}`}>
         <div class="focus-card">
-          {latest.data.cover && <img src={latest.data.cover} alt="" loading="lazy" />}
+          {latest.data.cover && <ResponsiveImage src={latest.data.cover} sizes="(max-width: 760px) 72vw, 42vw" alt="" loading="lazy" />}
           <div class="focus-card-shade"></div>
           <div class="focus-card-copy">
             <span class="focus-label">LATEST ENTRY / 001</span>
@@ -145,7 +147,7 @@ const shortTitle = (t: string) => t.split('——')[0];
               <div class="flashcard-stage">
                 <span class="flashcard-shadow" aria-hidden="true"></span>
                 <a class="series-visual" href={`/categories/${slugifyTaxonomy(c.data.category)}/`} data-flashcard="series">
-                  <img src={c.data.cover} alt={c.data.title} loading="lazy" />
+                  <ResponsiveImage src={c.data.cover} sizes="(max-width: 760px) 100vw, 55vw" alt={c.data.title} loading="lazy" />
                   <span class="flashcard-foil" aria-hidden="true"></span>
                   <span class="series-count">{String(list.length).padStart(2, '0')} 篇</span>
                   <span class="series-ord">SERIES 0{i + 1}</span>
@@ -172,7 +174,7 @@ const shortTitle = (t: string) => t.split('——')[0];
         <div class="flashcard-stage">
           <span class="flashcard-shadow" aria-hidden="true"></span>
           <a class="interlude-image" href={postUrl(essays[0])} data-flashcard="interlude">
-            <img src={essays[0].data.cover} alt={essays[0].data.title} loading="lazy" />
+            <ResponsiveImage src={essays[0].data.cover} sizes="(max-width: 760px) 100vw, 60vw" alt={essays[0].data.title} loading="lazy" />
             <span class="flashcard-foil" aria-hidden="true"></span>
           </a>
         </div>
@@ -208,7 +210,7 @@ const shortTitle = (t: string) => t.split('——')[0];
               <span class="latest-arrow">↗</span>
               <span class="latest-preview" aria-hidden="true">
                 <span class="preview-card" data-flashcard="preview">
-                  {p.data.cover && <img src={p.data.cover} alt="" loading="lazy" />}
+                  {p.data.cover && <ResponsiveImage src={p.data.cover} sizes="240px" alt="" loading="lazy" />}
                   <span class="flashcard-foil" aria-hidden="true"></span>
                 </span>
               </span>
@@ -249,6 +251,7 @@ const shortTitle = (t: string) => t.split('——')[0];
         var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
       }
       function tick() {
+        if (document.hidden) return setTimeout(tick, 1000);
         var s = order[idx];
         if (!deleting) {
           pos++; el.textContent = s.slice(0, pos);
@@ -310,8 +313,18 @@ const shortTitle = (t: string) => t.split('——')[0];
         st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
         st.setProperty('--chapter', p < 0.4 ? '"01"' : p < 0.72 ? '"02"' : '"03"');
         pin.classList.toggle('is-after', p > 0.42);
+        pin.classList.toggle('is-end', p > 0.96);
         bottom.style.opacity = String(1 - ramp(p, 0.04, 0.26));
         bottom.style.transform = 'translateY(' + split * 70 + 'px)';
+        bottom.style.visibility = p > 0.28 ? 'hidden' : 'visible';
+        var focus = scene.querySelector('.scene-focus');
+        if (focus) {
+          var active = p > 0.42 && p < 0.97;
+          focus.toggleAttribute('inert', !active);
+          focus.setAttribute('aria-hidden', String(!active));
+        }
+        var sceneLink = scene.querySelector('.scene-link');
+        if (sceneLink) sceneLink.toggleAttribute('inert', p > 0.38);
         for (var i = 0; i < shards.length; i++) {
           var dir = i % 2 ? 1 : -1;
           var local = ramp(p, 0.13 + Math.abs(i - 3) * 0.012, 0.55 + Math.abs(i - 3) * 0.012);
@@ -354,8 +367,11 @@ const shortTitle = (t: string) => t.split('——')[0];
       }
       var counts = { series: 0, preview: 0 };
       var items = [];
+      // 窄屏下 preview 卡片是 CSS 隐藏的：跳过注册，不给隐藏元素挂观察器和指针事件。
+      var smallQuery = window.matchMedia('(max-width: 760px)');
       Array.prototype.forEach.call(nodes, function (card) {
         var kind = card.getAttribute('data-flashcard'), sig = null;
+        if (kind === 'preview' && smallQuery.matches) return;
         if (kind === 'series') sig = SERIES[counts.series++ % SERIES.length];
         else if (kind === 'interlude') sig = INTERLUDE;
         else if (kind === 'preview') sig = previewSig(counts.preview++);

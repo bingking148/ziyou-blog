@@ -64,25 +64,65 @@ const items = headings.filter((h) => h.depth <= Math.max(2, minDepth + 1));
 <script>
   (function () {
     'use strict';
-    var links = document.querySelectorAll('.toc-link');
-    if (!links.length || !('IntersectionObserver' in window)) return;
+    var nav = document.querySelector('.toc-widget');
+    if (!nav) return;
+    // 只管理当前侧栏；移动端的 details 目录有自己的独立链接。
+    var links = nav.querySelectorAll('.toc-link');
+    if (!nav || !links.length) return;
     var map = {};
-    links.forEach(function (l) {
+    var slugs = [];
+    Array.prototype.forEach.call(links, function (l) {
       var slug = l.getAttribute('data-toc-slug');
-      if (slug) map[slug] = l;
+      if (slug) { map[slug] = l; slugs.push(slug); }
     });
-    var headings = document.querySelectorAll('.prose h2[id], .prose h3[id], .prose h1[id]');
+    var headings = [];
+    slugs.forEach(function (slug) {
+      var el = document.getElementById(slug);
+      if (el) headings.push(el);
+    });
     if (!headings.length) return;
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        var link = map[en.target.id];
-        if (!link) return;
-        if (en.isIntersecting) {
-          links.forEach(function (l) { l.classList.remove('is-active'); });
-          link.classList.add('is-active');
+    var list = nav.querySelector('.toc-list');
+    var active = null;
+    // 阅读线：视口顶部往下 25% 处；取线上方最后一个标题作为当前章节。
+    // IntersectionObserver 方案在长文里会漏掉「刚读完的章节」，尤其手机端 rootMargin 计算误差大。
+    function readLine() { return (window.innerHeight || 800) * 0.25 + 80; }
+    function update() {
+      var line = readLine();
+      var current = headings[0];
+      for (var i = 0; i < headings.length; i++) {
+        var top = headings[i].getBoundingClientRect().top;
+        if (top <= line) current = headings[i];
+        else break;
+      }
+      var link = map[current.id];
+      if (link === active) return;
+      if (active) {
+        active.classList.remove('is-active');
+        active.removeAttribute('aria-current');
+      }
+      active = link;
+      if (link) {
+        link.classList.add('is-active');
+        link.setAttribute('aria-current', 'true');
+        // 长目录内部跟随：把激活项滚进可视区，但不让目录抢走页面滚动
+        if (list && list.scrollHeight > list.clientHeight) {
+          var lr = link.getBoundingClientRect();
+          var vr = list.getBoundingClientRect();
+          if (lr.top < vr.top || lr.bottom > vr.bottom) {
+            list.scrollTop += lr.top - vr.top - vr.height / 2 + lr.height / 2;
+          }
         }
-      });
-    }, { rootMargin: '-80px 0px -70% 0px' });
-    headings.forEach(function (h) { io.observe(h); });
+      }
+    }
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    window.addEventListener('load', onScroll);
+    update();
   })();
 </script>

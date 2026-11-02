@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
 
 const posts = await getCollection('post');
@@ -28,7 +29,7 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
       return (
         <section class={`column-block column-block-${ci % 2}`} data-reveal>
           <a class="column-cover" href={url}>
-            <img src={c.data.cover} alt={c.data.title} loading="lazy" />
+            <ResponsiveImage src={c.data.cover} alt={c.data.title} sizes="(max-width: 760px) 100vw, 480px" loading="lazy" />
             <span class="column-badge">SERIES {num(ci + 1)}</span>
           </a>
           <div class="column-body">

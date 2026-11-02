@@ -46,11 +46,16 @@
       try { x.drawImage(img, 0, 0, s, s); } catch (e) { return null; }
       return pickAccent(x, s, s);
     }
+    function hasSavedMood() {
+      try { return localStorage.getItem('yzrt-mood-hue') !== null; } catch (e) { return false; }
+    }
     function applyVars(a) {
       var root = document.documentElement;
       var dark = root.dataset.theme === 'dark';
       var hue = a[0], sat = Math.max(a[1] * 100, 30);
       var s1 = Math.min(sat, 48), s2 = Math.min(sat, 42);
+      // 用户手动转过氛围旋钮时以旋钮为准，封面只补默认状态下的氛围
+      if (hasSavedMood()) { root.dataset.coverAccent = 'yield'; return; }
       if (dark) {
         root.style.setProperty('--red-0', hsl(hue, s2, 68));
         root.style.setProperty('--red-1', hsl(hue, s2, 68));

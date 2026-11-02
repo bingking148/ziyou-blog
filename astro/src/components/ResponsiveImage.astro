@@ -1,0 +1,14 @@
+---
+import { responsive } from '../utils/images.ts';
+interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  crossorigin?: string;
+}
+const { src, alt, class: className, sizes = '100vw', loading = 'lazy', ...rest } = Astro.props;
+---
+<img {...responsive(src, sizes)} alt={alt} class={className} loading={loading} {...rest} />

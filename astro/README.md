@@ -9,7 +9,12 @@ npm install       # 首次
 npm run dev       # 开发服务器 http://localhost:4321
 npm run build     # 生产构建 → dist/
 npm run preview   # 本地预览构建产物
+npm run test:ui   # Playwright 回归（自动启动 preview；首次先 npx playwright install chromium）
 ```
+
+`predev` / `prebuild` 会用 sharp 扫描 `public/images/`，生成内容哈希命名的 WebP 多宽版本到 `public/images/optimized/`，并写入 `src/generated/images.json`。原图不覆盖，产物纳入版本控制；`ResponsiveImage.astro` 负责 `srcset`、尺寸与懒加载。
+
+搜索支持 `/search/?q=关键词` 分享与前进/后退；索引和英文 Fuse 均按需加载。`public/_headers` 配置 Pages 缓存：`/_astro/` 与优化图片 immutable，HTML/RSS/搜索索引保持可更新。
 
 ## 迁移约束（继续有效）
 

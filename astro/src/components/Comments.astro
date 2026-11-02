@@ -10,27 +10,77 @@ const { path } = Astro.props;
 
 <section class="comments-wrap">
   <h2 class="comments-title">说些什么吧！</h2>
-  <link rel="stylesheet" href="/resources/waline/waline.css" />
-  <div id="waline"></div>
+  <div
+    id="waline"
+    data-waline-path={path}
+    data-waline-server={WALINE.serverURL}
+    data-waline-emoji={JSON.stringify(WALINE.emoji)}
+  >
+    <button type="button" class="waline-load-btn" id="waline-load-btn">加载评论</button>
+    <p class="waline-fallback">评论区未加载时，也可以 <a href={`https://github.com/bingking148`} target="_blank" rel="noopener">到 GitHub 找我</a>。</p>
+  </div>
 </section>
 
-<script type="module" define:vars={{ path, walineEmoji: WALINE.emoji, serverURL: WALINE.serverURL }}>
-  import { init } from '/resources/waline/waline.mjs';
-  init({
-    el: '#waline',
-    serverURL,
-    path,
-    reaction: true,
-    pageview: true,
-    meta: ['nick', 'mail', 'link'],
-    requiredMeta: ['nick'],
-    emoji: walineEmoji,
-    dark: 'html[data-theme="dark"]',
-    pageSize: 10,
-    wordLimit: 0,
-    lang: 'zh-CN',
-    commentSorting: 'latest',
-  });
+<script>
+  // 懒加载 Waline：接近视口或用户点击才下载 waline.mjs（~130KB）。
+  // 用普通 script + data-* 传配置——define:vars 会被 Astro 内联，失去拆分意义。
+  (function () {
+    'use strict';
+    var el = document.getElementById('waline');
+    if (!el) return;
+    var btn = document.getElementById('waline-load-btn');
+    var loaded = false, loading = false;
+    function load() {
+      if (loaded || loading) return;
+      loading = true;
+      if (btn) { btn.textContent = '加载中…'; btn.disabled = true; }
+      // Vite 不会打包 /resources/ 下的 vendored 文件，得在运行时拼 URL，
+      // 让浏览器自己走 <script type="module"> 的路径解析。
+      var s = document.createElement('script');
+      s.type = 'module';
+      s.textContent =
+        'import("/resources/waline/waline.mjs").then(function (mod) {' +
+        '  window.__walineReady && window.__walineReady(mod);' +
+        '}).catch(function (err) {' +
+        '  window.__walineFail && window.__walineFail(err);' +
+        '});';
+      window.__walineReady = function (mod) {
+        loaded = true;
+        if (btn) btn.remove();
+        var emoji = [];
+        try { emoji = JSON.parse(el.getAttribute('data-waline-emoji') || '[]'); } catch (e) {}
+        mod.init({
+          el: '#waline',
+          serverURL: el.getAttribute('data-waline-server'),
+          path: el.getAttribute('data-waline-path'),
+          reaction: true,
+          pageview: true,
+          meta: ['nick', 'mail', 'link'],
+          requiredMeta: ['nick'],
+          emoji: emoji,
+          dark: 'html[data-theme="dark"]',
+          pageSize: 10,
+          wordLimit: 0,
+          lang: 'zh-CN',
+          commentSorting: 'latest',
+        });
+      };
+      window.__walineFail = function () {
+        loading = false;
+        if (btn) { btn.textContent = '加载失败，点击重试'; btn.disabled = false; }
+      };
+      document.head.appendChild(s);
+    }
+    if (btn) btn.addEventListener('click', load);
+    // 等待真正接近评论区时再加载，避免桌面打开文章就下载 130KB 模块。
+    // 友链页等较短的页面由按钮兜底，键盘与触摸用户行为一致。
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) { io.disconnect(); load(); } });
+      }, { rootMargin: '150px 0px' });
+      io.observe(el);
+    }
+  })();
 </script>
 
 <style>
@@ -42,5 +92,26 @@ const { path } = Astro.props;
   .comments-title {
     margin: 0 0 20px;
     font-size: 20px;
+  }
+  .waline-load-btn {
+    display: block;
+    margin: 12px auto;
+    padding: 10px 28px;
+    min-height: 44px;
+    border: 1px solid var(--color-card-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-link);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .waline-load-btn:hover { background: var(--red-5); border-color: var(--red-2); }
+  .waline-load-btn:disabled { opacity: 0.6; cursor: wait; }
+  .waline-fallback {
+    margin: 8px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-faint);
+    text-align: center;
   }
 </style>

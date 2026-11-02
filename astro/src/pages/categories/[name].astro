@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
+import ResponsiveImage from '../../components/ResponsiveImage.astro';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
 
 type Post = CollectionEntry<'post'>;
@@ -34,7 +35,11 @@ const fmt = (d: Date) =>
 const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 ---
 
-<Base title={column ? column.data.title : `分类：${name}`} description={column?.data.description ?? `分类「${name}」下的文章`}>
+<Base
+  title={column ? column.data.title : `分类：${name}`}
+  description={column?.data.description ?? `分类「${name}」下的文章`}
+  cover={column?.data.cover}
+>
   {column && ColumnContent ? (
     <div class="ed-wrap">
       <PageHero
@@ -45,7 +50,7 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
         meta={[{ value: String(columnList.length), label: '篇目' }]}
       />
       <div class="column-banner" data-reveal>
-        <img src={column.data.cover} alt={column.data.title} />
+        <ResponsiveImage src={column.data.cover} alt={column.data.title} sizes="(max-width: 1080px) 100vw, 1080px" loading="eager" />
       </div>
       <div class="prose column-intro" data-reveal>
         <ColumnContent />
