@@ -545,11 +545,6 @@ const fmt = (d: Date) =>
     .ruler-ticks li span, .ruler-caption { display: none; }
     .ruler-scale { width: 20px; }
   }
-  @media (max-width: 1100px) {
-    .post-body-grid { grid-template-columns: minmax(0,760px); }
-    .post-toc-aside, .post-mood-aside { display: none; }
-    .reading-ruler { display: none; }
-  }
   @media (prefers-reduced-motion: reduce) {
     .ruler-ticks li { transition: none; }
   }
@@ -571,6 +566,13 @@ const fmt = (d: Date) =>
   .hero-foot-line { flex: 1; height: 1px; background: rgba(255,255,255,.2); }
 
   .post-body-grid { display: grid; grid-template-columns: 200px minmax(0, 790px) 200px; justify-content: center; gap: clamp(40px,5vw,80px); align-items: start; max-width: 1500px; margin: 0 auto; padding: 100px clamp(24px,4vw,56px) 80px; }
+  /* 窄屏收单栏：必须写在 .post-body-grid 基础规则之后——同特异性下后声明者胜，
+     放前面会被三栏基础规则覆盖，正文被挤进 200px 轨道并居中裁切（移动端阅读事故）。 */
+  @media (max-width: 1100px) {
+    .post-body-grid { grid-template-columns: minmax(0,760px); }
+    .post-toc-aside, .post-mood-aside { display: none; }
+    .reading-ruler { display: none; }
+  }
   /* sticky 直接以整篇正文为滚动容器；aside 不能被内容高度截短 */
   .post-toc-aside, .post-mood-aside { align-self: stretch; min-height: 0; }
   .toc-sticky { position: sticky; top: 48px; max-height: calc(100svh - 96px); }

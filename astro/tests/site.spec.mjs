@@ -105,3 +105,19 @@ test('320/640/768 与横屏不产生横向溢出', async ({ page }) => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${size.width} 宽溢出`).toBe(true);
   }
 });
+
+test('移动端正文列完整落在视口内，不被裁切到左侧外', async ({ page }) => {
+  // 回归：单栏 @media 覆盖若写在 .post-body-grid 基础规则之前，会被同特异性的
+  // 三栏基础规则覆盖；两侧 aside 隐藏后正文落进 200px 轨道，再被
+  // justify-content:center 推到视口左侧外——scrollWidth 不增长，只能查元素位置。
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const slug of ['python-closures-decorators', 'fraction-splitting-telescoping']) {
+    await page.goto(`/post/${slug}/`);
+    const box = await page.evaluate(() => {
+      const r = document.querySelector('.post-main').getBoundingClientRect();
+      return { left: r.left, right: r.right, vw: innerWidth };
+    });
+    expect(box.left, `${slug} 正文左缘被裁`).toBeGreaterThanOrEqual(0);
+    expect(box.right, `${slug} 正文右缘溢出`).toBeLessThanOrEqual(box.vw + 1);
+  }
+});
