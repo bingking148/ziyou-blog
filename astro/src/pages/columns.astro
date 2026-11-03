@@ -11,6 +11,10 @@ const columns = (await getCollection('columns')).sort((a, b) => a.data.order - b
 const fmt = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const num = (w?: number) => String(w ?? 0).padStart(2, '0');
+
+// 专栏卡片统一形态：无论收录多少篇，都只展示前 5 行，缺的补空行占位，
+// 保证每个专栏块高度一致，列表页节奏不被长专栏拉散。
+const MAX_VISIBLE = 5;
 ---
 
 <Base title="专栏" description="成系列的专题文章合集">
@@ -25,6 +29,9 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 
     {columns.map((c, ci) => {
       const list = columnPosts(c, posts);
+      const visible = list.slice(0, MAX_VISIBLE);
+      const rest = list.length - visible.length;
+      const blanks = Math.max(0, MAX_VISIBLE - visible.length);
       const url = `/categories/${slugifyTaxonomy(c.data.category)}/`;
       return (
         <section class={`column-block column-block-${ci % 2}`} data-reveal>
@@ -36,7 +43,7 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
             <h2 class="column-title"><a href={url}>{c.data.title}</a></h2>
             <p class="column-desc">{c.data.description}</p>
             <ol class="column-list">
-              {list.map((p) => (
+              {visible.map((p) => (
                 <li>
                   <a class="ed-row" href={postUrl(p)}>
                     <span class="row-no">{num(p.data.weight)}</span>
@@ -45,8 +52,11 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
                   </a>
                 </li>
               ))}
+              {Array.from({ length: blanks }).map(() => (
+                <li class="row-blank" aria-hidden="true"></li>
+              ))}
             </ol>
-            <a class="column-more" href={url}>进入专栏 <span>↗</span></a>
+            <a class="column-more" href={url}>{rest > 0 ? `进入专栏 · 还有 ${rest} 篇` : '进入专栏'} <span>↗</span></a>
           </div>
         </section>
       );
@@ -67,13 +77,19 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
   .column-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.2,.7,.2,1); }
   .column-cover:hover img { transform: scale(1.05); }
   .column-badge { position: absolute; left: 16px; bottom: 14px; font-size: 9px; letter-spacing: .3em; color: rgba(255,255,255,.9); text-shadow: 0 1px 8px rgba(0,0,0,.5); }
-  .column-title { margin: 0 0 12px; font-size: clamp(24px, 2.6vw, 32px); font-weight: 500; letter-spacing: .04em; }
+  /* 标题/简介/列表都按固定行数占位：专栏之间只有内容差异，没有高度差异 */
+  .column-title { margin: 0 0 12px; font-size: clamp(24px, 2.6vw, 32px); font-weight: 500; letter-spacing: .04em; line-height: 1.5; min-height: calc(2 * 1.5em); }
   .column-title a { color: var(--color-text-strong); }
   .column-title a:hover { color: var(--red-1); }
-  .column-desc { margin: 0 0 24px; font-size: 14px; line-height: 1.9; color: var(--color-text-muted); }
-  .column-list { list-style: none; margin: 0; padding: 0; }
-  .column-list .ed-row { padding: 14px 0; }
-  .column-list .row-title { font-size: 15px; }
+  .column-desc {
+    margin: 0 0 24px; font-size: 14px; line-height: 1.9; color: var(--color-text-muted);
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    min-height: calc(2 * 1.9em);
+  }
+  .column-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
+  .column-list .ed-row { height: 54px; align-items: center; padding: 0 4px; }
+  .column-list .row-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-blank { height: 54px; border-bottom: 1px solid var(--color-card-border); }
   .column-more { display: inline-flex; align-items: center; gap: 12px; margin-top: 22px; padding-bottom: 6px; border-bottom: 1px solid var(--red-3); font-size: 13px; letter-spacing: .1em; color: var(--red-1); }
   .column-more:hover { border-color: var(--red-1); }
   .column-more span { transition: transform .3s ease; }
@@ -89,13 +105,14 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
     .column-block:nth-child(3) .column-cover { aspect-ratio: 1.28; }
     .column-block:nth-child(4) .column-cover { aspect-ratio: 1; }
     .column-body { display: flex; flex: 1; flex-direction: column; padding-top: 26px; }
-    .column-title { font-size: clamp(22px, 1.65vw, 30px); line-height: 1.55; }
+    .column-title { font-size: clamp(22px, 1.65vw, 30px); line-height: 1.55; min-height: calc(2 * 1.55em); }
     .column-desc { font-size: 14px; }
     .column-list { border-top: 1px solid var(--color-card-border); }
-    .column-list .ed-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; padding: 18px 0; }
+    .column-list .ed-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 12px; align-items: center; height: 56px; padding: 0; }
     .column-list .row-title { font-size: 14px; line-height: 1.7; }
-    .column-list .row-meta { grid-column: 2; font-size: 10px; }
-    .column-more { align-self: flex-start; margin-top: 26px; }
+    .column-list .row-meta { font-size: 10px; }
+    .row-blank { height: 56px; }
+    .column-more { align-self: flex-start; margin-top: auto; padding-top: 26px; }
   }
   @media (max-width: 900px) {
     .column-block { grid-template-columns: 1fr; gap: 24px; margin-bottom: 64px; }
