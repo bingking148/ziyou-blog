@@ -135,7 +135,9 @@ test('宽屏页面多栏完整、无横向溢出且导航胶囊不错位', async
   await expect(page.locator('.search-results')).toHaveCSS('grid-template-columns', /.+ .+/);
   await page.goto('/columns/');
   await expect(page.locator('.column-block')).toHaveCount(4);
-  await expect(page.locator('.ed-wrap--wide')).toHaveCSS('grid-template-columns', /.+ .+ .+ .+/);
+  await expect(page.locator('.column-grid')).toHaveCSS('grid-template-columns', /.+ .+/);
+  const covers = await page.locator('.column-cover').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width));
+  expect(covers.every((width) => width <= 160), '专栏封面应保持小画幅').toBe(true);
 });
 
 test('宽屏文章正文与两侧栏、阅读标尺互不重叠', async ({ page }) => {
@@ -156,6 +158,25 @@ test('宽屏文章正文与两侧栏、阅读标尺互不重叠', async ({ page 
   }
 });
 
+
+test('专栏合集卡片在桌面双列、手机单列且保持小封面', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [1920, 1440, 1080, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/columns/');
+    await expect(page.locator('.column-block')).toHaveCount(4);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${width} 宽横向溢出`).toBe(true);
+    const columns = await page.locator('.column-grid').evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length);
+    expect(columns, `${width} 宽栏数`).toBe(width > 1080 ? 2 : 1);
+    const boxes = await page.locator('.column-block').evaluateAll((els) => els.map((el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right };
+    }));
+    expect(boxes.every((r) => r.left >= 0 && r.right <= width + 1), `${width} 宽卡片越界`).toBe(true);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.locator('.column-cover').first().evaluate((el) => el.getBoundingClientRect().width)).toBeLessThanOrEqual(96);
+});
 
 test('专栏序章紧凑无重复目录，归档封面支持鼠标与键盘预览', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

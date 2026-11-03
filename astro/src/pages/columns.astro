@@ -8,8 +8,6 @@ import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
 const posts = await getCollection('post');
 const columns = (await getCollection('columns')).sort((a, b) => a.data.order - b.data.order);
 
-const fmt = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 
 // 专栏卡片统一形态：无论收录多少篇，都只展示前 5 行，缺的补空行占位，
@@ -18,7 +16,7 @@ const MAX_VISIBLE = 5;
 ---
 
 <Base title="专栏" description="成系列的专题文章合集">
-  <div class="ed-wrap ed-wrap--wide">
+  <div class="ed-wrap columns-page">
     <PageHero
       index="05"
       label="SERIES"
@@ -27,28 +25,37 @@ const MAX_VISIBLE = 5;
       meta={[{ value: String(columns.length), label: '个专栏' }]}
     />
 
-    {columns.map((c, ci) => {
-      const list = columnPosts(c, posts);
-      const visible = list.slice(0, MAX_VISIBLE);
-      const rest = list.length - visible.length;
-      const blanks = Math.max(0, MAX_VISIBLE - visible.length);
-      const url = `/categories/${slugifyTaxonomy(c.data.category)}/`;
-      return (
-        <section class={`column-block column-block-${ci % 2}`} data-reveal>
-          <a class="column-cover" href={url}>
-            <ResponsiveImage src={c.data.cover} alt={c.data.title} sizes="(max-width: 760px) 100vw, 480px" loading="lazy" />
-            <span class="column-badge">SERIES {num(ci + 1)}</span>
-          </a>
-          <div class="column-body">
-            <h2 class="column-title"><a href={url}>{c.data.title}</a></h2>
-            <p class="column-desc">{c.data.description}</p>
+    <div class="column-grid">
+      {columns.map((c, ci) => {
+        const list = columnPosts(c, posts);
+        const visible = list.slice(0, MAX_VISIBLE);
+        const rest = list.length - visible.length;
+        const blanks = Math.max(0, MAX_VISIBLE - visible.length);
+        const url = `/categories/${slugifyTaxonomy(c.data.category)}/`;
+        return (
+          <section class="column-block" data-reveal>
+            <span class="column-spine" aria-hidden="true">SERIAL / {num(ci + 1)}</span>
+            <div class="column-top">
+              <a class="column-cover" href={url} tabindex="-1" aria-hidden="true">
+                <ResponsiveImage src={c.data.cover} alt="" sizes="(max-width: 760px) 32vw, 200px" loading="lazy" />
+                <span class="column-seal" aria-hidden="true">辑</span>
+              </a>
+              <div class="column-intro">
+                <div class="column-kicker">
+                  <span>SERIES {num(ci + 1)}</span>
+                  <span>{num(list.length)} 篇</span>
+                </div>
+                <h2 class="column-title"><a href={url}>{c.data.title}</a></h2>
+                <p class="column-desc">{c.data.description}</p>
+              </div>
+            </div>
             <ol class="column-list">
               {visible.map((p) => (
                 <li>
-                  <a class="ed-row" href={postUrl(p)}>
+                  <a class="column-row" href={postUrl(p)}>
                     <span class="row-no">{num(p.data.weight)}</span>
                     <span class="row-title">{p.data.title}</span>
-                    <time class="row-meta" datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+                    <span class="row-arrow" aria-hidden="true">↗</span>
                   </a>
                 </li>
               ))}
@@ -56,72 +63,271 @@ const MAX_VISIBLE = 5;
                 <li class="row-blank" aria-hidden="true"></li>
               ))}
             </ol>
-            <a class="column-more" href={url}>{rest > 0 ? `进入专栏 · 还有 ${rest} 篇` : '进入专栏'} <span>↗</span></a>
-          </div>
-        </section>
-      );
-    })}
+            <a class="column-more" href={url}>
+              <span>{rest > 0 ? `阅读完整专栏 · 还有 ${rest} 篇` : '阅读完整专栏'}</span>
+              <span class="more-arrow" aria-hidden="true">↗</span>
+            </a>
+          </section>
+        );
+      })}
+    </div>
   </div>
 </Base>
 
 <style>
-  .column-block {
+  .columns-page { max-width: 1240px; }
+  .column-grid {
     display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: clamp(28px, 4vw, 56px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 28px;
+  }
+  .column-block {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    border: 1px solid color-mix(in srgb, var(--red-3) 55%, transparent);
+    border-radius: 2px;
+    background: var(--color-surface);
+    box-shadow: 5px 6px 0 var(--red-5);
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
+  }
+  /* 折角与辑号都按纸页处理，不使用浮起的圆角卡片 */
+  .column-block::before {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    width: 23px;
+    height: 23px;
+    border-bottom: 1px solid var(--red-3);
+    background: var(--color-bg);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+    content: '';
+  }
+  .column-block::after {
+    position: absolute;
+    top: 17px;
+    right: 29px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--red-2);
+    box-shadow: 0 10px 0 var(--red-3), 0 20px 0 var(--red-3);
+    content: '';
+    opacity: .65;
+  }
+  .column-spine {
+    position: absolute;
+    top: 42px;
+    bottom: 58px;
+    left: 13px;
+    display: flex;
+    align-items: center;
+    border-left: 1px solid var(--red-4);
+    color: var(--color-text-faint);
+    font-size: 8px;
+    letter-spacing: .2em;
+    line-height: 1;
+    padding-left: 7px;
+    writing-mode: vertical-rl;
+  }
+  .column-top {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 22px;
     align-items: start;
-    margin-bottom: 88px;
+    padding: 26px 28px 22px 40px;
   }
-  /* 手机端 1fr 轨道会被封面图固有宽度（响应式变体 ~548px）顶开造成横向溢出，
-     grid 子项 min-width 归零后轨道才能收到视口内；图片自身也兜一层 max-width */
-  .column-block > * { min-width: 0; }
-  .column-cover img { max-width: 100%; }
-  .column-block-1 { margin-left: 6%; }
-  .column-cover { position: relative; display: block; overflow: hidden; aspect-ratio: 1.1; background: var(--red-4); }
-  .column-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.2,.7,.2,1); }
-  .column-cover:hover img { transform: scale(1.05); }
-  .column-badge { position: absolute; left: 16px; bottom: 14px; font-size: 9px; letter-spacing: .3em; color: rgba(255,255,255,.9); text-shadow: 0 1px 8px rgba(0,0,0,.5); }
-  /* 标题/简介/列表都按固定行数占位：专栏之间只有内容差异，没有高度差异 */
-  .column-title { margin: 0 0 12px; font-size: clamp(24px, 2.6vw, 32px); font-weight: 500; letter-spacing: .04em; line-height: 1.5; min-height: calc(2 * 1.5em); }
-  .column-title a { color: var(--color-text-strong); }
-  .column-title a:hover { color: var(--red-1); }
+  .column-cover {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border: 5px solid var(--color-surface);
+    outline: 1px solid var(--color-card-border);
+    background: var(--red-4);
+    box-shadow: 4px 4px 0 var(--red-4);
+    transform: rotate(-1.2deg);
+  }
+  .column-cover::before,
+  .column-cover::after {
+    position: absolute;
+    z-index: 1;
+    top: -8px;
+    width: 22px;
+    height: 9px;
+    background: color-mix(in srgb, var(--red-4) 80%, transparent);
+    content: '';
+  }
+  .column-cover::before { left: 8px; transform: rotate(-8deg); }
+  .column-cover::after { right: 8px; transform: rotate(7deg); }
+  .column-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(.82) contrast(.98);
+    transition: filter .5s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+  }
+  .column-seal {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: grid;
+    width: 24px;
+    height: 27px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.75);
+    outline: 1px solid var(--color-accent);
+    background: var(--color-accent);
+    color: #fff8ef;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1;
+  }
+  .column-block:hover .column-cover img { filter: saturate(1); transform: scale(1.025); }
+  .column-intro { min-width: 0; }
+  .column-kicker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 17px;
+    color: var(--color-text-faint);
+    font-size: 9px;
+    letter-spacing: .16em;
+    line-height: 1.4;
+  }
+  .column-kicker span:first-child { color: var(--red-2); }
+  .column-kicker span:first-child::after { margin-left: 12px; color: var(--red-3); content: '✦'; font-size: 8px; }
+  .column-kicker span:last-child { margin-left: auto; letter-spacing: .08em; }
+  .column-title {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    line-height: 1.45;
+  }
+  .column-title a {
+    padding-bottom: 4px;
+    background: linear-gradient(var(--red-3), var(--red-3)) 0 100% / 0 1px no-repeat;
+    color: var(--color-text-strong);
+    transition: color .25s ease, background-size .35s ease;
+  }
+  .column-title a:hover { background-size: 100% 1px; color: var(--red-1); }
   .column-desc {
-    margin: 0 0 24px; font-size: 14px; line-height: 1.9; color: var(--color-text-muted);
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
-    min-height: calc(2 * 1.9em);
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12.5px;
+    line-height: 1.85;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
   }
-  .column-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
-  .column-list .ed-row { height: 54px; align-items: center; padding: 0 4px; }
-  .column-list .row-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .row-blank { height: 54px; border-bottom: 1px solid var(--color-card-border); }
-  .column-more { display: inline-flex; align-items: center; gap: 12px; margin-top: 22px; padding-bottom: 6px; border-bottom: 1px solid var(--red-3); font-size: 13px; letter-spacing: .1em; color: var(--red-1); }
-  .column-more:hover { border-color: var(--red-1); }
-  .column-more span { transition: transform .3s ease; }
-  .column-more:hover span { transform: translate(3px,-3px); }
+  .column-list {
+    flex: 1;
+    margin: 0 28px 0 40px;
+    padding: 0;
+    border-top: 1px solid var(--red-3);
+    list-style: none;
+    counter-reset: reading;
+  }
+  .column-list > li { position: relative; }
+  .column-list > li:not(.row-blank)::after {
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    border: 1px solid var(--red-2);
+    background: var(--color-surface);
+    content: '';
+    transform: rotate(45deg);
+  }
+  .column-row {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) 16px;
+    gap: 10px;
+    align-items: center;
+    min-height: 48px;
+    border-bottom: 1px dotted color-mix(in srgb, var(--red-3) 60%, transparent);
+    color: var(--color-text);
+  }
+  .row-no { color: var(--red-2); font-size: 10px; letter-spacing: .08em; }
+  .row-title {
+    overflow: hidden;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    line-height: 1.6;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .row-arrow { color: var(--red-1); font-size: 13px; opacity: 0; transform: translate(-4px, 4px); transition: opacity .25s ease, transform .25s ease; }
+  .column-row:hover { color: var(--red-1); }
+  .column-row:hover .row-no { color: var(--color-accent); }
+  .column-row:hover .row-arrow { opacity: 1; transform: translate(0, 0); }
+  .row-blank { height: 48px; border-bottom: 1px dotted color-mix(in srgb, var(--red-3) 60%, transparent); }
+  .column-more {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 5px 28px 0 40px;
+    padding: 17px 0 19px;
+    color: var(--color-link);
+    font-size: 12px;
+    letter-spacing: .08em;
+  }
+  .column-more > span:first-child { display: flex; align-items: center; gap: 10px; }
+  .column-more > span:first-child::before { color: var(--color-accent); content: '※'; font-size: 12px; }
+  .more-arrow {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border: 1px solid var(--red-3);
+    font-size: 15px;
+    transform: rotate(2deg);
+    transition: background .25s ease, color .25s ease, transform .25s ease;
+  }
+  .column-more:hover .more-arrow { background: var(--red-1); color: var(--color-surface); transform: rotate(0); }
+
   @media (min-width: 1440px) {
-    /* 宽屏两列错峰：右列整体下沉一行距，随行距自然形成波浪，不再挤四列 */
-    .ed-wrap--wide { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(40px, 4.5vw, 84px); row-gap: 112px; align-items: start; }
-    .ed-wrap--wide > :global(.page-hero) { grid-column: 1 / -1; margin-bottom: 56px; }
-    .column-block { display: flex; flex-direction: column; gap: 0; margin: 0; }
-    .column-block-1 { margin-left: 0; margin-top: 112px; }
-    .column-cover { aspect-ratio: 1.4; }
-    .column-block:nth-child(3) .column-cover { aspect-ratio: 1.52; }
-    .column-block:nth-child(4) .column-cover { aspect-ratio: 1.26; }
-    .column-block:nth-child(5) .column-cover { aspect-ratio: 1.45; }
-    .column-body { display: flex; flex: 1; flex-direction: column; padding-top: 28px; }
-    .column-title { font-size: clamp(24px, 1.8vw, 32px); line-height: 1.5; min-height: calc(2 * 1.5em); }
-    .column-desc { font-size: 14.5px; }
-    .column-list { border-top: 1px solid var(--color-card-border); }
-    .column-list .ed-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 14px; align-items: center; height: 58px; padding: 0; }
-    .column-list .row-title { font-size: 15px; line-height: 1.7; }
-    .column-list .row-meta { font-size: 10.5px; }
-    .row-blank { height: 58px; }
-    .column-more { align-self: flex-start; margin-top: auto; padding-top: 28px; }
+    .columns-page :global(.page-hero) { padding: 88px 0 52px; }
+    .columns-page :global(.hero-main) { display: flex; }
+    .columns-page :global(.hero-lede) { max-width: 380px; margin-top: 0; }
   }
-  @media (max-width: 900px) {
-    .column-block { grid-template-columns: 1fr; gap: 24px; margin-bottom: 64px; }
-    .column-block-1 { margin-left: 0; }
-    .column-cover { aspect-ratio: 1.8; }
-    .column-list .row-meta { display: none; }
+  @media (max-width: 1080px) {
+    .column-grid { grid-template-columns: minmax(0, 1fr); max-width: 740px; margin: 0 auto; }
+    .column-top { grid-template-columns: 160px minmax(0, 1fr); }
+    .column-title { font-size: 25px; }
+    .column-desc { font-size: 13.5px; -webkit-line-clamp: 2; }
+  }
+  @media (max-width: 520px) {
+    .columns-page { padding-right: 20px; padding-left: 20px; }
+    .column-grid { gap: 26px; }
+    .column-block { box-shadow: 4px 5px 0 var(--red-5); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
+    .column-block::before { width: 17px; height: 17px; }
+    .column-block::after { display: none; }
+    .column-spine { left: 8px; padding-left: 5px; font-size: 7px; }
+    .column-top { grid-template-columns: 88px minmax(0, 1fr); gap: 16px; padding: 22px 18px 20px 29px; }
+    .column-cover { border-width: 3px; box-shadow: 3px 3px 0 var(--red-4); }
+    .column-cover::before, .column-cover::after { top: -6px; width: 17px; height: 7px; }
+    .column-seal { right: 5px; bottom: 5px; width: 20px; height: 22px; font-size: 13px; }
+    .column-kicker { gap: 6px; margin-bottom: 11px; font-size: 8px; letter-spacing: .08em; }
+    .column-kicker span:first-child::after { margin-left: 6px; font-size: 6px; }
+    .column-title { margin-bottom: 8px; font-size: 19px; line-height: 1.45; }
+    .column-desc { font-size: 11.5px; line-height: 1.75; -webkit-line-clamp: 3; }
+    .column-list { margin: 0 18px 0 29px; }
+    .column-row { grid-template-columns: 20px minmax(0, 1fr) 12px; gap: 8px; min-height: 46px; }
+    .row-title { font-size: 12px; }
+    .row-blank { height: 46px; }
+    .column-more { margin: 4px 18px 0 29px; padding: 15px 0 17px; font-size: 11px; }
+    .more-arrow { width: 25px; height: 25px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .column-cover img, .column-title a, .more-arrow, .row-arrow { transition: none; }
   }
 </style>
