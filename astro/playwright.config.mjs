@@ -15,7 +15,7 @@ export default defineConfig({
   webServer: {
     command: 'npm exec astro preview -- --host 127.0.0.1 --port 4321',
     url: 'http://127.0.0.1:4321',
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
