@@ -106,6 +106,249 @@ test('320/640/768 与横屏不产生横向溢出', async ({ page }) => {
   }
 });
 
+test('宽屏页面多栏完整、无横向溢出且导航胶囊不错位', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const paths = [
+    '/', '/archives/', '/categories/', '/categories/建站/', '/tags/', '/tags/python/',
+    '/columns/', '/about/', '/friend/', '/search/?q=Python',
+    '/categories/python基础/', '/post/blog-launch-from-zero/', '/404.html',
+  ];
+  for (const width of [1440, 1920, 2000]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const path of paths) {
+      await page.goto(encodeURI(path));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${width} ${path} 横向溢出`).toBe(true);
+      const pill = await page.locator('.nav-pill').evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return { position: getComputedStyle(el).position, left: r.left, right: r.right, width: r.width };
+      });
+      expect(pill.position).toBe('absolute');
+      expect(pill.width).toBeGreaterThan(0);
+      expect(pill.left).toBeGreaterThanOrEqual(0);
+      expect(pill.right).toBeLessThanOrEqual(width + 1);
+    }
+  }
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('/search/?q=Python');
+  await expect(page.locator('.result-row').first()).toBeVisible();
+  await expect(page.locator('.search-results')).toHaveCSS('grid-template-columns', /.+ .+/);
+  await page.goto('/columns/');
+  await expect(page.locator('.column-block')).toHaveCount(4);
+  await expect(page.locator('.ed-wrap--wide')).toHaveCSS('grid-template-columns', /.+ .+ .+ .+/);
+});
+
+test('宽屏文章正文与两侧栏、阅读标尺互不重叠', async ({ page }) => {
+  for (const width of [1440, 1920, 2000, 2560]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/post/blog-launch-from-zero/');
+    await expect(page.locator('.post-side-meta')).toBeVisible();
+    const boxes = await page.evaluate(() => Object.fromEntries(
+      ['.post-toc-aside', '.post-main', '.post-mood-aside', '.reading-ruler'].map((selector) => {
+        const r = document.querySelector(selector).getBoundingClientRect();
+        return [selector, { left: r.left, right: r.right, width: r.width }];
+      }),
+    ));
+    expect(boxes['.post-toc-aside'].right, `${width} 目录侵入正文`).toBeLessThan(boxes['.post-main'].left);
+    expect(boxes['.post-main'].right, `${width} 正文侵入右侧栏`).toBeLessThan(boxes['.post-mood-aside'].left);
+    expect(boxes['.post-mood-aside'].right, `${width} 标尺侵入右侧栏`).toBeLessThan(boxes['.reading-ruler'].left);
+    expect(boxes['.post-main'].width, `${width} 正文应保持舒适阅读宽度`).toBeLessThanOrEqual(861);
+  }
+});
+
+
+test('专栏序章紧凑无重复目录，归档封面支持鼠标与键盘预览', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('/categories/python基础/');
+  await expect(page.locator('.column-masthead h1')).toHaveCount(1);
+  await expect(page.locator('.column-intro table')).toHaveCount(0);
+  await expect(page.locator('.column-visual')).toBeVisible();
+  const boxes = await page.evaluate(() => Object.fromEntries(['.column-masthead', '.column-intro', '.journey'].map((selector) => {
+    const r = document.querySelector(selector).getBoundingClientRect();
+    return [selector, { top: r.top, bottom: r.bottom }];
+  })));
+  expect(boxes['.column-masthead'].bottom).toBeLessThanOrEqual(boxes['.column-intro'].top);
+  expect(boxes['.column-intro'].bottom).toBeLessThanOrEqual(boxes['.journey'].top);
+  expect(boxes['.column-masthead'].bottom - boxes['.column-masthead'].top).toBeLessThan(760);
+  await page.goto('/archives/');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const first = page.locator('.archive-year .ed-row').first();
+  const preview = first.locator('.archive-preview');
+  await expect(preview).toBeHidden();
+  await first.hover();
+  await expect(preview).toBeVisible();
+  await expect.poll(() => preview.locator('img').evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+  await expect(preview.locator('img')).toHaveAttribute('alt', '');
+  await expect(preview).toHaveCSS('pointer-events', 'none');
+  const previewBox = await preview.boundingBox();
+  expect(previewBox.x).toBeGreaterThanOrEqual(0);
+  expect(previewBox.x + previewBox.width).toBeLessThanOrEqual(1920);
+  await page.mouse.move(10, 100);
+  await expect(preview).toBeHidden();
+  await first.focus();
+  await expect(preview).toBeVisible();
+  await page.keyboard.press('Tab');
+  await expect(preview).toBeHidden();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(preview).toBeHidden();
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await first.hover();
+  await expect(preview).toBeHidden();
+});
+test('专栏按篇号排列，曲线随滚动绘制且响应窗口变化', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/categories/python基础/');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('[data-journey]')).toHaveClass(/is-enhanced/);
+  const items = page.locator('[data-journey-item]');
+  await expect(items).toHaveCount(15);
+  await expect(page.locator('.journey-number')).toHaveText(Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, '0')));
+  await expect(page.locator('[data-journey-line]')).toHaveCount(14);
+  await expect(items.first().locator('a')).toHaveAttribute('href', '/post/python-zero-setup/');
+  await items.first().scrollIntoViewIfNeeded();
+  await expect(items.first()).toHaveClass(/is-reached/);
+  await expect(items.nth(1)).not.toHaveClass(/is-reached/);
+  const desktopPath = await page.locator('[data-journey-line]').first().getAttribute('d');
+  // 第 1 张底部发出端口 → 第 2 张顶部接收端口，滚动到两端口正中应画到一半。
+  const midpoint = await page.evaluate(() => {
+    const out = document.querySelectorAll('[data-journey-out]')[0];
+    const into = document.querySelectorAll('[data-journey-in]')[1];
+    const y = (el) => el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2 + scrollY;
+    const target = (y(out) + y(into)) / 2 - innerHeight * 0.68;
+    scrollTo(0, target);
+    return target;
+  });
+  await expect.poll(() => page.locator('[data-journey-line]').first().evaluate((el) => Number.parseFloat(getComputedStyle(el).strokeDashoffset))).toBeCloseTo(0.5, 1);
+  await expect(items.nth(1)).not.toHaveClass(/is-reached/);
+  // 卡片按顶部接收端口激活：滚过 in[1] 后第 2 张出现，第一段也应画完。
+  await page.evaluate(() => {
+    const port = document.querySelectorAll('[data-journey-in]')[1];
+    const target = port.getBoundingClientRect().top + port.getBoundingClientRect().height / 2 + scrollY;
+    scrollTo(0, target - innerHeight * 0.68 + 50);
+  });
+  await expect(items.nth(1)).toHaveClass(/is-reached/);
+  await expect.poll(() => page.locator('[data-journey-line]').first().evaluate((el) => getComputedStyle(el).strokeDashoffset)).toBe('0px');
+  await page.evaluate((y) => scrollTo(0, y), midpoint - 300);
+  await expect.poll(() => page.locator('[data-journey-line]').first().evaluate((el) => getComputedStyle(el).strokeDashoffset)).toBe('1px');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => page.locator('[data-journey-line]').first().getAttribute('d')).not.toBe(desktopPath);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  const positions = await items.evaluateAll((els) => els.map((el) => {
+    const r = el.getBoundingClientRect();
+    return { left: r.left, right: r.right };
+  }));
+  expect(positions.every((p) => p.left === positions[0].left && p.right === positions[0].right)).toBe(true);
+  await expect(page.locator('[data-journey-preview]').first()).toBeHidden();
+  await page.goto('/categories/数学笔记/');
+  await expect(page.locator('.ed-list')).toBeVisible();
+  await expect(page.locator('[data-journey]')).toHaveCount(0);
+});
+
+test('专栏手绘散落保持稳定，封面预览支持指针与键盘且不越界', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/categories/python基础/');
+  const first = page.locator('.journey-card').first();
+  await first.scrollIntoViewIfNeeded();
+  await expect(first).toHaveCSS('opacity', '1');
+  const desktop = await page.locator('[data-journey-item]').evaluateAll((els) => els.map((el) => {
+    const r = el.getBoundingClientRect();
+    return { left: r.left, right: r.right, top: r.top + scrollY };
+  }));
+  expect(new Set(desktop.map((r) => Math.round(r.left))).size).toBeGreaterThan(2);
+  expect(desktop.every((r, i) => i === 0 || r.top > desktop[i - 1].top)).toBe(true);
+  expect(desktop.every((r) => r.left >= 0 && r.right <= 1440)).toBe(true);
+  await expect(page.locator('.journey-board')).toHaveCount(1);
+  await expect(page.locator('.journey-card-outline')).toHaveCount(15);
+  await expect(page.locator('.journey-card-pencil')).toHaveCount(15);
+  await expect(page.locator('[data-journey-pin]')).toHaveCount(15);
+  await expect(page.locator('[data-journey-in]')).toHaveCount(15);
+  await expect(page.locator('[data-journey-out]')).toHaveCount(15);
+  await expect(page.locator('.journey-paper-back')).toHaveCount(15);
+  await expect(page.locator('[data-journey-line]')).toHaveCount(14);
+  await expect(page.locator('[data-journey-echo]')).toHaveCount(14);
+  await expect(page.locator('[data-journey-grain]')).toHaveCount(14);
+  const preview = page.locator('[data-journey-preview="0"]');
+  await first.hover({ position: { x: 120, y: 100 } });
+  await expect(preview).toBeVisible();
+  await expect(preview.locator('img')).toHaveAttribute('alt', '');
+  await expect.poll(() => preview.locator('img').evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+  let box = await preview.boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(1440);
+  expect(box.y + box.height).toBeLessThanOrEqual(900);
+  await page.mouse.move(5, 5);
+  await expect(preview).toBeHidden();
+  // 键盘事件由鼠标之后产生，依然必须匹配 :focus-visible 才显示封面。
+  await page.keyboard.press('Tab');
+  await first.focus();
+  await expect(first).toBeFocused();
+  await expect(preview).toBeVisible();
+  await page.keyboard.press('Tab');
+  await expect(preview).toBeHidden();
+
+  // 靠近视口右下角时仍完整显示，浮层不能截断。
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  const last = page.locator('.journey-card').last();
+  await last.hover({ position: { x: 300, y: 100 } });
+  const lastPreview = page.locator('[data-journey-preview="14"]');
+  await expect(lastPreview).toBeVisible();
+  box = await lastPreview.boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(1440);
+  expect(box.y + box.height).toBeLessThanOrEqual(900);
+  await page.mouse.move(5, 5);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await last.hover();
+  await expect(lastPreview).toBeHidden();
+
+  for (const width of [761, 1000, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${width} 宽散落卡片溢出`).toBe(true);
+  }
+});
+
+test('专栏触屏点击直接打开文章，不经过封面预览', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  await page.goto('/categories/python基础/');
+  await expect(page.locator('[data-journey-preview]').first()).toBeHidden();
+  await page.locator('.journey-card').first().tap();
+  await expect(page).toHaveURL(/\/post\/python-zero-setup\/$/);
+  await context.close();
+});
+
+
+test('专栏在减少动态效果与无 JavaScript 时完整可读', async ({ page, browser }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/categories/python基础/');
+  await expect(page.locator('[data-journey-item]').first()).toBeVisible();
+  expect(await page.locator('[data-journey-item]').evaluateAll((els) => els.every((el) => getComputedStyle(el).opacity === '1'))).toBe(true);
+  expect(await page.locator('[data-journey-line]').evaluateAll((els) => els.every((el) => getComputedStyle(el).strokeDashoffset === '0px'))).toBe(true);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('[data-journey-item]').nth(1)).not.toHaveClass(/is-reached/);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('[data-journey-item]').nth(14)).toHaveClass(/is-reached/);
+  await expect(page.locator('[data-journey-line]').first()).toHaveCSS('stroke-dashoffset', '0px');
+
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const staticPage = await context.newPage();
+  await staticPage.goto('/categories/python基础/');
+  await expect(staticPage.locator('.journey-card').first()).toBeVisible();
+  await expect(staticPage.locator('.journey-card').last()).toBeVisible();
+  await expect(staticPage.locator('.page-hero .hero-title')).toBeVisible();
+  // 无 JS 时相邻卡片之间画静态短箭头；脚本接管后换逐段曲线。
+  expect(await staticPage.evaluate(() => {
+    const li = document.querySelector('[data-journey-item]');
+    return Number.parseFloat(getComputedStyle(li, '::after').height) > 20;
+  })).toBe(true);
+  await context.close();
+});
+
 test('移动端正文列完整落在视口内，不被裁切到左侧外', async ({ page }) => {
   // 回归：单栏 @media 覆盖若写在 .post-body-grid 基础规则之前，会被同特异性的
   // 三栏基础规则覆盖；两侧 aside 隐藏后正文落进 200px 轨道，再被

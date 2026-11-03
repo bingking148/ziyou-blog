@@ -50,6 +50,15 @@ const { index, label, title, lede, meta } = Astro.props;
     margin: 0; font-family: var(--font-serif); font-size: 26px; line-height: 1;
     color: var(--color-text-strong);
   }
+  @media (min-width: 1440px) {
+    .page-hero { display: grid; grid-template-columns: minmax(160px, .45fr) minmax(0, 1.4fr) auto; gap: var(--wide-gap); align-items: end; padding: 116px 0 64px; }
+    .hero-top { align-self: start; margin: 18px 0 0; }
+    .hero-main { display: block; }
+    .hero-title { font-size: clamp(48px, 4.3vw, 76px); }
+    .hero-lede { max-width: 680px; margin-top: 24px; font-size: 15px; }
+    .hero-meta { margin: 0; gap: 44px; padding-bottom: 5px; }
+    .hero-meta-item dd { font-size: 32px; }
+  }
   @media (max-width: 760px) {
     .page-hero { padding: 56px 0 32px; }
     .hero-meta { gap: 24px; }

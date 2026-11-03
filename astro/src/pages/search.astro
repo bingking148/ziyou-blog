@@ -9,7 +9,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
 ---
 
 <Base title="搜索" description="站内搜索" noindex>
-  <div class="ed-wrap search-page">
+  <div class="ed-wrap ed-wrap--wide search-page">
     <div class="search-top" data-reveal>
       <span class="ed-label">02 / SEARCH</span>
       <p class="search-hint">在 {posts.length} 篇文字里，找到你想读的那一篇。</p>
@@ -298,6 +298,28 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
   }
   .search-results :global(.result-row time) { flex-shrink: 0; padding-top: 6px; font-size: 11px; letter-spacing: .06em; color: var(--color-text-muted); }
   .search-results :global(.result-row .row-arrow) { padding-top: 4px; }
+  @media (min-width: 1440px) {
+    .search-page { max-width: var(--wide-content); }
+    .search-top { display: grid; grid-template-columns: minmax(160px, .45fr) minmax(0, 1.4fr) auto; gap: var(--wide-gap); align-items: end; padding: 116px 0 64px; }
+    .search-top .ed-label { align-self: start; margin-top: 18px; }
+    .search-hint { margin: 0; font-family: var(--font-serif); font-size: clamp(28px, 2.8vw, 46px); line-height: 1.65; color: var(--color-text-strong); }
+    .search-field { grid-column: 1 / -1; }
+    .search-page { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); column-gap: var(--wide-gap); }
+    .search-top { grid-column: 1 / -1; }
+    .search-field { margin-top: 0; padding: 24px 0; }
+    #search-input { font-size: clamp(32px, 3.2vw, 52px); }
+    .search-suggest { align-self: center; justify-content: flex-end; margin-top: 0; }
+    .search-status { grid-column: 1 / -1; margin: 72px 0 28px; }
+    .search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--wide-gap); border-top: 0; }
+    .search-results { grid-column: 1 / -1; }
+    .search-results :global(li) { min-width: 0; border-top: 1px solid var(--color-card-border); }
+    .search-results :global(.result-row) { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px 20px; min-height: 180px; padding: 28px 16px 28px 4px; }
+    .search-results :global(.result-body h3) { font-size: 20px; line-height: 1.6; }
+    .search-results :global(.result-body p) { display: -webkit-box; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .search-results :global(.result-row time) { grid-column: 2; grid-row: 2; padding-top: 0; }
+    .search-results :global(.result-row .row-arrow) { grid-column: 3; grid-row: 1; }
+    .search-noscript { grid-column: 1 / -1; }
+  }
   @media (max-width: 760px) {
     .search-top { padding-top: 48px; }
     .search-field { margin-top: 40px; }

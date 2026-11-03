@@ -61,7 +61,7 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
 ---
 
 <Base title="关于" description={`关于 ${AUTHOR}：${SITE_DESCRIPTION}`}>
-  <div class="ed-wrap">
+  <div class="ed-wrap ed-wrap--wide">
     <PageHero index="01" label="ABOUT" title="关于" lede="一个仍在学习的人，和一块留给好奇心的地方。" />
 
     <!-- 自述 -->
@@ -118,6 +118,8 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
       </div>
     </section>
 
+    <!-- 兴趣与联系 -->
+    <div class="about-lower">
     <!-- 兴趣 -->
     <section class="about-section" data-reveal>
       <h2 class="section-title"><span class="ed-label">INTERESTS</span>平时在做</h2>
@@ -147,6 +149,7 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
         </span>
       </div>
     </section>
+    </div>
   </div>
 </Base>
 
@@ -215,6 +218,23 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
   .contact-name { font-size: 13px; letter-spacing: .1em; color: var(--color-text-muted); }
   .contact-value { font-family: var(--font-code); font-size: 20px; letter-spacing: .04em; color: var(--color-text-strong); }
 
+  @media (min-width: 1440px) {
+    .about-intro { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: var(--wide-gap); align-items: end; padding: 48px 0 90px; }
+    .about-lead { max-width: 1080px; margin: 0; font-size: clamp(28px, 2.7vw, 44px); }
+    .about-sub { max-width: 460px; font-size: 15px; }
+    .stats-band { display: grid; grid-template-columns: minmax(480px, .9fr) minmax(0, 1.1fr); gap: var(--wide-gap); align-items: center; margin-right: calc(-1 * var(--wide-gutter)); margin-left: calc(-1 * var(--wide-gutter)); margin-bottom: 110px; padding: 60px var(--wide-gutter); }
+    .stats-grid { gap: 28px 0; }
+    .stat-num { font-size: clamp(42px, 4vw, 62px); }
+    .rhythm { margin-top: 0; padding: 0 0 0 var(--wide-gap); border-top: 0; border-left: 1px solid rgba(255,255,255,.14); }
+    .rhythm-chart { height: 150px; }
+    .tech-grid { gap: var(--wide-gap); }
+    .tech-group { padding: 8px 0 8px 28px; border-left: 1px solid var(--color-card-border); }
+    .tech-group h3 { font-size: 17px; }
+    .tech-group li { font-size: 14px; }
+    .about-lower { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); gap: var(--wide-gap); }
+    .about-lower .about-section { margin-bottom: 0; }
+    .contact-links { flex-direction: column; align-items: flex-start; gap: 20px; }
+  }
   @media (max-width: 760px) {
     .about-intro { padding: 24px 0 48px; }
     .stats-band { padding: 32px 24px 24px; margin-bottom: 56px; }

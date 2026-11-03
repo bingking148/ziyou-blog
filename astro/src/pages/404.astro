@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base title="页面走丢了" noindex>
-  <div class="ed-wrap nf-wrap" data-reveal>
+  <div class="ed-wrap ed-wrap--wide nf-wrap" data-reveal>
     <span class="ed-label">ERROR / 404</span>
     <p class="nf-code">404</p>
     <h1 class="nf-title">这一页不存在</h1>
@@ -33,4 +33,12 @@ import Base from '../layouts/Base.astro';
   .nf-title { margin: 16px 0 10px; font-size: 26px; font-weight: 500; }
   .nf-desc { margin: 0 0 32px; font-size: 14px; color: var(--color-text-muted); }
   .nf-actions { display: flex; gap: 28px; flex-wrap: wrap; }
+  @media (min-width: 1440px) {
+    .nf-wrap { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(0, 1.3fr); grid-template-rows: auto auto auto auto; gap: 0 var(--wide-gap); align-content: center; min-height: 78vh; }
+    .nf-wrap > .ed-label { grid-column: 1; grid-row: 1; align-self: start; margin-top: 26px; }
+    .nf-code { grid-column: 1; grid-row: 2 / 5; align-self: start; margin-top: 40px; font-size: clamp(150px, 16vw, 300px); }
+    .nf-title { grid-column: 2; grid-row: 2; margin: 30px 0 20px; font-size: clamp(38px, 4vw, 64px); }
+    .nf-desc { grid-column: 2; grid-row: 3; max-width: 540px; font-size: 16px; line-height: 1.95; }
+    .nf-actions { grid-column: 2; grid-row: 4; }
+  }
 </style>

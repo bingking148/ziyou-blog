@@ -358,13 +358,13 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     content: ''; position: absolute; left: 50%; bottom: 0; width: 3px; height: 3px;
     border-radius: 50%; background: currentColor; transform: translateX(-50%); opacity: .75;
   }
-  .nav-pill {
+  :global(.nav-pill) {
     position: absolute; z-index: -1; top: 2px; left: 0; height: calc(100% - 4px);
     border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.13);
     opacity: 0; pointer-events: none; backdrop-filter: blur(8px);
     transition: transform .5s cubic-bezier(.34,1.56,.64,1), width .5s cubic-bezier(.34,1.56,.64,1), opacity .3s;
   }
-  .nav-pill.is-ready { opacity: 1; }
+  :global(.nav-pill.is-ready) { opacity: 1; }
   .header-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; }
   #theme-toggle, #nav-toggle {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0;

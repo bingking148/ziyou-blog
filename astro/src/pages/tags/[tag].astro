@@ -24,9 +24,9 @@ const fmt = (d: Date) =>
 ---
 
 <Base title={`标签：${name}`} description={`标签「${name}」下的文章`}>
-  <div class="ed-wrap">
+  <div class="ed-wrap ed-wrap--wide">
     <PageHero index="07" label="TAG" title={`#${name}`} meta={[{ value: String(posts.length), label: '篇文章' }]} />
-    <ol class="ed-list" data-reveal>
+    <ol class="ed-list wide-list-grid" data-reveal>
       {posts.map((p, i) => (
         <li>
           <a class="ed-row" href={postUrl(p)}>

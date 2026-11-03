@@ -13,7 +13,7 @@ const posts = (await getCollection('post')).sort(
 const columns = (await getCollection('columns')).sort((a, b) => a.data.order - b.data.order);
 const latest = posts[0];
 const heroIndex = posts.slice(0, 3);
-const recent = posts.slice(1, 8);
+const recent = posts.slice(1, 7);
 // 随想位：从「人工智能学习」专栏随机抽一篇（构建时随机；dev 下每次刷新都换）
 const aiColumn = columns.find((c) => c.data.category === '人工智能学习');
 const aiPool = aiColumn ? columnPosts(aiColumn, posts) : [];
@@ -485,7 +485,7 @@ const shortTitle = (t: string) => t.split('——')[0];
 <style>
   /* ===== 三幕开场 ===== */
   .scene { position: relative; height: 100svh; min-height: 660px; overflow: hidden; color: #fff; background: #0a1420; }
-  .scene.has-motion { height: 240svh; min-height: 1500px; overflow: visible; }
+  .scene.has-motion { height: 240svh; min-height: 1500px; overflow-x: clip; overflow-y: visible; }
   .scene-pin {
     --hero-y: 0vh; --hero-scale: 1.04; --hero-blur: 0px; --hero-opacity: 1;
     --copy-y: 0vh; --copy-opacity: 1; --copy-blur: 0px;
@@ -763,6 +763,75 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   @supports (transform: translateZ(1px)) {
     .series-visual, .interlude-image, .preview-card { transform-origin: 50% 48%; }
+  }
+
+  /* ===== 宽屏杂志编排：从 1440px 起增加并列关系，而不是单纯放大中央窄栏 ===== */
+  @media (min-width: 1440px) {
+    .journal { max-width: var(--wide-content); padding-right: var(--wide-gutter); padding-left: var(--wide-gutter); }
+    /* 全宽画幅中倾斜闪卡的装饰性投影可以出画，但不能扩大页面滚动区域。 */
+    .journal { overflow-x: clip; }
+    .opening { display: grid; grid-template-columns: minmax(130px, .34fr) minmax(0, 1.8fr); gap: var(--wide-gap); padding: 160px 0 170px; }
+    .opening .section-no { padding-top: 17px; }
+    .opening-text { max-width: 1080px; font-size: clamp(30px, 2.35vw, 42px); }
+    .opening-mark { right: 0; top: 56px; font-size: 280px; }
+    .section-head { margin-bottom: 62px; }
+    .series { padding-bottom: 160px; }
+    .series-grid {
+      grid-template-columns: 1.18fr .94fr 1.06fr .94fr;
+      gap: clamp(24px, 2.2vw, 44px);
+      padding: 0;
+      align-items: start;
+    }
+    .series-item-2 { margin-top: 88px; }
+    .series-item-3 { margin-top: 24px; }
+    .series-item-4 { margin-top: 116px; }
+    .series-item-1 .series-visual { aspect-ratio: 1.28; }
+    .series-item-2 .series-visual { aspect-ratio: 1.02; }
+    .series-item-3 .series-visual { aspect-ratio: 1.22; }
+    .series-item-4 .series-visual { aspect-ratio: 1.08; }
+    .series-body { padding-top: 24px; }
+    .series-body h3 { font-size: clamp(22px, 1.45vw, 30px); }
+    .series-body > p { font-size: 14px; }
+    .interlude {
+      /* 杂志跨页：中等图（限宽）+ 右侧文案，整体居中，图不随视口膨胀。 */
+      grid-template-columns: minmax(0, 720px) minmax(320px, .9fr);
+      justify-content: center;
+      gap: clamp(48px, 4vw, 88px);
+      align-items: center;
+      margin-right: calc(-1 * var(--wide-gutter));
+      margin-left: calc(-1 * var(--wide-gutter));
+      margin-bottom: 150px;
+      padding: clamp(56px, 4vw, 84px) var(--wide-gutter);
+    }
+    .interlude-image { aspect-ratio: 1.5; }
+    .interlude-copy h2 { font-size: clamp(28px, 1.9vw, 36px); }
+    .interlude-copy > p:not(.interlude-kicker) { font-size: 15px; -webkit-line-clamp: 5; }
+    .latest { padding-bottom: 190px; }
+    .latest-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px var(--wide-gap); border-top: 0; }
+    .latest-list > li { min-width: 0; border-top: 1px solid var(--color-card-border); border-bottom: 1px solid var(--color-card-border); background: color-mix(in srgb, var(--color-surface) 58%, transparent); }
+    .latest-list > li:nth-child(even) { transform: none; }
+    /* 卡片统一顶对齐，节奏靠列间留白与呼吸，不做会让标题错行的垂直位移。 */
+    .latest-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 16px; grid-template-rows: auto auto; gap: 8px 16px; min-height: 132px; padding: 26px 20px; border-bottom: 0; align-items: start; }
+    .latest-row .latest-no { grid-row: 1; padding-top: 5px; }
+    .latest-title-wrap { grid-row: 1; }
+    .latest-row time { grid-column: 2; grid-row: 2; }
+    .latest-arrow { grid-column: 3; grid-row: 1; }
+    .latest-title-wrap h3 { font-size: clamp(17px, 1.15vw, 22px); line-height: 1.55; }
+    .latest-cat { font-size: 12px; }
+    .latest-preview { right: 6%; width: 230px; }
+    .latest-more { margin-top: 60px; }
+    .colophon { grid-template-columns: minmax(0, 1.5fr) minmax(300px, .7fr); gap: var(--wide-gap); padding: 94px 0 120px; }
+    .colophon-main h2 { font-size: clamp(36px, 3vw, 54px); }
+    .colophon-main > p { max-width: 560px; font-size: 15px; }
+    .colophon-knob { justify-self: end; min-width: 280px; }
+  }
+  @media (min-width: 1900px) {
+    .opening { grid-template-columns: minmax(180px, .4fr) minmax(0, 1.8fr); }
+    .series-grid { gap: 44px; }
+    .series-item-2 { margin-top: 96px; }
+    .series-item-4 { margin-top: 132px; }
+    .latest-list { column-gap: 64px; }
+    .latest-row { min-height: 142px; }
   }
 
   @media (max-width: 1000px) {

@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import ResponsiveImage from '../../components/ResponsiveImage.astro';
+import ColumnJourney from '../../components/ColumnJourney.astro';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
 
 type Post = CollectionEntry<'post'>;
@@ -39,38 +40,35 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
   title={column ? column.data.title : `分类：${name}`}
   description={column?.data.description ?? `分类「${name}」下的文章`}
   cover={column?.data.cover}
+  pageClass={column ? 'is-column-journey' : ''}
 >
   {column && ColumnContent ? (
-    <div class="ed-wrap">
-      <PageHero
-        index="05"
-        label="SERIES"
-        title={column.data.title}
-        lede={column.data.description}
-        meta={[{ value: String(columnList.length), label: '篇目' }]}
-      />
-      <div class="column-banner" data-reveal>
-        <ResponsiveImage src={column.data.cover} alt={column.data.title} sizes="(max-width: 1080px) 100vw, 1080px" loading="eager" />
+    <div class="ed-wrap ed-wrap--wide">
+      <div class="column-masthead">
+        <PageHero
+          index="05"
+          label="SERIES"
+          title={column.data.title}
+          lede={column.data.description}
+          meta={[{ value: String(columnList.length), label: '篇目' }]}
+        />
+        <figure class="column-visual" data-reveal>
+          <div class="column-visual-top"><span>CURATED NOTES</span><span>VOL. 05</span></div>
+          <div class="column-banner">
+            <ResponsiveImage src={column.data.cover} alt={column.data.title} sizes="(max-width: 1000px) 100vw, 46vw" loading="eager" />
+          </div>
+          <figcaption><span>按顺序，慢慢读懂。</span><span aria-hidden="true">READ / THINK / MAKE</span></figcaption>
+        </figure>
       </div>
       <div class="prose column-intro" data-reveal>
         <ColumnContent />
       </div>
-      <ol class="ed-list column-list" data-reveal>
-        {columnList.map((p) => (
-          <li>
-            <a class="ed-row" href={postUrl(p)}>
-              <span class="row-no">{num(p.data.weight)}</span>
-              <span class="row-title">{p.data.title}</span>
-              <time class="row-meta" datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
-            </a>
-          </li>
-        ))}
-      </ol>
+      <ColumnJourney posts={columnList} total={columnList.length} />
     </div>
   ) : (
-    <div class="ed-wrap">
+    <div class="ed-wrap ed-wrap--wide">
       <PageHero index="06" label="CATEGORY" title={name} meta={[{ value: String(inCategory.length), label: '篇文章' }]} />
-      <ol class="ed-list" data-reveal>
+      <ol class="ed-list wide-list-grid" data-reveal>
         {inCategory.map((p, i) => (
           <li>
             <a class="ed-row" href={postUrl(p)}>
@@ -86,12 +84,96 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 </Base>
 
 <style>
-  .column-banner { overflow: hidden; aspect-ratio: 2.6; margin-bottom: 40px; }
+  /* 专题序章：像一本展开的学习手册，而不是一张通栏海报。 */
+  :global(.is-column-journey .ed-wrap) { max-width: min(var(--max-width), calc(100vw - 48px)); }
+  .column-masthead { position: relative; border-bottom: 1px solid var(--color-card-border); }
+  .column-masthead :global(.page-hero) { position: relative; z-index: 1; }
+  .column-masthead :global(.hero-title) { text-wrap: balance; }
+  .column-visual { position: relative; margin: 0 0 58px; padding: 14px; background: var(--color-surface-muted); }
+  .column-visual::before { content: ''; position: absolute; z-index: -1; inset: 16px -12px -12px 16px; border: 1px solid var(--red-3); pointer-events: none; }
+  .column-visual-top, .column-visual figcaption { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--color-text-muted); font-size: 9px; letter-spacing: .18em; }
+  .column-visual-top { margin: 0 2px 13px; }
+  .column-visual figcaption { margin: 13px 2px 0; letter-spacing: .08em; }
+  .column-banner { overflow: hidden; aspect-ratio: 1.85; background: var(--red-4); }
   .column-banner img { width: 100%; height: 100%; object-fit: cover; }
-  .column-intro { max-width: 760px; margin-bottom: 48px; font-size: 15px; }
+  .column-intro { max-width: 780px; margin: 44px 0 0; font-size: 15px; }
+  .column-intro :global(p:first-child > a:only-child) { color: var(--red-2); font-size: 12px; letter-spacing: .08em; }
+  .column-intro :global(p:first-child) { margin: 0 0 26px; }
+  .column-intro :global(p:first-child::first-letter) { all: unset; }
+  .column-intro :global(h2) { margin-top: 32px; font-size: 20px; }
+  .column-intro :global(h2 + p) { margin-top: 12px; }
   .column-list .row-title { font-size: 16px; }
+  /* 专栏页独享的入场编排；无 JS 时所有内容保持原始可见状态。 */
+  :global(html.js .is-column-journey .page-hero .hero-top),
+  :global(html.js .is-column-journey .page-hero .hero-title),
+  :global(html.js .is-column-journey .page-hero .hero-lede),
+  :global(html.js .is-column-journey .page-hero .hero-meta) {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .8s ease-out, transform .8s cubic-bezier(.2,.7,.2,1);
+  }
+  :global(html.js .is-column-journey .page-hero.is-visible .hero-top),
+  :global(html.js .is-column-journey .page-hero.is-visible .hero-title),
+  :global(html.js .is-column-journey .page-hero.is-visible .hero-lede),
+  :global(html.js .is-column-journey .page-hero.is-visible .hero-meta) { opacity: 1; transform: translateY(0); }
+  :global(html.js .is-column-journey .page-hero .hero-title) { transition-delay: .1s; }
+  :global(html.js .is-column-journey .page-hero .hero-lede) { transition-delay: .18s; }
+  :global(html.js .is-column-journey .page-hero .hero-meta) { transition-delay: .25s; }
+  :global(html.js .is-column-journey .page-hero .hero-rule) { transform: scaleX(0); transform-origin: left; transition: transform 1.1s .12s cubic-bezier(.2,.7,.2,1); }
+  :global(html.js .is-column-journey .page-hero.is-visible .hero-rule) { transform: scaleX(1); }
+  :global(html.js .is-column-journey .column-visual) { opacity: 0; transform: translateY(22px) rotate(1.5deg); transition: opacity .9s .16s ease-out, transform 1.1s .16s cubic-bezier(.2,.7,.2,1); }
+  :global(html.js .is-column-journey .column-visual.is-visible) { opacity: 1; transform: none; }
+  :global(html.js .is-column-journey .column-banner) { clip-path: inset(0 100% 0 0); transition: clip-path 1.15s .3s cubic-bezier(.2,.7,.2,1); }
+  :global(html.js .is-column-journey .column-visual.is-visible .column-banner) { clip-path: inset(0); }
+  :global(html.js .is-column-journey .column-banner img) { transform: scale(1.06); transition: transform 1.6s .3s cubic-bezier(.2,.7,.2,1); }
+  :global(html.js .is-column-journey .column-visual.is-visible .column-banner img) { transform: scale(1); }
+  :global(html.js .is-column-journey .column-intro) { transform: translateY(16px); transition: opacity .8s ease-out, transform .8s cubic-bezier(.2,.7,.2,1); }
+  :global(html.js .is-column-journey .column-intro.is-visible) { transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js .is-column-journey .page-hero .hero-top),
+    :global(html.js .is-column-journey .page-hero .hero-title),
+    :global(html.js .is-column-journey .page-hero .hero-lede),
+    :global(html.js .is-column-journey .page-hero .hero-meta),
+    :global(html.js .is-column-journey .column-intro) { opacity: 1; transform: none; transition: none; }
+    :global(html.js .is-column-journey .page-hero .hero-rule) { transform: scaleX(1); transition: none; }
+    :global(html.js .is-column-journey .column-visual) { opacity: 1; transform: none; transition: none; }
+    :global(html.js .is-column-journey .column-banner) { clip-path: none; transition: none; }
+    :global(html.js .is-column-journey .column-banner img) { transform: none; transition: none; }
+  }
+  @media (min-width: 1001px) {
+    .column-masthead { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr); gap: clamp(48px, 5vw, 92px); align-items: center; padding: 54px 0 64px; }
+    .column-masthead :global(.page-hero) { padding: 0; }
+    .column-masthead :global(.hero-title) { font-size: clamp(48px, 5vw, 76px); }
+    .column-masthead :global(.hero-main) { display: block; }
+    .column-masthead :global(.hero-lede) { max-width: 550px; margin-top: 26px; }
+    .column-visual { margin: 34px 16px 0 0; transform: rotate(1deg); }
+    .column-intro { margin-top: 44px; padding-left: clamp(36px, 5vw, 90px); border-left: 1px solid var(--color-card-border); }
+  }
+  @media (min-width: 1440px) {
+    :global(.is-column-journey .ed-wrap) { max-width: var(--wide-content); }
+    .column-masthead { grid-template-columns: minmax(0, 1.25fr) minmax(480px, .75fr); gap: clamp(64px, 5vw, 100px); padding: 68px 4% 72px; }
+    .column-masthead :global(.page-hero) { display: block; }
+    .column-masthead :global(.hero-top) { margin: 0 0 38px; }
+    .column-masthead :global(.hero-title) { font-size: clamp(58px, 4.5vw, 84px); }
+    .column-masthead :global(.hero-meta) { margin-top: 42px; }
+    .column-visual { margin-top: 56px; }
+    .column-intro { max-width: 920px; margin: 48px 0 0 4%; }
+  }
+  @media (max-width: 1000px) {
+    .column-masthead :global(.page-hero) { padding-bottom: 38px; }
+    .column-visual { max-width: 760px; margin: 0 auto 46px; }
+    .column-intro { max-width: none; }
+  }
   @media (max-width: 760px) {
-    .column-banner { aspect-ratio: 1.8; margin-bottom: 28px; }
+    .column-masthead :global(.page-hero) { padding-top: 50px; }
+    .column-masthead :global(.hero-main) { display: block; }
+    .column-masthead :global(.hero-title) { font-size: clamp(34px, 9vw, 48px); }
+    .column-masthead :global(.hero-lede) { margin-top: 22px; }
+    .column-visual { margin: 0 6px 36px; padding: 10px; }
+    .column-visual::before { inset: 10px -7px -7px 10px; }
+    .column-visual figcaption > span:last-child { display: none; }
+    .column-banner { aspect-ratio: 1.8; }
+    .column-intro { margin-top: 34px; font-size: 14px; }
     .column-list .row-meta { display: none; }
   }
 </style>

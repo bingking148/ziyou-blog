@@ -37,6 +37,10 @@
 
   /* 布局 */
   --max-width: 1350px;
+  /* 1440px 起切为全流宽；手机与平板完全不读这组变量。 */
+  --wide-content: 1350px;
+  --wide-gutter: clamp(24px, 5vw, 64px);
+  --wide-gap: clamp(36px, 3.5vw, 68px);
   --radius: 16px;
 
   color-scheme: light;
@@ -259,6 +263,28 @@ img { max-width: 100%; height: auto; }
   .ed-wrap { padding-bottom: 64px; }
   .ed-row { padding: 16px 0; gap: 14px; }
   .ed-row .row-title { font-size: 15.5px; }
+}
+
+/* 宽屏不是把一根正文列拉满，而是让章节与索引进入多栏画廊。
+   只由显式标记的页面启用，旧页面和平板/手机布局不受影响。 */
+@media (min-width: 1440px) {
+  :root {
+    /* 桌面全流宽：版心不再封顶，始终只留下屏幕安全边距。 */
+    --wide-content: 100%;
+    --wide-gutter: clamp(20px, 1.8vw, 40px);
+    --wide-gap: clamp(42px, 3.5vw, 68px);
+  }
+  .ed-wrap--wide { max-width: var(--wide-content); padding-right: var(--wide-gutter); padding-left: var(--wide-gutter); }
+  .wide-list-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--wide-gap); border-top: 0; }
+  .wide-list-grid > li { min-width: 0; border-top: 1px solid var(--color-card-border); }
+  .wide-list-grid .ed-row { min-height: 88px; padding: 23px 14px 23px 6px; gap: 20px; }
+  .wide-list-grid .row-title { font-size: 18px; line-height: 1.65; }
+  .wide-list-grid .ed-row:hover { background: var(--red-5-5); }
+}
+@media (min-width: 1900px) {
+  :root { --wide-gutter: clamp(28px, 1.8vw, 40px); --wide-gap: 76px; }
+  .wide-list-grid .ed-row { min-height: 96px; }
+  .wide-list-grid .row-title { font-size: 19px; }
 }
 
 /* ============================================================

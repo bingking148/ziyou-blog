@@ -14,7 +14,7 @@ const max = Math.max(...tags.map(([, c]) => c));
 ---
 
 <Base title="标签" description="文章标签">
-  <div class="ed-wrap">
+  <div class="ed-wrap ed-wrap--wide">
     <PageHero index="07" label="TAGS" title="标签" lede="按关键词，找到同一主题的文字。" meta={[{ value: String(tags.length), label: '个标签' }]} />
     <div class="tag-cloud" data-reveal>
       {tags.map(([name, count]) => (
@@ -34,4 +34,9 @@ const max = Math.max(...tags.map(([, c]) => c));
   .tag-cloud { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: baseline; }
   .cloud-tag { font-weight: 400; }
   .cloud-tag sup { margin-left: 5px; font-size: 10px; opacity: .6; }
+  @media (min-width: 1440px) {
+    .tag-cloud { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--wide-gap); align-items: start; border-top: 1px solid var(--color-card-border); }
+    .cloud-tag { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-width: 0; padding: 22px 10px 22px 0; border-bottom-color: var(--color-card-border); overflow-wrap: anywhere; }
+    .cloud-tag sup { flex-shrink: 0; font-size: 11px; }
+  }
 </style>

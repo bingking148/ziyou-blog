@@ -7,10 +7,10 @@
   },
   "scripts": {
     "predev": "node scripts/optimize-images.mjs",
-    "dev": "astro dev",
+    "dev": "astro dev --host",
     "prebuild": "node scripts/optimize-images.mjs",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro preview --host",
     "test:ui": "playwright test"
   },
   "dependencies": {

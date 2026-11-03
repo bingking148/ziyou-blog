@@ -9,7 +9,7 @@ import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
 
 <Base title="友情链接" description="友情链接与交换方式">
   <link slot="head" rel="stylesheet" href="/resources/waline/waline.css" />
-  <div class="ed-wrap">
+  <div class="ed-wrap ed-wrap--wide">
     <PageHero
       index="03"
       label="FRIENDS"
@@ -22,7 +22,7 @@ import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
     />
 
     <!-- 本站信息 -->
-    <section class="friend-section" data-reveal>
+    <section class="friend-section friend-site" data-reveal>
       <h2 class="section-title"><span class="ed-label">THIS SITE</span>本站信息</h2>
       <dl class="site-info">
         <div class="info-item"><dt>站名</dt><dd>{SITE_TITLE}</dd></div>
@@ -51,7 +51,7 @@ import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
     </section>
 
     <!-- 申请 -->
-    <section class="friend-section" data-reveal>
+    <section class="friend-section friend-exchange" data-reveal>
       <h2 class="section-title"><span class="ed-label">EXCHANGE</span>交换友链</h2>
       <p class="apply-note">先添加本站，然后在本页留言，按下面的格式留下你的信息。</p>
       <div class="apply-code">
@@ -107,6 +107,24 @@ import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
 
   .friend-comments { padding-top: 8px; border-top: 1px solid var(--color-card-border); }
 
+  @media (min-width: 1440px) {
+    .friend-site { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(0, 1.8fr); gap: var(--wide-gap); margin-bottom: 100px; }
+    .friend-site .section-title { display: block; margin: 0; }
+    .friend-site .section-title .ed-label { display: block; margin-bottom: 16px; }
+    .site-info { padding: 22px 0; }
+    .info-item dd { font-size: 23px; }
+    .friend-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px var(--wide-gap); border-top: 0; }
+    .friend-row { display: grid; grid-template-columns: 22px 100px minmax(0, 1fr) 20px; gap: 20px; min-height: 180px; padding: 30px 22px; border: 1px solid var(--color-card-border); background: color-mix(in srgb, var(--color-surface) 58%, transparent); }
+    .friend-avatar { width: 100px; height: 100px; }
+    .friend-url { grid-column: 3; font-size: 11px; }
+    .friend-arrow { grid-column: 4; grid-row: 1; }
+    .friend-exchange { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(260px, .75fr) minmax(0, 1.05fr); gap: var(--wide-gap); align-items: start; margin-bottom: 96px; }
+    .friend-exchange .section-title { display: block; margin: 0; }
+    .friend-exchange .section-title .ed-label { display: block; margin-bottom: 16px; }
+    .apply-note { margin: 0; line-height: 1.95; }
+    .apply-code { min-width: 0; }
+    .friend-comments { max-width: 1180px; margin-left: auto; }
+  }
   @media (max-width: 760px) {
     .friend-section { margin-bottom: 56px; }
     .section-title { font-size: 22px; gap: 12px; }

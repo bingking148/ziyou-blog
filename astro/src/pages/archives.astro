@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { postUrl } from '../utils/columns.ts';
 
 const posts = (await getCollection('post')).sort(
@@ -20,7 +21,7 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
 ---
 
 <Base title="归档" description={`全部 ${posts.length} 篇文章的时间归档`}>
-  <div class="ed-wrap">
+  <div class="ed-wrap ed-wrap--wide">
     <PageHero
       index="04"
       label="ARCHIVE"
@@ -37,7 +38,7 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
     {years.map((y) => (
       <section class="archive-year" data-reveal>
         <h2 class="archive-year-title"><span>{y}</span><i aria-hidden="true"></i></h2>
-        <ol class="ed-list">
+        <ol class="ed-list wide-list-grid">
           {byYear.get(y)!.map((p, i) => (
             <li>
               <a class="ed-row" href={postUrl(p)}>
@@ -45,6 +46,11 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
                 <span class="row-title">{p.data.title}</span>
                 <span class="row-meta archive-cats">{p.data.categories[0]}</span>
                 <time class="row-meta" datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+                {p.data.cover && (
+                  <span class="archive-preview" aria-hidden="true">
+                    <ResponsiveImage src={p.data.cover} sizes="240px" alt="" loading="lazy" />
+                  </span>
+                )}
               </a>
             </li>
           ))}
@@ -62,6 +68,24 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
   .archive-year-title span { font-size: clamp(32px, 3.6vw, 46px); font-weight: 500; color: var(--red-1); letter-spacing: .06em; }
   .archive-year-title i { flex: 1; height: 1px; background: var(--color-card-border); }
   .archive-year .ed-list { border-top: none; }
+  .archive-year li { position: relative; }
+  .archive-preview { position: absolute; right: 18%; top: 50%; z-index: 5; display: block; width: 240px; aspect-ratio: 1.45; overflow: hidden; pointer-events: none; visibility: hidden; opacity: 0; background: var(--red-4); box-shadow: 0 24px 60px rgba(15,30,50,.28); transform: translateY(-42%) rotate(4deg) scale(.9); transition: opacity .35s, transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s .45s; }
+  .archive-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .ed-row:hover .archive-preview, .ed-row:focus-visible .archive-preview { visibility: visible; opacity: 1; transform: translateY(-50%) rotate(-3deg) scale(1); transition-delay: 0s; }
+  @media (min-width: 1440px) {
+    .archive-year { margin-bottom: 104px; }
+    .archive-year-title { margin-bottom: 30px; }
+    .archive-year-title span { font-size: 58px; }
+    .archive-year .ed-list { column-gap: var(--wide-gap); }
+    .archive-discovery { margin-bottom: 76px; }
+  }
+  @media (min-width: 1900px) {
+    .archive-year-title span { font-size: 64px; }
+    .archive-year { margin-bottom: 124px; }
+  }
+  @media (max-width: 1000px), (hover: none), (prefers-reduced-motion: reduce) {
+    .archive-preview { display: none; }
+  }
   @media (max-width: 760px) {
     .archive-cats { display: none; }
     .archive-year { margin-bottom: 40px; }

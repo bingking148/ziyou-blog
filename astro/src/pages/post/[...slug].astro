@@ -286,8 +286,17 @@ const fmt = (d: Date) =>
 
       <aside class="post-mood-aside">
         <div class="mood-sticky">
-          <span class="sidebar-label">SET THE MOOD</span>
-          <MoodKnob />
+          <span class="sidebar-label">ARTICLE NOTES</span>
+          <dl class="post-side-meta">
+            <div><dt>发布日期</dt><dd>{fmt(post.data.date)}</dd></div>
+            <div><dt>全文</dt><dd>{wordCount} 字</dd></div>
+            <div><dt>阅读</dt><dd>约 {readingMinutes} 分钟</dd></div>
+            {column && <div><dt>所属专栏</dt><dd><a href={`/categories/${slugifyTaxonomy(column.data.category)}/`}>{column.data.title}</a></dd></div>}
+          </dl>
+          <div class="sidebar-mood">
+            <span class="sidebar-label">SET THE MOOD</span>
+            <MoodKnob />
+          </div>
         </div>
       </aside>
     </div>
@@ -566,6 +575,16 @@ const fmt = (d: Date) =>
   .hero-foot-line { flex: 1; height: 1px; background: rgba(255,255,255,.2); }
 
   .post-body-grid { display: grid; grid-template-columns: 200px minmax(0, 790px) 200px; justify-content: center; gap: clamp(40px,5vw,80px); align-items: start; max-width: 1500px; margin: 0 auto; padding: 100px clamp(24px,4vw,56px) 80px; }
+  @media (min-width: 1440px) {
+    .post-hero-content { left: var(--wide-gutter); width: min(1080px, 72vw); }
+    .post-hero-foot { left: var(--wide-gutter); right: var(--wide-gutter); }
+    .post-body-grid { grid-template-columns: 200px minmax(0, 820px) 220px; gap: clamp(32px, 2.8vw, 56px); max-width: none; padding-right: calc(var(--wide-gutter) + 64px); padding-left: var(--wide-gutter); }
+    .post-inner :global(.prose) { font-size: 17.5px; }
+  }
+  @media (min-width: 1900px) {
+    .post-body-grid { grid-template-columns: 250px minmax(0, 860px) 260px; gap: clamp(56px, 4.5vw, 88px); }
+    .reading-ruler { right: var(--wide-gutter); }
+  }
   /* 窄屏收单栏：必须写在 .post-body-grid 基础规则之后——同特异性下后声明者胜，
      放前面会被三栏基础规则覆盖，正文被挤进 200px 轨道并居中裁切（移动端阅读事故）。 */
   @media (max-width: 1100px) {
@@ -585,6 +604,11 @@ const fmt = (d: Date) =>
   .post-toc-aside :global(.toc-link.is-active) { background: transparent; font-weight: 500; }
   .post-toc-aside :global(.toc-link:hover) { background: transparent; }
   .post-mood-aside :global(.mood-knob-widget) { border: 0; box-shadow: none; background: transparent; }
+  .post-side-meta { margin: 0; }
+  .post-side-meta > div { padding: 13px 0; border-top: 1px solid var(--color-card-border); }
+  .post-side-meta dt { margin-bottom: 5px; font-size: 10px; letter-spacing: .12em; color: var(--color-text-muted); }
+  .post-side-meta dd { margin: 0; font-family: var(--font-serif); font-size: 14px; line-height: 1.65; color: var(--color-text-strong); }
+  .post-side-meta a { color: var(--color-link); }
 
   .post-inner :global(.prose) { font-size: 17px; line-height: 2.05; }
   .post-inner :global(.prose > p:first-of-type) { font-size: 18px; }

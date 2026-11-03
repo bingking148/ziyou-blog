@@ -13,7 +13,7 @@ export default defineConfig({
     navigationTimeout: 15_000,
   },
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4321',
+    command: 'npm exec astro preview -- --host 127.0.0.1 --port 4321',
     url: 'http://127.0.0.1:4321',
     reuseExistingServer: false,
     timeout: 60_000,

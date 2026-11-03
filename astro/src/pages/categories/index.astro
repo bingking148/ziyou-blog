@@ -13,9 +13,9 @@ const cats = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
 <Base title="分类" description="文章分类">
-  <div class="ed-wrap">
+  <div class="ed-wrap ed-wrap--wide">
     <PageHero index="06" label="CATEGORIES" title="分类" lede="按主题翻阅。" meta={[{ value: String(cats.length), label: '个分类' }]} />
-    <ol class="ed-list" data-reveal>
+    <ol class="ed-list wide-list-grid" data-reveal>
       {cats.map(([name, count], i) => (
         <li>
           <a class="ed-row" href={`/categories/${slugifyTaxonomy(name)}/`}>
