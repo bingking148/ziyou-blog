@@ -62,5 +62,8 @@ const { index, label, title, lede, meta } = Astro.props;
   @media (max-width: 760px) {
     .page-hero { padding: 56px 0 32px; }
     .hero-meta { gap: 24px; }
+    /* 窄屏「数量 + 单位」横排一行（视觉序：4 个专栏），竖排在手机上像断行 */
+    .hero-meta-item { flex-direction: row-reverse; align-items: baseline; gap: 8px; }
+    .hero-meta-item dd { font-size: 22px; }
   }
 </style>

@@ -72,6 +72,10 @@ const MAX_VISIBLE = 5;
     align-items: start;
     margin-bottom: 88px;
   }
+  /* 手机端 1fr 轨道会被封面图固有宽度（响应式变体 ~548px）顶开造成横向溢出，
+     grid 子项 min-width 归零后轨道才能收到视口内；图片自身也兜一层 max-width */
+  .column-block > * { min-width: 0; }
+  .column-cover img { max-width: 100%; }
   .column-block-1 { margin-left: 6%; }
   .column-cover { position: relative; display: block; overflow: hidden; aspect-ratio: 1.1; background: var(--red-4); }
   .column-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.2,.7,.2,1); }
