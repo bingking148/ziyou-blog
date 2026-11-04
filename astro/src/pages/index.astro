@@ -53,10 +53,17 @@ const shortTitle = (t: string) => t.split('——')[0];
       </div>
 
       <div class="scene-after" aria-hidden="true">
-        <span class="after-orbit after-orbit-a"></span>
-        <span class="after-orbit after-orbit-b"></span>
-        <p class="after-ghost">BEYOND<br />THE CODE</p>
-        <p class="after-caption">每一次下潜，都有新的风景。</p>
+        <svg class="after-lines" viewBox="0 0 1440 850" preserveAspectRatio="none">
+          <path class="after-rule" d="M0 690H1440M0 710H1440M1060 0V850M1080 0V850" />
+          <path class="after-cut" d="M-40 760L620 0M0 820L680 0" />
+        </svg>
+        <p class="after-kicker">CHAPTER 02 / NOTES ON CURIOSITY</p>
+        <p class="after-ghost"><span>BEYOND</span><span><em>THE</em> <b>CODE</b></span></p>
+        <p class="after-caption">
+          <span>代码之外，仍有世界。</span>
+          <span class="after-caption-en">A QUIET ARCHIVE OF<br />LOUD IDEAS.</span>
+        </p>
+        <span class="after-stamp">02</span>
       </div>
 
       <a class="scene-focus" href={postUrl(latest)} aria-label={`阅读最新文章：${latest.data.title}`}>
@@ -303,12 +310,15 @@ const shortTitle = (t: string) => t.split('——')[0];
         st.setProperty('--copy-opacity', (1 - ramp(p, 0.08, 0.36)).toFixed(3));
         st.setProperty('--copy-blur', (split * 7).toFixed(2) + 'px');
         st.setProperty('--after-opacity', reveal.toFixed(3));
-        st.setProperty('--after-scale', (0.76 + reveal * 0.24).toFixed(3));
+        st.setProperty('--after-scale', (0.9 + reveal * 0.1).toFixed(3));
+        st.setProperty('--after-clip', ((1 - reveal) * 46).toFixed(2) + '%');
+        st.setProperty('--after-title-y', ((1 - reveal) * 32).toFixed(2) + 'px');
+        st.setProperty('--after-lines-x', ((1 - reveal) * -40).toFixed(2) + 'px');
         st.setProperty('--focus-opacity', arrive.toFixed(3));
         st.setProperty('--focus-x', ((1 - arrive) * (mobile ? 34 : 58) - exit * 4) + 'vw');
         st.setProperty('--focus-y', ((1 - arrive) * 20 - exit * 9) + 'vh');
         st.setProperty('--focus-ry', ((1 - arrive) * -48 + exit * 12).toFixed(2) + 'deg');
-        st.setProperty('--focus-rz', ((1 - arrive) * 9 - exit * 2).toFixed(2) + 'deg');
+        st.setProperty('--focus-rz', ((1 - arrive) * 9 - arrive * 2 - exit * 2).toFixed(2) + 'deg');
         st.setProperty('--focus-scale', (0.82 + arrive * 0.18).toFixed(3));
         st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
         st.setProperty('--chapter', p < 0.4 ? '"01"' : p < 0.72 ? '"02"' : '"03"');
@@ -489,7 +499,8 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene-pin {
     --hero-y: 0vh; --hero-scale: 1.04; --hero-blur: 0px; --hero-opacity: 1;
     --copy-y: 0vh; --copy-opacity: 1; --copy-blur: 0px;
-    --after-opacity: 0; --after-scale: .76; --focus-opacity: 0;
+    --after-opacity: 0; --after-scale: .9; --after-clip: 46%;
+    --after-title-y: 32px; --after-lines-x: -40px; --focus-opacity: 0;
     --focus-x: 58vw; --focus-y: 20vh; --focus-ry: -48deg; --focus-rz: 9deg; --focus-scale: .82;
     --scene-progress: 0%; --chapter: "01";
     position: sticky; top: 0; height: 100svh; min-height: 620px; overflow: hidden;
@@ -532,39 +543,95 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: absolute; inset: 0; z-index: 0; overflow: hidden;
     opacity: var(--after-opacity);
     background:
-      radial-gradient(circle at 68% 42%, rgba(97,147,185,.22), transparent 34%),
-      radial-gradient(circle at 12% 92%, rgba(137,87,74,.18), transparent 40%),
-      linear-gradient(125deg, #09131f, #152738 64%, #0b1724);
+      radial-gradient(circle at 74% 20%, #f7fbfb 0, transparent 38%),
+      linear-gradient(125deg, #d4e4eb, #edf4f6 56%, #cbdfe8);
+    clip-path: inset(0 var(--after-clip) 0 var(--after-clip));
     transform: scale(var(--after-scale));
   }
-  .after-orbit { position: absolute; border: 1px solid rgba(185,213,234,.14); border-radius: 50%; transform: rotate(-24deg); }
-  .after-orbit-a { width: 78vw; height: 42vw; right: -15vw; top: 10%; }
-  .after-orbit-b { width: 58vw; height: 70vw; right: 0; top: -8%; }
-  .after-ghost {
-    position: absolute; left: 5vw; top: 50%; margin: 0;
-    transform: translateY(-50%); font-size: clamp(72px,10.5vw,180px); line-height: .98;
-    letter-spacing: -.04em; font-weight: 600; color: transparent;
-    -webkit-text-stroke: 1px rgba(192,217,236,.17);
+  .scene-after::before {
+    content: ""; position: absolute; inset: 0; z-index: 0;
+    background:
+      linear-gradient(90deg, transparent 49.95%, rgba(21,51,74,.09) 50%, transparent 50.05%),
+      linear-gradient(0deg, transparent 49.95%, rgba(21,51,74,.07) 50%, transparent 50.05%);
+    background-size: 8.333% 100%, 100% 20%;
   }
-  .after-caption { position: absolute; left: 6vw; bottom: 20%; margin: 0; font-size: 12px; letter-spacing: .24em; color: rgba(223,234,244,.55); }
+  .scene-after::after {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    opacity: .2; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
+  }
+  .after-lines {
+    position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%;
+    transform: translate3d(var(--after-lines-x), 0, 0);
+  }
+  .after-lines path { fill: none; vector-effect: non-scaling-stroke; }
+  .after-rule { stroke: #18374d; stroke-width: 1; opacity: .25; }
+  .after-cut { stroke: #b74c3b; stroke-width: 2; opacity: .9; }
+  .after-kicker {
+    position: absolute; z-index: 2; left: 5%; top: 7%; margin: 0;
+    color: #9e4033; font-size: clamp(8px, .8vw, 12px); letter-spacing: .28em;
+  }
+  .after-ghost {
+    position: absolute; z-index: 2; left: 4.3%; top: 14%; margin: 0;
+    transform: translateY(var(--after-title-y));
+    font-family: Arial, Helvetica, sans-serif; font-size: clamp(86px, 11vw, 190px);
+    font-weight: 900; line-height: .82; letter-spacing: -.085em; color: #102434;
+    white-space: nowrap; -webkit-text-stroke: 0;
+  }
+  .after-ghost > span { display: block; }
+  .after-ghost > span:last-child {
+    margin-left: 11vw; font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400; font-style: italic; letter-spacing: -.07em;
+  }
+  .after-ghost b { position: relative; isolation: isolate; color: #b74c3b; font-weight: 400; }
+  .after-ghost b::after {
+    content: ""; position: absolute; z-index: -1; left: -8%; top: 52%;
+    width: 120%; height: .09em; background: #102434; transform: rotate(-7deg);
+  }
+  .after-caption {
+    position: absolute; z-index: 2; left: 5%; bottom: 13%; margin: 0;
+    color: #344e61; font-size: clamp(10px, .9vw, 14px); letter-spacing: .15em; line-height: 1.85;
+  }
+  .after-caption-en { display: block; margin-top: 5px; font-size: .8em; letter-spacing: .18em; }
+  .after-stamp {
+    position: absolute; z-index: 2; right: 35.5%; bottom: 12%;
+    display: grid; place-items: center; width: clamp(68px, 7vw, 108px); aspect-ratio: 1;
+    border: 1px solid #a84536; border-radius: 50%; color: #a84536;
+    font-family: Georgia, serif; font-size: clamp(26px, 2.4vw, 40px);
+    transform: rotate(12deg);
+  }
   .scene-focus {
-    position: absolute; z-index: 3; right: 9vw; top: 50%; width: min(42vw, 580px);
+    position: absolute; z-index: 3; right: 5.5vw; top: 50%; width: min(28vw, 430px);
     color: #fff; opacity: var(--focus-opacity); pointer-events: none;
     transform: translate3d(var(--focus-x), calc(-50% + var(--focus-y)), 0) rotateY(var(--focus-ry)) rotateZ(var(--focus-rz)) scale(var(--focus-scale));
     transform-style: preserve-3d; will-change: transform, opacity;
   }
   .scene-pin.is-after .scene-focus { pointer-events: auto; }
-  .focus-card { position: relative; aspect-ratio: 1.12; overflow: hidden; background: #1d3246; box-shadow: -40px 50px 100px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.16); }
-  .focus-card > img { width: 100%; height: 100%; max-width: none; object-fit: cover; transition: transform 1.2s cubic-bezier(.2,.7,.2,1); }
-  .scene-focus:hover .focus-card > img { transform: scale(1.06); }
-  .focus-card-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6,15,26,.94), rgba(6,15,26,.04) 70%); }
-  .focus-card-copy { position: absolute; left: 8%; right: 8%; bottom: 9%; }
+  .focus-card {
+    position: relative; aspect-ratio: .82; overflow: hidden; background: #26465c;
+    box-shadow: 18px 22px 0 #102434;
+    transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s;
+  }
+  .focus-card::before {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: #315b73; mix-blend-mode: color; opacity: .42; transition: opacity .6s;
+  }
+  .focus-card > img {
+    width: 100%; height: 100%; max-width: none; object-fit: cover;
+    filter: grayscale(.65) saturate(.55) contrast(1.06);
+    transition: transform 1.2s cubic-bezier(.2,.7,.2,1), filter .6s;
+  }
+  .scene-focus:hover .focus-card { transform: translateY(-6px); box-shadow: 22px 28px 0 #102434; }
+  .scene-focus:hover .focus-card::before { opacity: 0; }
+  .scene-focus:hover .focus-card > img { transform: scale(1.04); filter: grayscale(0) saturate(1) contrast(1); }
+  .focus-card-shade { position: absolute; z-index: 2; inset: 0; background: linear-gradient(0deg, rgba(11,28,42,.95), rgba(11,28,42,.03) 75%); }
+  .focus-card-copy { position: absolute; z-index: 3; left: 8%; right: 8%; bottom: 8%; }
   .focus-label { font-size: 9px; letter-spacing: .25em; color: rgba(255,255,255,.68); }
-  .focus-card-copy h2 { margin: 14px 0 24px; color: #fff; font-size: clamp(25px,2.8vw,42px); line-height: 1.4; font-weight: 400; letter-spacing: .04em; }
-  .focus-read { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.26); padding-top: 16px; font-size: 11px; letter-spacing: .14em; }
+  .focus-card-copy h2 { margin: 14px 0 24px; color: #fff; font-family: Georgia, var(--font-serif); font-size: clamp(23px,2.2vw,34px); line-height: 1.45; font-weight: 400; letter-spacing: .03em; }
+  .focus-read { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.3); padding-top: 16px; font-size: 11px; letter-spacing: .14em; }
   .focus-read i { font-size: 20px; font-style: normal; transition: transform .3s; }
   .scene-focus:hover .focus-read i { transform: translate(4px,-4px); }
-  .focus-edge { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.24) 49%, transparent 60%); background-size: 260% 100%; background-position: var(--scene-progress) 0; mix-blend-mode: screen; pointer-events: none; }
+  .focus-edge { position: absolute; z-index: 4; inset: 0; border: 1px solid rgba(16,36,52,.35); pointer-events: none; }
   .scene-frame { position: absolute; z-index: 4; inset: 112px 4.5vw 118px; border: 1px solid rgba(255,255,255,.13); pointer-events: none; opacity: var(--copy-opacity); }
   .scene-content {
     position: absolute; z-index: 4; left: clamp(40px,8vw,140px); top: 50%; width: min(76vw,1400px); padding-right: 5vw;
@@ -606,11 +673,13 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene-progress {
     position: absolute; z-index: 6; left: 4.5vw; right: 4.5vw; bottom: 34px;
     display: flex; align-items: center; gap: 18px; pointer-events: none;
-    opacity: var(--after-opacity); color: rgba(218,231,242,.62);
+    opacity: var(--after-opacity); color: rgba(16,36,52,.62);
     font-size: 8px; letter-spacing: .26em;
   }
-  .progress-track { width: 130px; height: 1px; background: rgba(255,255,255,.18); overflow: hidden; }
-  .progress-track i { display: block; width: var(--scene-progress); height: 100%; background: #dbe7f1; }
+  .progress-track { width: 130px; height: 1px; background: rgba(16,36,52,.18); overflow: hidden; }
+  .progress-track i { display: block; width: var(--scene-progress); height: 100%; background: #102434; }
+  .scene-pin.is-after .scene-side, .scene-pin.is-after .scene-scroll { color: rgba(16,36,52,.62); }
+  .scene-pin.is-after .scene-side i { background: rgba(16,36,52,.3); }
   .progress-no { margin-left: auto; font-size: 12px; }
   .progress-no::before { content: var(--chapter); }
   /* JS 未启动时保持原始封面，不让装饰层挡住文字与链接。 */
@@ -839,8 +908,10 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-title { font-size: clamp(42px,7.4vw,72px); }
     .scene-side { display: none; }
     .scene-edition { display: none; }
-    .scene-focus { right: 6vw; width: min(55vw,520px); }
-    .after-ghost { font-size: 11vw; }
+    .scene-focus { right: 5vw; width: 32vw; }
+    .after-ghost { font-size: 10.5vw; }
+    .after-ghost > span:last-child { margin-left: 7vw; }
+    .after-stamp { display: none; }
     .latest-preview { display: none; }
     .colophon { gap: 30px; }
   }
@@ -860,13 +931,19 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-index-item { padding: 13px 0; border-left: none; }
     .scene-index-item:nth-child(n+2) { display: none; }
     .scene-scroll { display: none; }
-    .scene-focus { right: 7vw; width: 72vw; }
-    .focus-card { aspect-ratio: .98; }
-    .focus-card-copy h2 { font-size: clamp(24px,6vw,32px); margin-bottom: 18px; }
-    .after-ghost { left: 7vw; top: 18%; font-size: 16vw; }
-    .after-caption { left: 7vw; bottom: 15%; font-size: 10px; letter-spacing: .14em; }
-    .after-orbit-a { width: 140vw; height: 100vw; right: -60vw; }
-    .after-orbit-b { display: none; }
+    .scene-focus { right: 7vw; top: 64%; width: 68vw; }
+    .focus-card { aspect-ratio: .9; box-shadow: 10px 14px 0 #102434; }
+    .scene-focus:hover .focus-card { box-shadow: 12px 17px 0 #102434; }
+    .focus-card-copy h2 { font-size: clamp(20px,5.4vw,28px); margin-bottom: 18px; }
+    .focus-label { font-size: 7px; }
+    .focus-read { padding-top: 12px; font-size: 9px; }
+    .after-kicker { left: 7%; top: 8%; font-size: 8px; letter-spacing: .2em; }
+    .after-ghost { left: 7%; top: 15%; font-size: 16vw; line-height: .84; }
+    .after-ghost > span:last-child { margin-left: 5vw; }
+    .after-caption { left: 7%; top: 34%; bottom: auto; font-size: 11px; letter-spacing: .12em; }
+    .after-caption-en { display: none; }
+    .after-rule { opacity: .14; }
+    .after-cut { stroke-width: 1.4; }
     .scene-progress { left: 24px; right: 24px; bottom: 24px; }
     .progress-label { font-size: 7px; letter-spacing: .18em; }
     .progress-track { width: 60px; }
