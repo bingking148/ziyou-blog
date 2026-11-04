@@ -1,6 +1,6 @@
 ---
 title: 'Python 基础专栏'
-description: '写给完全没写过代码的人：从装环境、跑出第一个程序开始，一路做到 BMI 计算器、猜数字、记账本、聊天机器人、智能助手家族、文件工具、函数外挂，每篇一个能跑的小项目，按学习顺序排列。'
+description: '写给完全没写过代码的人：从装环境、跑出第一个程序开始，一路做到 BMI 计算器、猜数字、记账本、聊天机器人、智能助手家族、文件工具、函数外挂、网络编程、并发、正则与生成器，每篇一个能跑的小项目，按学习顺序排列。'
 column: true
 column_order: 2
 cover: /images/covers/python-basics-for-ai-cover.jpg
@@ -10,7 +10,7 @@ cover: /images/covers/python-basics-for-ai-cover.jpg
 
 这套教程按**零基础**写：不需要你学过任何编程语言，不需要数学很好，只需要一台电脑。每一篇都从一个具体的小项目出发，缺什么语法就补什么语法——你不会读到「本节讲变量，下节讲常量」这种脱离用处的排列。
 
-十五篇走完，你会亲手做出十五个能运行的程序：
+十八篇走完，你会亲手做出十八个能运行的程序：
 
 | 篇目 | 项目 |
 |---|---|
@@ -29,5 +29,8 @@ cover: /images/covers/python-basics-for-ai-cover.jpg
 | [第 13 篇：CSV、TSV 与 JSON](/post/python-file-formats/) | 给数据立固定格式 |
 | [第 14 篇：赋值、浅拷贝与深拷贝](/post/python-shallow-deep-copy/) | 看清变量在内存里的本质 |
 | [第 15 篇：多装饰器与带参装饰器](/post/python-decorator-advanced/) | 装饰器的进阶玩法 |
+| [第 16 篇：网络编程](/post/python-socket-network/) | 让程序隔空说话 |
+| [第 17 篇：进程与线程](/post/python-process-thread/) | 让程序同时干活 |
+| [第 18 篇：正则与生成器](/post/python-regex-generator/) | 挖数据、扛大数据 |
 
 学完想转向大模型，接着看 [人工智能学习专栏](/categories/人工智能学习/)。
