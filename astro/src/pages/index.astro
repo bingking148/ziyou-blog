@@ -44,18 +44,23 @@ const shortTitle = (t: string) => t.split('——')[0];
         <div class="scene-glint" aria-hidden="true"></div>
       </div>
 
-      <div class="scene-shards" aria-hidden="true">
-        {Array.from({ length: 7 }, (_, i) => (
-          <div class="scene-shard" style={`--slice:${i}`}>
-            <ResponsiveImage src="/images/hero-bg-1920.jpg" sizes="100vw" alt="" loading="eager" />
-          </div>
-        ))}
+      <div class="scene-tears" aria-hidden="true">
+        <div class="scene-tear scene-tear-a">
+          <ResponsiveImage src="/images/hero-bg-1920.jpg" sizes="100vw" alt="" loading="eager" />
+        </div>
+        <div class="scene-tear scene-tear-b">
+          <ResponsiveImage src="/images/hero-bg-1920.jpg" sizes="100vw" alt="" loading="eager" />
+        </div>
       </div>
+      <svg class="scene-incision" viewBox="0 0 1440 850" preserveAspectRatio="none" aria-hidden="true">
+        <path class="incision-glow" pathLength="1" d="M-40 760L620 0M0 820L680 0" />
+        <path class="incision-core" pathLength="1" d="M-40 760L620 0M0 820L680 0" />
+      </svg>
 
       <div class="scene-after" aria-hidden="true">
         <svg class="after-lines" viewBox="0 0 1440 850" preserveAspectRatio="none">
           <path class="after-rule" d="M0 690H1440M0 710H1440M1060 0V850M1080 0V850" />
-          <path class="after-cut" d="M-40 760L620 0M0 820L680 0" />
+          <path class="after-cut" pathLength="1" d="M-40 760L620 0M0 820L680 0" />
         </svg>
         <p class="after-kicker">CHAPTER 02 / NOTES ON CURIOSITY</p>
         <p class="after-ghost"><span>BEYOND</span><span><em>THE</em> <b>CODE</b></span></p>
@@ -83,8 +88,8 @@ const shortTitle = (t: string) => t.split('——')[0];
       <div class="scene-content">
         <p class="scene-eyebrow"><span></span> FIELD NOTES OF A CURIOUS MIND</p>
         <h1 class="scene-title">
-          <span class="title-line">在键盘上，</span>
-          <span class="title-line title-indent">写下又一行注释。</span>
+          <span class="title-shift title-shift-a"><span class="title-line">在键盘上，</span></span>
+          <span class="title-shift title-shift-b"><span class="title-line title-indent">写下又一行注释。</span></span>
         </h1>
         <div class="scene-intro">
           <p class="scene-typing">
@@ -120,7 +125,17 @@ const shortTitle = (t: string) => t.split('——')[0];
         <span class="progress-track"><i></i></span>
         <span class="progress-no">01</span>
       </div>
-      <a class="scene-scroll" href="#journal" aria-label="跳过开场，向下阅读"><span></span>SCROLL TO EXPLORE</a>
+      <a
+        class="scene-scroll"
+        href="#journal"
+        data-cinematic-scroll
+        aria-label="播放开场动画并进入第二幕"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path d="M12 4v15M5.5 13l6.5 6.5L18.5 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="scroll-label" aria-hidden="true">PLAY OPENING</span>
+      </a>
     </div>
   </section>
 
@@ -283,8 +298,9 @@ const shortTitle = (t: string) => t.split('——')[0];
       if (!scene) return;
       scene.classList.add('has-motion');
       var pin = scene.querySelector('.scene-pin');
-      var shards = scene.querySelectorAll('.scene-shard');
       var bottom = scene.querySelector('.scene-bottom');
+      var cta = scene.querySelector('[data-cinematic-scroll]');
+      var playing = false;
       var ticking = false;
       var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
       var smooth = function (v) { v = clamp(v); return v * v * (3 - 2 * v); };
@@ -295,59 +311,149 @@ const shortTitle = (t: string) => t.split('——')[0];
         var distance = scene.offsetHeight - window.innerHeight;
         if (distance <= 0) return;
         var p = clamp(-rect.top / distance);
-        var split = ramp(p, 0.12, 0.46);
-        var reveal = ramp(p, 0.43, 0.72);
-        var arrive = ramp(p, 0.58, 0.88);
+        var hold = ramp(p, 0, 0.16);
+        var incision = ramp(p, 0.14, 0.28);
+        var tear = ramp(p, 0.26, 0.46);
+        var paper = ramp(p, 0.4, 0.62);
+        var lineIn = ramp(p, 0.5, 0.68);
+        var poster = ramp(p, 0.54, 0.72);
+        var stamp = ramp(p, 0.66, 0.78);
+        var arrive = ramp(p, 0.68, 0.86);
         var exit = ramp(p, 0.88, 1);
         var mobile = window.innerWidth <= 760;
         var st = pin.style;
         st.setProperty('--scene-p', p.toFixed(4));
-        st.setProperty('--hero-y', (-split * 16 - reveal * 35) + 'vh');
-        st.setProperty('--hero-scale', (1.04 + split * 0.09).toFixed(3));
-        st.setProperty('--hero-blur', (split * 8).toFixed(2) + 'px');
-        st.setProperty('--hero-opacity', (1 - ramp(p, 0.27, 0.5)).toFixed(3));
-        st.setProperty('--copy-y', (-split * 25).toFixed(2) + 'vh');
-        st.setProperty('--copy-opacity', (1 - ramp(p, 0.08, 0.36)).toFixed(3));
-        st.setProperty('--copy-blur', (split * 7).toFixed(2) + 'px');
-        st.setProperty('--after-opacity', reveal.toFixed(3));
-        st.setProperty('--after-scale', (0.9 + reveal * 0.1).toFixed(3));
-        st.setProperty('--after-clip', ((1 - reveal) * 46).toFixed(2) + '%');
-        st.setProperty('--after-title-y', ((1 - reveal) * 32).toFixed(2) + 'px');
-        st.setProperty('--after-lines-x', ((1 - reveal) * -40).toFixed(2) + 'px');
-        st.setProperty('--focus-opacity', arrive.toFixed(3));
-        st.setProperty('--focus-x', ((1 - arrive) * (mobile ? 34 : 58) - exit * 4) + 'vw');
-        st.setProperty('--focus-y', ((1 - arrive) * 20 - exit * 9) + 'vh');
-        st.setProperty('--focus-ry', ((1 - arrive) * -48 + exit * 12).toFixed(2) + 'deg');
-        st.setProperty('--focus-rz', ((1 - arrive) * 9 - arrive * 2 - exit * 2).toFixed(2) + 'deg');
-        st.setProperty('--focus-scale', (0.82 + arrive * 0.18).toFixed(3));
+        st.setProperty('--hero-y', '0vh');
+        st.setProperty('--hero-scale', (1.04 + hold * 0.04 + tear * 0.02).toFixed(3));
+        st.setProperty('--hero-blur', (tear * (mobile ? 3 : 6)).toFixed(2) + 'px');
+        st.setProperty('--hero-opacity', (1 - ramp(p, 0.28, 0.44)).toFixed(3));
+        st.setProperty('--copy-y', '0vh');
+        st.setProperty('--copy-opacity', (1 - ramp(p, 0.34, 0.5)).toFixed(3));
+        st.setProperty('--copy-blur', (tear * (mobile ? 3 : 6)).toFixed(2) + 'px');
+        st.setProperty('--intro-opacity', (1 - ramp(p, 0.08, 0.22)).toFixed(3));
+        st.setProperty('--intro-y', (-ramp(p, 0.08, 0.22) * 4).toFixed(2) + 'vh');
+        st.setProperty('--title-a-x', (-tear * (mobile ? 9 : 14)).toFixed(2) + 'vw');
+        st.setProperty('--title-a-y', (-tear * (mobile ? 7 : 10)).toFixed(2) + 'vh');
+        st.setProperty('--title-b-x', (tear * (mobile ? 10 : 15)).toFixed(2) + 'vw');
+        st.setProperty('--title-b-y', (tear * (mobile ? 8 : 11)).toFixed(2) + 'vh');
+        st.setProperty('--incision-scale', incision.toFixed(3));
+        st.setProperty('--incision-opacity', (1 - ramp(p, 0.42, 0.52)).toFixed(3));
+        st.setProperty('--tear-gap', (tear * (mobile ? 6 : 10)).toFixed(2) + '%');
+        st.setProperty('--tear-opacity', (1 - ramp(p, 0.4, 0.5)).toFixed(3));
+        st.setProperty('--tear-a-x', (-tear * (mobile ? 14 : 28)).toFixed(2) + 'vw');
+        st.setProperty('--tear-a-y', (-tear * (mobile ? 12 : 22)).toFixed(2) + 'vh');
+        st.setProperty('--tear-a-r', (-tear * (mobile ? 5 : 8)).toFixed(2) + 'deg');
+        st.setProperty('--tear-b-x', (tear * (mobile ? 16 : 30)).toFixed(2) + 'vw');
+        st.setProperty('--tear-b-y', (tear * (mobile ? 14 : 24)).toFixed(2) + 'vh');
+        st.setProperty('--tear-b-r', (tear * (mobile ? 6 : 9)).toFixed(2) + 'deg');
+        st.setProperty('--paper-gap', (8 + paper * 105).toFixed(2) + '%');
+        st.setProperty('--after-opacity', Math.min(1, paper * 1.6).toFixed(3));
+        st.setProperty('--after-scale', (0.94 + paper * 0.06).toFixed(3));
+        st.setProperty('--after-title-a-x', (-(1 - poster) * (mobile ? 6 : 12)).toFixed(2) + 'vw');
+        st.setProperty('--after-title-b-x', ((1 - poster) * (mobile ? 6 : 12)).toFixed(2) + 'vw');
+        st.setProperty('--after-title-y', '0px');
+        st.setProperty('--after-title-mask', ((1 - poster) * 85).toFixed(2) + '%');
+        st.setProperty('--after-lines-x', ((1 - paper) * -40).toFixed(2) + 'px');
+        st.setProperty('--after-lines-opacity', paper.toFixed(3));
+        st.setProperty('--after-line', lineIn.toFixed(3));
+        st.setProperty('--after-meta', poster.toFixed(3));
+        st.setProperty('--after-stamp', stamp.toFixed(3));
+        st.setProperty('--focus-opacity', (arrive * (1 - exit)).toFixed(3));
+        st.setProperty('--focus-x', ((1 - arrive) * (mobile ? 24 : 18) + exit * (mobile ? 20 : 28)) + 'vw');
+        st.setProperty('--focus-y', ((1 - arrive) * (mobile ? 22 : 18) + exit * (mobile ? 6 : 8)) + 'vh');
+        st.setProperty('--focus-ry', ((1 - arrive) * -38 + exit * 12).toFixed(2) + 'deg');
+        st.setProperty('--focus-rz', ((1 - arrive) * 8 - arrive * 2 - exit * 2).toFixed(2) + 'deg');
+        st.setProperty('--focus-scale', (0.76 + arrive * 0.24).toFixed(3));
         st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
-        st.setProperty('--chapter', p < 0.4 ? '"01"' : p < 0.72 ? '"02"' : '"03"');
-        pin.classList.toggle('is-after', p > 0.42);
+        st.setProperty('--scroll-cta-opacity', (1 - ramp(p, 0.08, 0.18)).toFixed(3));
+        st.setProperty('--chapter', p < 0.28 ? '"01"' : p < 0.74 ? '"02"' : '"03"');
+        pin.classList.toggle('is-after', p > 0.4);
+        pin.classList.toggle('is-past-intro', p > 0.18 || playing);
         pin.classList.toggle('is-end', p > 0.96);
         bottom.style.opacity = String(1 - ramp(p, 0.04, 0.26));
-        bottom.style.transform = 'translateY(' + split * 70 + 'px)';
+        bottom.style.transform = 'translateY(' + tear * 70 + 'px)';
         bottom.style.visibility = p > 0.28 ? 'hidden' : 'visible';
         var focus = scene.querySelector('.scene-focus');
         if (focus) {
-          var active = p > 0.42 && p < 0.97;
+          var active = p > 0.62 && p < 0.97;
           focus.toggleAttribute('inert', !active);
           focus.setAttribute('aria-hidden', String(!active));
         }
         var sceneLink = scene.querySelector('.scene-link');
-        if (sceneLink) sceneLink.toggleAttribute('inert', p > 0.38);
-        for (var i = 0; i < shards.length; i++) {
-          var dir = i % 2 ? 1 : -1;
-          var local = ramp(p, 0.13 + Math.abs(i - 3) * 0.012, 0.55 + Math.abs(i - 3) * 0.012);
-          var x = dir * local * (12 + Math.abs(i - 3) * 10);
-          var y = local * ((i - 3) * 13);
-          var ry = dir * local * (mobile ? 26 : 64);
-          var rz = dir * local * (3 + Math.abs(i - 3) * 1.5);
-          var scale = 1 - local * 0.28;
-          var opacity = 1 - ramp(p, 0.49 + Math.abs(i - 3) * 0.012, 0.71 + Math.abs(i - 3) * 0.012);
-          shards[i].style.transform = 'translate3d(' + x + 'vw,' + y + 'vh,0) rotateY(' + ry + 'deg) rotateZ(' + rz + 'deg) scale(' + scale + ')';
-          shards[i].style.opacity = String(opacity);
+        if (sceneLink) sceneLink.toggleAttribute('inert', p > 0.22);
+        if (cta) {
+          cta.toggleAttribute('inert', p > 0.18 || playing);
+          if (playing) cta.setAttribute('aria-disabled', 'true');
+          else cta.removeAttribute('aria-disabled');
         }
       }
+      var root = document.documentElement;
+      var playFrame = 0;
+      var previousScrollBehavior = root.style.scrollBehavior;
+      // 加速—匀速—减速的梯形速度：对称缓动会把切口推到 1.3s 之后，观影像页面卡住。
+      var CINEMA_ACCEL = 0.16;
+      var CINEMA_DECEL = 0.24;
+      var CINEMA_CRUISE = 1 / (1 - (CINEMA_ACCEL + CINEMA_DECEL) / 2);
+      var easeCinema = function (x) {
+        x = clamp(x);
+        var cruiseEnd = 1 - CINEMA_DECEL;
+        if (x < CINEMA_ACCEL) return CINEMA_CRUISE * x * x / (2 * CINEMA_ACCEL);
+        if (x <= cruiseEnd) return CINEMA_CRUISE * (CINEMA_ACCEL / 2 + x - CINEMA_ACCEL);
+        var u = x - cruiseEnd;
+        return CINEMA_CRUISE * (1 - CINEMA_ACCEL / 2 - CINEMA_DECEL + u - (u * u) / (2 * CINEMA_DECEL));
+      };
+      function stopCinema() {
+        if (!playing) return;
+        playing = false;
+        if (playFrame) cancelAnimationFrame(playFrame);
+        playFrame = 0;
+        root.style.scrollBehavior = previousScrollBehavior;
+        pin.classList.remove('is-cinematic');
+        if (cta) cta.removeAttribute('aria-disabled');
+        schedule();
+      }
+      function playCinema(now) {
+        var t = clamp((now - playCinema.start) / playCinema.duration);
+        var y = playCinema.from + (playCinema.to - playCinema.from) * easeCinema(t);
+        window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+        if (t >= 1) { stopCinema(); return; }
+        playFrame = requestAnimationFrame(playCinema);
+      }
+      if (cta) {
+        cta.addEventListener('click', function (event) {
+          if (playing) return;
+          var distance = scene.offsetHeight - window.innerHeight;
+          if (distance <= 0) return;
+          event.preventDefault();
+          var from = window.scrollY;
+          var to = scene.offsetTop + distance * 0.86;
+          if (from >= to) { schedule(); return; }
+          var base = window.innerWidth <= 760 ? 3400 : 3800;
+          var ratio = clamp((to - from) / (to - scene.offsetTop));
+          playing = true;
+          previousScrollBehavior = root.style.scrollBehavior;
+          root.style.scrollBehavior = 'auto';
+          pin.classList.add('is-cinematic');
+          cta.setAttribute('aria-disabled', 'true');
+          cta.setAttribute('inert', '');
+          playCinema.start = performance.now();
+          playCinema.from = from;
+          playCinema.to = to;
+          playCinema.duration = Math.max(base * 0.55, base * ratio);
+          playFrame = requestAnimationFrame(playCinema);
+        });
+      }
+      window.addEventListener('wheel', stopCinema, { passive: true });
+      window.addEventListener('touchstart', stopCinema, { passive: true });
+      window.addEventListener('keydown', function (event) {
+        if (!playing) return;
+        var keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'PageUp', 'PageDown', 'Home', 'End'];
+        if (keys.indexOf(event.key) >= 0) stopCinema();
+      });
+      window.addEventListener('resize', stopCinema);
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stopCinema();
+      });
       function schedule() {
         if (!ticking) { ticking = true; requestAnimationFrame(update); }
       }
@@ -495,14 +601,22 @@ const shortTitle = (t: string) => t.split('——')[0];
 <style>
   /* ===== 三幕开场 ===== */
   .scene { position: relative; height: 100svh; min-height: 660px; overflow: hidden; color: #fff; background: #0a1420; }
-  .scene.has-motion { height: 240svh; min-height: 1500px; overflow-x: clip; overflow-y: visible; }
+  .scene.has-motion { height: 260svh; min-height: 1600px; overflow-x: clip; overflow-y: visible; }
   .scene-pin {
     --hero-y: 0vh; --hero-scale: 1.04; --hero-blur: 0px; --hero-opacity: 1;
     --copy-y: 0vh; --copy-opacity: 1; --copy-blur: 0px;
-    --after-opacity: 0; --after-scale: .9; --after-clip: 46%;
-    --after-title-y: 32px; --after-lines-x: -40px; --focus-opacity: 0;
-    --focus-x: 58vw; --focus-y: 20vh; --focus-ry: -48deg; --focus-rz: 9deg; --focus-scale: .82;
-    --scene-progress: 0%; --chapter: "01";
+    --intro-opacity: 1; --intro-y: 0vh;
+    --title-a-x: 0vw; --title-a-y: 0vh; --title-b-x: 0vw; --title-b-y: 0vh;
+    --incision-scale: 0; --incision-opacity: 0;
+    --tear-gap: 0%; --tear-opacity: 1;
+    --tear-a-x: 0vw; --tear-a-y: 0vh; --tear-a-r: 0deg;
+    --tear-b-x: 0vw; --tear-b-y: 0vh; --tear-b-r: 0deg;
+    --paper-gap: 8%; --after-opacity: 0; --after-scale: .94;
+    --after-title-a-x: -12vw; --after-title-b-x: 12vw; --after-title-y: 0px; --after-title-mask: 85%;
+    --after-lines-x: -40px; --after-lines-opacity: 0; --after-line: 0;
+    --after-meta: 0; --after-stamp: 0;
+    --focus-opacity: 0; --focus-x: 18vw; --focus-y: 18vh; --focus-ry: -38deg; --focus-rz: 8deg; --focus-scale: .76;
+    --scene-progress: 0%; --chapter: "01"; --scroll-cta-opacity: 1;
     position: sticky; top: 0; height: 100svh; min-height: 620px; overflow: hidden;
     isolation: isolate; perspective: 1400px; perspective-origin: 50% 46%;
     background: #0a1420;
@@ -525,27 +639,45 @@ const shortTitle = (t: string) => t.split('——')[0];
       linear-gradient(180deg, rgba(10,21,34,.35), transparent 30%);
   }
   .scene-glint { display: none; }
-  .scene-shards { display: none; position: absolute; inset: 0; z-index: 2; pointer-events: none; transform-style: preserve-3d; }
-  .scene-shard {
-    --step: calc(100% / 7);
-    position: absolute; top: -2px; bottom: -2px;
-    left: calc(var(--slice) * var(--step)); width: calc(var(--step) + 1px);
-    overflow: hidden; opacity: 0; transform-origin: center;
-    box-shadow: 0 24px 70px rgba(0,0,0,.3);
-    will-change: transform, opacity;
+  .scene-tears {
+    display: none; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    opacity: var(--tear-opacity); transform: scale(var(--hero-scale));
+    transform-style: preserve-3d; will-change: transform, opacity;
   }
-  .scene-shard img {
-    position: absolute; top: 0; height: 100%; max-width: none; width: 700%;
-    left: calc(var(--slice) * -100%); object-fit: cover; object-position: center 42%;
+  .scene-tear {
+    position: absolute; inset: -2px; overflow: hidden;
+    box-shadow: 0 24px 70px rgba(0,0,0,.32);
+    backface-visibility: hidden; will-change: transform, clip-path;
+  }
+  .scene-tear img {
+    width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%;
     filter: blur(var(--hero-blur));
   }
+  .scene-tear-a {
+    clip-path: polygon(0 0, calc(43% + var(--tear-gap)) 0, 0 calc(89% + var(--tear-gap)));
+    transform: translate3d(var(--tear-a-x), var(--tear-a-y), 0) rotate(var(--tear-a-r));
+  }
+  .scene-tear-b {
+    clip-path: polygon(calc(43% - var(--tear-gap)) 0, 100% 0, 100% 100%, 0 100%, 0 calc(89% - var(--tear-gap)));
+    transform: translate3d(var(--tear-b-x), var(--tear-b-y), 0) rotate(var(--tear-b-r));
+  }
+  .scene-incision {
+    display: none; position: absolute; inset: 0; z-index: 5; width: 100%; height: 100%;
+    pointer-events: none; opacity: var(--incision-opacity);
+  }
+  .scene-incision path {
+    fill: none; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--incision-scale));
+  }
+  .incision-glow { stroke: #d8ecf2; stroke-width: 8; opacity: calc(var(--incision-scale) * .22); }
+  .incision-core { stroke: #b74c3b; stroke-width: 3; }
   .scene-after {
     position: absolute; inset: 0; z-index: 0; overflow: hidden;
     opacity: var(--after-opacity);
     background:
       radial-gradient(circle at 74% 20%, #f7fbfb 0, transparent 38%),
       linear-gradient(125deg, #d4e4eb, #edf4f6 56%, #cbdfe8);
-    clip-path: inset(0 var(--after-clip) 0 var(--after-clip));
+    clip-path: polygon(calc(-4% - var(--paper-gap)) 100%, calc(43% - var(--paper-gap)) 0, calc(55% + var(--paper-gap)) 0, calc(8% + var(--paper-gap)) 100%);
     transform: scale(var(--after-scale));
   }
   .scene-after::before {
@@ -562,13 +694,18 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   .after-lines {
     position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%;
+    opacity: var(--after-lines-opacity);
     transform: translate3d(var(--after-lines-x), 0, 0);
   }
   .after-lines path { fill: none; vector-effect: non-scaling-stroke; }
   .after-rule { stroke: #18374d; stroke-width: 1; opacity: .25; }
-  .after-cut { stroke: #b74c3b; stroke-width: 2; opacity: .9; }
+  .after-cut {
+    stroke: #b74c3b; stroke-width: 2; opacity: .9;
+    stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--after-line));
+  }
   .after-kicker {
     position: absolute; z-index: 2; left: 5%; top: 7%; margin: 0;
+    opacity: var(--after-meta);
     color: #9e4033; font-size: clamp(8px, .8vw, 12px); letter-spacing: .28em;
   }
   .after-ghost {
@@ -578,10 +715,16 @@ const shortTitle = (t: string) => t.split('——')[0];
     font-weight: 900; line-height: .82; letter-spacing: -.085em; color: #102434;
     white-space: nowrap; -webkit-text-stroke: 0;
   }
-  .after-ghost > span { display: block; }
+  .after-ghost > span { display: block; will-change: transform, clip-path; }
+  .after-ghost > span:first-child {
+    transform: translate3d(var(--after-title-a-x), 0, 0);
+    clip-path: inset(0 calc(var(--after-title-mask)) 0 0);
+  }
   .after-ghost > span:last-child {
     margin-left: 11vw; font-family: Georgia, "Times New Roman", serif;
     font-weight: 400; font-style: italic; letter-spacing: -.07em;
+    transform: translate3d(var(--after-title-b-x), 0, 0);
+    clip-path: inset(0 0 0 calc(var(--after-title-mask)));
   }
   .after-ghost b { position: relative; isolation: isolate; color: #b74c3b; font-weight: 400; }
   .after-ghost b::after {
@@ -590,6 +733,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   .after-caption {
     position: absolute; z-index: 2; left: 5%; bottom: 13%; margin: 0;
+    opacity: var(--after-meta);
     color: #344e61; font-size: clamp(10px, .9vw, 14px); letter-spacing: .15em; line-height: 1.85;
   }
   .after-caption-en { display: block; margin-top: 5px; font-size: .8em; letter-spacing: .18em; }
@@ -598,7 +742,8 @@ const shortTitle = (t: string) => t.split('——')[0];
     display: grid; place-items: center; width: clamp(68px, 7vw, 108px); aspect-ratio: 1;
     border: 1px solid #a84536; border-radius: 50%; color: #a84536;
     font-family: Georgia, serif; font-size: clamp(26px, 2.4vw, 40px);
-    transform: rotate(12deg);
+    opacity: var(--after-stamp);
+    transform: rotate(12deg) scale(var(--after-stamp));
   }
   .scene-focus {
     position: absolute; z-index: 3; right: 5.5vw; top: 50%; width: min(28vw, 430px);
@@ -641,15 +786,18 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   .scene.has-motion .scene-content { pointer-events: auto; }
   .scene-pin.is-after .scene-content { pointer-events: none; }
-  .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 30px; font-size: 10px; letter-spacing: .36em; color: rgba(255,255,255,.72); animation: rise-in 1s .25s both; }
+  .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 30px; font-size: 10px; letter-spacing: .36em; color: rgba(255,255,255,.72); opacity: var(--intro-opacity); animation: rise-in 1s .25s both; }
   .scene-eyebrow span { width: 36px; height: 1px; background: rgba(255,255,255,.65); }
   .scene-title { margin: 0; font-weight: 400; font-size: clamp(46px,6.8vw,104px); line-height: 1.32; letter-spacing: .04em; color: #fff; text-shadow: 0 3px 30px rgba(10,20,35,.25); }
+  .title-shift { display: block; will-change: transform; }
+  .title-shift-a { transform: translate3d(var(--title-a-x), var(--title-a-y), 0); }
+  .title-shift-b { transform: translate3d(var(--title-b-x), var(--title-b-y), 0); }
   .title-line { display: block; animation: rise-in 1.2s cubic-bezier(.16,.8,.26,1) both; }
   .title-line:nth-child(1) { animation-delay: .4s; }
   .title-line:nth-child(2) { animation-delay: .58s; }
   .title-indent { padding-left: 1.15em; }
   @keyframes rise-in { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
-  .scene-intro { display: flex; align-items: center; gap: 42px; margin-top: 44px; padding-left: 1.3em; animation: rise-in 1s .85s both; }
+  .scene-intro { display: flex; align-items: center; gap: 42px; margin-top: 44px; padding-left: 1.3em; opacity: var(--intro-opacity); animation: rise-in 1s .85s both; }
   .scene-typing { margin: 0; min-height: 1.5em; font-size: 13px; letter-spacing: .12em; color: rgba(255,255,255,.74); }
   .typing-cursor { display: inline-block; width: 1px; height: 1em; margin-left: 5px; background: currentColor; vertical-align: -2px; animation: blink 1.2s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
@@ -667,9 +815,44 @@ const shortTitle = (t: string) => t.split('——')[0];
   .index-title { font-size: 12px; letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .index-arrow { opacity: .6; transition: transform .3s; }
   .scene-index-item:hover .index-arrow { transform: translate(3px,-3px); opacity: 1; }
-  .scene-scroll { position: absolute; z-index: 6; right: 4.5vw; bottom: 128px; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.6); font-size: 9px; letter-spacing: .3em; writing-mode: vertical-rl; }
-  .scene-scroll span { display: none; }
-  @keyframes scroll-pulse { 50% { transform: scaleY(.55); transform-origin: top; opacity: .4; } }
+  .scene-scroll {
+    position: absolute; z-index: 6; right: 4.5vw; bottom: 118px;
+    display: grid; place-items: center; width: 58px; aspect-ratio: 1;
+    border-radius: 50%; color: #102434;
+    background: linear-gradient(165deg, #f2fafb, #cfe3ea);
+    box-shadow:
+      0 10px 26px rgba(5, 18, 32, .38),
+      0 0 0 1px rgba(216, 236, 242, .35) inset;
+    opacity: var(--scroll-cta-opacity);
+    transition: opacity .35s ease, color .3s ease, transform .3s cubic-bezier(.2,.7,.2,1);
+    animation: cta-intro 2.6s cubic-bezier(.2,.7,.2,1) 1.2s 2 both;
+  }
+  /* 唯一的引导动效：圆盘落定后外扩一圈冰蓝涟漪，呼吸三次即静，不与三幕争戏。 */
+  .scene-scroll::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    border: 1.5px solid rgba(216, 236, 242, .85);
+    animation: cta-ripple 2.6s ease-out 1.2s 2;
+  }
+  .scene-scroll svg { position: relative; z-index: 1; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+  .scroll-label {
+    position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    font-size: 8px; letter-spacing: .22em; white-space: nowrap; color: rgba(216,236,242,.9);
+    text-shadow: 0 1px 8px rgba(5, 18, 32, .8);
+  }
+  .scene-scroll:hover { color: var(--red-2); transform: scale(1.06); }
+  .scene-scroll:hover svg { transform: translateY(3px); }
+  .scene-scroll:focus-visible { outline: 2px solid #d8ecf2; outline-offset: 4px; }
+  @keyframes cta-intro {
+    0% { transform: scale(.6); }
+    60% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  @keyframes cta-ripple {
+    0% { transform: scale(1); opacity: .9; }
+    100% { transform: scale(2.1); opacity: 0; }
+  }
+  .scene-pin.is-past-intro .scene-scroll,
+  .scene-pin.is-cinematic .scene-scroll { opacity: 0; pointer-events: none; }
   .scene-progress {
     position: absolute; z-index: 6; left: 4.5vw; right: 4.5vw; bottom: 34px;
     display: flex; align-items: center; gap: 18px; pointer-events: none;
@@ -683,10 +866,11 @@ const shortTitle = (t: string) => t.split('——')[0];
   .progress-no { margin-left: auto; font-size: 12px; }
   .progress-no::before { content: var(--chapter); }
   /* JS 未启动时保持原始封面，不让装饰层挡住文字与链接。 */
-  .scene-shards, .scene-after, .scene-focus, .scene-progress { visibility: hidden; }
-  .scene.has-motion .scene-shards, .scene.has-motion .scene-after,
-  .scene.has-motion .scene-focus, .scene.has-motion .scene-progress { visibility: visible; }
-  .scene.has-motion .scene-shards { display: block; }
+  .scene-tears, .scene-incision, .scene-after, .scene-focus, .scene-progress { visibility: hidden; }
+  .scene.has-motion .scene-tears, .scene.has-motion .scene-incision,
+  .scene.has-motion .scene-after, .scene.has-motion .scene-focus,
+  .scene.has-motion .scene-progress { visibility: visible; }
+  .scene.has-motion .scene-tears, .scene.has-motion .scene-incision { display: block; }
 
   /* ===== 正文 ===== */
   .journal { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px,5vw,64px); }
@@ -917,9 +1101,9 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   @media (max-width: 760px) {
     .scene { min-height: 620px; }
-    .scene.has-motion { height: 220svh; min-height: 1300px; }
+    .scene.has-motion { height: 230svh; min-height: 1400px; }
     .scene-pin { min-height: 580px; perspective: 1000px; }
-    .scene-image, .scene-shard img { object-position: 58% center; }
+    .scene-image, .scene-tear img { object-position: 58% center; }
     .scene-frame { display: none; }
     .scene-content { left: 24px; right: 24px; padding: 0; top: 44%; }
     .scene-eyebrow { font-size: 8px; letter-spacing: .22em; margin-bottom: 24px; }
@@ -930,7 +1114,9 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-index { grid-template-columns: 1fr; }
     .scene-index-item { padding: 13px 0; border-left: none; }
     .scene-index-item:nth-child(n+2) { display: none; }
-    .scene-scroll { display: none; }
+    .scene-scroll { right: 18px; bottom: 104px; width: 48px; }
+    .scene-scroll svg { width: 17px; height: 17px; }
+    .scroll-label { font-size: 7px; letter-spacing: .18em; }
     .scene-focus { right: 7vw; top: 64%; width: 68vw; }
     .focus-card { aspect-ratio: .9; box-shadow: 10px 14px 0 #102434; }
     .scene-focus:hover .focus-card { box-shadow: 12px 17px 0 #102434; }
@@ -970,6 +1156,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-glint { display: none; }
     .scene-content { opacity: 1 !important; }
     .scene-image, .title-line, .scene-eyebrow, .scene-intro { animation: none; }
+    .scene-scroll, .scene-scroll::after { animation: none; }
     .latest-preview { display: none; }
     .flashcard-shadow, .flashcard-foil,
     .series-visual::before, .series-visual::after,
