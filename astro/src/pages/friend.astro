@@ -28,6 +28,11 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
           <span>ziyou814.top</span>
           <span>EST. {SINCE} · {AUTHOR}</span>
         </div>
+        <button
+          class="bc-copy"
+          type="button"
+          data-copy={`- name: ${SITE_TITLE}\n  url: https://ziyou814.top\n  desc: ${SITE_DESCRIPTION}。\n  image: https://ziyou814.top/images/hero-bg-1280.jpg`}
+        >复制本站信息</button>
         <span class="seal" aria-hidden="true">留灯</span>
       </div>
 
@@ -37,6 +42,7 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
           href={f.url}
           target="_blank"
           rel="noopener"
+          data-name={f.name}
           data-reveal
           style={`--i:${i + 2}`}
         >
@@ -82,6 +88,45 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
   </div>
 </Base>
 
+<script>
+  (function () {
+    'use strict';
+    // 一键复制本站信息：留言交换前，先把本站加到对方的友链里
+    var copyBtn = document.querySelector('.bc-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        var text = copyBtn.getAttribute('data-copy') || '';
+        var done = function (ok) {
+          copyBtn.textContent = ok ? '已复制 ✓' : '复制失败，请手动复制';
+          copyBtn.classList.toggle('is-done', ok);
+          setTimeout(function () {
+            copyBtn.textContent = '复制本站信息';
+            copyBtn.classList.remove('is-done');
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+        } else { done(false); }
+      });
+    }
+
+    // 第三方头像失败兜底：首字母方块替代破图
+    document.querySelectorAll('.bizcard.fr img').forEach(function (img) {
+      var swap = function () {
+        var card = img.closest('.bizcard');
+        var name = (card && card.getAttribute('data-name')) || '?';
+        var span = document.createElement('span');
+        span.className = 'fr-fallback';
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = name.slice(0, 1).toUpperCase();
+        img.replaceWith(span);
+      };
+      if (img.complete && img.naturalWidth === 0) swap();
+      else img.addEventListener('error', swap, { once: true });
+    });
+  })();
+</script>
+
 <style>
   .friend-page { --hard: #102434; }
   :global([data-theme="dark"]) .friend-page { --hard: rgba(0, 0, 0, .55); }
@@ -119,6 +164,15 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
   .bc-name { font-family: var(--font-article); font-weight: 800; font-size: clamp(28px, 2.6vw, 36px); letter-spacing: -.01em; line-height: 1; color: var(--color-text-strong); padding-left: 26px; }
   .bc-desc { font-family: var(--font-serif); font-size: 13.5px; color: var(--color-text-muted); padding-left: 26px; }
   .bc-meta { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--color-card-border); padding-top: 13px; font-family: var(--font-code); font-size: 11px; color: var(--color-text-muted); }
+  .bc-copy {
+    align-self: flex-start; margin-left: 26px;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+    background: transparent; color: var(--color-accent);
+    padding: 5px 12px; cursor: pointer;
+    font-family: var(--font-code); font-size: 11px; letter-spacing: .08em;
+    transition: background .25s ease, color .25s ease;
+  }
+  .bc-copy:hover, .bc-copy.is-done { background: var(--color-accent); color: #fff; }
   .seal {
     position: absolute; right: 15px; top: 15px;
     width: 46px; aspect-ratio: 1;
@@ -130,6 +184,12 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
   }
 
   .fr-avatar { width: 84px; height: 84px; object-fit: cover; flex-shrink: 0; margin-left: 12px; border: 1px solid var(--color-card-border); }
+  .fr-fallback {
+    width: 84px; height: 84px; flex-shrink: 0; margin-left: 12px;
+    display: grid; place-items: center;
+    background: linear-gradient(140deg, var(--red-2), var(--red-0));
+    color: #fff; font-family: var(--font-article); font-weight: 800; font-size: 30px;
+  }
   .fr-info { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .fr-info b { font-family: var(--font-serif); font-size: 22px; font-weight: 500; letter-spacing: .04em; color: var(--color-text-strong); }
   .fr-info small { font-size: 13px; color: var(--color-text-muted); }

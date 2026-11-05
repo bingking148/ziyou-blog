@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import PageHero from '../../components/PageHero.astro';
+import ChapterRule from '../../components/ChapterRule.astro';
 import { slugifyTaxonomy } from '../../utils/columns.ts';
 
 const posts = await getCollection('post');
@@ -14,7 +14,7 @@ const cats = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 
 <Base title="分类" description="文章分类">
   <div class="ed-wrap ed-wrap--wide">
-    <PageHero index="06" label="CATEGORIES" title="分类" lede="按主题翻阅。" meta={[{ value: String(cats.length), label: '个分类' }]} />
+    <ChapterRule no="06" label="分类" en="CATEGORIES" value={`${cats.length} 个分类`} title="分类" lede="按主题翻阅。" />
     <ol class="ed-list wide-list-grid" data-reveal>
       {cats.map(([name, count], i) => (
         <li>

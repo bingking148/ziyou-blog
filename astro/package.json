@@ -11,7 +11,8 @@
     "prebuild": "node scripts/optimize-images.mjs",
     "build": "astro build",
     "preview": "astro preview --host",
-    "test:ui": "playwright test"
+    "test:ui": "playwright test",
+    "test:prod": "node scripts/test-prod.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.14",

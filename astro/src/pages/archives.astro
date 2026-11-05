@@ -1,7 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
+import ChapterRule from '../components/ChapterRule.astro';
+
 import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { postUrl } from '../utils/columns.ts';
 
@@ -22,12 +23,13 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
 
 <Base title="归档" description={`全部 ${posts.length} 篇文章的时间归档`}>
   <div class="ed-wrap ed-wrap--wide">
-    <PageHero
-      index="04"
-      label="ARCHIVE"
+    <ChapterRule
+      no="04"
+      label="归档"
+      en="ARCHIVE"
+      value={`${posts.length} 篇 · ${years.length} 个年份`}
       title="归档"
       lede="写下的每一篇，都留在这里。"
-      meta={[{ value: String(posts.length), label: '篇文章' }, { value: String(years.length), label: '个年份' }]}
     />
     <nav class="archive-discovery" aria-label="按主题浏览">
       <a href="/categories/">按分类浏览</a>

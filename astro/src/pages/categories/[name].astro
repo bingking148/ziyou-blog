@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import PageHero from '../../components/PageHero.astro';
+import ChapterRule from '../../components/ChapterRule.astro';
 import ResponsiveImage from '../../components/ResponsiveImage.astro';
 import ColumnJourney from '../../components/ColumnJourney.astro';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
@@ -45,12 +45,13 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
   {column && ColumnContent ? (
     <div class="ed-wrap ed-wrap--wide">
       <div class="column-masthead">
-        <PageHero
-          index="05"
-          label="SERIES"
+        <ChapterRule
+          no="05"
+          label="专栏"
+          en="SERIES"
+          value={`${columnList.length} 篇目`}
           title={column.data.title}
           lede={column.data.description}
-          meta={[{ value: String(columnList.length), label: '篇目' }]}
         />
         <figure class="column-visual" data-reveal>
           <div class="column-visual-top"><span>CURATED NOTES</span><span>VOL. 05</span></div>
@@ -67,7 +68,7 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
     </div>
   ) : (
     <div class="ed-wrap ed-wrap--wide">
-      <PageHero index="06" label="CATEGORY" title={name} meta={[{ value: String(inCategory.length), label: '篇文章' }]} />
+      <ChapterRule no="06" label="分类" en="CATEGORY" value={`${inCategory.length} 篇`} title={name} />
       <ol class="ed-list wide-list-grid" data-reveal>
         {inCategory.map((p, i) => (
           <li>

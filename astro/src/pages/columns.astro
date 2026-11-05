@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
+import ChapterRule from '../components/ChapterRule.astro';
 import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
 
@@ -17,12 +17,13 @@ const MAX_VISIBLE = 5;
 
 <Base title="专栏" description="成系列的专题文章合集">
   <div class="ed-wrap columns-page">
-    <PageHero
-      index="05"
-      label="SERIES"
+    <ChapterRule
+      no="05"
+      label="专栏"
+      en="SERIES"
+      value={`${columns.length} 个专栏`}
       title="专栏"
       lede="成系列的专题，按学习顺序编排，慢慢读完。"
-      meta={[{ value: String(columns.length), label: '个专栏' }]}
     />
 
     <div class="column-grid">

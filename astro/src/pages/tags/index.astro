@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import PageHero from '../../components/PageHero.astro';
+import ChapterRule from '../../components/ChapterRule.astro';
 import { slugifyTaxonomy } from '../../utils/columns.ts';
 
 const posts = await getCollection('post');
@@ -15,7 +15,7 @@ const max = Math.max(...tags.map(([, c]) => c));
 
 <Base title="标签" description="文章标签">
   <div class="ed-wrap ed-wrap--wide">
-    <PageHero index="07" label="TAGS" title="标签" lede="按关键词，找到同一主题的文字。" meta={[{ value: String(tags.length), label: '个标签' }]} />
+    <ChapterRule no="07" label="标签" en="TAGS" value={`${tags.length} 个标签`} title="标签" lede="按关键词，找到同一主题的文字。" />
     <div class="tag-cloud" data-reveal>
       {tags.map(([name, count]) => (
         <a

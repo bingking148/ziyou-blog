@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import PageHero from '../../components/PageHero.astro';
+import ChapterRule from '../../components/ChapterRule.astro';
 import { postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
 
 export async function getStaticPaths() {
@@ -25,7 +25,7 @@ const fmt = (d: Date) =>
 
 <Base title={`标签：${name}`} description={`标签「${name}」下的文章`}>
   <div class="ed-wrap ed-wrap--wide">
-    <PageHero index="07" label="TAG" title={`#${name}`} meta={[{ value: String(posts.length), label: '篇文章' }]} />
+    <ChapterRule no="07" label="标签" en="TAG" value={`${posts.length} 篇`} title={`#${name}`} />
     <ol class="ed-list wide-list-grid" data-reveal>
       {posts.map((p, i) => (
         <li>

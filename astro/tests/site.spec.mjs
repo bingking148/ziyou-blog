@@ -225,9 +225,12 @@ test('专栏按篇号排列，曲线随滚动绘制且响应窗口变化', async
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect(page.locator('[data-journey]')).toHaveClass(/is-enhanced/);
   const items = page.locator('[data-journey-item]');
-  await expect(items).toHaveCount(18);
-  await expect(page.locator('.journey-number')).toHaveText(Array.from({ length: 18 }, (_, i) => String(i + 1).padStart(2, '0')));
-  await expect(page.locator('[data-journey-line]')).toHaveCount(17);
+  // 数量从页面动态推导，内容增删不再需要改测试
+  const n = await items.count();
+  expect(n).toBeGreaterThan(0);
+  await expect(page.locator('.journey-number')).toHaveCount(n);
+  await expect(page.locator('.journey-number')).toHaveText(Array.from({ length: n }, (_, i) => String(i + 1).padStart(2, '0')));
+  await expect(page.locator('[data-journey-line]')).toHaveCount(n - 1);
   await expect(items.first().locator('a')).toHaveAttribute('href', '/post/python-zero-setup/');
   await items.first().scrollIntoViewIfNeeded();
   await expect(items.first()).toHaveClass(/is-reached/);
@@ -282,15 +285,16 @@ test('专栏手绘散落保持稳定，封面预览支持指针与键盘且不�
   expect(desktop.every((r, i) => i === 0 || r.top > desktop[i - 1].top)).toBe(true);
   expect(desktop.every((r) => r.left >= 0 && r.right <= 1440)).toBe(true);
   await expect(page.locator('.journey-board')).toHaveCount(1);
-  await expect(page.locator('.journey-card-outline')).toHaveCount(18);
-  await expect(page.locator('.journey-card-pencil')).toHaveCount(18);
-  await expect(page.locator('[data-journey-pin]')).toHaveCount(18);
-  await expect(page.locator('[data-journey-in]')).toHaveCount(18);
-  await expect(page.locator('[data-journey-out]')).toHaveCount(18);
-  await expect(page.locator('.journey-paper-back')).toHaveCount(18);
-  await expect(page.locator('[data-journey-line]')).toHaveCount(17);
-  await expect(page.locator('[data-journey-echo]')).toHaveCount(17);
-  await expect(page.locator('[data-journey-grain]')).toHaveCount(17);
+  const n = await page.locator('[data-journey-item]').count();
+  await expect(page.locator('.journey-card-outline')).toHaveCount(n);
+  await expect(page.locator('.journey-card-pencil')).toHaveCount(n);
+  await expect(page.locator('[data-journey-pin]')).toHaveCount(n);
+  await expect(page.locator('[data-journey-in]')).toHaveCount(n);
+  await expect(page.locator('[data-journey-out]')).toHaveCount(n);
+  await expect(page.locator('.journey-paper-back')).toHaveCount(n);
+  await expect(page.locator('[data-journey-line]')).toHaveCount(n - 1);
+  await expect(page.locator('[data-journey-echo]')).toHaveCount(n - 1);
+  await expect(page.locator('[data-journey-grain]')).toHaveCount(n - 1);
   const preview = page.locator('[data-journey-preview="0"]');
   await first.hover({ position: { x: 120, y: 100 } });
   await expect(preview).toBeVisible();
@@ -361,7 +365,7 @@ test('专栏在减少动态效果与无 JavaScript 时完整可读', async ({ pa
   await staticPage.goto('/categories/python基础/');
   await expect(staticPage.locator('.journey-card').first()).toBeVisible();
   await expect(staticPage.locator('.journey-card').last()).toBeVisible();
-  await expect(staticPage.locator('.page-hero .hero-title')).toBeVisible();
+  await expect(staticPage.locator('.chapter-rule .cr-title')).toBeVisible();
   // 无 JS 时相邻卡片之间画静态短箭头；脚本接管后换逐段曲线。
   expect(await staticPage.evaluate(() => {
     const li = document.querySelector('[data-journey-item]');
@@ -384,4 +388,41 @@ test('移动端正文列完整落在视口内，不被裁切到左侧外', async
     expect(box.left, `${slug} 正文左缘被裁`).toBeGreaterThanOrEqual(0);
     expect(box.right, `${slug} 正文右缘溢出`).toBeLessThanOrEqual(box.vw + 1);
   }
+});
+
+test('内页三装置：目录卡、档案卷宗与名片灯', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  // 搜索 · 目录卡与键盘流
+  await page.goto('/search/');
+  await expect(page.locator('.cat-tab')).toBeVisible();
+  await expect(page.locator('.cat-stamp')).toHaveText('查');
+  await page.locator('#search-input').fill('工具调用');
+  await expect(page.locator('.result-row h3 em').first()).toHaveText('工具调用');
+  await expect(page.locator('.result-row .hit-meter i.on').first()).toBeVisible();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('.result-row.is-active')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.result-row')).toHaveCount(0);
+  // 无结果状态给出热词出口
+  await page.locator('#search-input').fill('不存在的关键词xyzq');
+  await expect(page.locator('#search-status .suggest-btn').first()).toBeVisible();
+
+  // 关于 · 卷宗指标与索引对账（数量随内容增长仍然成立）
+  await page.goto('/about/');
+  await expect(page.locator('.dos-tab')).toHaveText('FILE NO. 001 · OPEN');
+  await expect(page.locator('.dos-seal')).toHaveText('自由');
+  const total = (await (await page.request.get('/search.json')).json()).length;
+  const nums = await page.locator('.dos-metrics .metric dd').allTextContents();
+  expect(nums[0].trim()).toBe(String(total));
+
+  // 友链 · 名片与灯的数量关系（朋友数变化不破坏断言）
+  await page.goto('/friend/');
+  await expect(page.locator('.lamp-lede h1')).toContainText('一盏灯');
+  await expect(page.locator('.bc-copy')).toBeVisible();
+  const friends = await page.locator('.bizcard.fr').count();
+  expect(friends).toBeGreaterThan(0);
+  await expect(page.locator('.bizcard')).toHaveCount(friends + 2);
+  await expect(page.locator('.lamp.on')).toHaveCount(friends + 1);
+  await expect(page.locator('.lamp.off')).toHaveCount(1);
 });
