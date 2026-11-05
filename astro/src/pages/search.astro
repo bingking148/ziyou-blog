@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import ChapterRule from '../components/ChapterRule.astro';
 
 const posts = await getCollection('post');
 const counts = new Map<string, number>();
@@ -10,30 +11,38 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
 
 <Base title="搜索" description="站内搜索" noindex>
   <div class="ed-wrap ed-wrap--wide search-page">
-    <div class="search-top" data-reveal>
-      <span class="ed-label">02 / SEARCH</span>
-      <p class="search-hint">搜索全站 {posts.length} 篇文章</p>
+    <ChapterRule no="02" label="检索" en="CATALOG" value={`${posts.length} FILES INDEXED`} />
+
+    <div class="catalog" data-reveal style="--i:1">
+      <span class="cat-tab">INDEX CARD / 目录卡</span>
+      <div class="cat-card">
+        <div class="search-field">
+          <svg class="search-icon" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="输入关键词，找回那一行…"
+            autocomplete="off"
+            autofocus
+            aria-label="搜索文章"
+          />
+        </div>
+        <div class="cat-read">
+          <span class="cat-meta">INDEX {posts.length} FILES · CJK + FUZE</span>
+          <p id="search-status" class="search-status" role="status" aria-live="polite">
+            {posts.length} 篇文章在目录里 · 输入即搜；也可以 <a href="/archives/">浏览全部归档</a>
+          </p>
+        </div>
+        <div class="cat-scale" aria-hidden="true"></div>
+        <span class="cat-stamp" aria-hidden="true">查</span>
+      </div>
     </div>
 
-    <div class="search-field" data-reveal>
-      <input
-        id="search-input"
-        type="search"
-        placeholder="输入关键词…"
-        autocomplete="off"
-        autofocus
-        aria-label="搜索文章"
-      />
-      <svg class="search-icon" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <span class="search-underline" aria-hidden="true"></span>
-    </div>
-
-    <div class="search-suggest" data-reveal>
+    <div class="search-suggest" data-reveal style="--i:2">
       <span>试试：</span>
       {hotTags.map((t) => <button type="button" class="suggest-btn" data-keyword={t}>{t}</button>)}
     </div>
 
-    <p id="search-status" class="search-status" role="status" aria-live="polite">输入关键词开始搜索；也可以 <a href="/archives/">直接浏览全部归档</a>。</p>
     <ul id="search-results" class="search-results"></ul>
 
     <noscript>
@@ -65,25 +74,42 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
       status.classList.toggle('is-error', !!isError);
     }
 
-    function render(items, query) {
+    // 命中强度刻度：1–4 格，纯装饰，含义由状态行文字承载
+    function meterHtml(level, delay) {
+      var cells = '';
+      for (var n = 1; n <= 4; n++) cells += '<i' + (n <= level ? ' class="on"' : '') + '></i>';
+      return '<span class="hit-meter" aria-hidden="true" style="--d:' + delay + 'ms">' + cells + '</span>';
+    }
+
+    // 标题里的关键词朱砂高亮（仅第一处）
+    function markTitle(title, q) {
+      if (!q) return esc(title);
+      var idx = title.toLowerCase().indexOf(q.toLowerCase());
+      if (idx < 0) return esc(title);
+      return esc(title.slice(0, idx)) + '<em>' + esc(title.slice(idx, idx + q.length)) + '</em>' + esc(title.slice(idx + q.length));
+    }
+
+    function render(rows, query) {
       if (!query) {
         results.innerHTML = '';
         setStatus(index ? '共收录 ' + index.length + ' 篇文章' : '输入关键词开始搜索');
         return;
       }
-      if (!items.length) {
+      if (!rows.length) {
         results.innerHTML = '';
-        setStatus('没有找到「' + esc(query) + '」相关的文章');
+        setStatus('没有找到「' + esc(query) + '」——换个词，或去 <a href="/archives/">归档页</a> 翻翻');
         return;
       }
-      setStatus('找到 ' + items.length + ' 篇');
-      results.innerHTML = items
-        .map(function (it, i) {
+      setStatus('命中 ' + rows.length + ' 篇 · 按强度排序');
+      results.innerHTML = rows
+        .map(function (row, i) {
+          var it = row.it;
           return (
-            '<li><a class="ed-row result-row" href="' + esc(it.permalink) + '">' +
+            '<li><a class="result-row" ' + (row.level >= 4 ? 'data-m="4"' : '') + ' href="' + esc(it.permalink) + '">' +
+            meterHtml(row.level, i * 40) +
             '<span class="row-no">' + String(i + 1).padStart(2, '0') + '</span>' +
             '<span class="result-body">' +
-            '<h3>' + esc(it.title) + '</h3>' +
+            '<h3>' + markTitle(it.title, query) + '</h3>' +
             (it.description ? '<p>' + esc(it.description.slice(0, 110)) + '</p>' : '') +
             '</span>' +
             '<time>' + esc(it.date) + '</time>' +
@@ -99,7 +125,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
     function runSearch(q) {
       if (!index) return;
       if (CJK.test(q)) {
-        // 中文：子串匹配（标题/描述/标签加权靠前）
+        // 中文：子串匹配（标题/描述/标签加权靠前），打分归一为 1–4 格
         var lower = q.toLowerCase();
         var hits = index
           .map(function (it) {
@@ -112,7 +138,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
           })
           .filter(Boolean)
           .sort(function (a, b) { return b.score - a.score; })
-          .map(function (h) { return h.it; });
+          .map(function (h) { return { it: h.it, level: Math.min(4, Math.ceil(h.score / 2)) }; });
         render(hits, q);
       } else {
         // 拉丁文首次查询时才真正建 fuse 实例——中文用户不需要付这部分初始化成本
@@ -128,7 +154,12 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
             ignoreLocation: true,
           });
         }
-        if (fuse) render(fuse.search(q, { limit: 20 }).map(function (r) { return r.item; }), q);
+        if (fuse) {
+          var lower = q.toLowerCase();
+          render(fuse.search(q, { limit: 20 }).map(function (r) {
+            return { it: r.item, level: r.item.title.toLowerCase().includes(lower) ? 4 : 2 };
+          }), q);
+        }
       }
     }
 
@@ -146,7 +177,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
       if (loading) return;
       loading = true;
       loadFailed = false;
-      setStatus('正在加载索引…');
+      setStatus('正在加载目录…');
       fetch('/search.json')
         .then(function (r) {
           if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -161,7 +192,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
         .catch(function () {
           loading = false;
           loadFailed = true;
-          setStatus('索引加载失败。<button type="button" class="search-retry" id="search-retry">点击重试</button>', true);
+          setStatus('目录加载失败。<button type="button" class="search-retry" id="search-retry">点击重试</button>', true);
           var retry = document.getElementById('search-retry');
           if (retry) retry.addEventListener('click', function () { loadIndex(then); });
         });
@@ -224,25 +255,28 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
 </script>
 
 <style>
-  .search-page { max-width: 960px; }
-  .search-top { padding: 88px 0 0; }
-  .search-hint { margin: 18px 0 0; font-size: 14px; color: var(--color-text-muted); }
-  .search-field {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-top: 56px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--red-3);
+  .search-page { max-width: 960px; --hard: #102434; }
+  :global([data-theme="dark"]) .search-page { --hard: rgba(0, 0, 0, .55); }
+
+  /* 目录卡：白卡 + 标签页 + 硬投影，入场时从更斜的位置回正 */
+  .catalog { position: relative; margin-top: 44px; transform: rotate(-.7deg); }
+  html.js .catalog[data-reveal] { transition: opacity .5s ease-out, transform .7s cubic-bezier(.2, .8, .2, 1); }
+  html.js .catalog[data-reveal]:not(.is-visible) { transform: translateY(22px) rotate(-2deg); }
+  .cat-tab {
+    position: relative; z-index: 1; display: inline-block; margin-left: 30px;
+    padding: 8px 16px 7px; background: var(--color-text-strong); color: var(--color-bg);
+    font-family: var(--font-code); font-size: 10px; letter-spacing: .22em;
   }
+  .cat-card {
+    position: relative; margin-top: -1px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-card-border);
+    box-shadow: 14px 16px 0 var(--hard);
+    padding: 30px 32px 24px;
+  }
+  .search-field { display: flex; align-items: center; gap: 18px; }
   #search-input {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    outline: none;
-    background: transparent;
-    padding: 0;
+    flex: 1; min-width: 0; border: none; outline: none; background: transparent; padding: 0;
     font-family: var(--font-serif);
     font-size: clamp(26px, 3.6vw, 42px);
     letter-spacing: .04em;
@@ -251,22 +285,13 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
   #search-input::placeholder { color: var(--color-text-muted); opacity: .55; }
   .search-icon { flex-shrink: 0; color: var(--red-2); transition: transform .4s ease; }
   .search-field:focus-within .search-icon { transform: rotate(90deg); }
-  .search-underline {
-    position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
-    background: var(--red-1);
-    transform: scaleX(0); transform-origin: left;
-    transition: transform .5s cubic-bezier(.2,.8,.2,1);
+  .cat-read {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px 24px; flex-wrap: wrap;
+    margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--color-card-border);
   }
-  .search-field:focus-within .search-underline { transform: scaleX(1); }
-  .search-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 24px; font-size: 13px; color: var(--color-text-muted); }
-  .suggest-btn {
-    border: none; background: none; padding: 2px 0; cursor: pointer;
-    font-family: inherit; font-size: 13px; letter-spacing: .05em;
-    color: var(--red-1); border-bottom: 1px solid var(--red-3);
-    transition: border-color .25s ease;
-  }
-  .suggest-btn:hover { border-color: var(--red-1); }
-  .search-status { margin: 56px 0 20px; font-size: 12px; letter-spacing: .12em; color: var(--color-text-muted); }
+  .cat-meta { font-family: var(--font-code); font-size: 11px; letter-spacing: .16em; color: var(--color-text-faint); white-space: nowrap; }
+  .search-status { margin: 0; font-size: 12.5px; letter-spacing: .04em; color: var(--color-text-muted); text-align: right; }
   .search-status.is-error { color: var(--color-accent); }
   .search-status a { color: var(--color-link); border-bottom: 1px solid var(--red-3); }
   .search-retry {
@@ -276,53 +301,101 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
     font-size: 12px; cursor: pointer;
   }
   .search-retry:hover { background: var(--red-5); }
+  .cat-scale {
+    position: relative; height: 10px; margin-top: 18px;
+    background:
+      repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-text-faint) 45%, transparent) 0 1px, transparent 1px 2.2%),
+      repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-text-faint) 70%, transparent) 0 1px, transparent 1px 11%);
+  }
+  .cat-scale::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: color-mix(in srgb, var(--color-text-faint) 55%, transparent); }
+  .cat-stamp {
+    position: absolute; right: 18px; bottom: 44px;
+    width: 46px; aspect-ratio: 1; border: 1px solid var(--color-accent); border-radius: 50%;
+    display: grid; place-items: center; color: var(--color-accent);
+    font-family: var(--font-serif); font-size: 20px;
+    transform: rotate(-10deg); opacity: .85;
+  }
+
+  .search-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin-top: 28px; font-size: 13px; color: var(--color-text-muted); }
+  .suggest-btn {
+    border: 1px solid var(--color-card-border); background: var(--color-surface);
+    padding: 5px 14px; cursor: pointer;
+    font-family: inherit; font-size: 13px; letter-spacing: .05em;
+    color: var(--color-link);
+    transition: border-color .25s ease, color .25s ease;
+  }
+  .suggest-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+  /* 结果行：命中刻度 + 编号 + 正文 + 日期 + 箭头 */
+  .search-results { list-style: none; margin: 48px 0 0; padding: 0; border-top: 1px solid var(--color-card-border); }
+  .search-results :global(.result-row) {
+    display: grid;
+    grid-template-columns: 64px 26px minmax(0, 1fr) auto 18px;
+    gap: 8px 16px;
+    align-items: start;
+    padding: 22px 4px;
+    border-bottom: 1px solid var(--color-card-border);
+    color: var(--color-text-strong);
+    transition: background .3s ease;
+  }
+  .search-results :global(.result-row:hover) { background: var(--red-5-5); }
+  .search-results :global(.hit-meter) { display: flex; gap: 3px; padding-top: 9px; }
+  .search-results :global(.hit-meter i) { flex: 1; height: 4px; background: color-mix(in srgb, var(--color-text-faint) 25%, transparent); }
+  .search-results :global(.hit-meter i.on) { background: var(--red-2); }
+  .search-results :global(.result-row[data-m="4"] .hit-meter i.on) { background: var(--color-accent); }
+  @keyframes meter-in { from { transform: scaleX(0); } }
+  .search-results :global(.hit-meter i.on) { transform-origin: left; animation: meter-in .45s ease var(--d, 0ms) both; }
+  .search-results :global(.row-no) { padding-top: 5px; font-family: var(--font-code); font-size: 11px; color: var(--red-2); letter-spacing: .08em; }
+  .search-results :global(.result-body) { min-width: 0; }
+  .search-results :global(.result-body h3) {
+    margin: 0 0 8px; font-family: var(--font-serif); font-size: 19px; font-weight: 500;
+    letter-spacing: .03em; color: var(--color-text-strong);
+    transition: color .3s ease;
+  }
+  .search-results :global(.result-body h3 em) { font-style: normal; color: var(--color-accent); }
+  .search-results :global(.result-row:hover .result-body h3) { color: var(--red-1); }
+  .search-results :global(.result-body p) {
+    margin: 0; font-size: 13px; line-height: 1.8; color: var(--color-text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .search-results :global(.result-row time) { padding-top: 6px; font-family: var(--font-code); font-size: 11px; letter-spacing: .04em; color: var(--color-text-muted); }
+  .search-results :global(.row-arrow) { padding-top: 4px; color: var(--red-2); }
+  .search-results :global(.result-row:hover .row-arrow) { transform: translate(3px, -3px); }
+
   .search-noscript {
     margin: 32px 0 0; padding: 14px 18px;
     border-left: 2px solid var(--color-accent);
     background: color-mix(in srgb, var(--color-accent) 7%, transparent);
     font-size: 13.5px; line-height: 1.8;
   }
-  .search-results { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
-  .search-results :global(.result-row) { align-items: flex-start; }
-  .search-results :global(.result-row .row-no) { padding-top: 6px; }
-  .search-results :global(.result-body) { flex: 1; min-width: 0; }
-  .search-results :global(.result-body h3) {
-    margin: 0 0 8px; font-family: var(--font-serif); font-size: 19px; font-weight: 500;
-    letter-spacing: .03em; color: var(--color-text-strong);
-    transition: color .3s ease;
-  }
-  .search-results :global(.result-row:hover .result-body h3) { color: var(--red-1); }
-  .search-results :global(.result-body p) {
-    margin: 0; font-size: 13px; line-height: 1.8; color: var(--color-text-muted);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .search-results :global(.result-row time) { flex-shrink: 0; padding-top: 6px; font-size: 11px; letter-spacing: .06em; color: var(--color-text-muted); }
-  .search-results :global(.result-row .row-arrow) { padding-top: 4px; }
+
   @media (min-width: 1440px) {
     .search-page { max-width: var(--wide-content); }
-    .search-top { display: grid; grid-template-columns: minmax(160px, .45fr) minmax(0, 1.4fr) auto; gap: var(--wide-gap); align-items: end; padding: 116px 0 64px; }
-    .search-top .ed-label { align-self: start; margin-top: 18px; }
-    .search-hint { margin: 0; font-family: var(--font-serif); font-size: clamp(28px, 2.8vw, 46px); line-height: 1.65; color: var(--color-text-strong); }
-    .search-field { grid-column: 1 / -1; }
-    .search-page { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); column-gap: var(--wide-gap); }
-    .search-top { grid-column: 1 / -1; }
-    .search-field { margin-top: 0; padding: 24px 0; }
-    #search-input { font-size: clamp(32px, 3.2vw, 52px); }
-    .search-suggest { align-self: center; justify-content: flex-end; margin-top: 0; }
-    .search-status { grid-column: 1 / -1; margin: 72px 0 28px; }
-    .search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--wide-gap); border-top: 0; }
-    .search-results { grid-column: 1 / -1; }
-    .search-results :global(li) { min-width: 0; border-top: 1px solid var(--color-card-border); }
-    .search-results :global(.result-row) { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px 20px; min-height: 180px; padding: 28px 16px 28px 4px; }
+    .catalog { max-width: 900px; }
+    .search-suggest { max-width: 900px; }
+    .search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--wide-gap); }
+    .search-results :global(li) { min-width: 0; }
+    .search-results :global(.result-row) { min-height: 116px; padding: 26px 16px 26px 4px; gap: 8px 20px; }
     .search-results :global(.result-body h3) { font-size: 20px; line-height: 1.6; }
     .search-results :global(.result-body p) { display: -webkit-box; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-    .search-results :global(.result-row time) { grid-column: 2; grid-row: 2; padding-top: 0; }
-    .search-results :global(.result-row .row-arrow) { grid-column: 3; grid-row: 1; }
-    .search-noscript { grid-column: 1 / -1; }
   }
   @media (max-width: 760px) {
-    .search-top { padding-top: 48px; }
-    .search-field { margin-top: 40px; }
-    .search-results :global(.result-row time) { display: none; }
+    .catalog { margin-top: 32px; transform: rotate(-1deg); }
+    html.js .catalog[data-reveal]:not(.is-visible) { transform: translateY(16px) rotate(-1.8deg); }
+    .cat-tab { margin-left: 20px; }
+    .cat-card { padding: 22px 20px 18px; box-shadow: 7px 8px 0 var(--hard); }
+    .cat-scale { height: 8px; margin-top: 14px; }
+    .cat-stamp { width: 40px; font-size: 17px; right: 14px; bottom: 40px; }
+    .cat-read { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .search-status { text-align: left; }
+    .search-field { gap: 14px; }
+    .search-results { margin-top: 36px; }
+    .search-results :global(.result-row) { grid-template-columns: 56px minmax(0, 1fr) 16px; padding: 18px 0; }
+    .search-results :global(.row-no), .search-results :global(.result-row time) { display: none; }
+    .search-results :global(.result-body h3) { font-size: 17px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .catalog[data-reveal], html.js .catalog[data-reveal]:not(.is-visible) { transform: rotate(-.7deg); transition: none; }
+    .search-results :global(.hit-meter i.on) { animation: none; }
   }
 </style>

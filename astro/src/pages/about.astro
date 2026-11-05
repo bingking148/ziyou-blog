@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
-import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR } from '../consts.ts';
+import ChapterRule from '../components/ChapterRule.astro';
+import { AUTHOR, SITE_DESCRIPTION, SINCE, SOCIAL } from '../consts.ts';
 
 const posts = await getCollection('post');
 const columns = await getCollection('columns');
@@ -30,6 +30,7 @@ for (const p of posts) {
   if (b) b.count++;
 }
 const maxCount = Math.max(...buckets.map((b) => b.count));
+const peakMonth = buckets.find((b) => b.count === maxCount);
 
 const techGroups = [
   { name: '编程语言', en: 'LANGUAGES', items: [
@@ -61,49 +62,49 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
 ---
 
 <Base title="关于" description={`关于 ${AUTHOR}：${SITE_DESCRIPTION}`}>
-  <div class="ed-wrap ed-wrap--wide">
-    <PageHero index="01" label="ABOUT" title="关于" lede="一个仍在学习的人，和一块留给好奇心的地方。" />
+  <div class="ed-wrap ed-wrap--wide about-page">
+    <ChapterRule no="01" label="档案" en="DOSSIER" value={`EST. ${SINCE}`} />
 
-    <!-- 自述 -->
-    <section class="about-intro" data-reveal>
-      <p class="about-lead">
-        我是 {AUTHOR}。这里不追热点，只记录那些<span>真正想明白的事</span>——
-        技术笔记、学习心得，和一些代码解释不了的问题。
-      </p>
-      <p class="about-sub">写代码出 BUG，折腾各种技术，再把踩过的坑讲清楚。如果这些文字对你有用，欢迎常来。</p>
-    </section>
+    <!-- 档案卷宗 -->
+    <section class="dossier" data-reveal style="--i:1" aria-label="站主档案">
+      <span class="dos-tab">FILE NO. 001 · OPEN</span>
+      <span class="dos-seal" aria-hidden="true">自由</span>
 
-    <!-- 写作数据 -->
-    <section class="stats-band" data-reveal aria-label="写作数据">
-      <div class="stats-grid">
-        <div class="stat"><span class="stat-num">{posts.length}</span><span class="stat-label">ARTICLES / 文章</span></div>
-        <div class="stat"><span class="stat-num">{(totalWords / 10000).toFixed(1)}<small>万</small></span><span class="stat-label">WORDS / 总字数</span></div>
-        <div class="stat"><span class="stat-num">{columns.length}</span><span class="stat-label">SERIES / 专栏</span></div>
-        <div class="stat"><span class="stat-num">{monthSpan}</span><span class="stat-label">MONTHS / 写作月</span></div>
-      </div>
-      <div class="rhythm">
-        <div class="rhythm-head">
-          <span class="rhythm-title">写作节奏</span>
-          <span class="rhythm-note">按月统计 · 空白月份是真实的停笔</span>
-        </div>
-        <div class="rhythm-chart" role="img" aria-label={`月度写作篇数：${buckets.map((b) => `${b.label} 月 ${b.count} 篇`).join('，')}`}>
+      <dl class="dos-form">
+        <div><dt>姓名 NAME</dt><dd>{AUTHOR}</dd></div>
+        <div><dt>坐标 SITE</dt><dd>ziyou814.top<small>EST. {SINCE}</small></dd></div>
+        <div class="wide"><dt>站训 MOTTO</dt><dd>在键盘上，<em>写下又一行注释</em>。</dd></div>
+        <div class="wide"><dt>导语 NOTE</dt><dd>不追热点，只记录真正想明白的事——技术笔记、学习心得，和代码解释不了的问题。</dd></div>
+      </dl>
+
+      <dl class="dos-metrics" aria-label="写作数据">
+        <div class="metric"><dt>文章</dt><dd>{posts.length}</dd></div>
+        <div class="metric"><dt>总字数</dt><dd>{(totalWords / 10000).toFixed(1)}<small>万</small></dd></div>
+        <div class="metric"><dt>专栏</dt><dd>{columns.length}</dd></div>
+        <div class="metric"><dt>写作月</dt><dd>{monthSpan}</dd></div>
+      </dl>
+
+      <div class="dos-rhythm">
+        <div
+          class="rhythm-chart"
+          role="img"
+          aria-label={`月度写作篇数：${buckets.map((b) => `${b.label} 月 ${b.count} 篇`).join('，')}`}
+        >
           {buckets.map((b) => (
-            <div class="rhythm-col">
+            <div class:list={['rhythm-col', { 'is-peak': b.count === maxCount, 'is-empty': b.count === 0 }]}>
               <span class="rhythm-count">{b.count > 0 ? b.count : ''}</span>
-              <span
-                class:list={['rhythm-bar', { 'is-peak': b.count === maxCount, 'is-empty': b.count === 0 }]}
-                style={`height:${b.count === 0 ? 2 : Math.max(6, (b.count / maxCount) * 100)}%`}
-              ></span>
+              <span class="rhythm-bar" style={`height:${b.count === 0 ? 2 : Math.max(6, (b.count / maxCount) * 100)}%`}></span>
               <span class="rhythm-month">{b.label}</span>
             </div>
           ))}
         </div>
+        <p class="rhythm-note">写作节奏 · 空白月是<b>真实的停笔</b><br />{peakMonth.label} 最多 {maxCount} 篇</p>
       </div>
     </section>
 
     <!-- 技术栈 -->
     <section class="about-section" data-reveal>
-      <h2 class="section-title"><span class="ed-label">TOOLBOX</span>趁手的工具</h2>
+      <h2 class="sec-k"><b>TOOLBOX</b>趁手的工具 · FILE ENTRIES</h2>
       <div class="tech-grid">
         {techGroups.map((g) => (
           <div class="tech-group">
@@ -120,131 +121,153 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
 
     <!-- 兴趣与联系 -->
     <div class="about-lower">
-    <!-- 兴趣 -->
-    <section class="about-section" data-reveal>
-      <h2 class="section-title"><span class="ed-label">INTERESTS</span>平时在做</h2>
-      <ol class="ed-list">
-        {hobbies.map((h, i) => (
-          <li class="ed-row">
-            <span class="row-no">0{i + 1}</span>
-            <span class="row-title">{h}</span>
-          </li>
-        ))}
-      </ol>
-    </section>
+      <section class="about-section" data-reveal>
+        <h2 class="sec-k"><b>INTERESTS</b>平时在做</h2>
+        <ol class="ledger">
+          {hobbies.map((h, i) => (
+            <li><span class="no">0{i + 1}</span>{h}</li>
+          ))}
+        </ol>
+      </section>
 
-    <!-- 联系 -->
-    <section class="about-section about-contact" data-reveal>
-      <h2 class="section-title"><span class="ed-label">CONTACT</span>找到我</h2>
-      <div class="contact-links">
-        <span class="contact-item">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12.003 2c-2.265 0-6.29 1.364-6.29 7.325v1.195S3.55 14.96 3.55 17.474c0 .665.17 1.025.281 1.025.114 0 .902-.484 1.748-2.072 0 0-.18 2.197 1.904 3.967 0 0-1.77.495-1.77 1.182 0 .686 4.078.43 6.29.43 2.21 0 6.287.257 6.287-.43 0-.687-1.768-1.182-1.768-1.182 2.085-1.77 1.905-3.967 1.905-3.967.845 1.588 1.634 2.072 1.746 2.072.111 0 .283-.36.283-1.025 0-2.514-2.166-6.954-2.166-6.954V9.325C18.29 3.364 14.268 2 12.003 2z"/></svg>
-          <span class="contact-name">QQ</span>
-          <span class="contact-value">1605726649</span>
-        </span>
-        <span class="contact-item">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.032zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.969-.982z"/></svg>
-          <span class="contact-name">微信</span>
-          <span class="contact-value">18239772567</span>
-        </span>
-      </div>
-    </section>
+      <section class="about-section" data-reveal>
+        <h2 class="sec-k"><b>CONTACT</b>找到我</h2>
+        <div class="contact">
+          <span><span class="k">QQ</span><span class="v">1605726649</span></span>
+          <span><span class="k">WECHAT</span><span class="v">18239772567</span></span>
+          <a href={SOCIAL.github} target="_blank" rel="noopener"><span class="k">GITHUB</span><span class="v">github.com/bingking148 ↗</span></a>
+        </div>
+      </section>
     </div>
   </div>
 </Base>
 
 <style>
-  .about-intro { padding: 40px 0 64px; }
-  .about-lead {
-    margin: 0 0 22px;
-    font-family: var(--font-serif);
-    font-size: clamp(21px, 2.4vw, 30px);
-    line-height: 1.95;
-    letter-spacing: .03em;
-    color: var(--color-text-strong);
-  }
-  .about-lead span { color: var(--red-1); box-shadow: inset 0 -.3em 0 var(--red-4); }
-  .about-sub { max-width: 560px; margin: 0; font-size: 14px; line-height: 1.95; color: var(--color-text-muted); }
+  .about-page { --hard: #102434; --band: #102434; --band-text: #eef5f7; --band-muted: #9db4cf; --band-line: rgba(216, 236, 242, .16); }
+  :global([data-theme="dark"]) .about-page { --hard: rgba(0, 0, 0, .55); --band: #0c1520; }
 
-  /* 写作数据带 */
-  .stats-band {
-    background: #17202c;
-    color: #fff;
-    padding: 48px clamp(24px, 4vw, 56px) 36px;
-    margin-bottom: 80px;
+  /* 卷宗卡 */
+  .dossier {
+    position: relative;
+    margin-top: 46px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-card-border);
+    box-shadow: 13px 15px 0 var(--hard);
+    transform: rotate(-.35deg);
+    padding: 34px 0 0;
   }
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
-  .stat { display: flex; flex-direction: column; gap: 12px; padding-left: 24px; border-left: 1px solid rgba(255,255,255,.16); }
-  .stat:first-child { padding-left: 0; border-left: none; }
-  .stat-num { font-family: var(--font-serif); font-size: clamp(34px, 4vw, 52px); line-height: 1; }
-  .stat-num small { font-size: .4em; margin-left: 4px; opacity: .7; }
-  .stat-label { font-size: 9px; letter-spacing: .22em; color: rgba(255,255,255,.55); }
-  .rhythm { margin-top: 44px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,.14); }
-  .rhythm-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
-  .rhythm-title { font-size: 13px; letter-spacing: .2em; }
-  .rhythm-note { font-size: 11px; color: rgba(255,255,255,.45); }
-  .rhythm-chart { display: flex; align-items: stretch; gap: 10px; height: 120px; }
+  .dos-tab {
+    position: absolute; left: -1px; top: -30px;
+    padding: 8px 16px 7px;
+    background: var(--color-text-strong); color: var(--color-bg);
+    font-family: var(--font-code); font-size: 10px; letter-spacing: .22em;
+  }
+  .dos-seal {
+    position: absolute; right: 22px; top: 22px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 10px 0 8px; width: 52px;
+    border: 1.5px solid var(--color-accent); color: var(--color-accent);
+    font-family: var(--font-serif); font-size: 21px; line-height: 1.15;
+    writing-mode: vertical-rl; letter-spacing: .1em;
+    transform: rotate(-7deg); opacity: .9;
+    animation: seal-in .5s cubic-bezier(.2, .8, .3, 1.4) .7s both;
+  }
+  @keyframes seal-in { from { transform: rotate(-7deg) scale(1.55); opacity: 0; } }
+
+  /* 登记表 */
+  .dos-form { margin: 0; padding: 0 34px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 34px; }
+  .dos-form > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 15px 0; border-top: 1px solid var(--color-card-border); }
+  .dos-form > div:nth-child(-n + 2) { border-top: 0; }
+  .dos-form > div.wide { grid-column: 1 / -1; }
+  .dos-form dt { margin: 0; font-family: var(--font-code); font-size: 10px; letter-spacing: .18em; color: var(--color-text-muted); }
+  .dos-form dd { margin: 0; font-family: var(--font-serif); font-size: 22px; line-height: 1.5; color: var(--color-text-strong); }
+  .dos-form dd small { font-size: .45em; color: var(--color-text-muted); margin-left: 12px; letter-spacing: .08em; }
+  .dos-form dd em { font-style: normal; color: var(--color-accent); box-shadow: inset 0 -.24em 0 color-mix(in srgb, var(--color-accent) 16%, transparent); }
+
+  /* 指标带 */
+  .dos-metrics {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    margin: 20px 0 0; padding: 20px 34px;
+    border-top: 1px solid var(--color-text-strong);
+    background: var(--band); color: var(--band-text);
+  }
+  .metric dt { font-size: 10px; letter-spacing: .22em; color: var(--band-muted); margin-bottom: 8px; }
+  .metric dd { margin: 0; font-family: var(--font-article); font-weight: 800; font-size: clamp(30px, 3vw, 44px); line-height: 1; }
+  .metric dd small { font-size: .4em; font-weight: 600; opacity: .7; margin-left: 4px; }
+
+  /* 写作节奏 */
+  .dos-rhythm { display: flex; align-items: flex-end; gap: 28px; padding: 22px 34px 26px; }
+  .rhythm-chart { flex: 1; display: flex; align-items: stretch; gap: 12px; height: 132px; }
   .rhythm-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
-  .rhythm-count { font-size: 11px; color: rgba(255,255,255,.65); height: 14px; }
-  .rhythm-bar { width: 8px; max-width: 100%; background: var(--red-2); }
-  .rhythm-bar.is-peak { background: #d98063; }
-  .rhythm-bar.is-empty { width: 100%; max-width: 28px; background: rgba(255,255,255,.18); }
-  .rhythm-month { font-size: 10px; letter-spacing: .08em; color: rgba(255,255,255,.5); }
+  .rhythm-count { font-family: var(--font-code); font-size: 11px; color: var(--color-text-muted); height: 14px; }
+  .rhythm-bar { width: 9px; max-width: 100%; background: var(--red-2); }
+  .rhythm-col.is-peak .rhythm-bar { background: var(--color-accent); }
+  .is-empty .rhythm-bar { width: 100%; max-width: 26px; background: color-mix(in srgb, var(--color-text-faint) 22%, transparent); }
+  .rhythm-month { font-family: var(--font-code); font-size: 9.5px; letter-spacing: .04em; color: var(--color-text-faint); }
+  .rhythm-note { margin: 0; font-size: 12px; line-height: 1.9; color: var(--color-text-muted); max-width: 168px; }
+  .rhythm-note b { color: var(--color-accent); font-weight: 500; }
 
-  .about-section { margin-bottom: 72px; }
-  .section-title { display: flex; align-items: baseline; gap: 18px; margin: 0 0 28px; font-size: 26px; font-weight: 500; letter-spacing: .04em; }
-  .section-title .ed-label { flex-shrink: 0; }
+  /* 其余区块 */
+  .about-section { margin: 72px 0 0; }
+  .sec-k { display: flex; align-items: baseline; gap: 14px; margin: 0 0 26px; font-family: var(--font-serif); font-size: 25px; font-weight: 500; letter-spacing: .04em; color: var(--color-text-strong); }
+  .sec-k b { font-family: var(--font-code); font-size: 10px; letter-spacing: .26em; color: var(--color-accent); font-weight: 700; }
 
   .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
   .tech-group { padding-left: 20px; border-left: 1px solid var(--color-card-border); }
   .tech-group:first-child { padding-left: 0; border-left: none; }
   .tech-group h3 { display: flex; flex-direction: column; gap: 6px; margin: 0 0 16px; font-size: 15px; font-weight: 500; color: var(--color-text-strong); }
-  .tech-group h3 span { font-size: 9px; letter-spacing: .24em; color: var(--color-text-muted); }
+  .tech-group h3 span { font-family: var(--font-code); font-size: 9px; letter-spacing: .24em; color: var(--color-text-muted); }
   .tech-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .tech-group li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--color-text); }
   .tech-dot { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--tech-color, var(--red-1)); }
 
-  .about-contact { margin-bottom: 0; }
-  .contact-links { display: flex; flex-wrap: wrap; gap: 24px 48px; }
-  .contact-item {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--red-3);
-    color: var(--red-1);
+  .about-lower { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); gap: 40px; }
+  .ledger { list-style: none; margin: 0; padding: 0; }
+  .ledger li { display: flex; gap: 18px; align-items: baseline; padding: 15px 0; border-top: 1px solid var(--color-card-border); font-family: var(--font-serif); font-size: 17px; color: var(--color-text-strong); }
+  .ledger li:first-child { border-top: 0; padding-top: 0; }
+  .ledger .no { font-family: var(--font-code); font-size: 11px; color: var(--color-accent); }
+
+  .contact { display: flex; flex-direction: column; gap: 8px; }
+  .contact span, .contact a {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 13px 0; border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 32%, transparent);
   }
-  .contact-item svg { align-self: center; flex-shrink: 0; }
-  .contact-name { font-size: 13px; letter-spacing: .1em; color: var(--color-text-muted); }
-  .contact-value { font-family: var(--font-code); font-size: 20px; letter-spacing: .04em; color: var(--color-text-strong); }
+  .contact .k { font-family: var(--font-code); font-size: 10px; letter-spacing: .16em; color: var(--color-accent); min-width: 72px; }
+  .contact .v { font-family: var(--font-code); font-size: 17px; letter-spacing: .02em; color: var(--color-text-strong); }
+  .contact a:hover .v { color: var(--color-accent); }
 
   @media (min-width: 1440px) {
-    .about-intro { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: var(--wide-gap); align-items: end; padding: 48px 0 90px; }
-    .about-lead { max-width: 1080px; margin: 0; font-size: clamp(28px, 2.7vw, 44px); }
-    .about-sub { max-width: 460px; font-size: 15px; }
-    .stats-band { display: grid; grid-template-columns: minmax(480px, .9fr) minmax(0, 1.1fr); gap: var(--wide-gap); align-items: center; margin-right: calc(-1 * var(--wide-gutter)); margin-left: calc(-1 * var(--wide-gutter)); margin-bottom: 110px; padding: 60px var(--wide-gutter); }
-    .stats-grid { gap: 28px 0; }
-    .stat-num { font-size: clamp(42px, 4vw, 62px); }
-    .rhythm { margin-top: 0; padding: 0 0 0 var(--wide-gap); border-top: 0; border-left: 1px solid rgba(255,255,255,.14); }
-    .rhythm-chart { height: 150px; }
+    .dossier { margin-top: 58px; padding-top: 40px; }
+    .dos-form { padding: 0 44px; column-gap: 44px; }
+    .dos-form dd { font-size: 25px; }
+    .dos-metrics { padding: 24px 44px; margin-top: 24px; }
+    .dos-rhythm { padding: 26px 44px 30px; }
+    .rhythm-chart { height: 148px; }
+    .about-lower { gap: var(--wide-gap); }
     .tech-grid { gap: var(--wide-gap); }
-    .tech-group { padding: 8px 0 8px 28px; border-left: 1px solid var(--color-card-border); }
-    .tech-group h3 { font-size: 17px; }
-    .tech-group li { font-size: 14px; }
-    .about-lower { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); gap: var(--wide-gap); }
-    .about-lower .about-section { margin-bottom: 0; }
-    .contact-links { flex-direction: column; align-items: flex-start; gap: 20px; }
   }
   @media (max-width: 760px) {
-    .about-intro { padding: 24px 0 48px; }
-    .stats-band { padding: 32px 24px 24px; margin-bottom: 56px; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 0; }
-    .stat:nth-child(3) { padding-left: 0; border-left: none; }
-    .rhythm-chart { gap: 6px; height: 100px; }
-    .rhythm-note { display: none; }
-    .tech-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 20px; }
+    .dossier { margin-top: 34px; padding-top: 26px; box-shadow: 7px 8px 0 var(--hard); transform: rotate(-.5deg); }
+    .dos-tab { top: -27px; padding: 7px 12px 6px; }
+    .dos-seal { width: 44px; font-size: 18px; right: 14px; top: 14px; padding: 8px 0 6px; }
+    .dos-form { grid-template-columns: 1fr; padding: 0 20px; }
+    .dos-form > div, .dos-form > div.wide { grid-column: 1; }
+    .dos-form > div:nth-child(2) { border-top: 1px solid var(--color-card-border); }
+    .dos-form > div { grid-template-columns: 80px minmax(0, 1fr); gap: 12px; padding: 12px 0; }
+    .dos-form dd { font-size: 19px; }
+    .dos-metrics { grid-template-columns: 1fr 1fr; gap: 16px 12px; padding: 18px 20px; }
+    .metric dd { font-size: 26px; }
+    .dos-rhythm { flex-direction: column; align-items: stretch; gap: 14px; padding: 16px 20px 20px; }
+    .rhythm-chart { gap: 6px; height: 104px; }
+    .rhythm-month { font-size: 8.5px; }
+    .rhythm-note { max-width: none; }
+    .about-section { margin-top: 56px; }
+    .sec-k { font-size: 21px; }
+    .tech-grid { grid-template-columns: 1fr 1fr; gap: 30px 18px; }
     .tech-group:nth-child(3) { padding-left: 0; border-left: none; }
-    .about-section { margin-bottom: 56px; }
-    .section-title { font-size: 22px; gap: 12px; }
+    .about-lower { grid-template-columns: 1fr; gap: 48px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dos-seal { animation: none; }
   }
 </style>

@@ -1,0 +1,35 @@
+---
+interface Props {
+  no: string;
+  label: string;
+  en?: string;
+  value?: string;
+}
+const { no, label, en, value } = Astro.props;
+---
+<header class="chapter-rule" data-reveal>
+  <span class="cr-no">{no}</span>
+  <span class="cr-label">{label}{en && <> / {en}</>}</span>
+  <span class="cr-line" aria-hidden="true"></span>
+  {value && <span class="cr-value">{value}</span>}
+</header>
+
+<style>
+  .chapter-rule {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 88px 0 0;
+    font-family: var(--font-code);
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: var(--color-text-muted);
+  }
+  .cr-no { font-weight: 700; color: var(--color-accent); }
+  .cr-label { color: var(--color-text-strong); letter-spacing: .22em; }
+  .cr-line { flex: 1; height: 1px; background: var(--color-card-border); }
+  .cr-value { white-space: nowrap; }
+  @media (min-width: 1440px) { .chapter-rule { padding-top: 112px; } }
+  @media (max-width: 760px) { .chapter-rule { padding-top: 56px; gap: 10px; font-size: 10px; } }
+</style>

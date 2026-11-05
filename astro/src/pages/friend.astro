@@ -1,137 +1,176 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
+import ChapterRule from '../components/ChapterRule.astro';
 import Comments from '../components/Comments.astro';
 import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { FRIENDS } from '../data/friends.ts';
-import { SITE_TITLE, AUTHOR, SINCE } from '../consts.ts';
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
 ---
 
 <Base title="友情链接" description="友情链接与交换方式">
   <link slot="head" rel="stylesheet" href="/resources/waline/waline.css" />
-  <div class="ed-wrap ed-wrap--wide">
-    <PageHero
-      index="03"
-      label="FRIENDS"
-      title="友情链接"
-      lede="独立写作者之间，互相留一盏灯。"
-      meta={[
-        { value: String(FRIENDS.length), label: '位朋友' },
-        { value: String(SINCE), label: '本站创立于' },
-      ]}
-    />
+  <div class="ed-wrap ed-wrap--wide friend-page">
+    <ChapterRule no="03" label="友链" en="LAMPS" value={`${FRIENDS.length} LIT · EST. ${SINCE}`} />
 
-    <!-- 本站信息 -->
-    <section class="friend-section friend-site" data-reveal>
-      <h2 class="section-title"><span class="ed-label">THIS SITE</span>本站信息</h2>
-      <dl class="site-info">
-        <div class="info-item"><dt>站名</dt><dd>{SITE_TITLE}</dd></div>
-        <div class="info-item"><dt>站长</dt><dd>{AUTHOR}</dd></div>
-        <div class="info-item"><dt>网址</dt><dd>https://ziyou814.top</dd></div>
-      </dl>
-    </section>
+    <div class="lamp-lede" data-reveal>
+      <h1>互相留<em>一盏灯</em>。</h1>
+      <span>EVERY CARD KEEPS A LIGHT ON</span>
+    </div>
 
-    <!-- 小伙伴们 -->
-    <section class="friend-section" data-reveal>
-      <h2 class="section-title"><span class="ed-label">BLOGROLL</span>小伙伴们</h2>
-      <div class="friend-list">
-        {FRIENDS.map((f, i) => (
-          <a class="friend-row" href={f.url} target="_blank" rel="noopener">
-            <span class="friend-no">{String(i + 1).padStart(2, '0')}</span>
-            <ResponsiveImage class="friend-avatar" src={f.image} alt={f.name} sizes="84px" loading="lazy" />
-            <span class="friend-info">
-              <strong>{f.name}</strong>
-              <span class="friend-desc">{f.desc}</span>
-            </span>
-            <span class="friend-url">{new URL(f.url).hostname}</span>
-            <span class="friend-arrow">↗</span>
-          </a>
-        ))}
+    <!-- 名片阵列 -->
+    <div class="deck">
+      <div class="bizcard mine" data-reveal style="--i:1">
+        <i class="lamp on" aria-hidden="true"></i>
+        <span class="bc-tag">THIS SITE / 本站</span>
+        <b class="bc-name">{SITE_TITLE}</b>
+        <span class="bc-desc">{SITE_DESCRIPTION}。</span>
+        <div class="bc-meta">
+          <span>ziyou814.top</span>
+          <span>EST. {SINCE} · {AUTHOR}</span>
+        </div>
+        <span class="seal" aria-hidden="true">留灯</span>
       </div>
-    </section>
 
-    <!-- 申请 -->
-    <section class="friend-section friend-exchange" data-reveal>
-      <h2 class="section-title"><span class="ed-label">EXCHANGE</span>交换友链</h2>
-      <p class="apply-note">先添加本站，然后在本页留言，按下面的格式留下你的信息。</p>
-      <div class="apply-code">
-        <pre><code>- name: # 您的名字
-  url: # 您的网址
-  desc: # 简短描述
-  image: # 一张图片</code></pre>
+      {FRIENDS.map((f, i) => (
+        <a
+          class="bizcard fr"
+          href={f.url}
+          target="_blank"
+          rel="noopener"
+          data-reveal
+          style={`--i:${i + 2}`}
+        >
+          <i class="lamp on" aria-hidden="true"></i>
+          <ResponsiveImage class="fr-avatar" src={f.image} alt={f.name} sizes="84px" loading="lazy" />
+          <span class="fr-info">
+            <b>{f.name}</b>
+            <small>{f.desc}</small>
+            <u>{new URL(f.url).hostname}</u>
+          </span>
+          <span class="fr-arrow" aria-hidden="true">↗</span>
+        </a>
+      ))}
+
+      <div class="bizcard slot" data-reveal style={`--i:${FRIENDS.length + 2}`}>
+        <i class="lamp off" aria-hidden="true"></i>
+        <div class="slot-copy">
+          <b>你的名片留在这里</b>
+          <small>申请交换 · EXCHANGE</small>
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- 交换 -->
+    <div class="exchange" data-reveal>
+      <p class="ex-note">
+        先添加本站，然后<b>在本页留言</b>，按右边格式留下你的信息。<br />
+        审核通过后，你的灯也会亮在这里。
+      </p>
+      <pre class="ex-code"><code>- name: <em># 您的名字</em>
+  url: <em># 您的网址</em>
+  desc: <em># 简短描述</em>
+  image: <em># 一张图片</em></code></pre>
+    </div>
 
     <div class="friend-comments" data-reveal>
+      <div class="comments-head" aria-hidden="true">
+        <span>留言 · 交换记录</span>
+        <b>WALINE / OPEN</b>
+      </div>
       <Comments path="/friend/" />
     </div>
   </div>
 </Base>
 
 <style>
-  .friend-section { margin-bottom: 72px; }
-  .section-title { display: flex; align-items: baseline; gap: 18px; margin: 0 0 28px; font-size: 26px; font-weight: 500; letter-spacing: .04em; }
-  .section-title .ed-label { flex-shrink: 0; }
+  .friend-page { --hard: #102434; }
+  :global([data-theme="dark"]) .friend-page { --hard: rgba(0, 0, 0, .55); }
 
-  .site-info { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 24px; margin: 0; padding: 28px 0; border-top: 1px solid var(--color-card-border); border-bottom: 1px solid var(--color-card-border); }
-  .info-item dt { font-size: 11px; letter-spacing: .2em; color: var(--color-text-muted); margin-bottom: 10px; }
-  .info-item dd { margin: 0; font-family: var(--font-serif); font-size: 20px; color: var(--color-text-strong); overflow-wrap: anywhere; }
+  .lamp-lede { display: flex; align-items: baseline; gap: clamp(16px, 3vw, 36px); flex-wrap: wrap; margin-top: 40px; }
+  .lamp-lede h1 { margin: 0; font-size: clamp(30px, 3.4vw, 46px); font-weight: 500; letter-spacing: .05em; color: var(--color-text-strong); }
+  .lamp-lede h1 em { font-style: normal; color: var(--color-accent); }
+  .lamp-lede span { font-family: var(--font-code); font-size: 10px; letter-spacing: .24em; color: var(--color-text-muted); }
 
-  .friend-list { border-top: 1px solid var(--color-card-border); }
-  .friend-row {
-    display: flex; align-items: center; gap: clamp(16px, 3vw, 32px);
-    padding: 24px 8px;
-    border-bottom: 1px solid var(--color-card-border);
-    color: var(--color-text-strong);
-    transition: background .3s ease;
-  }
-  .friend-row:hover { background: var(--red-5-5); }
-  .friend-no { font-size: 11px; color: var(--red-2); }
-  .friend-avatar {
-    width: 84px; height: 84px; object-fit: cover; flex-shrink: 0;
+  /* 灯：本页唯一的循环动效 */
+  .lamp { position: absolute; left: 16px; top: 16px; width: 10px; height: 10px; border-radius: 50%; }
+  .lamp.on { background: var(--color-accent); box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 65%, transparent); animation: lamp-breathe 3.6s ease-in-out infinite; }
+  .lamp.off { background: transparent; border: 1px solid color-mix(in srgb, var(--color-text-faint) 45%, transparent); }
+  @keyframes lamp-breathe { 50% { box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 85%, transparent); } }
+
+  .deck { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; margin-top: 44px; }
+  .bizcard {
+    position: relative;
+    display: flex; flex-direction: column; gap: 11px;
+    background: var(--color-surface);
     border: 1px solid var(--color-card-border);
-    transition: transform .5s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 11px 13px 0 var(--hard);
+    padding: 24px;
+    transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease;
   }
-  .friend-row:hover .friend-avatar { transform: scale(1.05); }
-  .friend-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
-  .friend-info strong { font-family: var(--font-serif); font-size: 22px; font-weight: 500; letter-spacing: .04em; }
-  .friend-desc { font-size: 13px; color: var(--color-text-muted); }
-  .friend-url { flex-shrink: 0; font-size: 12px; color: var(--color-text-muted); letter-spacing: .04em; }
-  .friend-arrow { flex-shrink: 0; font-size: 20px; color: var(--red-2); transition: transform .3s ease; }
-  .friend-row:hover .friend-arrow { transform: translate(4px,-4px); }
+  .bizcard:hover { transform: translateY(-4px) rotate(0deg); box-shadow: 13px 16px 0 var(--hard); }
+  .mine { transform: rotate(-1.6deg); }
+  .mine:hover { transform: rotate(0deg) translateY(-4px); }
+  .fr { transform: rotate(.9deg); flex-direction: row; align-items: center; gap: 18px; box-shadow: 10px 12px 0 color-mix(in srgb, var(--hard) 85%, transparent); }
+  .fr:hover { transform: rotate(0deg) translateY(-4px); }
+  .slot { border: 1.5px dashed color-mix(in srgb, var(--color-text-faint) 45%, transparent); box-shadow: none; background: transparent; display: grid; place-items: center; text-align: center; padding: 28px 22px; }
+  .slot .lamp { position: static; margin: 0 auto 12px; }
 
-  .apply-note { margin: 0 0 20px; font-size: 14px; color: var(--color-text-muted); }
-  .apply-code { background: #17202c; padding: 24px 28px; }
-  .apply-code pre { margin: 0; overflow-x: auto; }
-  .apply-code code { font-family: var(--font-code); font-size: 13.5px; line-height: 1.9; color: #c9d6e8; }
+  .bc-tag { font-family: var(--font-code); font-size: 10px; letter-spacing: .22em; color: var(--color-accent); padding-left: 26px; }
+  .bc-name { font-family: var(--font-article); font-weight: 800; font-size: clamp(28px, 2.6vw, 36px); letter-spacing: -.01em; line-height: 1; color: var(--color-text-strong); padding-left: 26px; }
+  .bc-desc { font-family: var(--font-serif); font-size: 13.5px; color: var(--color-text-muted); padding-left: 26px; }
+  .bc-meta { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--color-card-border); padding-top: 13px; font-family: var(--font-code); font-size: 11px; color: var(--color-text-muted); }
+  .seal {
+    position: absolute; right: 15px; top: 15px;
+    width: 46px; aspect-ratio: 1;
+    border: 1px solid var(--color-accent); color: var(--color-accent);
+    display: grid; place-items: center;
+    font-family: var(--font-serif); font-size: 15px; line-height: 1.2;
+    writing-mode: vertical-rl; letter-spacing: .12em;
+    transform: rotate(8deg); opacity: .9;
+  }
 
-  .friend-comments { padding-top: 8px; border-top: 1px solid var(--color-card-border); }
+  .fr-avatar { width: 84px; height: 84px; object-fit: cover; flex-shrink: 0; margin-left: 12px; border: 1px solid var(--color-card-border); }
+  .fr-info { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .fr-info b { font-family: var(--font-serif); font-size: 22px; font-weight: 500; letter-spacing: .04em; color: var(--color-text-strong); }
+  .fr-info small { font-size: 13px; color: var(--color-text-muted); }
+  .fr-info u { font-family: var(--font-code); font-size: 10.5px; color: var(--red-2); text-decoration: none; letter-spacing: .04em; }
+  .fr-arrow { margin-left: auto; align-self: flex-start; color: var(--red-2); font-size: 18px; padding-right: 4px; }
+
+  .slot-copy b { display: block; font-family: var(--font-serif); font-size: 17px; font-weight: 500; color: var(--color-text); }
+  .slot-copy small { display: block; margin-top: 8px; font-family: var(--font-code); font-size: 10px; letter-spacing: .2em; color: var(--color-text-muted); }
+
+  .exchange { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 30px; align-items: start; margin-top: 64px; }
+  .ex-note { margin: 0; font-family: var(--font-serif); font-size: 16.5px; line-height: 2.1; color: var(--color-text); }
+  .ex-note b { color: var(--color-accent); font-weight: 500; }
+  .ex-code { margin: 0; background: var(--color-text-strong); padding: 22px 26px; }
+  .ex-code code { font-family: var(--font-code); font-size: 13.5px; line-height: 2.05; color: color-mix(in srgb, var(--color-bg) 88%, transparent); }
+  .ex-code em { font-style: normal; color: color-mix(in srgb, var(--color-accent) 80%, #e8b7a8); }
+
+  .friend-comments { margin-top: 64px; border-top: 1px dashed var(--color-card-border); padding-top: 24px; }
+  .comments-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; font-size: 11px; letter-spacing: .22em; color: var(--color-text-muted); }
+  .comments-head b { font-family: var(--font-code); color: var(--color-accent); font-weight: 700; }
 
   @media (min-width: 1440px) {
-    .friend-site { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(0, 1.8fr); gap: var(--wide-gap); margin-bottom: 100px; }
-    .friend-site .section-title { display: block; margin: 0; }
-    .friend-site .section-title .ed-label { display: block; margin-bottom: 16px; }
-    .site-info { padding: 22px 0; }
-    .info-item dd { font-size: 23px; }
-    .friend-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px var(--wide-gap); border-top: 0; }
-    .friend-row { display: grid; grid-template-columns: 22px 100px minmax(0, 1fr) 20px; gap: 20px; min-height: 180px; padding: 30px 22px; border: 1px solid var(--color-card-border); background: color-mix(in srgb, var(--color-surface) 58%, transparent); }
-    .friend-avatar { width: 100px; height: 100px; }
-    .friend-url { grid-column: 3; font-size: 11px; }
-    .friend-arrow { grid-column: 4; grid-row: 1; }
-    .friend-exchange { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(260px, .75fr) minmax(0, 1.05fr); gap: var(--wide-gap); align-items: start; margin-bottom: 96px; }
-    .friend-exchange .section-title { display: block; margin: 0; }
-    .friend-exchange .section-title .ed-label { display: block; margin-bottom: 16px; }
-    .apply-note { margin: 0; line-height: 1.95; }
-    .apply-code { min-width: 0; }
-    .friend-comments { max-width: 1180px; margin-left: auto; }
+    .lamp-lede { margin-top: 52px; }
+    .lamp-lede h1 { font-size: clamp(36px, 3vw, 52px); }
+    .deck { gap: var(--wide-gap); margin-top: 56px; }
+    .exchange { gap: var(--wide-gap); margin-top: 84px; }
+    .fr-avatar { width: 96px; height: 96px; }
+    .friend-comments { margin-top: 84px; max-width: 1180px; }
   }
   @media (max-width: 760px) {
-    .friend-section { margin-bottom: 56px; }
-    .section-title { font-size: 22px; gap: 12px; }
-    .site-info { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
-    .info-item:last-child { grid-column: 1 / -1; }
-    .friend-avatar { width: 64px; height: 64px; }
-    .friend-url { display: none; }
-    .friend-info strong { font-size: 19px; }
+    .lamp-lede { margin-top: 28px; }
+    .lamp-lede h1 { font-size: 27px; }
+    .deck { grid-template-columns: 1fr; gap: 26px; margin-top: 34px; }
+    .bizcard { box-shadow: 6px 7px 0 var(--hard); padding: 20px; }
+    .fr { box-shadow: 6px 7px 0 color-mix(in srgb, var(--hard) 85%, transparent); }
+    .fr-avatar { width: 66px; height: 66px; }
+    .fr-info b { font-size: 19px; }
+    .exchange { grid-template-columns: 1fr; margin-top: 52px; }
+    .friend-comments { margin-top: 52px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lamp.on { animation: none; }
+    .bizcard, .bizcard:hover { transition: none; }
   }
 </style>
