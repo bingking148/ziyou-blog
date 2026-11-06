@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 8 篇：Manus 专题——做对了几乎一切，却算错了两件事'
 weight: 8
-date: 2026-11-03T21:00:00+08:00
+date: 2026-11-06T11:00:00+08:00
 cover: /images/covers/ai-agent-manus-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', 'Manus', '上下文工程', '出海']

@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 9 篇：Gen 6——平台托管与个人代理，Agent 回到云端'
 weight: 9
-date: 2026-11-03T22:00:00+08:00
+date: 2026-11-06T12:00:00+08:00
 cover: /images/covers/ai-agent-gen6-platform-hosting-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', '个人助理', '平台托管', '豆包手机']

@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 5 篇：Gen 3——推理模型、MCP 与 Computer Use'
 weight: 5
-date: 2026-11-03T18:00:00+08:00
+date: 2026-11-05T21:00:00+08:00
 cover: /images/covers/ai-agent-gen3-reasoning-mcp-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', 'MCP', '推理模型', 'Claude Code']

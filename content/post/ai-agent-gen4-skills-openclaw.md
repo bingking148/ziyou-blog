@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 6 篇：Gen 4——技能打包与常驻，OpenClaw 的狂潮与退潮'
 weight: 6
-date: 2026-11-03T19:00:00+08:00
+date: 2026-11-06T09:00:00+08:00
 cover: /images/covers/ai-agent-gen4-skills-openclaw-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', 'OpenClaw', 'Agent Skills', '常驻Agent']

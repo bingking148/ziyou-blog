@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 7 篇：Gen 5——Work 化，Agent 走向每一个坐在电脑前的人'
 weight: 7
-date: 2026-11-03T20:00:00+08:00
+date: 2026-11-06T10:00:00+08:00
 cover: /images/covers/ai-agent-gen5-work-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', 'Cowork', 'Harness Engineering', 'Vibe Coding']

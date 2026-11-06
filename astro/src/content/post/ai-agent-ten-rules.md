@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 10 篇：本地还是云端，与十条规律'
 weight: 10
-date: 2026-11-03T23:00:00+08:00
+date: 2026-11-06T13:00:00+08:00
 cover: /images/covers/ai-agent-ten-rules-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', '发展规律', '本地部署', '云计算']

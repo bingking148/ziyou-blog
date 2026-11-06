@@ -1,7 +1,7 @@
 ---
 title: 'AI Agent 发展史第 4 篇：Gen 2——用流程换确定性'
 weight: 4
-date: 2026-11-03T17:00:00+08:00
+date: 2026-11-05T20:00:00+08:00
 cover: /images/covers/ai-agent-gen2-workflows-cover.jpg
 categories: ['人工智能', 'AI Agent 发展史']
 tags: ['AI Agent', '智能体', '工作流', '上下文工程', 'RAG']
