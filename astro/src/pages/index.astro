@@ -445,6 +445,8 @@ const shortTitle = (t: string) => t.split('——')[0];
       }
       window.addEventListener('wheel', stopCinema, { passive: true });
       window.addEventListener('touchstart', stopCinema, { passive: true });
+      /* 返回顶部按钮起飞前先叫停正片播放，两套滚动别打架。 */
+      window.addEventListener('site:stop-cinema', stopCinema);
       window.addEventListener('keydown', function (event) {
         if (!playing) return;
         var keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'PageUp', 'PageDown', 'Home', 'End'];
@@ -600,8 +602,9 @@ const shortTitle = (t: string) => t.split('——')[0];
 
 <style>
   /* ===== 三幕开场 ===== */
-  .scene { position: relative; height: 100svh; min-height: 660px; overflow: hidden; color: #fff; background: #0a1420; }
-  .scene.has-motion { height: 260svh; min-height: 1600px; overflow-x: clip; overflow-y: visible; }
+  /* 高度直接写进基础样式：若等 JS 加 has-motion 才撑到 260svh，首帧按矮高度排版、
+     脚本执行后整页内容下跳一截，就是打开首页时的闪屏。reduced 用户在下方媒体查询还原。 */
+  .scene { position: relative; height: 260svh; min-height: 1600px; overflow-x: clip; overflow-y: visible; color: #fff; background: #0a1420; }
   .scene-pin {
     --hero-y: 0vh; --hero-scale: 1.04; --hero-blur: 0px; --hero-opacity: 1;
     --copy-y: 0vh; --copy-opacity: 1; --copy-blur: 0px;
@@ -1151,6 +1154,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     .colophon-knob { max-width: 280px; }
   }
   @media (prefers-reduced-motion: reduce) {
+    .scene { height: 100svh; min-height: 660px; overflow: hidden; }
     .scene-media { transform: none !important; }
     .scene-card { transform: none !important; }
     .scene-glint { display: none; }

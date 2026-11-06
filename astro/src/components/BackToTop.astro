@@ -18,9 +18,81 @@
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
     window.addEventListener('resize', update, { passive: true });
+
+    /* ===== 两段式返回顶部 =====
+       开场三幕是滚动驱动的：滚过动画区就是倒放。原生 smooth 一路匀快滚过去，
+       动画被快进得像故障。这里拆成两段：动画区之外快速回，进入动画区后
+       按正片播放同款的「慢起—匀速—缓停」梯形节奏滚到顶，动画自然倒放。 */
+    var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
+    /* 与首页 cinema 同参数的梯形缓动：起点慢起、中段匀速、终点缓停。 */
+    var ACCEL = 0.16, DECEL = 0.24;
+    var CRUISE = 1 / (1 - (ACCEL + DECEL) / 2);
+    function easeCinema(x) {
+      x = clamp(x);
+      var cruiseEnd = 1 - DECEL;
+      if (x < ACCEL) return CRUISE * x * x / (2 * ACCEL);
+      if (x <= cruiseEnd) return CRUISE * (ACCEL / 2 + x - ACCEL);
+      var u = x - cruiseEnd;
+      return CRUISE * (1 - ACCEL / 2 - DECEL + u - (u * u) / (2 * DECEL));
+    }
+    function easeInOut(x) {
+      x = clamp(x);
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    }
+
+    var frame = 0;
+    var root = document.documentElement;
+    var savedBehavior = root.style.scrollBehavior;
+    function stopGlide() {
+      if (!frame) return;
+      cancelAnimationFrame(frame);
+      frame = 0;
+      root.style.scrollBehavior = savedBehavior;
+    }
+    /* from → to，duration 毫秒，ease 决定节奏，done 收尾。 */
+    function glide(from, to, duration, ease, done) {
+      var start = performance.now();
+      root.style.scrollBehavior = 'auto';
+      function step(now) {
+        var t = clamp((now - start) / duration);
+        window.scrollTo({ top: from + (to - from) * ease(t), left: 0, behavior: 'auto' });
+        if (t >= 1) { frame = 0; root.style.scrollBehavior = savedBehavior; if (done) done(); return; }
+        frame = requestAnimationFrame(step);
+      }
+      frame = requestAnimationFrame(step);
+    }
+    ['wheel', 'touchstart'].forEach(function (name) {
+      window.addEventListener(name, stopGlide, { passive: true });
+    });
+    window.addEventListener('keydown', function (event) {
+      if (!frame) return;
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].indexOf(event.key) >= 0) stopGlide();
+    });
+
     button.addEventListener('click', function () {
       var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+      if (reduced) { window.scrollTo({ top: 0, behavior: 'auto' }); return; }
+      stopGlide();
+      var y = window.scrollY;
+      if (y <= 4) return;
+      var scene = document.querySelector('.scene.has-motion');
+      if (!scene) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      /* 先叫停可能正在播放的开场正片。 */
+      window.dispatchEvent(new CustomEvent('site:stop-cinema'));
+      var distance = scene.offsetHeight - window.innerHeight;
+      var sceneTop = scene.getBoundingClientRect().top + y;
+      var sceneEnd = sceneTop + distance; /* 三幕动画到此播完 */
+      var cinemaBase = window.innerWidth <= 760 ? 3400 : 3800;
+      if (y > sceneEnd + 60) {
+        /* 第一段：动画区之外，快速（但仍是缓入缓出）滚到动画终点。 */
+        var fast = Math.min(1200, Math.max(420, (y - sceneEnd) * 0.22));
+        glide(y, sceneEnd, fast, easeInOut, function () {
+          /* 第二段：动画区，按正片同款节奏倒放回顶。 */
+          glide(sceneEnd, 0, cinemaBase, easeCinema, null);
+        });
+      } else {
+        glide(y, 0, Math.max(cinemaBase * 0.55, cinemaBase * (y / Math.max(1, sceneEnd))), easeCinema, null);
+      }
     });
     update();
   })();
