@@ -308,7 +308,9 @@ const shortTitle = (t: string) => t.split('——')[0];
       function update() {
         ticking = false;
         var rect = scene.getBoundingClientRect();
-        var distance = scene.offsetHeight - window.innerHeight;
+        /* 用 pin 高度而不是 window.innerHeight：pin 是 100svh，工具栏收放不改变，
+           平板上地址栏一弹一收 innerHeight 会跳，进度 p 跟着闪。 */
+        var distance = scene.offsetHeight - pin.offsetHeight;
         if (distance <= 0) return;
         var p = clamp(-rect.top / distance);
         var hold = ramp(p, 0, 0.16);
@@ -421,10 +423,11 @@ const shortTitle = (t: string) => t.split('——')[0];
       }
       if (cta) {
         cta.addEventListener('click', function (event) {
-          if (playing) return;
-          var distance = scene.offsetHeight - window.innerHeight;
-          if (distance <= 0) return;
+          /* 先挡默认锚点跳转再早退：播放中再点一下不能闪跳到 #journal。 */
           event.preventDefault();
+          if (playing) return;
+          var distance = scene.offsetHeight - pin.offsetHeight;
+          if (distance <= 0) return;
           var from = window.scrollY;
           var to = scene.offsetTop + distance * 0.86;
           if (from >= to) { schedule(); return; }
@@ -452,7 +455,9 @@ const shortTitle = (t: string) => t.split('——')[0];
         var keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'PageUp', 'PageDown', 'Home', 'End'];
         if (keys.indexOf(event.key) >= 0) stopCinema();
       });
-      window.addEventListener('resize', stopCinema);
+      /* 注意：resize 不叫停正片。平板上点按弹出地址栏、滚动又收起地址栏都会触发
+         resize，若在此中止，开场动画会被遗弃在三幕中途——白纸海报卡在半空的
+         「白屏」就是这么来的。目标位置是文档坐标，窗口怎么变都成立，继续播完。 */
       document.addEventListener('visibilitychange', function () {
         if (document.hidden) stopCinema();
       });

@@ -79,7 +79,9 @@
       if (!scene) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
       /* 先叫停可能正在播放的开场正片。 */
       window.dispatchEvent(new CustomEvent('site:stop-cinema'));
-      var distance = scene.offsetHeight - window.innerHeight;
+      /* 与首页 update() 同基准：pin(100svh) 高度稳定，工具栏收放不改变动画终点。 */
+      var pin = scene.querySelector('.scene-pin');
+      var distance = scene.offsetHeight - (pin ? pin.offsetHeight : window.innerHeight);
       var sceneTop = scene.getBoundingClientRect().top + y;
       var sceneEnd = sceneTop + distance; /* 三幕动画到此播完 */
       var cinemaBase = window.innerWidth <= 760 ? 3400 : 3800;
