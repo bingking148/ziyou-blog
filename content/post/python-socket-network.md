@@ -3,7 +3,7 @@ title: 'Python 第 16 篇：网络编程，让程序隔着网络说话'
 weight: 16
 cover: /images/covers/python-socket-network-cover.jpg
 date: 2026-11-03T09:00:00+08:00
-lastmod: 2026-11-04T09:00:00+08:00
+lastmod: 2026-11-06T10:00:00+08:00
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '网络编程', 'socket']
 description: '前面所有程序都只在一台电脑里自说自话。这篇把程序连上网：socket 是什么、服务器端怎么绑定端口等连接、客户端怎么连上去收发消息，最后跑通一个能隔空对话的收发程序。'
@@ -35,7 +35,7 @@ print(socket_object)
 1. `AF_INET` 是地址家族，意思是「用 IPv4」；对应的还有 `AF_INET6`（IPv6）；
 2. `SOCK_STREAM` 是 socket 类型，意思是「用 TCP 协议」；对应的还有 `SOCK_DGRAM`（UDP）。
 
-新手第一次接触，记住这一对就行：**IPv4 + TCP**，也就是 `socket.AF_INET, socket.SOCK_STREAM`。TCP 是可靠的、按顺序的传输，绝大多数网页、API 请求都走它。
+新手第一次接触，记这一对就行：**IPv4 + TCP**，也就是 `socket.AF_INET, socket.SOCK_STREAM`。TCP 是可靠的、按顺序的传输，绝大多数网页、API 请求都走它。
 
 ## 2. 服务器端：等着别人连进来
 
@@ -147,7 +147,7 @@ finally:
 
 跑起来后，先启动服务器，再开另一个窗口跑客户端，就能看到两边互相收发消息。测试时把 IP 换成 `127.0.0.1`——这是「本机」的地址，两个程序在同一台电脑上也能通。
 
-## 5. 常见坑
+## 5. 几个容易写错的地方
 
 1. 端口被占用——`bind` 报错 `OSError: Address already in use`，多半是上个服务器没关干净。加 `SO_REUSEADDR`，或者换个端口号；
 2. `send` 忘了 `encode`——网络传的是字节，直接发字符串报 `TypeError`。发的时候 `.encode('utf-8')`，收的时候 `.decode('utf-8')`；
@@ -164,7 +164,7 @@ finally:
 
 **练习二：一问一答**
 
-改练习一：客户端循环输入、循环发送，服务器每次收到都回一句；客户端输入 `bye` 时两边一起退出。体会「服务器一直开着、客户端随时进出」的模式。
+改练习一：客户端循环输入、循环发送，服务器每次收到都回一句；客户端输入 `bye` 时两边一起退出。看看「服务器一直开着、客户端随时进出」是什么感觉。
 
 **练习三：给服务器加日志**
 
@@ -172,10 +172,10 @@ finally:
 
 **练习四：收发 JSON**
 
-把第 13 篇的 JSON 用起来：客户端把字典 `{'user': 'alice', 'msg': '你好'}` 用 `json.dumps` 转成字符串再 `encode` 发送，服务器收到后 `decode` 再 `json.loads` 还原成字典打印。体会「结构化的数据怎么在网络里传」。
+把第 13 篇的 JSON 用起来：客户端把字典 `{'user': 'alice', 'msg': '你好'}` 用 `json.dumps` 转成字符串再 `encode` 发送，服务器收到后 `decode` 再 `json.loads` 还原成字典打印。看看结构化的数据在网络里是怎么传的。
 
-## 7. 本篇小结
+## 7. 小结
 
-网络编程记住一条主线：服务器 `bind → listen → accept → 收发 → close`，客户端 `connect → 收发 → close`，两边靠 `(ip, 端口)` 元组对上号，消息用 `encode` 发、`decode` 收。地址测试用 `127.0.0.1`，端口被占用就换一个。
+网络编程就一条线：服务器 `bind → listen → accept → 收发 → close`，客户端 `connect → 收发 → close`，两边靠 `(ip, 端口)` 元组对上号，消息用 `encode` 发、`decode` 收。地址测试用 `127.0.0.1`，端口被占用就换一个。
 
-到这里，程序能跨机器说话了。但有个问题一直没碰：程序现在还是一件一件做事的，同一时刻只能干一件事。下一篇讲进程和线程，让程序「同时」干好几件事——[第 17 篇：进程与线程](/post/python-process-thread/)。
+程序能跨机器说话了。但有个问题一直没碰：程序现在还是一件一件做事的，同一时刻只能干一件事。下一篇讲进程和线程，让程序「同时」干好几件事——[第 17 篇：进程与线程](/post/python-process-thread/)。
