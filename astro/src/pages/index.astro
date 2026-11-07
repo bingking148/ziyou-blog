@@ -471,6 +471,7 @@ const shortTitle = (t: string) => t.split('——')[0];
         stage = i;
         playing = !!asCta;
         pin.classList.toggle('is-cinematic', playing);
+        scene.classList.add('is-flipping'); /* 翻转期间禁用子元素 transition，防双帧同显 */
         if (cta) {
           if (playing) cta.setAttribute('aria-disabled', 'true');
           else cta.removeAttribute('aria-disabled');
@@ -491,6 +492,7 @@ const shortTitle = (t: string) => t.split('——')[0];
       /* 落幕：只有两个端点需要与真实滚动交接——两侧画面一致，交接零跳变。
          第二幕（stage 2）是动画终点：海报退场后自动滑入正文，不停留在空旷帧。 */
       function finishFlip() {
+        scene.classList.remove('is-flipping'); /* 翻转结束，恢复子元素 transition */
         if (playing) { playing = false; pin.classList.remove('is-cinematic'); if (cta) cta.removeAttribute('aria-disabled'); }
         if (stage === 2) {
           unlockScroll();
@@ -605,6 +607,8 @@ const shortTitle = (t: string) => t.split('——')[0];
           if (y <= 2 && !down) return;                     /* 封面顶向上：原生橡皮筋 */
           if (navFlight) return;                           /* 锚点飞行中：不抢 */
         }
+        /* 翻转进行中：忽略新滚轮，等当前幕演完再响应下一格。防止快速滚动切碎动画。 */
+        if (flipFrame) { event.preventDefault(); return; }
         event.preventDefault();
         var unit = event.deltaMode === 1 ? 40 : 1;
         var delta = event.deltaY * unit;
@@ -612,7 +616,7 @@ const shortTitle = (t: string) => t.split('——')[0];
         if (now - wheelAt > 200) wheelAcc = 0;
         wheelAt = now;
         wheelAcc += Math.abs(delta);
-        if (wheelAcc >= 30) { wheelAcc = 0; pageIntent(down ? 1 : -1); }
+        if (wheelAcc >= 60) { wheelAcc = 0; pageIntent(down ? 1 : -1); } /* 阈值从 30 提到 60，防误触 */
       }, { passive: false });
       /* 键盘：方向键/空格翻页，Home 倒放回封面，End 一口气正片到正文。 */
       window.addEventListener('keydown', function (event) {
@@ -902,6 +906,9 @@ const shortTitle = (t: string) => t.split('——')[0];
      合成器会先于 JS 启动原生惯性滚动，preventDefault 拦不住，惯性会把
      页面甩进正文。横向手势与双指缩放仍交给浏览器。 */
   .scene.has-motion { touch-action: pan-x pinch-zoom; }
+  /* 翻转期间禁用所有子元素的 transition：render(p) 逐帧写 CSS 变量，
+     若子元素有 transition 会插值滞后，导致新旧两帧同时可见（双帧同显闪屏）。 */
+  .scene.is-flipping *, .scene-pin.is-flipping * { transition: none !important; }
   .scene-pin {
     --hero-y: 0vh; --hero-scale: 1.04; --hero-blur: 0px; --hero-opacity: 1;
     --copy-y: 0vh; --copy-opacity: 1; --copy-blur: 0px;
