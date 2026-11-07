@@ -20,21 +20,11 @@
     window.addEventListener('resize', update, { passive: true });
 
     /* ===== 两段式返回顶部 =====
-       开场三幕是滚动驱动的：滚过动画区就是倒放。原生 smooth 一路匀快滚过去，
-       动画被快进得像故障。这里拆成两段：动画区之外快速回，进入动画区后
-       按正片播放同款的「慢起—匀速—缓停」梯形节奏滚到顶，动画自然倒放。 */
+       开场三幕已改为虚拟时间线（index.astro）：动画区没有真实滚动可擦。
+       这里拆成两段——动画区之外仍由本脚本快速滚回边界；进入动画区后把
+       倒放委托给开场脚本（site:intro-reverse），按正片同款梯形节奏演回
+       封面，落点自动解锁。 */
     var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
-    /* 与首页 cinema 同参数的梯形缓动：起点慢起、中段匀速、终点缓停。 */
-    var ACCEL = 0.16, DECEL = 0.24;
-    var CRUISE = 1 / (1 - (ACCEL + DECEL) / 2);
-    function easeCinema(x) {
-      x = clamp(x);
-      var cruiseEnd = 1 - DECEL;
-      if (x < ACCEL) return CRUISE * x * x / (2 * ACCEL);
-      if (x <= cruiseEnd) return CRUISE * (ACCEL / 2 + x - ACCEL);
-      var u = x - cruiseEnd;
-      return CRUISE * (1 - ACCEL / 2 - DECEL + u - (u * u) / (2 * DECEL));
-    }
     function easeInOut(x) {
       x = clamp(x);
       return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
@@ -77,23 +67,22 @@
       if (y <= 4) return;
       var scene = document.querySelector('.scene.has-motion');
       if (!scene) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-      /* 先叫停可能正在播放的开场正片。 */
+      /* 先叫停可能正在播放的开场正片与翻页补间。 */
       window.dispatchEvent(new CustomEvent('site:stop-cinema'));
-      /* 与首页 update() 同基准：pin(100svh) 高度稳定，工具栏收放不改变动画终点。 */
+      /* 与首页同基准：pin(100svh) 高度稳定，工具栏收放不改变动画终点。 */
       var pin = scene.querySelector('.scene-pin');
       var distance = scene.offsetHeight - (pin ? pin.offsetHeight : window.innerHeight);
       var sceneTop = scene.getBoundingClientRect().top + y;
       var sceneEnd = sceneTop + distance; /* 三幕动画到此播完 */
-      var cinemaBase = window.innerWidth <= 760 ? 3400 : 3800;
       if (y > sceneEnd + 60) {
         /* 第一段：动画区之外，快速（但仍是缓入缓出）滚到动画终点。 */
         var fast = Math.min(1200, Math.max(420, (y - sceneEnd) * 0.22));
         glide(y, sceneEnd, fast, easeInOut, function () {
-          /* 第二段：动画区，按正片同款节奏倒放回顶。 */
-          glide(sceneEnd, 0, cinemaBase, easeCinema, null);
+          /* 第二段：委托开场脚本按正片节奏倒放三幕，落点自动解锁。 */
+          window.dispatchEvent(new CustomEvent('site:intro-reverse'));
         });
       } else {
-        glide(y, 0, Math.max(cinemaBase * 0.55, cinemaBase * (y / Math.max(1, sceneEnd))), easeCinema, null);
+        window.dispatchEvent(new CustomEvent('site:intro-reverse'));
       }
     });
     update();

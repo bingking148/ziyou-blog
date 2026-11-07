@@ -80,6 +80,13 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* 首页开场演示态：锁住页面滚动，三幕由虚拟时间线驱动（见 index.astro）。
+   演示期间零真实滚动，浏览器工具栏收放与惯性滚动都插不进手。
+   滚动条隐藏造成的宽度差由脚本量出后以 padding-right 补偿。 */
+html.intro-lock {
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   font-family: var(--font-article);
