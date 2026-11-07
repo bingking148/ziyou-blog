@@ -289,20 +289,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     })();
   </script>
   <script>
-    /* ===== 三幕开场 v4：虚拟时间线，与真实滚动彻底解耦 =====
-       平板闪屏的根因：此前三幕把动画进度绑在真实文档滚动上——工具栏收放、
-       惯性滚动、resize 都会直接改写滚动几何，画面被浏览器反复拉扯，锁输入
-       治标不治本。这一版演示全程零真实滚动：
-
-       - 进度 p 只活在 JS 里，rAF 补间逐帧写 CSS 变量：一整段连续动画，
-         浏览器插不进手，也就无从闪起
-       - 演示期间锁住页面滚动（html.intro-lock，桌面滚动条宽度实时补偿），
-         落幕时与真实滚动无缝交接——p=1 的画面与滚动位置 end 的 sticky
-         画面逐像素一致，交接零跳变
-       - 三个停靠点不变：封面(0) → 海报+卡片(0.86) → 正文顶(1)；滚轮一格 /
-         滑动一次 / 方向键一下翻一页，整幕约 3.1s，找回正片的从容节奏
-       - 从正文向上滚过边界自动回到演示态倒放对应一幕；返回顶部把倒放
-         委托给本脚本（site:intro-reverse），不再用滚动擦时间线 */
+    /* 三幕开场：真实滚动距离映射时间线，快速拖动与反向滚动都保持一致。 */
     (function () {
       'use strict';
       var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -313,14 +300,19 @@ const shortTitle = (t: string) => t.split('——')[0];
       var pin = scene.querySelector('.scene-pin');
       var bottom = scene.querySelector('.scene-bottom');
       var cta = scene.querySelector('[data-cinematic-scroll]');
-      var root = document.documentElement;
+      var playing = false;
+      var ticking = false;
       var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
       var smooth = function (v) { v = clamp(v); return v * v * (3 - 2 * v); };
       var ramp = function (p, a, b) { return smooth((p - a) / (b - a)); };
-
-      /* ===== 渲染：纯函数。画面只由进度 p 决定，与滚动位置无关 ===== */
-      var playing = false;
-      function render(p) {
+      function update() {
+        ticking = false;
+        var rect = scene.getBoundingClientRect();
+        /* 用 pin 高度而不是 window.innerHeight：pin 是 100svh，工具栏收放不改变，
+           平板上地址栏一弹一收 innerHeight 会跳，进度 p 跟着闪。 */
+        var distance = scene.offsetHeight - pin.offsetHeight;
+        if (distance <= 0) return;
+        var p = clamp(-rect.top / distance);
         var hold = ramp(p, 0, 0.16);
         var incision = ramp(p, 0.14, 0.28);
         var tear = ramp(p, 0.26, 0.46);
@@ -397,29 +389,10 @@ const shortTitle = (t: string) => t.split('——')[0];
           else cta.removeAttribute('aria-disabled');
         }
       }
-      /* ===== 几何与状态 =====
-         停靠点仍是文档坐标：end = 三幕播完时的滚动位置，p=1 的 sticky 画面
-         与 scrollY=end 的画面逐像素一致，交接因此零跳变。 */
-      function trackDistance() { return scene.offsetHeight - pin.offsetHeight; }
-      function endY() { return scene.offsetTop + trackDistance(); }
-      function scrollP() {
-        var d = trackDistance();
-        if (d <= 0) return 0;
-        return clamp((window.scrollY - scene.offsetTop) / d);
-      }
-
-      var STOPS = [0, 0.86, 1]; /* 封面 → 海报+卡片 → 正文顶 */
-      var present = false;      /* 演示态：滚动已锁，虚拟时间线驱动画面 */
-      var vp = 0;               /* 虚拟进度 */
-      var stage = 0;            /* 当前补间的目标幕 */
-      var flipFrame = 0;
-      var contentFrame = 0;     /* 端点停靠 → 正文的交接滚动 */
-      var navFlight = false;    /* skip-link 锚点飞行期间不抢越界 */
-      var lastY = window.scrollY;
-      var ticking = false;
-
-      /* 加速—匀速—减速的梯形速度：与旧版正片同款节奏。对称缓动会把切口
-         推得太靠后，观影像页面卡住。 */
+      var root = document.documentElement;
+      var playFrame = 0;
+      var previousScrollBehavior = root.style.scrollBehavior;
+      // 加速—匀速—减速的梯形速度：对称缓动会把切口推到 1.3s 之后，观影像页面卡住。
       var CINEMA_ACCEL = 0.16;
       var CINEMA_DECEL = 0.24;
       var CINEMA_CRUISE = 1 / (1 - (CINEMA_ACCEL + CINEMA_DECEL) / 2);
@@ -431,224 +404,161 @@ const shortTitle = (t: string) => t.split('——')[0];
         var u = x - cruiseEnd;
         return CINEMA_CRUISE * (1 - CINEMA_ACCEL / 2 - CINEMA_DECEL + u - (u * u) / (2 * CINEMA_DECEL));
       };
-      var easeInOut = function (x) {
-        x = clamp(x);
-        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-      };
-
-      /* ===== 滚动锁：演示期间零真实滚动，工具栏与惯性都插不进手 =====
-         桌面滚动条隐藏会让整页横跳一下，锁定瞬间量出宽度补回去。 */
-      function lockScroll() {
-        if (present) return;
-        var before = window.innerWidth - root.clientWidth;
-        root.classList.add('intro-lock');
-        var after = window.innerWidth - root.clientWidth;
-        if (before > after) root.style.paddingRight = (before - after) + 'px';
-        present = true;
+      function stopCinema() {
+        if (!playing) return;
+        playing = false;
+        if (playFrame) cancelAnimationFrame(playFrame);
+        playFrame = 0;
+        root.style.scrollBehavior = previousScrollBehavior;
+        pin.classList.remove('is-cinematic');
+        if (cta) cta.removeAttribute('aria-disabled');
+        schedule();
       }
-      function unlockScroll() {
-        if (!present) return;
-        present = false;
-        root.classList.remove('intro-lock');
-        root.style.paddingRight = '';
+      function playCinema(now) {
+        var t = clamp((now - playCinema.start) / playCinema.duration);
+        var y = playCinema.from + (playCinema.to - playCinema.from) * easeCinema(t);
+        window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+        if (t >= 1) { stopCinema(); return; }
+        playFrame = requestAnimationFrame(playCinema);
       }
-
-      /* ===== 幕间补间：一段连续动画，不被滚动打断 ===== */
-      function flipDuration(d) {
-        if (d > 0.3) {
-          var ms = 800 + d * 2700; /* 一整幕约 3.1s：从容，又不至于拖沓 */
-          return window.innerWidth <= 760 ? ms * 0.9 : ms;
+      if (cta) {
+        cta.addEventListener('click', function (event) {
+          /* 先挡默认锚点跳转再早退：播放中再点一下不能闪跳到 #journal。 */
+          event.preventDefault();
+          cancelFlip();
+          if (playing) return;
+          var distance = scene.offsetHeight - pin.offsetHeight;
+          if (distance <= 0) return;
+          var from = window.scrollY;
+          var to = scene.offsetTop + distance * 0.86;
+          if (from >= to) { schedule(); return; }
+          var base = window.innerWidth <= 760 ? 3400 : 3800;
+          var ratio = clamp((to - from) / (to - scene.offsetTop));
+          playing = true;
+          previousScrollBehavior = root.style.scrollBehavior;
+          root.style.scrollBehavior = 'auto';
+          pin.classList.add('is-cinematic');
+          cta.setAttribute('aria-disabled', 'true');
+          cta.setAttribute('inert', '');
+          playCinema.start = performance.now();
+          playCinema.from = from;
+          playCinema.to = to;
+          playCinema.duration = Math.max(base * 0.55, base * ratio);
+          playFrame = requestAnimationFrame(playCinema);
+        });
+      }
+      /* ===== 翻页控制：一格滚轮 / 一次滑动 / 一下方向键 = 翻一页 =====
+         连续滚动把动画进度暴露给浏览器工具栏与惯性滚动，平板上极易被遗弃在
+         半空（白屏卡死的根因）。改为离散停靠点：任何操作的落点必是完整的一
+         幕，几何只用 100svh 的 pin 高度换算，工具栏收放插不进来。 */
+      var stops = [0, 0.86, 1]; /* 封面 → 海报+卡片 → 正文顶 */
+      var flipFrame = 0;
+      function stopY(i) {
+        return scene.offsetTop + (scene.offsetHeight - pin.offsetHeight) * stops[i];
+      }
+      function nearestStop() {
+        var y = window.scrollY, best = 0, gap = Infinity;
+        for (var i = 0; i < stops.length; i++) {
+          var d = Math.abs(y - stopY(i));
+          if (d < gap) { gap = d; best = i; }
         }
-        return Math.max(280, Math.min(900, 280 + d * 4400)); /* 卡片退场/回场的短过渡 */
+        return best;
       }
-      function cancelFlip() { if (flipFrame) cancelAnimationFrame(flipFrame); flipFrame = 0; }
-      function cancelContent() { if (contentFrame) cancelAnimationFrame(contentFrame); contentFrame = 0; }
-      function flipToStage(i, asCta) {
-        i = Math.max(0, Math.min(STOPS.length - 1, i));
+      function cancelFlip() {
+        if (flipFrame) cancelAnimationFrame(flipFrame);
+        flipFrame = 0;
+      }
+      function flipTo(target, duration) {
         cancelFlip();
-        cancelContent();
-        var from = vp, to = STOPS[i], d = Math.abs(to - from);
-        stage = i;
-        playing = !!asCta;
-        pin.classList.toggle('is-cinematic', playing);
-        if (cta) {
-          if (playing) cta.setAttribute('aria-disabled', 'true');
-          else cta.removeAttribute('aria-disabled');
-        }
-        if (d < 0.0015) { vp = to; render(vp); finishFlip(); return; }
-        var ms = flipDuration(d);
-        var ease = d > 0.3 ? easeCinema : easeInOut;
+        var from = window.scrollY;
+        if (Math.abs(target - from) < 2) { window.scrollTo({ top: target, left: 0, behavior: 'auto' }); return; }
+        var span = Math.abs(target - from);
+        var ms = duration || Math.max(520, Math.min(1050, 430 + span * 0.34));
         var start = performance.now();
+        root.style.scrollBehavior = 'auto';
         function frame(now) {
-          var t = clamp((now - start) / ms);
-          vp = from + (to - from) * ease(t);
-          render(vp);
-          if (t >= 1) { flipFrame = 0; vp = to; render(vp); finishFlip(); return; }
+          var t = Math.min(1, (now - start) / ms);
+          var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          window.scrollTo({ top: from + (target - from) * e, left: 0, behavior: 'auto' });
+          if (t >= 1) { flipFrame = 0; root.style.scrollBehavior = previousScrollBehavior; schedule(); return; }
           flipFrame = requestAnimationFrame(frame);
         }
         flipFrame = requestAnimationFrame(frame);
       }
-      /* 落幕：只有两个端点需要与真实滚动交接——两侧画面一致，交接零跳变。 */
-      function finishFlip() {
-        if (playing) { playing = false; pin.classList.remove('is-cinematic'); if (cta) cta.removeAttribute('aria-disabled'); }
-        if (stage === 2) {
-          unlockScroll();
-          window.scrollTo({ top: endY(), left: 0, behavior: 'instant' });
-          lastY = window.scrollY;
-        } else if (stage === 0) {
-          unlockScroll();
-          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-          lastY = 0;
-        }
-        schedule();
-      }
-      function enterPresent(atP) {
-        cancelFlip();
-        cancelContent();
-        if (present) return;
-        lockScroll();
-        vp = clamp(atP === undefined ? scrollP() : atP);
-        render(vp);
-      }
-      function nearestStage() {
-        var best = 0, gap = Infinity;
-        for (var i = 0; i < STOPS.length; i++) {
-          var g = Math.abs(STOPS[i] - vp);
-          if (g < gap) { gap = g; best = i; }
-        }
-        return best;
-      }
-      function targetStage(dir) {
-        /* 取「行进方向上的下一个停靠点」：从卡片幕向上先落封面，不跳幕。
-           动画进行中以「目标幕」而非瞬时 vp 为基准——否则 vp 还停在上一幕的
-           epsilon 邻域时（如卡片幕补间末尾 p≈0.875），向上会被判成原地而吞掉输入。 */
-        var base = flipFrame ? STOPS[stage] : vp;
-        if (dir > 0) { for (var i = 0; i < STOPS.length; i++) if (STOPS[i] > base + 0.012) return i; return STOPS.length - 1; }
-        for (var j = STOPS.length - 1; j >= 0; j--) if (STOPS[j] < base - 0.012) return j;
-        return 0;
+      function stopToward(dir) {
+        /* 取「行进方向上的下一个停靠点」：从正文顶向上先落海报页，不会跳页。 */
+        var y = window.scrollY;
+        var i;
+        if (dir > 0) { for (i = 0; i < stops.length; i++) if (stopY(i) > y + 2) return i; return -1; }
+        for (i = stops.length - 1; i >= 0; i--) if (stopY(i) < y - 2) return i;
+        return -1;
       }
       function flipStep(dir) {
-        var t = targetStage(dir);
-        if (flipFrame && stage === t) return;  /* 已在翻向该幕，不重启补间 */
-        if (!flipFrame && Math.abs(STOPS[t] - vp) < 0.0015) return;
-        flipToStage(t);
+        var last = stops.length - 1;
+        if (dir > 0 && window.scrollY >= stopY(last) - 2) return; /* 已在正文页沿，向下交给原生 */
+        var i = stopToward(dir);
+        if (i < 0) i = dir > 0 ? last : 0; /* 到头贴齐端点（小幅回正） */
+        var target = stopY(i);
+        if (Math.abs(target - window.scrollY) < 2) return;
+        flipTo(target);
       }
-      /* 从正文回滚越界：倒放上一幕。轻蹭（惯性刚过线 14px 内）直接弹回正文顶；
-         正好停在正文顶（y==end）不算轻蹭，上翻意图照常倒放。 */
-      function backFromEnd(y) {
-        var end = endY();
-        if (y !== undefined && y < end && end - y < 14) { flipToStage(2); return; }
-        var near = nearestStage();
-        flipToStage(near === 2 ? 1 : near);
-      }
-      /* 正文顶下方一条边界带内的滚轮/按键向上：不赌原生越界检测，直接接住。
-         锁定的同时把滚动位置规整到 end——捕获的画面与 vp=1 逐像素一致。 */
-      function recallFromContent() {
-        enterPresent();
-        window.scrollTo({ top: endY(), left: 0, behavior: 'instant' });
-        lastY = window.scrollY;
-        backFromEnd();
-      }
-      /* 正文交接滚动：海报完整退场，落点后即原生滚动——
-         修掉第三幕上触摸/键盘无路可走的死胡同。 */
-      function enterContent() {
-        cancelFlip();
-        cancelContent();
-        var from = window.scrollY;
-        var to = scene.offsetTop + scene.offsetHeight;
-        var max = root.scrollHeight - window.innerHeight;
-        if (to > max) to = max;
-        if (to <= from + 2) { window.scrollTo({ top: to, left: 0, behavior: 'instant' }); lastY = to; return; }
-        var ms = Math.max(700, Math.min(1300, (to - from) * 0.9));
-        var start = performance.now();
-        function frame(now) {
-          var t = clamp((now - start) / ms);
-          window.scrollTo({ top: from + (to - from) * easeInOut(t), left: 0, behavior: 'instant' });
-          if (t >= 1) { contentFrame = 0; lastY = window.scrollY; return; }
-          contentFrame = requestAnimationFrame(frame);
-        }
-        contentFrame = requestAnimationFrame(frame);
-      }
-      /* 所有输入的统一路由：无论此刻处于哪个状态，一次「下一页/上一页」
-         意图都落到一个完整幕上，页面不存在可停留的中间态。 */
-      function pageIntent(dir) {
-        if (present) { flipStep(dir); return; }
-        var end = endY(), y = window.scrollY;
-        if (dir > 0) {
-          if (y <= 2) { enterPresent(0); flipToStage(1); }
-          else if (y >= end - 2) enterContent();
-          else { enterPresent(); flipToStage(nearestStage()); }
-        } else {
-          if (y > end + 2) return;              /* 正文深处：向上交给原生，越界处接住 */
-          if (y >= end - 2) { enterPresent(); backFromEnd(y); }
-          else if (y > 2) { enterPresent(); flipToStage(nearestStage()); }
-          /* y<=2：封面顶，向上是原生橡皮筋 */
-        }
-      }
-      /* 滚轮：一格一页；触控板小增量累积成一页；正文与边界放行原生。 */
+      /* 滚轮：一格一页；触控板小增量累积成一页；边界处放行原生滚动。 */
       var wheelAcc = 0, wheelAt = 0;
       window.addEventListener('wheel', function (event) {
         if (event.ctrlKey) return; /* 缩放手势不抢 */
-        if (event.deltaY === 0) return;
+        var end = stopY(stops.length - 1);
+        var y = window.scrollY;
+        if (y > end + 2) { if (playing) stopCinema(); return; } /* 正文区：原生 */
         var down = event.deltaY > 0;
-        if (!present) {
-          var y = window.scrollY, end = endY();
-          if (contentFrame) { cancelContent(); return; }   /* 交接滚动中：滚轮接管，转原生 */
-          if (y > end + 2) {
-            /* 正文深处：原生；边界带内的向上滚轮直接接住 */
-            if (!down && y <= end + 140) { event.preventDefault(); recallFromContent(); }
-            return;
-          }
-          if (y >= end - 2 && down) return;                /* 端点停靠向下：原生进正文 */
-          if (y <= 2 && !down) return;                     /* 封面顶向上：原生橡皮筋 */
-          if (navFlight) return;                           /* 锚点飞行中：不抢 */
-        }
+        if (y >= end - 2 && down) { cancelFlip(); return; }  /* 最后一页向下：进正文 */
+        if (y <= 2 && !down) { cancelFlip(); return; }       /* 封面顶向上：橡皮筋 */
+        if (event.deltaY === 0) return;
         event.preventDefault();
+        stopCinema();
         var unit = event.deltaMode === 1 ? 40 : 1;
         var delta = event.deltaY * unit;
         var now = performance.now();
         if (now - wheelAt > 200) wheelAcc = 0;
         wheelAt = now;
         wheelAcc += Math.abs(delta);
-        if (wheelAcc >= 30) { wheelAcc = 0; pageIntent(down ? 1 : -1); }
+        if (wheelAcc >= 30) { wheelAcc = 0; flipStep(delta > 0 ? 1 : -1); }
       }, { passive: false });
-      /* 键盘：方向键/空格翻页，Home 倒放回封面，End 一口气正片到正文。 */
+      /* 键盘：方向键/空格翻页，Home 回封面。 */
       window.addEventListener('keydown', function (event) {
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         var el = event.target;
         if (el && el.closest && el.closest('input, textarea, select, [contenteditable]')) return;
+        var end = stopY(stops.length - 1);
+        if (window.scrollY > end + 2) { if (playing) stopCinema(); return; }
         var k = event.key;
+        if (k === ' ' && el !== document.body && el !== document.documentElement) return; /* 按钮空格不抢 */
         var next = k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'ArrowRight';
         var prev = k === 'ArrowUp' || k === 'PageUp' || k === 'ArrowLeft';
-        if (!next && !prev && k !== 'Home' && k !== 'End') return; /* 其余键不打扰正片 */
-        if (k === ' ' && el !== document.body && el !== document.documentElement) return; /* 按钮空格不抢 */
-        if (!present) {
-          var y = window.scrollY, end = endY();
-          if (contentFrame) { cancelContent(); event.preventDefault(); pageIntent(next ? 1 : -1); return; }
-          if (y > end + 2) {
-            /* 正文深处：原生；边界带内的向上键直接接住 */
-            if (prev && y <= end + 140) { event.preventDefault(); recallFromContent(); }
-            return;
-          }
-          if (y <= 2 && prev) return;                 /* 封面顶向上：原生橡皮筋 */
-          if (y >= end - 2 && next) { event.preventDefault(); enterContent(); return; }
-        }
+        if (!next && !prev && k !== 'Home' && k !== 'End') { if (playing) { stopCinema(); settle(); } return; }
+        stopCinema();
         event.preventDefault();
-        if (k === 'Home') { if (!present) enterPresent(); flipToStage(0); }
-        else if (k === 'End') { if (!present) enterPresent(); flipToStage(2); }
-        else pageIntent(next ? 1 : -1);
+        if (k === 'Home') flipTo(0, 700);
+        else if (k === 'End') flipTo(end, 700);
+        else flipStep(next ? 1 : -1);
       });
-      /* 触摸：整页翻动。手指从不拖动时间线——演示态里页面根本没有真实滚动，
+      /* 触摸：整页翻动。手指从不拖动时间线——页面上不存在可停的中间态，
          松手按方向翻一页（整幕动画一口气演完）；拖动中只给一点弹性预告。 */
       var touchId = null, touchX0 = 0, touchY0 = 0;
       var touchSamples = [];
       function releaseNudge() { pin.style.transform = ''; }
+      /* 任何「只打断不接管」的路径都必须落在整页上，杜绝半空停留。 */
+      function settle() {
+        var end = stopY(stops.length - 1);
+        var y = window.scrollY;
+        if (y > 2 && y < end - 2) flipTo(stopY(nearestStop()), 500);
+      }
       scene.addEventListener('touchstart', function (event) {
         if (event.touches.length !== 1) { touchId = null; releaseNudge(); return; }
         var t = event.touches[0];
         touchId = t.identifier;
         touchX0 = t.clientX; touchY0 = t.clientY;
         touchSamples = [[performance.now(), t.clientY]];
+        if (playing) { stopCinema(); settle(); } /* 轻点打断正片，但必须落回整页 */
       }, { passive: true });
       scene.addEventListener('touchmove', function (event) {
         if (touchId === null) return;
@@ -658,10 +568,9 @@ const shortTitle = (t: string) => t.split('——')[0];
         var dy = t.clientY - touchY0;
         var dx = t.clientX - touchX0;
         if (Math.abs(dx) > Math.abs(dy) + 24) { releaseNudge(); return; } /* 横滑不抢 */
-        if (!present) {
-          var y = window.scrollY;
-          if (y > endY() + 2 || (y <= 2 && dy > 0)) { releaseNudge(); return; } /* 正文/封面橡皮筋方向：交给原生 */
-        }
+        var end = stopY(stops.length - 1);
+        var atFirst = window.scrollY <= 2, atLast = window.scrollY >= end - 2;
+        if ((atFirst && dy > 0) || (atLast && dy < 0)) { releaseNudge(); return; } /* 越界方向交给原生橡皮筋 */
         if (event.cancelable) event.preventDefault(); /* 页面永不跟手滚动 */
         touchSamples.push([performance.now(), t.clientY]);
         if (touchSamples.length > 12) touchSamples.shift();
@@ -688,70 +597,28 @@ const shortTitle = (t: string) => t.split('——')[0];
         releaseNudge();
         var dy = touchSamples.length ? touchSamples[touchSamples.length - 1][1] - touchY0 : 0;
         var v = flickVel();
-        if (dy < -40 || v < -0.5) pageIntent(1);  /* 上滑 → 下一页 */
-        else if (dy > 40 || v > 0.5) pageIntent(-1);
+        if (dy < -40 || v < -0.5) flipStep(1);  /* 上滑 → 下一页 */
+        else if (dy > 40 || v > 0.5) flipStep(-1);
       }
       scene.addEventListener('touchend', endTouch);
       scene.addEventListener('touchcancel', endTouch);
-      /* PLAY OPENING：从封面按正片节奏连演到卡片幕（可被滚轮/触摸打断转翻页）。 */
-      if (cta) {
-        cta.addEventListener('click', function (event) {
-          /* 先挡默认锚点跳转再早退：播放中再点一下不能闪跳到 #journal。 */
-          event.preventDefault();
-          cancelContent();
-          if (playing || flipFrame) return;
-          if (!present) {
-            if (window.scrollY > 2) return;   /* CTA 只在封面承担正片入口 */
-            enterPresent(0);
-          }
-          flipToStage(1, true);
-        });
-      }
-      /* 返回顶部按钮起飞前叫停补间；动画区一段委托给本脚本倒放（见 BackToTop）。 */
-      window.addEventListener('site:stop-cinema', function () { cancelFlip(); cancelContent(); });
-      window.addEventListener('site:intro-reverse', function () {
-        enterPresent();      /* 已在演示态则沿用当前虚拟进度 */
-        flipToStage(0);      /* 按正片同款梯形节奏倒放回封面，落点解锁 */
+      /* 返回顶部按钮起飞前叫停正片与翻页，两套滚动别打架。 */
+      window.addEventListener('site:stop-cinema', function () { stopCinema(); cancelFlip(); });
+      /* 注意：resize 不叫停正片与翻页。平板上点按弹出地址栏、滚动又收起地址栏都会触发
+         resize，若在此中止，开场动画会被遗弃在三幕中途——白纸海报卡在半空的
+         「白屏」就是这么来的。停靠点是文档坐标，窗口怎么变都成立。 */
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { stopCinema(); cancelFlip(); settle(); }
       });
-      /* skip-link 锚点飞行期间不抢越界：让它原生滚回封面。 */
-      var skip = document.querySelector('.skip-link');
-      if (skip) skip.addEventListener('click', function () {
-        navFlight = true;
-        setTimeout(function () { navFlight = false; }, 3000);
-      });
-      /* 注意：resize 不再需要叫停任何东西——演示态里没有真实滚动，进度活在
-         JS 里，工具栏收放/旋转屏幕都改不动它。旧版「白纸卡在半空」的根因
-         （滚动几何被 resize 改写）已随滚动解耦一并消失。 */
       function schedule() {
-        if (ticking || present) return;
-        ticking = true;
-        requestAnimationFrame(function () { ticking = false; if (!present) render(scrollP()); });
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
       }
-      function onScroll() {
-        var y = window.scrollY, prev = lastY;
-        lastY = y;
-        if (present) return;   /* 演示态下滚动不参与渲染 */
-        if (navFlight && y <= 2) navFlight = false;
-        var end = endY();
-        if (!navFlight && prev >= end - 2 && y < end - 2 && y > 2) {
-          /* 从正文原生回滚越过边界（惯性/滚动条/锚点落点）：回到演示态，
-             锁掉惯性，倒放对应一幕。 */
-          enterPresent();
-          backFromEnd(y);
-          return;
-        }
-        schedule();
-      }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', function () { if (present) render(vp); else schedule(); });
-      window.addEventListener('load', function () { if (present) render(vp); else schedule(); });
-      render(scrollP());
-      /* 刷新或恢复会话时滚动位置可能落在两幕之间：进演示态吸附到最近整幕，
-         不让页面停在半空。 */
-      (function () {
-        var y0 = window.scrollY, end0 = endY();
-        if (y0 > 2 && y0 < end0 - 2) { enterPresent(); flipToStage(nearestStage()); }
-      })();
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      window.addEventListener('load', schedule);
+      update();
+      /* 刷新或恢复会话时滚动位置可能落在两幕之间：吸附回最近整页，不让页面停在半空。 */
+      settle();
     })();
   </script>
   <script>
