@@ -488,15 +488,13 @@ const shortTitle = (t: string) => t.split('——')[0];
         }
         flipFrame = requestAnimationFrame(frame);
       }
-      /* 落幕：只有两个端点需要与真实滚动交接——两侧画面一致，交接零跳变。
-         第二幕（stage 2）是动画终点：海报退场后自动滑入正文，不停留在空旷帧。 */
+      /* 落幕：只有两个端点需要与真实滚动交接——两侧画面一致，交接零跳变。 */
       function finishFlip() {
         if (playing) { playing = false; pin.classList.remove('is-cinematic'); if (cta) cta.removeAttribute('aria-disabled'); }
         if (stage === 2) {
           unlockScroll();
           window.scrollTo({ top: endY(), left: 0, behavior: 'instant' });
           lastY = window.scrollY;
-          enterContent();
         } else if (stage === 0) {
           unlockScroll();
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -690,10 +688,8 @@ const shortTitle = (t: string) => t.split('——')[0];
         releaseNudge();
         var dy = touchSamples.length ? touchSamples[touchSamples.length - 1][1] - touchY0 : 0;
         var v = flickVel();
-        /* 与滚轮/键盘同向：手指上滑（dy<0）= 向上翻 = 回上一页；手指下滑 = 向下翻 = 下一页。
-           速度方向同理：v<0 表示手指向上运动。 */
-        if (dy < -40 || v < -0.5) pageIntent(-1);
-        else if (dy > 40 || v > 0.5) pageIntent(1);
+        if (dy < -40 || v < -0.5) pageIntent(1);  /* 上滑 → 下一页 */
+        else if (dy > 40 || v > 0.5) pageIntent(-1);
       }
       scene.addEventListener('touchend', endTouch);
       scene.addEventListener('touchcancel', endTouch);
