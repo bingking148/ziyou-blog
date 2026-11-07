@@ -534,31 +534,25 @@ const shortTitle = (t: string) => t.split('——')[0];
         if (k === ' ' && el !== document.body && el !== document.documentElement) return; /* 按钮空格不抢 */
         var next = k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'ArrowRight';
         var prev = k === 'ArrowUp' || k === 'PageUp' || k === 'ArrowLeft';
-        if (!next && !prev && k !== 'Home' && k !== 'End') { if (playing) { stopCinema(); settle(); } return; }
+        if (!next && !prev && k !== 'Home' && k !== 'End') { if (playing) stopCinema(); return; }
         stopCinema();
         event.preventDefault();
         if (k === 'Home') flipTo(0, 700);
         else if (k === 'End') flipTo(end, 700);
         else flipStep(next ? 1 : -1);
       });
-      /* 触摸：整页翻动。手指从不拖动时间线——页面上不存在可停的中间态，
-         松手按方向翻一页（整幕动画一口气演完）；拖动中只给一点弹性预告。 */
-      var touchId = null, touchX0 = 0, touchY0 = 0;
+      /* 触摸：场内 1:1 跟手擦洗时间线，松手快甩按方向翻页，慢拖吸附最近整页。 */
+      var touchId = null, touchX0 = 0, touchY0 = 0, touchBase = 0;
       var touchSamples = [];
-      function releaseNudge() { pin.style.transform = ''; }
-      /* 任何「只打断不接管」的路径都必须落在整页上，杜绝半空停留。 */
-      function settle() {
-        var end = stopY(stops.length - 1);
-        var y = window.scrollY;
-        if (y > 2 && y < end - 2) flipTo(stopY(nearestStop()), 500);
-      }
       scene.addEventListener('touchstart', function (event) {
-        if (event.touches.length !== 1) { touchId = null; releaseNudge(); return; }
+        stopCinema();
+        if (event.touches.length !== 1) { touchId = null; return; }
         var t = event.touches[0];
         touchId = t.identifier;
         touchX0 = t.clientX; touchY0 = t.clientY;
+        touchBase = window.scrollY;
         touchSamples = [[performance.now(), t.clientY]];
-        if (playing) { stopCinema(); settle(); } /* 轻点打断正片，但必须落回整页 */
+        cancelFlip();
       }, { passive: true });
       scene.addEventListener('touchmove', function (event) {
         if (touchId === null) return;
@@ -566,17 +560,15 @@ const shortTitle = (t: string) => t.split('——')[0];
         for (var i = 0; i < event.touches.length; i++) if (event.touches[i].identifier === touchId) t = event.touches[i];
         if (!t) return;
         var dy = t.clientY - touchY0;
-        var dx = t.clientX - touchX0;
-        if (Math.abs(dx) > Math.abs(dy) + 24) { releaseNudge(); return; } /* 横滑不抢 */
         var end = stopY(stops.length - 1);
-        var atFirst = window.scrollY <= 2, atLast = window.scrollY >= end - 2;
-        if ((atFirst && dy > 0) || (atLast && dy < 0)) { releaseNudge(); return; } /* 越界方向交给原生橡皮筋 */
-        if (event.cancelable) event.preventDefault(); /* 页面永不跟手滚动 */
+        var target = touchBase - dy;
+        if (target < -1 || target > end + 1) return; /* 越界方向交给原生橡皮筋 */
+        if (Math.abs(t.clientX - touchX0) > Math.abs(dy) + 24) return; /* 明显横滑不抢 */
+        if (event.cancelable) event.preventDefault();
+        root.style.scrollBehavior = 'auto';
+        window.scrollTo({ top: target, left: 0, behavior: 'auto' });
         touchSamples.push([performance.now(), t.clientY]);
         if (touchSamples.length > 12) touchSamples.shift();
-        /* 弹性预告：手指方向上最多 12px 的牵拉感，暗示这一划会翻页。 */
-        var pull = Math.max(-12, Math.min(12, dy * 0.08));
-        pin.style.transform = 'translate3d(0,' + pull + 'px,0)';
       }, { passive: false });
       /* 甩动速度取最近 ~80ms 窗口；事件批量同帧到达时分母退化，回退整段手势。 */
       function flickVel() {
@@ -594,11 +586,16 @@ const shortTitle = (t: string) => t.split('——')[0];
       function endTouch() {
         if (touchId === null) return;
         touchId = null;
-        releaseNudge();
-        var dy = touchSamples.length ? touchSamples[touchSamples.length - 1][1] - touchY0 : 0;
+        root.style.scrollBehavior = previousScrollBehavior;
+        /* 快甩（有速度）按方向翻页；慢拖交给中点吸附：越过两页中点算翻过去，
+           没过就弹回，与系统分页手感一致。 */
         var v = flickVel();
-        if (dy < -40 || v < -0.5) flipStep(1);  /* 上滑 → 下一页 */
-        else if (dy > 40 || v > 0.5) flipStep(-1);
+        if (v < -0.55) flipStep(1);
+        else if (v > 0.55) flipStep(-1);
+        else {
+          var i = nearestStop();
+          if (Math.abs(window.scrollY - stopY(i)) > 2) flipTo(stopY(i), 620);
+        }
       }
       scene.addEventListener('touchend', endTouch);
       scene.addEventListener('touchcancel', endTouch);
@@ -608,7 +605,7 @@ const shortTitle = (t: string) => t.split('——')[0];
          resize，若在此中止，开场动画会被遗弃在三幕中途——白纸海报卡在半空的
          「白屏」就是这么来的。停靠点是文档坐标，窗口怎么变都成立。 */
       document.addEventListener('visibilitychange', function () {
-        if (document.hidden) { stopCinema(); cancelFlip(); settle(); }
+        if (document.hidden) { stopCinema(); cancelFlip(); }
       });
       function schedule() {
         if (!ticking) { ticking = true; requestAnimationFrame(update); }
@@ -618,7 +615,11 @@ const shortTitle = (t: string) => t.split('——')[0];
       window.addEventListener('load', schedule);
       update();
       /* 刷新或恢复会话时滚动位置可能落在两幕之间：吸附回最近整页，不让页面停在半空。 */
-      settle();
+      (function settleInitial() {
+        var end = stopY(stops.length - 1);
+        var y = window.scrollY;
+        if (y > 2 && y < end - 2) flipTo(stopY(nearestStop()), 700);
+      })();
     })();
   </script>
   <script>
