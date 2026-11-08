@@ -313,68 +313,74 @@ const shortTitle = (t: string) => t.split('——')[0];
         var distance = scene.offsetHeight - pin.offsetHeight;
         if (distance <= 0) return;
         var p = clamp(-rect.top / distance);
-        var hold = ramp(p, 0, 0.16);
-        var incision = ramp(p, 0.14, 0.28);
-        var tear = ramp(p, 0.26, 0.46);
-        var paper = ramp(p, 0.4, 0.62);
-        var lineIn = ramp(p, 0.5, 0.68);
-        var poster = ramp(p, 0.54, 0.72);
-        var stamp = ramp(p, 0.66, 0.78);
-        var arrive = ramp(p, 0.68, 0.86);
-        var exit = ramp(p, 0.88, 1);
+        /* 镜头：只对画面做推近和对焦。中文标题和英文海报都以整块透明度进出，
+           不位移、不模糊、不遮罩，避免字被撕开或裁成半个。 */
+        var rack = ramp(p, 0.02, 0.28);
+        var dip = ramp(p, 0.3, 0.4);
+        var rise = ramp(p, 0.46, 0.58);
+        var settle = ramp(p, 0.56, 0.74);
+        var arrive = ramp(p, 0.68, 0.84);
+        var exit = ramp(p, 0.9, 1);
+        var gate = (function () {
+          if (p < 0.32) return 0;
+          if (p < 0.42) return ramp(p, 0.32, 0.42);
+          if (p < 0.54) return 1 - ramp(p, 0.42, 0.54);
+          return 0;
+        })();
         var mobile = window.innerWidth <= 760;
         var st = pin.style;
         st.setProperty('--scene-p', p.toFixed(4));
         st.setProperty('--hero-y', '0vh');
-        st.setProperty('--hero-scale', (1.04 + hold * 0.04 + tear * 0.02).toFixed(3));
-        st.setProperty('--hero-blur', (tear * (mobile ? 3 : 6)).toFixed(2) + 'px');
-        st.setProperty('--hero-opacity', (1 - ramp(p, 0.28, 0.44)).toFixed(3));
+        st.setProperty('--hero-scale', (1.06 - rack * 0.04).toFixed(3));
+        st.setProperty('--hero-blur', '0px');
+        st.setProperty('--hero-opacity', (1 - dip).toFixed(3));
         st.setProperty('--copy-y', '0vh');
-        st.setProperty('--copy-opacity', (1 - ramp(p, 0.34, 0.5)).toFixed(3));
-        st.setProperty('--copy-blur', (tear * (mobile ? 3 : 6)).toFixed(2) + 'px');
-        st.setProperty('--intro-opacity', (1 - ramp(p, 0.08, 0.22)).toFixed(3));
-        st.setProperty('--intro-y', (-ramp(p, 0.08, 0.22) * 4).toFixed(2) + 'vh');
-        st.setProperty('--title-a-x', (-tear * (mobile ? 9 : 14)).toFixed(2) + 'vw');
-        st.setProperty('--title-a-y', (-tear * (mobile ? 7 : 10)).toFixed(2) + 'vh');
-        st.setProperty('--title-b-x', (tear * (mobile ? 10 : 15)).toFixed(2) + 'vw');
-        st.setProperty('--title-b-y', (tear * (mobile ? 8 : 11)).toFixed(2) + 'vh');
-        st.setProperty('--incision-scale', incision.toFixed(3));
-        st.setProperty('--incision-opacity', (1 - ramp(p, 0.42, 0.52)).toFixed(3));
-        st.setProperty('--tear-gap', (tear * (mobile ? 6 : 10)).toFixed(2) + '%');
-        st.setProperty('--tear-opacity', (1 - ramp(p, 0.4, 0.5)).toFixed(3));
-        st.setProperty('--tear-a-x', (-tear * (mobile ? 14 : 28)).toFixed(2) + 'vw');
-        st.setProperty('--tear-a-y', (-tear * (mobile ? 12 : 22)).toFixed(2) + 'vh');
-        st.setProperty('--tear-a-r', (-tear * (mobile ? 5 : 8)).toFixed(2) + 'deg');
-        st.setProperty('--tear-b-x', (tear * (mobile ? 16 : 30)).toFixed(2) + 'vw');
-        st.setProperty('--tear-b-y', (tear * (mobile ? 14 : 24)).toFixed(2) + 'vh');
-        st.setProperty('--tear-b-r', (tear * (mobile ? 6 : 9)).toFixed(2) + 'deg');
-        st.setProperty('--paper-gap', (8 + paper * 105).toFixed(2) + '%');
-        st.setProperty('--after-opacity', Math.min(1, paper * 1.6).toFixed(3));
-        st.setProperty('--after-scale', (0.94 + paper * 0.06).toFixed(3));
-        st.setProperty('--after-title-a-x', (-(1 - poster) * (mobile ? 6 : 12)).toFixed(2) + 'vw');
-        st.setProperty('--after-title-b-x', ((1 - poster) * (mobile ? 6 : 12)).toFixed(2) + 'vw');
+        st.setProperty('--copy-opacity', (1 - dip).toFixed(3));
+        st.setProperty('--copy-blur', '0px');
+        st.setProperty('--intro-opacity', (1 - ramp(p, 0.18, 0.3)).toFixed(3));
+        st.setProperty('--intro-y', '0vh');
+        st.setProperty('--title-a-x', '0vw');
+        st.setProperty('--title-a-y', '0vh');
+        st.setProperty('--title-b-x', '0vw');
+        st.setProperty('--title-b-y', '0vh');
+        st.setProperty('--incision-scale', ramp(p, 0.08, 0.26).toFixed(3));
+        st.setProperty('--incision-opacity', (1 - dip).toFixed(3));
+        st.setProperty('--tear-gap', '0%');
+        st.setProperty('--tear-opacity', '0');
+        st.setProperty('--tear-a-x', '0vw');
+        st.setProperty('--tear-a-y', '0vh');
+        st.setProperty('--tear-a-r', '0deg');
+        st.setProperty('--tear-b-x', '0vw');
+        st.setProperty('--tear-b-y', '0vh');
+        st.setProperty('--tear-b-r', '0deg');
+        st.setProperty('--gate', (gate * (mobile ? 42 : 46)).toFixed(2) + 'vh');
+        st.setProperty('--paper-gap', '120%');
+        st.setProperty('--after-opacity', rise.toFixed(3));
+        st.setProperty('--after-scale', (0.985 + rise * 0.015).toFixed(3));
+        st.setProperty('--after-title-a-x', '0vw');
+        st.setProperty('--after-title-b-x', '0vw');
         st.setProperty('--after-title-y', '0px');
-        st.setProperty('--after-title-mask', ((1 - poster) * 85).toFixed(2) + '%');
-        st.setProperty('--after-lines-x', ((1 - paper) * -40).toFixed(2) + 'px');
-        st.setProperty('--after-lines-opacity', paper.toFixed(3));
-        st.setProperty('--after-line', lineIn.toFixed(3));
-        st.setProperty('--after-meta', poster.toFixed(3));
-        st.setProperty('--after-stamp', stamp.toFixed(3));
+        st.setProperty('--after-title-mask', '0%');
+        st.setProperty('--after-lines-x', '0px');
+        st.setProperty('--after-lines-opacity', rise.toFixed(3));
+        st.setProperty('--after-line', settle.toFixed(3));
+        st.setProperty('--after-meta', settle.toFixed(3));
+        st.setProperty('--after-stamp', ramp(p, 0.64, 0.78).toFixed(3));
         st.setProperty('--focus-opacity', (arrive * (1 - exit)).toFixed(3));
-        st.setProperty('--focus-x', ((1 - arrive) * (mobile ? 24 : 18) + exit * (mobile ? 20 : 28)) + 'vw');
-        st.setProperty('--focus-y', ((1 - arrive) * (mobile ? 22 : 18) + exit * (mobile ? 6 : 8)) + 'vh');
-        st.setProperty('--focus-ry', ((1 - arrive) * -38 + exit * 12).toFixed(2) + 'deg');
-        st.setProperty('--focus-rz', ((1 - arrive) * 8 - arrive * 2 - exit * 2).toFixed(2) + 'deg');
-        st.setProperty('--focus-scale', (0.76 + arrive * 0.24).toFixed(3));
+        st.setProperty('--focus-x', ((1 - arrive) * (mobile ? 6 : 4)).toFixed(2) + 'vw');
+        st.setProperty('--focus-y', ((1 - arrive) * (mobile ? 8 : 6)).toFixed(2) + 'vh');
+        st.setProperty('--focus-ry', '0deg');
+        st.setProperty('--focus-rz', '0deg');
+        st.setProperty('--focus-scale', (0.94 + arrive * 0.06).toFixed(3));
         st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
-        st.setProperty('--scroll-cta-opacity', (1 - ramp(p, 0.08, 0.18)).toFixed(3));
-        st.setProperty('--chapter', p < 0.28 ? '"01"' : p < 0.74 ? '"02"' : '"03"');
-        pin.classList.toggle('is-after', p > 0.4);
-        pin.classList.toggle('is-past-intro', p > 0.18 || playing);
+        st.setProperty('--scroll-cta-opacity', (1 - ramp(p, 0.12, 0.24)).toFixed(3));
+        st.setProperty('--chapter', p < 0.34 ? '"01"' : p < 0.7 ? '"02"' : '"03"');
+        pin.classList.toggle('is-after', p > 0.5);
+        pin.classList.toggle('is-past-intro', p > 0.22 || playing);
         pin.classList.toggle('is-end', p > 0.96);
-        bottom.style.opacity = String(1 - ramp(p, 0.04, 0.26));
-        bottom.style.transform = 'translateY(' + tear * 70 + 'px)';
-        bottom.style.visibility = p > 0.28 ? 'hidden' : 'visible';
+        bottom.style.opacity = String(1 - ramp(p, 0.16, 0.3));
+        bottom.style.transform = 'none';
+        bottom.style.visibility = p > 0.34 ? 'hidden' : 'visible';
         var focus = scene.querySelector('.scene-focus');
         if (focus) {
           var active = p > 0.62 && p < 0.97;
@@ -623,7 +629,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     --after-title-a-x: -12vw; --after-title-b-x: 12vw; --after-title-y: 0px; --after-title-mask: 85%;
     --after-lines-x: -40px; --after-lines-opacity: 0; --after-line: 0;
     --after-meta: 0; --after-stamp: 0;
-    --focus-opacity: 0; --focus-x: 18vw; --focus-y: 18vh; --focus-ry: -38deg; --focus-rz: 8deg; --focus-scale: .76;
+    --focus-opacity: 0; --focus-x: 4vw; --focus-y: 6vh; --focus-ry: 0deg; --focus-rz: 0deg; --focus-scale: .94; --gate: 0vh; --hero-blur: 0px;
     --scene-progress: 0%; --chapter: "01"; --scroll-cta-opacity: 1;
     position: sticky; top: 0; height: 100svh; min-height: 620px; overflow: hidden;
     isolation: isolate; perspective: 1400px; perspective-origin: 50% 46%;
@@ -637,8 +643,14 @@ const shortTitle = (t: string) => t.split('——')[0];
     will-change: transform, opacity;
   }
   .scene-media { position: absolute; inset: 0; }
-  .scene-image { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%; animation: scene-in 2.2s cubic-bezier(.2,.7,.2,1) both; }
-  @keyframes scene-in { from { opacity: .2; filter: blur(8px); } to { opacity: 1; filter: blur(0); } }
+  .scene-image { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%; filter: blur(var(--hero-blur)); animation: scene-in 1.4s ease both; }
+  @keyframes scene-in { from { opacity: .35; } to { opacity: 1; } }
+  .scene-pin::before, .scene-pin::after {
+    content: ""; position: absolute; left: 0; right: 0; height: var(--gate, 0vh);
+    background: #07090d; z-index: 7; pointer-events: none;
+  }
+  .scene-pin::before { top: 0; }
+  .scene-pin::after { bottom: 0; }
   .scene-shade {
     position: absolute; inset: 0;
     background:
@@ -685,7 +697,6 @@ const shortTitle = (t: string) => t.split('——')[0];
     background:
       radial-gradient(circle at 74% 20%, #f7fbfb 0, transparent 38%),
       linear-gradient(125deg, #d4e4eb, #edf4f6 56%, #cbdfe8);
-    clip-path: polygon(calc(-4% - var(--paper-gap)) 100%, calc(43% - var(--paper-gap)) 0, calc(55% + var(--paper-gap)) 0, calc(8% + var(--paper-gap)) 100%);
     transform: scale(var(--after-scale));
   }
   .scene-after::before {
@@ -723,16 +734,12 @@ const shortTitle = (t: string) => t.split('——')[0];
     font-weight: 900; line-height: .82; letter-spacing: -.085em; color: #102434;
     white-space: nowrap; -webkit-text-stroke: 0;
   }
-  .after-ghost > span { display: block; will-change: transform, clip-path; }
-  .after-ghost > span:first-child {
-    transform: translate3d(var(--after-title-a-x), 0, 0);
-    clip-path: inset(0 calc(var(--after-title-mask)) 0 0);
-  }
+  .after-ghost > span { display: block; }
+  .after-ghost > span:first-child { transform: none; }
   .after-ghost > span:last-child {
     margin-left: 11vw; font-family: Georgia, "Times New Roman", serif;
     font-weight: 400; font-style: italic; letter-spacing: -.07em;
-    transform: translate3d(var(--after-title-b-x), 0, 0);
-    clip-path: inset(0 0 0 calc(var(--after-title-mask)));
+    transform: none;
   }
   .after-ghost b { position: relative; isolation: isolate; color: #b74c3b; font-weight: 400; }
   .after-ghost b::after {
@@ -788,7 +795,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene-frame { position: absolute; z-index: 4; inset: 112px 4.5vw 118px; border: 1px solid rgba(255,255,255,.13); pointer-events: none; opacity: var(--copy-opacity); }
   .scene-content {
     position: absolute; z-index: 4; left: clamp(40px,8vw,140px); top: 50%; width: min(76vw,1400px); padding-right: 5vw;
-    opacity: var(--copy-opacity); filter: blur(var(--copy-blur)); pointer-events: auto;
+    opacity: var(--copy-opacity); pointer-events: auto;
     transform: translateY(calc(-52% + var(--copy-y)));
     will-change: transform, opacity;
   }
