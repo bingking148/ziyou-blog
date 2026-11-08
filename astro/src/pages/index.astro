@@ -321,19 +321,23 @@ const shortTitle = (t: string) => t.split('——')[0];
         var p = clamp(-rect.top / distance);
         /* 硬切：只取 0/1 或三档，不做淡入淡出和描边拖尾。 */
         var step = function (at) { return p >= at ? 1 : 0; };
-        var mass = p < 0.2 ? 0 : p < 0.28 ? 0.4 : p < 0.34 ? 0.72 : 1;
-        var act2 = step(0.34);
-        var act1 = 1 - act2;
-        var slash = step(0.34);
-        var hitA = step(0.34);
-        var hitB = step(0.46);
-        var hitC = step(0.54);
+        /* 0 竖条纸面，1 竖条放倒、红条掀开，2 斜切海报。三档硬切。 */
+        var phase = p < 0.22 ? 0 : p < 0.38 ? 1 : 2;
+        var shear = phase === 0 ? 0 : 1;
+        var mass = phase === 0 ? 0 : phase === 1 ? 0.62 : 1;
+        var act2 = phase === 2 ? 1 : 0;
+        var act1 = phase === 2 ? 0 : 1;
+        var slash = phase >= 1 ? 1 : 0;
+        var hitA = act2;
+        var hitB = p >= 0.46 ? 1 : 0;
+        var hitC = p >= 0.54 ? 1 : 0;
         var arrive = (p >= 0.74 && p < 0.96) ? 1 : 0;
         var mobile = window.innerWidth <= 760;
         var st = pin.style;
         st.setProperty('--scene-p', p.toFixed(4));
         st.setProperty('--act1', String(act1));
         st.setProperty('--act2', String(act2));
+        st.setProperty('--shear', String(shear));
         st.setProperty('--hero-y', '0vh');
         st.setProperty('--hero-scale', '1');
         st.setProperty('--hero-blur', '0px');
@@ -382,8 +386,9 @@ const shortTitle = (t: string) => t.split('——')[0];
         st.setProperty('--focus-scale', '1');
         st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
         st.setProperty('--scroll-cta-opacity', String(step(0.12) ? 0 : 1));
-        st.setProperty('--chapter', p < 0.34 ? '"01"' : '"02"');
+        st.setProperty('--chapter', phase < 2 ? '"01"' : '"02"');
         pin.classList.toggle('is-after', act2 === 1);
+        pin.classList.toggle('is-shear', shear === 1 && act2 === 0);
         pin.classList.toggle('is-past-intro', p > 0.2 || playing);
         pin.classList.toggle('is-end', p > 0.96);
         bottom.style.opacity = String(act1);
@@ -654,11 +659,20 @@ const shortTitle = (t: string) => t.split('——')[0];
   .slab {
     position: absolute; z-index: 1; left: 0; top: 0; bottom: 0; width: 16%;
     background: var(--slab); pointer-events: none;
+    transform-origin: 12% 78%;
+    transform: rotate(calc(var(--shear, 0) * -78deg));
+    opacity: var(--act1, 1);
   }
   .mass {
-    position: absolute; z-index: 1; right: 0; top: 0; bottom: 0;
-    width: calc(9% + var(--block, 0) * 43%);
+    position: absolute; z-index: 1; right: 0; top: 0; height: 100%;
+    width: calc(8% + var(--block, 0) * 42%);
     background: #c41e3a; pointer-events: none;
+    transform-origin: 100% 0%;
+    transform: skewX(calc(var(--shear, 0) * -18deg));
+  }
+  .scene-pin.is-after .mass {
+    top: -12%; height: 128%;
+    transform: skewX(-18deg);
   }
   .rule-v {
     position: absolute; z-index: 3; left: 46%; top: 14%; bottom: 16%;
@@ -669,14 +683,15 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: absolute; z-index: 6; left: 18%; height: 16px; pointer-events: none;
     opacity: var(--slash, 0); transform-origin: left center;
   }
-  .slash-a { top: 22%; width: 62%; background: var(--ink); transform: rotate(-18deg); }
+  .slash-a { top: 38%; left: 4%; width: 54%; background: var(--ink); transform: rotate(-16deg); }
   .slash-b { top: 58%; width: 48%; height: 12px; background: #c41e3a; transform: rotate(11deg); }
   .mega {
-    position: absolute; z-index: 4; left: -1.2vw; top: 18%;
+    position: absolute; z-index: 4; left: 22px; top: 16%;
     margin: 0; color: #c41e3a;
     font-family: Arial, Helvetica, sans-serif; font-weight: 900;
-    font-size: clamp(120px, 18vw, 260px); line-height: .78; letter-spacing: -.08em;
+    font-size: clamp(108px, 14vw, 200px); line-height: .78; letter-spacing: -.06em;
     opacity: var(--act1, 1); pointer-events: none;
+    transform: translate(calc(var(--shear, 0) * 22vw), calc(var(--shear, 0) * 18vh)) rotate(calc(var(--shear, 0) * 12deg));
   }
   .marks { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
   .corner { position: absolute; width: 16px; height: 16px; border: 0 solid var(--ink); }
@@ -722,9 +737,9 @@ const shortTitle = (t: string) => t.split('——')[0];
   .chip-b { left: 72%; top: 24%; background: var(--ink); color: var(--paper); animation-delay: .5s; }
   .scene-pin.is-after .chip { left: auto; right: 7%; top: 72%; background: #f7f4ee; color: #111; }
   .scene-pin.is-after .chip-b { left: auto; right: 18%; top: 30%; background: #111; color: #f7f4ee; }
-  .slab-ticks { position: absolute; left: 1.4vw; bottom: 16%; width: 9%; display: flex; flex-direction: column; gap: 7px; opacity: var(--act1, 1); }
-  .slab-ticks i { display: block; height: 3px; background: #c41e3a; }
-  .slab-ticks i:nth-child(odd) { width: 68%; background: var(--on-slab); }
+  .slab-ticks { position: absolute; left: 28px; bottom: 18%; width: 72px; display: flex; flex-direction: column; gap: 7px; opacity: var(--act1, 1); }
+  .slab-ticks i { display: block; width: 100%; height: 4px; background: #c41e3a; }
+  .slab-ticks i:nth-child(odd) { width: 62%; background: var(--on-slab); }
   .red-index { display: none; }
   .scene-pin.is-after .red-index { display: flex; flex-direction: column; gap: 12px; position: absolute; right: 2.2%; top: 20%; color: #f7f4ee; font: 900 12px Arial, Helvetica, sans-serif; letter-spacing: .22em; }
   .red-index span { border-left: 3px solid #f7f4ee; padding-left: 8px; }
@@ -788,21 +803,20 @@ const shortTitle = (t: string) => t.split('——')[0];
   .incision-glow { stroke: #c41e3a; stroke-width: 14; opacity: calc(var(--incision-scale) * .28); }
   .incision-core { stroke: #c41e3a; stroke-width: 4; }
   .scene-after {
-    position: absolute; inset: 0; z-index: 5; overflow: hidden; pointer-events: none;
+    position: absolute; inset: 0; z-index: 5; overflow: visible; pointer-events: none;
     opacity: var(--act2, 0);
   }
   .after-kicker {
-    position: absolute; z-index: 3; left: 18%; top: 11%; margin: 0;
+    position: absolute; z-index: 3; left: 28px; top: 31%; margin: 0;
     color: var(--muted); font-size: 12px; letter-spacing: .28em; font-weight: 700;
     opacity: var(--hit-a, 0);
   }
   .cx-a {
-    position: absolute; z-index: 3; left: 12%; top: 14%; margin: 0;
+    position: absolute; z-index: 6; left: 28px; top: 12%; margin: 0;
     color: var(--ink); font-family: Arial, Helvetica, sans-serif;
-    font-size: clamp(84px, 11.5vw, 168px); font-weight: 900; line-height: .78;
+    font-size: clamp(72px, 9.2vw, 132px); font-weight: 900; line-height: .78;
     letter-spacing: -.08em; white-space: nowrap;
     opacity: var(--hit-a, 0);
-    transform: translateX(calc((1 - var(--hit-a, 0)) * -6vw));
   }
   .cx-plate {
     position: absolute; z-index: 6; left: 22%; top: 42%; margin: 0;
@@ -1208,7 +1222,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-scroll svg { width: 17px; height: 17px; }
     .scroll-label { font-size: 7px; letter-spacing: .18em; }
     .mass { width: calc(var(--block, 0) * 42%); }
-    .cx-a { left: 16px; top: 14%; width: auto; font-size: clamp(52px, 16vw, 72px); }
+    .cx-a { left: 28px; top: 14%; width: auto; font-size: clamp(48px, 14vw, 68px); }
     .cx-plate { left: 12px; top: 28%; font-size: clamp(32px, 10vw, 46px); transform: rotate(-3deg); }
     .after-kicker { left: 16px; top: 10%; font-size: 11px; letter-spacing: .14em; color: var(--muted); }
     .after-caption { left: 16px; right: 16px; top: 46%; max-width: none; }
