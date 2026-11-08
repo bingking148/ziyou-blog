@@ -6,9 +6,10 @@ import Comments from '../../components/Comments.astro';
 import PostNav from '../../components/PostNav.astro';
 import Toc from '../../components/Toc.astro';
 import AccentColor from '../../components/AccentColor.astro';
+import InkPlate from '../../components/InkPlate.astro';
 import MoodKnob from '../../components/MoodKnob.astro';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
-import { AUTHOR, OUTDATE_DAYS, DEFAULT_COVER } from '../../consts.ts';
+import { AUTHOR, OUTDATE_DAYS } from '../../consts.ts';
 
 type Post = CollectionEntry<'post'>;
 
@@ -45,7 +46,6 @@ const needsKatex =
   /\$\$[\s\S]+?\$\$/.test(bodyText) ||
   /(^|[^\\$\d])\$[^$\n]+\$(?!\d)/m.test(bodyText);
 
-const cover = post.data.cover || DEFAULT_COVER;
 const url = postUrl(post);
 const updated = post.data.updatedDate;
 const isOutdated =
@@ -62,7 +62,7 @@ const fmt = (d: Date) =>
 <Base
   title={post.data.title}
   description={post.data.description}
-  cover={cover}
+  cover="/images/notebook-og.jpg"
   pageClass="is-post"
   type="article"
   publishedTime={post.data.date}
@@ -73,7 +73,7 @@ const fmt = (d: Date) =>
     '@type': 'BlogPosting',
     headline: post.data.title,
     description: post.data.description,
-    image: new URL(cover, Astro.site).href,
+    image: new URL('/images/notebook-og.jpg', Astro.site).href,
     datePublished: post.data.date.toISOString(),
     ...(updated ? { dateModified: updated.toISOString() } : {}),
     author: { '@type': 'Person', name: AUTHOR },
@@ -92,7 +92,7 @@ const fmt = (d: Date) =>
   </div>
 
   <!-- 页边阅读标尺：只负责进度，章节跳转交给左侧目录 -->
-  <div class="reading-ruler is-on-hero" role="progressbar" aria-label="文章阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="reading-ruler" role="progressbar" aria-label="文章阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
     <div class="ruler-readout"><output class="ruler-percent">00</output><span class="ruler-unit">%</span></div>
     <span class="ruler-caption">读</span>
     <div class="ruler-scale" aria-hidden="true">
@@ -111,10 +111,6 @@ const fmt = (d: Date) =>
 
   <article class="post-layout">
     <header id="header" class="post-hero">
-      <div class="post-hero-media">
-        <img class="post-cover" src={cover} alt={post.data.title} crossorigin="anonymous" fetchpriority="high" />
-      </div>
-      <div class="post-hero-shade" aria-hidden="true"></div>
       <div class="post-hero-content">
         <div class="post-kicker">
           <span>{column ? '专栏' : '随笔'}</span>
@@ -136,11 +132,7 @@ const fmt = (d: Date) =>
           {updated && updated.getTime() !== post.data.date.getTime() && <span>更新于 {fmt(updated)}</span>}
         </div>
       </div>
-      <div class="post-hero-foot" aria-hidden="true">
-        <span>阅读</span>
-        <span class="hero-foot-line"></span>
-        <span>向下读</span>
-      </div>
+      <div class="post-hero-plate" aria-hidden="true"><InkPlate seed={post.id} /></div>
     </header>
 
     <div class="post-body-grid">
@@ -331,12 +323,8 @@ const fmt = (d: Date) =>
       measure();
 
       // 封面是否还在视口里：决定标尺走白（hero 上）还是走墨（正文上）
-      if (hero && 'IntersectionObserver' in window) {
-        new IntersectionObserver(function (entries) {
-          heroVisible = entries[0].isIntersecting;
-          if (ruler) ruler.classList.toggle('is-on-hero', heroVisible);
-        }, { rootMargin: '-15% 0px 0px 0px' }).observe(hero);
-      }
+      if (ruler) ruler.classList.remove('is-on-hero');
+      if (hero) heroVisible = false;
 
       function update() {
         ticking = false;
@@ -792,5 +780,26 @@ const fmt = (d: Date) =>
   }
   @media (prefers-reduced-motion: reduce) {
     .post-cover, .post-kicker, .post-title, .post-description, .post-meta { animation: none; }
+  }
+
+  /* 文章开篇是纸页，不再用照片当底。后写的规则压过旧的全屏暗色封面。 */
+  .post-hero {
+    position: relative; height: auto !important; min-height: 0 !important; overflow: visible;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, 220px);
+    gap: clamp(28px, 4vw, 64px); align-items: end;
+    max-width: 1080px; margin: 0 auto;
+    padding: 56px clamp(24px, 5vw, 72px) 28px;
+    color: var(--color-text); background: transparent;
+  }
+  .post-hero-content { position: static !important; left: auto !important; right: auto !important; bottom: auto !important; width: auto !important; }
+  .post-kicker, .post-column-badge, .post-description, .post-meta { color: var(--color-text-muted) !important; text-shadow: none; }
+  .post-kicker i { background: var(--color-accent) !important; }
+  .post-title { color: var(--color-text-strong) !important; text-shadow: none !important; max-width: 16em; animation: none; }
+  .post-column-badge:hover { color: var(--color-accent) !important; }
+  .post-hero-plate :global(.ink-plate-svg) { width: 100%; aspect-ratio: 1; border: 1px solid var(--color-card-border); }
+  @media (max-width: 760px) {
+    .post-hero { grid-template-columns: 1fr !important; padding: 28px 22px 12px; height: auto !important; min-height: 0 !important; }
+    .post-hero-plate { max-width: 148px; }
+    .post-title { font-size: clamp(28px, 8vw, 36px) !important; }
   }
 </style>

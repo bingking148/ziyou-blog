@@ -295,9 +295,9 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
   :global([data-theme="dark"]) .search-page { --hard: rgba(0, 0, 0, .55); }
 
   /* 目录卡：白卡 + 标签页 + 硬投影，入场时从更斜的位置回正 */
-  .catalog { position: relative; margin-top: 44px; transform: rotate(-.7deg); }
+  .catalog { position: relative; margin-top: 44px; transform: none; }
   html.js .catalog[data-reveal] { transition: opacity .5s ease-out, transform .7s cubic-bezier(.2, .8, .2, 1); }
-  html.js .catalog[data-reveal]:not(.is-visible) { transform: translateY(22px) rotate(-2deg); }
+  html.js .catalog[data-reveal]:not(.is-visible) { transform: none; }
   .cat-tab {
     position: relative; z-index: 1; display: inline-block; margin-left: 30px;
     padding: 8px 16px 7px; background: var(--color-text-strong); color: var(--color-bg);
@@ -307,7 +307,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
     position: relative; margin-top: -1px;
     background: var(--color-surface);
     border: 1px solid var(--color-card-border);
-    box-shadow: 14px 16px 0 var(--hard);
+    box-shadow: none;
     padding: 30px 32px 24px;
   }
   .search-field { display: flex; align-items: center; gap: 18px; }
@@ -420,8 +420,8 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
     .search-results :global(.result-body p) { display: -webkit-box; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
   }
   @media (max-width: 760px) {
-    .catalog { margin-top: 32px; transform: rotate(-1deg); }
-    html.js .catalog[data-reveal]:not(.is-visible) { transform: translateY(16px) rotate(-1.8deg); }
+    .catalog { margin-top: 32px; transform: none; }
+    html.js .catalog[data-reveal]:not(.is-visible) { transform: none; }
     .cat-tab { margin-left: 20px; }
     .cat-card { padding: 22px 20px 18px; box-shadow: 7px 8px 0 var(--hard); }
     .cat-scale { height: 8px; margin-top: 14px; }
@@ -435,7 +435,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
     .search-results :global(.result-body h3) { font-size: 17px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    html.js .catalog[data-reveal], html.js .catalog[data-reveal]:not(.is-visible) { transform: rotate(-.7deg); transition: none; }
+    html.js .catalog[data-reveal], html.js .catalog[data-reveal]:not(.is-visible) { transform: none; transition: none; }
     .search-results :global(.hit-meter i.on) { animation: none; }
   }
 </style>

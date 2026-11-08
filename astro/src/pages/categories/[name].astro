@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ChapterRule from '../../components/ChapterRule.astro';
-import ResponsiveImage from '../../components/ResponsiveImage.astro';
+import InkPlate from '../../components/InkPlate.astro';
 import ColumnJourney from '../../components/ColumnJourney.astro';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
 
@@ -39,7 +39,7 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 <Base
   title={column ? column.data.title : `分类：${name}`}
   description={column?.data.description ?? `分类「${name}」下的文章`}
-  cover={column?.data.cover}
+  cover="/images/notebook-og.jpg"
   pageClass={column ? 'is-column-journey' : ''}
 >
   {column && ColumnContent ? (
@@ -55,8 +55,8 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
         />
         <figure class="column-visual" data-reveal>
           <div class="column-visual-top"><span>按顺序</span><span>{String(columnList.length).padStart(2, '0')} 篇</span></div>
-          <div class="column-banner ink-plate">
-            <ResponsiveImage src={column.data.cover} alt={column.data.title} sizes="(max-width: 1000px) 100vw, 46vw" loading="eager" />
+          <div class="column-banner">
+            <InkPlate seed={column.id} />
           </div>
           <figcaption><span>按顺序，慢慢读懂。</span></figcaption>
         </figure>

@@ -2,22 +2,19 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import MoodKnob from '../components/MoodKnob.astro';
-import ResponsiveImage from '../components/ResponsiveImage.astro';
-import { responsive } from '../utils/images.ts';
-import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
-import { TYPING_STRINGS, SOCIAL, AUTHOR } from '../consts.ts';
+import InkPlate from '../components/InkPlate.astro';
+import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
+import { TYPING_STRINGS, SOCIAL } from '../consts.ts';
 
 const posts = (await getCollection('post')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
 const columns = (await getCollection('columns')).sort((a, b) => a.data.order - b.data.order);
 const latest = posts[0];
-const heroIndex = posts.slice(0, 3);
-const recent = posts.slice(1, 7);
-// 随想位：从「人工智能学习」专栏随机抽一篇（构建时随机；dev 下每次刷新都换）
+const recent = posts.slice(0, 6);
 const aiColumn = columns.find((c) => c.data.category === '人工智能学习');
 const aiPool = aiColumn ? columnPosts(aiColumn, posts) : [];
-const essays = aiPool.length ? [aiPool[Math.floor(Math.random() * aiPool.length)]] : [];
+const essay = aiPool.length ? aiPool[Math.floor(Math.random() * aiPool.length)] : undefined;
 const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
 
 const fmt = (d: Date) =>
@@ -26,115 +23,48 @@ const shortTitle = (t: string) => t.split('——')[0];
 ---
 
 <Base pageClass="is-home">
-  <!-- 开场：同一张封面、同一套中文句子。滚动只画一条朱砂线，再把最近一篇沿这条斜线送进来。 -->
-  <section id="header" class="scene" aria-label="站点封面">
-    <div class="scene-pin">
-      <div class="scene-card">
-        <div class="scene-media">
-          <ResponsiveImage
-            class="scene-image"
-            src="/images/hero-bg-1920.jpg"
-            sizes="100vw"
-            alt="立于晴空下的蓝发人物"
-            loading="eager"
-            fetchpriority="high"
-          />
-        </div>
-        <div class="scene-shade" aria-hidden="true"></div>
-      </div>
-
-      <svg class="scene-incision" viewBox="0 0 1440 850" preserveAspectRatio="none" aria-hidden="true">
-        <path class="incision-core" pathLength="1" d="M160 700 L1040 520" />
-      </svg>
-
-      <a class="scene-focus" href={postUrl(latest)} aria-label={`阅读最新文章：${latest.data.title}`}>
-        <div class="focus-card">
-          <div class="focus-copy">
-            <span class="focus-label">最近一篇</span>
-            <h2>{shortTitle(latest.data.title)}</h2>
-            <span class="focus-read">进入这一篇 <i>↗</i></span>
-          </div>
-        </div>
-      </a>
-
-      <div class="scene-stack">
-      <div class="scene-content">
+  <section id="header" class="folio" aria-label="开篇">
+    <div class="folio-pin">
+      <div class="margin-rule" aria-hidden="true"><i></i></div>
+      <div class="folio-copy">
         <p class="site-kicker">注</p>
         <h1 class="scene-title">
           <span class="title-line">在键盘上，</span>
           <span class="title-line">写下又一行注释。</span>
         </h1>
-        <div class="scene-intro">
-          <p class="scene-typing">
+        <p class="folio-next">代码之外，仍有世界。</p>
+        <div class="folio-actions">
+          <p class="folio-typing">
             <span id="typing-text">{TYPING_STRINGS[0]}</span><span class="typing-cursor" aria-hidden="true"></span>
           </p>
-          <a class="scene-link" href={postUrl(latest)}>
-            <span>阅读最新一篇</span>
-            <svg viewBox="0 0 32 16" width="32" height="16" fill="none" aria-hidden="true"><path d="M0 8h29M22 1l7 7-7 7" stroke="currentColor" stroke-width="1.3"/></svg>
-          </a>
-          <a
-            class="scene-scroll"
-            href="#journal"
-            data-cinematic-scroll
-            aria-label="看下一句"
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
-              <path d="M12 4v15M5.5 13l6.5 6.5L18.5 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <span>下一句</span>
-          </a>
+          <a class="folio-link" href={postUrl(latest)}>阅读最新一篇</a>
+          <a class="folio-more" href="#journal" data-folio-next>往下读</a>
         </div>
       </div>
-      <div class="scene-next" aria-hidden="true">
-        <p class="scene-title">
-          <span class="title-line">代码之外，</span>
-          <span class="title-line">仍有世界。</span>
-        </p>
-      </div>
-      </div>
-
-      <div class="scene-bottom">
-        <div class="scene-edition">
-          <span>注</span>
-          <span>{new Date().getFullYear()}</span>
-        </div>
-        <nav class="scene-index" aria-label="最新文章速览">
-          {heroIndex.map((p, i) => (
-            <a href={postUrl(p)} class="scene-index-item">
-              <span class="index-no">0{i + 1}</span>
-              <span class="index-title">{shortTitle(p.data.title)}</span>
-              <span class="index-arrow">↗</span>
-            </a>
-          ))}
-        </nav>
-      </div>
-      <div class="scene-progress" aria-hidden="true">
-        <span class="progress-label">一句，再到下一句</span>
-        <span class="progress-track"><i></i></span>
-      </div>
+      <a class="folio-latest" href={postUrl(latest)}>
+        <InkPlate seed={latest.id} />
+        <span class="folio-latest-kicker">最近一篇</span>
+        <strong>{shortTitle(latest.data.title)}</strong>
+      </a>
     </div>
   </section>
 
   <div id="journal" class="journal">
-    <!-- 序：让内容自己说话 -->
     <section class="opening" data-reveal>
       <span class="site-kicker">序</span>
       <p class="opening-text">
-        这里不追逐热点，只记录那些<span>真正想明白的事</span>。<br />
-        从大模型的原理，到 Python 的第一行代码，<br class="desktop-br" />
-        再到数学与世界运作的方式——慢慢写，认真想。
+        这里不追逐热点，只记录那些<span>真正想明白的事</span>。
+        从大模型的原理，到 Python 的第一行代码，再到数学与世界运作的方式——慢慢写，认真想。
       </p>
-      <div class="opening-mark" aria-hidden="true">“</div>
     </section>
 
-    <!-- 专题：非对称杂志编排 -->
     <section class="series" aria-labelledby="series-title">
       <header class="section-head" data-reveal>
         <div>
           <span class="site-kicker">专栏</span>
           <h2 id="series-title">按顺序读完</h2>
         </div>
-        <a class="text-link" href="/columns/">全部专栏 <span>↗</span></a>
+        <a class="text-link" href="/columns/">全部专栏</a>
       </header>
       <ol class="serial-list">
         {columns.map((c, i) => {
@@ -147,7 +77,6 @@ const shortTitle = (t: string) => t.split('——')[0];
                 <span class="serial-name">{c.data.title.replace('专栏', '')}</span>
                 <span class="serial-count">{String(list.length).padStart(2, '0')} 篇</span>
                 <span class="serial-next">{first ? shortTitle(first.data.title) : '开始阅读'}</span>
-                <span class="serial-arrow">↗</span>
               </a>
             </li>
           );
@@ -155,66 +84,54 @@ const shortTitle = (t: string) => t.split('——')[0];
       </ol>
     </section>
 
-    <!-- 随想：大尺幅横图 + 文字 -->
-    {essays[0] && (
-      <section class="interlude" data-reveal aria-label="数理随想">
-        <a class="interlude-image ink-plate" href={postUrl(essays[0])}>
-          <ResponsiveImage src={essays[0].data.cover} sizes="(max-width: 760px) 100vw, 40vw" alt="" loading="lazy" />
-        </a>
-        <div class="interlude-copy">
+    {essay && (
+      <section class="interlude" data-reveal aria-label="随笔">
+        <InkPlate seed={essay.id} />
+        <div>
           <span class="site-kicker">随笔</span>
-          <p class="interlude-kicker">在公式之外</p>
-          <h2><a href={postUrl(essays[0])}>{essays[0].data.title}</a></h2>
-          <p>{essays[0].data.description}</p>
-          <a class="text-link" href={postUrl(essays[0])}>读这篇随想 <span>↗</span></a>
+          <h2><a href={postUrl(essay)}>{shortTitle(essay.data.title)}</a></h2>
+          <p>{essay.data.description}</p>
+          <a class="text-link" href={postUrl(essay)}>读这一篇</a>
         </div>
       </section>
     )}
 
-    <!-- 最新：编号目录，悬停浮图 -->
     <section class="latest" aria-labelledby="latest-title">
       <header class="section-head" data-reveal>
         <div>
           <span class="site-kicker">最近</span>
           <h2 id="latest-title">最近写下</h2>
         </div>
-        <span class="section-aside">{posts.length} 篇文字，仍在生长</span>
+        <a class="text-link" href="/archives/">全部归档</a>
       </header>
-      <ol class="latest-list">
+      <ol class="serial-list">
         {recent.map((p, i) => (
-          <li data-reveal style={`--i:${Math.min(i, 3)}`}>
-            <a class="latest-row" href={postUrl(p)}>
-              <span class="latest-no">{String(i + 1).padStart(2, '0')}</span>
-              <span class="latest-title-wrap">
-                <h3>{shortTitle(p.data.title)}</h3>
-                <span class="latest-cat">{p.data.categories[0]}</span>
-              </span>
-              <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
-              <span class="latest-arrow">↗</span>
+          <li data-reveal>
+            <a class="serial-row" href={postUrl(p)}>
+              <span class="serial-no">{String(i + 1).padStart(2, '0')}</span>
+              <span class="serial-name">{shortTitle(p.data.title)}</span>
+              <time class="serial-count" datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+              <span class="serial-next">{p.data.categories[0]}</span>
             </a>
           </li>
         ))}
       </ol>
-      <div class="latest-more" data-reveal>
-        <a class="text-link" href="/archives/">翻阅全部归档 <span>↗</span></a>
-      </div>
     </section>
 
-    <!-- 尾章：作者与氛围 -->
     <section class="colophon" data-reveal>
-      <div class="colophon-main">
+      <div>
         <span class="site-kicker">关于</span>
         <h2>一个仍在学习的人，<br />和一块留给好奇心的地方。</h2>
         <p>写代码，也写那些代码解释不了的问题。如果这个角落对你有用，欢迎常来。</p>
         <div class="colophon-links">
-          <a class="text-link" href="/about/">关于我 <span>↗</span></a>
-          {SOCIAL.github && <a class="text-link" href={SOCIAL.github} target="_blank" rel="noopener">GitHub <span>↗</span></a>}
+          <a class="text-link" href="/about/">关于我</a>
+          {SOCIAL.github && <a class="text-link" href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>}
         </div>
         <div class="colophon-tags">
           {tags.slice(0, 8).map((t) => <a href={`/tags/${slugifyTaxonomy(t)}/`}>#{t}</a>)}
         </div>
       </div>
-      <div class="colophon-knob"><MoodKnob /></div>
+      <MoodKnob />
     </section>
   </div>
 
@@ -222,11 +139,8 @@ const shortTitle = (t: string) => t.split('——')[0];
     (function () {
       'use strict';
       var el = document.getElementById('typing-text');
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       var order = strings.slice(), idx = 0, pos = order[0].length, deleting = true;
-      for (var i = order.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
-      }
       function tick() {
         if (document.hidden) return setTimeout(tick, 1000);
         var s = order[idx];
@@ -240,342 +154,137 @@ const shortTitle = (t: string) => t.split('——')[0];
           setTimeout(tick, 45);
         }
       }
-      setTimeout(tick, 3200);
+      setTimeout(tick, 2800);
     })();
   </script>
   <script>
-    /* 一句换到下一句：滚动只驱动一条朱砂线和一张始终在画面内的文章卡。 */
     (function () {
       'use strict';
       var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-      var scene = document.querySelector('.scene');
-      if (!scene) return;
-      var pin = scene.querySelector('.scene-pin');
-      var next = scene.querySelector('.scene-next');
-      var focus = scene.querySelector('.scene-focus');
-      var cta = scene.querySelector('[data-cinematic-scroll]');
-      function placeHeader() {
-        var past = scene.getBoundingClientRect().bottom < 72;
-        document.body.dataset.scene = past ? 'journal' : 'photo';
+      var folio = document.querySelector('.folio');
+      if (!folio) return;
+      var pin = folio.querySelector('.folio-pin');
+      var next = folio.querySelector('.folio-next');
+      var link = folio.querySelector('[data-folio-next]');
+      function place(p) {
+        var shown = p > 0.62 ? 1 : 0;
+        if (pin) pin.style.setProperty('--rule', Math.round(p * 100) + '%');
+        if (pin) pin.style.setProperty('--next', String(shown));
+        if (next) next.setAttribute('aria-hidden', shown ? 'false' : 'true');
       }
-      if (reduced.matches || !pin) {
-        placeHeader();
-        window.addEventListener('scroll', placeHeader, { passive: true });
-        window.addEventListener('resize', placeHeader);
-        return;
-      }
-      scene.classList.add('has-motion');
-      var playing = false;
+      if (reduced.matches) { place(1); return; }
+      folio.classList.add('has-motion');
       var ticking = false;
-      var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
-      var smooth = function (v) { v = clamp(v); return v * v * (3 - 2 * v); };
-      var ramp = function (p, a, b) { return smooth((p - a) / (b - a)); };
       function update() {
         ticking = false;
-        var rect = scene.getBoundingClientRect();
-        var distance = scene.offsetHeight - pin.offsetHeight;
-        if (distance <= 0) { placeHeader(); return; }
-        var p = clamp(-rect.top / distance);
-        var line = ramp(p, 0.04, 0.42);
-        var swap = ramp(p, 0.34, 0.48);
-        var copy = swap <= 0.5 ? 1 - swap * 2 : 0;
-        var nextOp = swap <= 0.5 ? 0 : (swap - 0.5) * 2;
-        var card = ramp(p, 0.5, 0.86);
-        var mobile = window.innerWidth <= 760;
-        var st = pin.style;
-        st.setProperty('--scene-p', p.toFixed(4));
-        st.setProperty('--line', line.toFixed(3));
-        st.setProperty('--copy-opacity', copy.toFixed(3));
-        st.setProperty('--next-opacity', nextOp.toFixed(3));
-        st.setProperty('--card-opacity', card.toFixed(3));
-        st.setProperty('--card-x', ((1 - card) * (mobile ? 0 : 16)).toFixed(1) + 'px');
-        st.setProperty('--card-y', ((1 - card) * (mobile ? 12 : 24)).toFixed(1) + 'px');
-        st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
-        if (next) next.setAttribute('aria-hidden', nextOp > 0.6 ? 'false' : 'true');
-        if (focus) {
-          var active = card > 0.62;
-          focus.toggleAttribute('inert', !active);
-          focus.setAttribute('aria-hidden', active ? 'false' : 'true');
+        var distance = folio.offsetHeight - (pin ? pin.offsetHeight : 0);
+        var p = distance > 0 ? Math.max(0, Math.min(1, -folio.getBoundingClientRect().top / distance)) : 1;
+        place(p);
+      }
+      function schedule() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+      if (link) link.addEventListener('click', function (event) {
+        event.preventDefault();
+        var distance = folio.offsetHeight - (pin ? pin.offsetHeight : 0);
+        var target = folio.offsetTop + distance;
+        var start = window.scrollY;
+        var t0 = performance.now();
+        function step(now) {
+          var t = Math.min(1, (now - t0) / 700);
+          var e = t * t * (3 - 2 * t);
+          window.scrollTo(0, start + (target - start) * e);
+          if (t < 1) requestAnimationFrame(step);
         }
-        var sceneLink = scene.querySelector('.scene-link');
-        if (sceneLink) sceneLink.toggleAttribute('inert', copy < 0.2);
-        if (cta) {
-          var ctaOff = copy < 0.2 || playing;
-          cta.toggleAttribute('inert', ctaOff);
-          if (playing) cta.setAttribute('aria-disabled', 'true');
-          else cta.removeAttribute('aria-disabled');
-        }
-        placeHeader();
-      }
-      var root = document.documentElement;
-      var playFrame = 0;
-      var previousScrollBehavior = root.style.scrollBehavior;
-      function stopCinema() {
-        if (!playing) return;
-        playing = false;
-        if (playFrame) cancelAnimationFrame(playFrame);
-        playFrame = 0;
-        root.style.scrollBehavior = previousScrollBehavior;
-        if (cta) cta.removeAttribute('aria-disabled');
-        schedule();
-      }
-      function playCinema(now) {
-        var t = clamp((now - playCinema.start) / playCinema.duration);
-        var eased = t * t * (3 - 2 * t);
-        window.scrollTo(0, playCinema.from + (playCinema.to - playCinema.from) * eased);
-        if (t >= 1) { stopCinema(); return; }
-        playFrame = requestAnimationFrame(playCinema);
-      }
-      if (cta) {
-        cta.addEventListener('click', function (event) {
-          event.preventDefault();
-          if (playing) return;
-          var distance = scene.offsetHeight - pin.offsetHeight;
-          if (distance <= 0) return;
-          var from = window.scrollY;
-          var to = scene.offsetTop + distance * 0.9;
-          if (from >= to - 4) { schedule(); return; }
-          playing = true;
-          previousScrollBehavior = root.style.scrollBehavior;
-          root.style.scrollBehavior = 'auto';
-          cta.setAttribute('aria-disabled', 'true');
-          cta.setAttribute('inert', '');
-          playCinema.start = performance.now();
-          playCinema.from = from;
-          playCinema.to = to;
-          playCinema.duration = window.innerWidth <= 760 ? 1100 : 1400;
-          playFrame = requestAnimationFrame(playCinema);
-        });
-      }
-      window.addEventListener('wheel', stopCinema, { passive: true });
-      window.addEventListener('touchstart', stopCinema, { passive: true });
-      window.addEventListener('site:stop-cinema', stopCinema);
-      window.addEventListener('keydown', function (event) {
-        if (!playing) return;
-        var keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'PageUp', 'PageDown', 'Home', 'End'];
-        if (keys.indexOf(event.key) >= 0) stopCinema();
+        requestAnimationFrame(step);
       });
-      function schedule() {
-        if (!ticking) { ticking = true; requestAnimationFrame(update); }
-      }
       window.addEventListener('scroll', schedule, { passive: true });
       window.addEventListener('resize', schedule);
-      window.addEventListener('load', schedule);
       update();
     })();
   </script>
 </Base>
 
 <style>
-  .scene {
-    position: relative;
-    height: 150svh;
-    min-height: 860px;
-    overflow-x: clip;
-    overflow-y: visible;
-    color: #fff;
-    background: #0a1420;
+  .folio { position: relative; height: 118svh; min-height: 760px; }
+  .folio-pin {
+    --rule: 8%;
+    --next: 0;
+    position: sticky; top: 72px; height: calc(100svh - 72px); min-height: 560px;
+    display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(220px, 320px);
+    gap: clamp(32px, 5vw, 72px); align-items: center;
+    padding: 4vh clamp(24px, 6vw, 88px) 6vh calc(clamp(24px, 6vw, 88px) + 28px);
   }
-  .scene-pin {
-    --line: 0;
-    --copy-opacity: 1;
-    --next-opacity: 0;
-    --card-opacity: 0;
-    --card-x: 16px;
-    --card-y: 24px;
-    --scene-progress: 0%;
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    min-height: 620px;
-    overflow: hidden;
-    background: #0a1420;
+  .margin-rule { position: absolute; left: clamp(20px, 4vw, 56px); top: 12%; bottom: 14%; width: 1px; background: var(--color-card-border); }
+  .margin-rule i { display: block; width: 1px; height: var(--rule); background: var(--color-accent); }
+  .site-kicker { color: var(--color-text-strong); }
+  .scene-title { margin: 0; font-weight: 500; font-size: clamp(40px, 5vw, 76px); line-height: 1.28; letter-spacing: .02em; color: var(--color-text-strong); }
+  .title-line { display: block; }
+  .folio-next {
+    max-width: 12em; margin: 22px 0 0;
+    font-family: var(--font-serif); font-size: clamp(28px, 3vw, 44px); line-height: 1.35;
+    color: var(--color-text-strong); opacity: var(--next);
   }
-  .scene-card { position: absolute; inset: 0; overflow: hidden; background: #26384c; }
-  .scene-media { position: absolute; inset: 0; }
-  .scene-image {
-    width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%;
-    animation: scene-in .8s ease both;
-  }
-  @keyframes scene-in { from { opacity: .35; } to { opacity: 1; } }
-  .scene-shade {
-    position: absolute; inset: 0;
-    background:
-      linear-gradient(90deg, rgba(10,20,32,.72) 0%, rgba(10,20,32,.28) 46%, rgba(10,20,32,.05) 72%),
-      linear-gradient(0deg, rgba(10,20,32,.72) 0%, transparent 36%),
-      linear-gradient(180deg, rgba(10,20,32,.28), transparent 24%);
-  }
-  .scene-incision {
-    position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%;
-    pointer-events: none; visibility: hidden;
-  }
-  .scene.has-motion .scene-incision,
-  .scene.has-motion .scene-next,
-  .scene.has-motion .scene-focus { visibility: visible; }
-  .scene-incision path { fill: none; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--line)); }
-  .incision-core { stroke: #bf4136; stroke-width: 2; }
-  .scene-stack {
-    position: absolute; z-index: 4;
-    left: clamp(28px, 7vw, 120px); top: 18%;
-    width: min(680px, 62vw);
-  }
-  .scene .site-kicker { color: rgba(255,255,255,.82); }
-  .scene-content { opacity: var(--copy-opacity); }
-  .scene-next {
-    position: absolute; left: 0; right: 0; top: 34px;
-    opacity: var(--next-opacity); visibility: hidden; pointer-events: none;
-  }
-  .scene-title {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-weight: 500;
-    font-size: clamp(40px, 4.6vw, 72px);
-    line-height: 1.35;
-    letter-spacing: .03em;
-    color: #fff;
-  }
-  .title-line { display: block; white-space: nowrap; }
-  .scene-intro { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; margin-top: 28px; }
-  .scene-typing { margin: 0; min-height: 1.5em; font-size: 14px; letter-spacing: .06em; color: rgba(255,255,255,.78); }
-  .typing-cursor { display: inline-block; width: 1px; height: 1em; margin-left: 5px; background: currentColor; vertical-align: -2px; animation: blink 1.2s step-end infinite; }
+  .folio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 28px; }
+  .folio-typing { margin: 0; min-height: 1.5em; color: var(--color-text-muted); font-size: 15px; }
+  .typing-cursor { display: inline-block; width: 1px; height: .9em; margin-left: 4px; background: currentColor; animation: blink 1.2s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .scene-link, .scene-scroll {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.55);
-    color: #fff; font-family: var(--font-serif); font-size: 15px; letter-spacing: .06em;
+  .folio-link, .folio-more, .text-link { color: var(--color-text-strong); border-bottom: 1px solid var(--color-accent); padding-bottom: 2px; }
+  .folio-link:hover, .folio-more:hover, .text-link:hover { color: var(--color-accent); }
+  .folio-latest {
+    display: grid; gap: 14px; align-content: end; color: var(--color-text-strong);
+    border-top: 1px solid var(--color-card-border); padding-top: 16px;
   }
-  .scene-link svg, .scene-scroll svg { transition: transform .3s ease; }
-  .scene-link:hover svg { transform: translateX(6px); }
-  .scene-scroll:hover svg { transform: translateY(3px); }
-  .scene-focus {
-    position: absolute; z-index: 4;
-    right: max(28px, 4vw); bottom: 118px;
-    width: min(300px, 24vw);
-    color: #fff;
-    opacity: var(--card-opacity);
-    visibility: hidden;
-    transform: translate3d(var(--card-x), var(--card-y), 0);
-  }
-  .focus-card { background: #102434; border-left: 2px solid #bf4136; }
-  .focus-copy { padding: 16px 18px 18px; }
-  .focus-label { font-family: var(--font-serif); font-size: 13px; letter-spacing: .12em; color: rgba(255,255,255,.72); }
-  .focus-copy h2 { margin: 8px 0 12px; font-family: var(--font-serif); font-weight: 500; font-size: 20px; line-height: 1.45; color: #fff; }
-  .focus-read { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.28); padding-top: 10px; font-size: 13px; }
-  .focus-read i { font-style: normal; }
-  .scene-bottom {
-    position: absolute; z-index: 5; left: clamp(28px, 6vw, 80px); right: clamp(28px, 6vw, 80px); bottom: 0;
-    display: flex; align-items: stretch; border-top: 1px solid rgba(255,255,255,.2);
-  }
-  .scene-edition { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: 18%; padding: 18px 18px 18px 0; font-family: var(--font-serif); font-size: 13px; letter-spacing: .12em; color: rgba(255,255,255,.7); }
-  .scene-index { display: grid; grid-template-columns: repeat(3, 1fr); flex: 1; }
-  .scene-index-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 18px 16px; border-left: 1px solid rgba(255,255,255,.18); color: #fff; }
-  .scene-index-item:hover { background: rgba(255,255,255,.08); color: #fff; }
-  .index-no { font-size: 12px; color: rgba(255,255,255,.55); }
-  .index-title { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .scene-progress {
-    position: absolute; z-index: 5; left: clamp(28px, 7vw, 120px); bottom: 108px;
-    display: flex; align-items: center; gap: 12px; pointer-events: none;
-    color: rgba(255,255,255,.7); font-family: var(--font-serif); font-size: 12px; letter-spacing: .12em;
-    opacity: var(--next-opacity);
-  }
-  .progress-track { width: 88px; height: 1px; background: rgba(255,255,255,.28); }
-  .progress-track i { display: block; width: var(--scene-progress); height: 100%; background: #bf4136; }
+  .folio-latest :global(.ink-plate-svg) { width: 100%; aspect-ratio: 1; height: auto; border: 1px solid var(--color-card-border); }
+  .folio-latest-kicker { font-size: 13px; letter-spacing: .12em; }
+  .folio-latest strong { font-family: var(--font-serif); font-weight: 500; font-size: 22px; line-height: 1.45; }
 
-  .journal { max-width: 1080px; margin: 0 auto; padding: 0 clamp(24px, 5vw, 64px); }
-  .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
-  .section-head h2 { margin: 0; font-size: clamp(28px, 3vw, 40px); font-weight: 500; letter-spacing: .04em; }
-  .section-aside { font-size: 13px; color: var(--color-text-muted); }
-  .text-link { display: inline-flex; align-items: center; gap: 10px; padding-bottom: 4px; border-bottom: 1px solid var(--red-3); font-size: 14px; color: var(--red-1); }
-  .text-link:hover { color: var(--color-accent); border-color: var(--color-accent); }
-
-  .opening { position: relative; padding: 120px 0 100px; }
-  .opening-text { position: relative; z-index: 1; margin: 0; max-width: 18em; font-family: var(--font-serif); font-size: clamp(24px, 2.4vw, 34px); line-height: 1.9; letter-spacing: .03em; color: var(--color-text-strong); }
-  .opening-text span { color: var(--color-accent); box-shadow: inset 0 -.28em 0 color-mix(in srgb, var(--color-accent) 22%, transparent); }
-  .opening-mark { position: absolute; right: 4%; top: 72px; font-family: var(--font-serif); font-size: 96px; line-height: 1; color: var(--red-4); }
-
-  .series { padding-bottom: 100px; }
-  .serial-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
+  .journal { max-width: 980px; margin: 0 auto; padding: 0 clamp(24px, 5vw, 64px) 48px; }
+  .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 8px; }
+  .section-head h2, .colophon h2, .interlude h2 { margin: 0; font-weight: 500; letter-spacing: .03em; }
+  .section-head h2 { font-size: clamp(28px, 3vw, 40px); }
+  .opening { padding: 88px 0 72px; }
+  .opening-text { margin: 0; max-width: 20em; font-family: var(--font-serif); font-size: clamp(22px, 2.2vw, 32px); line-height: 1.85; color: var(--color-text-strong); }
+  .opening-text span { color: var(--color-accent); }
+  .series, .latest { padding-bottom: 72px; }
+  .serial-list { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--color-card-border); }
   .serial-row {
-    display: grid;
-    grid-template-columns: 36px max-content 4.2em minmax(0, 1fr) auto;
-    gap: 14px 18px;
-    align-items: baseline;
-    padding: 18px 4px;
-    border-bottom: 1px solid var(--color-card-border);
-    color: var(--color-text-strong);
+    display: grid; grid-template-columns: 36px minmax(0, 1.4fr) auto minmax(0, 1fr);
+    gap: 12px 18px; align-items: baseline; padding: 16px 2px;
+    border-bottom: 1px solid var(--color-card-border); color: var(--color-text-strong);
   }
-  .serial-no { color: var(--color-accent); font-size: 12px; }
-  .serial-name { font-family: var(--font-serif); font-size: 20px; white-space: nowrap; }
-  .serial-count, .serial-next { font-size: 13px; color: var(--color-text-muted); }
-  .serial-next { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .serial-arrow { color: var(--red-2); }
-  .serial-row:hover .serial-name { color: var(--red-1); }
-
+  .serial-no { color: var(--color-accent); font-size: 13px; }
+  .serial-name { font-family: var(--font-serif); font-size: 20px; line-height: 1.45; }
+  .serial-count, .serial-next { color: var(--color-text-muted); font-size: 14px; }
+  .serial-row:hover .serial-name { color: var(--color-accent); }
   .interlude {
-    display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-    gap: clamp(28px, 4vw, 64px); align-items: center;
-    margin: 0 0 100px; padding: 36px 0;
-    border-top: 1px solid var(--color-card-border);
+    display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 36px; align-items: center;
+    margin-bottom: 72px; padding-top: 12px;
   }
-  .interlude-image { display: block; aspect-ratio: 1.55; }
-  .interlude-image img { width: 100%; height: 100%; object-fit: cover; }
-  .interlude-copy h2 { margin: 0 0 16px; font-size: clamp(22px, 2vw, 30px); font-weight: 500; line-height: 1.5; }
-  .interlude-copy h2 a { color: var(--color-text-strong); }
-  .interlude-copy > p:not(.interlude-kicker) { margin: 0 0 20px; font-size: 15px; line-height: 1.9; color: var(--color-text-muted); }
+  .interlude :global(.ink-plate-svg) { border: 1px solid var(--color-card-border); }
+  .interlude h2 { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.4; }
+  .interlude h2 a { color: var(--color-text-strong); }
+  .interlude p { margin: 12px 0 18px; color: var(--color-text-muted); line-height: 1.85; }
+  .colophon { display: grid; grid-template-columns: minmax(0, 1.4fr) 260px; gap: 36px; align-items: center; padding: 28px 0 72px; border-top: 1px solid var(--color-card-border); }
+  .colophon h2 { font-size: clamp(26px, 3vw, 38px); line-height: 1.45; }
+  .colophon p { max-width: 36em; color: var(--color-text-muted); line-height: 1.85; }
+  .colophon-links { display: flex; gap: 22px; margin-top: 8px; }
+  .colophon-tags { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 22px; }
+  .colophon-tags a { color: var(--color-text-muted); }
+  .colophon-tags a:hover { color: var(--color-accent); }
 
-  .latest { padding-bottom: 100px; }
-  .latest-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
-  .latest-row { display: flex; align-items: baseline; gap: 16px; padding: 18px 4px; border-bottom: 1px solid var(--color-card-border); color: var(--color-text-strong); }
-  .latest-no { width: 28px; flex-shrink: 0; font-size: 12px; color: var(--color-accent); }
-  .latest-title-wrap { flex: 1; min-width: 0; }
-  .latest-title-wrap h3 { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.5; }
-  .latest-cat { display: block; margin-top: 4px; font-size: 12px; color: var(--color-text-muted); }
-  .latest-row time { font-size: 12px; color: var(--color-text-muted); }
-  .latest-arrow { color: var(--red-2); }
-  .latest-row:hover .latest-title-wrap h3 { color: var(--red-1); }
-  .latest-more { margin-top: 28px; text-align: right; }
-
-  .colophon { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(220px, 280px); gap: 48px; align-items: center; padding: 64px 0 88px; border-top: 1px solid var(--color-card-border); }
-  .colophon-main h2 { margin: 0 0 16px; font-size: clamp(26px, 3vw, 40px); font-weight: 500; line-height: 1.6; }
-  .colophon-main > p { max-width: 36em; margin: 0; font-size: 15px; line-height: 1.9; color: var(--color-text-muted); }
-  .colophon-links { display: flex; gap: 28px; margin-top: 22px; }
-  .colophon-tags { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 28px; }
-  .colophon-tags a { font-size: 13px; color: var(--color-text-muted); }
-  .colophon-tags a:hover { color: var(--red-1); }
-  .colophon-knob :global(.mood-knob-widget) { border: 0; box-shadow: none; background: transparent; }
-
-  @media (min-width: 1440px) {
-    .journal { max-width: 1120px; }
-    .opening-text { font-size: 36px; }
-  }
-  @media (max-width: 760px) {
-    .scene { height: 138svh; min-height: 720px; }
-    .scene-stack { left: 22px; right: 22px; top: 16%; width: auto; }
-    .scene-title { font-size: clamp(28px, 7.6vw, 34px); }
-    .scene-next { top: 32px; }
-    .scene-intro { flex-direction: column; align-items: flex-start; gap: 14px; }
-    .scene-focus {
-      left: 22px; right: 22px; top: auto; bottom: 22px; width: auto;
-      transform: translate3d(0, var(--card-y), 0);
-    }
-    .focus-copy h2 { font-size: 17px; }
-    .scene-bottom, .scene-progress { display: none; }
-    .opening { padding: 88px 0 64px; }
-    .opening-text { font-size: 22px; }
-    .opening-mark { font-size: 72px; top: 48px; }
-    .desktop-br { display: none; }
-    .serial-row { grid-template-columns: 28px minmax(0, 1fr) auto; }
-    .serial-name { white-space: normal; }
+  @media (max-width: 800px) {
+    .folio { height: auto; min-height: 0; }
+    .folio-pin { position: static; height: auto; min-height: 0; grid-template-columns: 1fr; padding: 36px 22px 28px 46px; }
+    .scene-title { font-size: clamp(32px, 9vw, 42px); }
+    .folio-next { opacity: 1; font-size: 26px; }
+    .folio-latest { max-width: 220px; }
+    .interlude, .colophon, .serial-row { grid-template-columns: 1fr; }
     .serial-count, .serial-next { display: none; }
-    .interlude { grid-template-columns: 1fr; gap: 22px; margin-bottom: 72px; }
-    .latest-row time { display: none; }
-    .colophon { grid-template-columns: 1fr; gap: 28px; padding: 48px 0 64px; }
+    .opening { padding: 56px 0 40px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .scene { height: 100svh; min-height: 640px; }
-    .scene-image, .typing-cursor { animation: none; }
-    .scene-content { opacity: 1 !important; }
-    .scene-next, .scene-focus, .scene-incision, .scene-progress { display: none; }
+    .folio { height: auto; min-height: 0; }
+    .folio-pin { position: static; height: auto; }
+    .folio-next { opacity: 1; }
+    .typing-cursor { animation: none; }
   }
 </style>
-

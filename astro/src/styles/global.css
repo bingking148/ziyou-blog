@@ -3,36 +3,36 @@
    --red-* 变量名不可改：封面取色与氛围旋钮脚本都写这组变量
    ============================================================ */
 :root {
-  --red-0: #1c3454;
-  --red-1: #2c5382;
-  --red-2: #4a76a8;
-  --red-3: #9db4cf;
-  --red-4: #d8e2ee;
-  --red-5: #edf2f8;
-  --red-5-5: #f2f6fa;
-  --red-6: #f7fafc;
-  --color-red-6-shadow: rgba(44, 83, 130, 0.5);
-  --color-red-3-shadow: rgba(44, 83, 130, 0.25);
+  --red-0: #2a2420;
+  --red-1: #3d342c;
+  --red-2: #6d6258;
+  --red-3: #c4b8aa;
+  --red-4: #e6dfd4;
+  --red-5: #f3eee6;
+  --red-5-5: #f7f3ec;
+  --red-6: #f4f1ea;
+  --color-red-6-shadow: rgba(42, 36, 32, 0.35);
+  --color-red-3-shadow: rgba(42, 36, 32, 0.16);
 
-  /* 语义色：正文与链接必须稳定可读，不随氛围旋钮漂移 */
-  --color-bg: #f7fafc;
-  --color-surface: #ffffff;
-  --color-surface-muted: var(--red-5-5);
-  --color-text: #3a4454;
-  --color-text-strong: #1c2430;
-  --color-text-muted: #5d6b7e;
-  --color-text-faint: #7a879a;
-  --color-link: #2c5382;
-  --color-link-hover: #bf4136;
-  --color-focus: #bf4136;
-  --color-card-border: rgba(44, 83, 130, 0.12);
-  --color-accent: #bf4136; /* 朱砂点睛 */
-  --shadow-soft: 0 6px 28px rgba(44, 83, 130, 0.12);
-  --shadow-lift: 0 14px 48px rgba(44, 83, 130, 0.18);
+  /* 语义色：正文不随氛围旋钮漂移。纸色与松烟是站点本色。 */
+  --color-bg: #f4f1ea;
+  --color-surface: #fbf8f3;
+  --color-surface-muted: #efeae2;
+  --color-text: #3a342c;
+  --color-text-strong: #1a1612;
+  --color-text-muted: #6b6258;
+  --color-text-faint: #8a8076;
+  --color-link: #1a1612;
+  --color-link-hover: #8f2d2d;
+  --color-focus: #8f2d2d;
+  --color-card-border: rgba(26, 22, 18, 0.14);
+  --color-accent: #8f2d2d;
+  --shadow-soft: none;
+  --shadow-lift: none;
 
-  /* 字体 */
-  --font-article: "Mulish", "LXGW WenKai Screen", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-serif: "LXGW WenKai Screen", "Mulish", -apple-system, "PingFang SC", serif;
+  /* 字体：中文以霞鹜文楷领先，像一本手写的笔记。 */
+  --font-article: "LXGW WenKai Screen", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif: "LXGW WenKai Screen", "PingFang SC", "Microsoft YaHei", serif;
   --font-code: Menlo, Monaco, Consolas, monospace;
 
   /* 布局 */
@@ -41,7 +41,7 @@
   --wide-content: 1350px;
   --wide-gutter: clamp(24px, 5vw, 64px);
   --wide-gap: clamp(36px, 3.5vw, 68px);
-  --radius: 16px;
+  --radius: 2px;
 
   color-scheme: light;
 }
@@ -52,18 +52,18 @@
   --red-5-5: rgba(130, 167, 204, 0.05);
   --red-6: rgba(130, 167, 204, 0.2);
 
-  --color-bg: #14181f;
-  --color-surface: #1e232c;
-  --color-surface-muted: #232933;
-  --color-text: #b8c2d0;
-  --color-text-strong: #e6edf5;
-  --color-text-muted: #a3b0c2;
-  --color-text-faint: #7a879a;
-  --color-link: #82a7d6;
-  --color-link-hover: #d98063;
-  --color-focus: #d98063;
-  --color-card-border: rgba(130, 167, 204, 0.14);
-  --color-accent: #d98063;
+  --color-bg: #161310;
+  --color-surface: #211c18;
+  --color-surface-muted: #2a241f;
+  --color-text: #d9d0c4;
+  --color-text-strong: #f4efe8;
+  --color-text-muted: #b7ab9e;
+  --color-text-faint: #8d8276;
+  --color-link: #f4efe8;
+  --color-link-hover: #e7b2a4;
+  --color-focus: #e7b2a4;
+  --color-card-border: rgba(244, 239, 232, 0.14);
+  --color-accent: #e7b2a4;
   --shadow-soft: 0 6px 28px rgba(0, 0, 0, 0.35);
   --shadow-lift: 0 14px 48px rgba(0, 0, 0, 0.5);
 
@@ -200,16 +200,7 @@ img { max-width: 100%; height: auto; }
 .prose th { background: var(--red-5); color: var(--color-text-strong); }
 .prose img { border-radius: 10px; }
 
-/* 首字下沉（编辑排版） */
-.prose > p:first-of-type::first-letter {
-  float: left;
-  font-size: 3em;
-  line-height: 1;
-  padding: 0.04em 0.14em 0.02em 0;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  color: var(--red-1);
-}
+/* 正文按笔记排，不把首字拆成杂志下沉。 */
 
 /* ============================================================
    内页编辑式共享类

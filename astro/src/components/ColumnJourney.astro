@@ -1,467 +1,98 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import ResponsiveImage from './ResponsiveImage.astro';
 import { postUrl } from '../utils/columns.ts';
 
 interface Props {
   posts: CollectionEntry<'post'>[];
   total: number;
 }
-
-const { posts, total } = Astro.props;
-const fmt = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const { posts } = Astro.props;
 const num = (w?: number) => String(w ?? 0).padStart(2, '0');
-// 同一组笔迹和摆位每次构建都一致，像手贴卡片而不是刷新时重新洗牌。
-const scatter = [
-  { width: 41, shift: 1, turn: -1.6, gap: 184 },
-  { width: 43, shift: 3, turn: 1.2, gap: 202 },
-  { width: 40, shift: 5, turn: -1.05, gap: 174 },
-  { width: 42, shift: -2, turn: 1.6, gap: 210 },
-  { width: 44, shift: 3, turn: -0.85, gap: 190 },
-  { width: 41, shift: -1, turn: 1.1, gap: 198 },
-];
-const layout = (i: number) => {
-  const s = scatter[i % scatter.length];
-  return `--card-width:${s.width}%;--card-shift:${s.shift}%;--card-turn:${s.turn}deg;--card-gap:${s.gap}px`;
-};
-// 纸边只保留轻微的不齐，主体仍是一张可以安静读完文字的便签。
-const outlines = [
-  'M 1 2 Q 24 0 49 2 T 99 1 L 98 99 Q 73 97 49 99 T 1 98 Z',
-  'M 2 1 Q 28 3 51 1 T 98 2 L 99 98 Q 75 100 51 98 T 2 99 Z',
-  'M 1 1 Q 24 3 50 1 T 99 2 L 98 98 Q 74 96 49 99 T 2 98 Z',
-];
+const fmt = (d: Date) =>
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 ---
 
-<section class="journey" aria-labelledby="journey-heading" data-journey>
-  <header class="journey-heading">
-    <h2 id="journey-heading">阅读路线</h2>
-    <span>一篇一篇</span>
-    <p>沿着这条线，一篇一篇读下去。</p>
-    <span class="journey-total">{String(total).padStart(2, '0')} 篇</span>
-  </header>
-
-  <div class="journey-board">
-    <span class="board-doodle board-doodle-star" aria-hidden="true">✳</span>
-    <span class="board-doodle board-doodle-note" aria-hidden="true">一篇<br />一篇 ↓</span>
-    <div class="journey-track" data-journey-track>
-    <svg class="journey-lines" data-journey-lines aria-hidden="true" focusable="false">
-      <defs>
-        <marker id="column-journey-arrow" viewBox="-2 -2 18 18" refX="12" refY="7" markerWidth="20" markerHeight="20" orient="auto" markerUnits="userSpaceOnUse">
-          <path d="M 1 1 Q 7 4 13 7 Q 7 10 1 14" fill="none" stroke="currentColor" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M 2 0 Q 8 4 13 7 M 2 13 Q 7 10 12 7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity=".45" />
-        </marker>
-      </defs>
-      {posts.slice(1).map((_, i) => (
-        <g class="journey-connector">
-          <path class="journey-line journey-line-echo" data-journey-echo={i} pathLength="1" transform="translate(1.8 -1.2)" />
-          <path class="journey-line journey-line-crayon" data-journey-line pathLength="1" marker-end="url(#column-journey-arrow)" />
-          <path class="journey-line journey-line-grain" data-journey-grain={i} pathLength="1" transform="translate(-.7 .6)" />
-        </g>
-      ))}
+<section class="journey" data-journey aria-label="阅读顺序">
+  <div class="journey-rule" aria-hidden="true">
+    <svg viewBox="0 0 2 100" preserveAspectRatio="none">
+      <line class="journey-line" data-journey-line x1="1" y1="0" x2="1" y2="100" pathLength="1" />
     </svg>
-
-    <ol class="journey-list">
-      {posts.map((p, i) => (
-        <li class="journey-item" data-journey-item style={layout(i)}>
-          <span class="journey-port journey-port-in" data-journey-in aria-hidden="true"></span>
-          <span class="journey-port journey-port-out" data-journey-out aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M 6 .8 L 11 11.2 H 1 Z" /></svg></span>
-          <a class="journey-card" href={postUrl(p)} data-preview={p.data.cover ? i : undefined}>
-            <span class="journey-paper-back" aria-hidden="true"></span>
-            <span class="journey-pin" data-journey-pin aria-hidden="true"><span></span></span>
-            <svg class="journey-card-outline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d={outlines[(i + 1) % outlines.length]} transform="translate(.9 .8)" opacity=".38" />
-              <path class="journey-card-pencil" d={outlines[i % outlines.length]} />
-            </svg>
-            <span class="journey-card-top">
-              <span class="journey-number"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><ellipse cx="32" cy="22" rx="29" ry="17" transform={`rotate(${(i % 2 ? 1 : -1) * 3} 32 22)`} /></svg><span>{num(p.data.weight)}</span></span>
-              <span class="journey-chapter">笔记</span>
-              <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
-            </span>
-            <span class="journey-crayon-swatch" aria-hidden="true"></span>
-            <h3>{p.data.title}</h3>
-            {p.data.description && <p>{p.data.description}</p>}
-            <span class="journey-card-bottom">
-              <span class="journey-read">翻开这一页 <span aria-hidden="true">↗</span></span>
-              <span class="journey-card-scribble" aria-hidden="true">⌁</span>
-            </span>
-          </a>
-        </li>
-      ))}
-    </ol>
-    {posts.map((p, i) => p.data.cover && (
-      <span class="journey-preview" data-journey-preview={i} aria-hidden="true">
-        <ResponsiveImage src={p.data.cover} sizes="260px" alt="" loading="lazy" />
-      </span>
-    ))}
-    </div>
   </div>
+  <ol class="journey-list">
+    {posts.map((p) => (
+      <li class="journey-item" data-journey-item>
+        <a class="journey-card" href={postUrl(p)}>
+          <span class="journey-number">{num(p.data.weight)}</span>
+          <span class="journey-title">{p.data.title}</span>
+          <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+        </a>
+      </li>
+    ))}
+  </ol>
 </section>
 
 <script>
   (function () {
-    'use strict';
     var root = document.querySelector('[data-journey]');
-    if (!(root instanceof HTMLElement)) return;
-    var track = root.querySelector('[data-journey-track]');
-    var svg = root.querySelector('[data-journey-lines]');
-    var items = Array.from(root.querySelectorAll('[data-journey-item]'));
-    var incoming = Array.from(root.querySelectorAll('[data-journey-in]'));
-    var outgoing = Array.from(root.querySelectorAll('[data-journey-out]'));
-    var paths = Array.from(root.querySelectorAll('[data-journey-line]'));
-    var echoes = Array.from(root.querySelectorAll('[data-journey-echo]'));
-    var grains = Array.from(root.querySelectorAll('[data-journey-grain]'));
-    if (!track || !svg || items.length !== incoming.length || items.length !== outgoing.length || paths.length !== items.length - 1) return;
-
-    var reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    var points = [], outPoints = [], progress = [], ticking = false, needsMeasure = false;
-    function clamp(n) { return Math.max(0, Math.min(1, n)); }
-
-    function measure() {
-      var rect = track.getBoundingClientRect();
-      var scrollY = window.scrollY;
-      function portPoint(anchor) {
-        var r = anchor.getBoundingClientRect();
-        return {
-          x: r.left + r.width / 2 - rect.left,
-          y: r.top + r.height / 2 - rect.top,
-          documentY: r.top + r.height / 2 + scrollY
-        };
-      }
-      points = incoming.map(portPoint);
-      outPoints = outgoing.map(portPoint);
-      svg.setAttribute('viewBox', '0 0 ' + rect.width + ' ' + rect.height);
-      svg.setAttribute('width', String(rect.width));
-      svg.setAttribute('height', String(rect.height));
-      paths.forEach(function (path, i) {
-        var a = outPoints[i], b = points[i + 1];
-        var lead = Math.min(72, Math.max(40, (b.y - a.y) * 0.35));
-        // 上一张底部垂直出线，在卡间空档横跨，再垂直进入下一张顶部；复笔同形微偏移。
-        var curve = 'M ' + a.x + ' ' + a.y + ' C ' + a.x + ' ' + (a.y + lead) + ', ' + b.x + ' ' + (b.y - lead) + ', ' + b.x + ' ' + b.y;
-        path.setAttribute('d', curve);
-        echoes[i].setAttribute('d', curve);
-        grains[i].setAttribute('d', curve);
-      });
-    }
-
-    function update() {
-      ticking = false;
-      if (reduced.matches) return;
-      var readingLine = window.scrollY + window.innerHeight * 0.68;
-      items.forEach(function (item, i) {
-        var active = points[i].documentY <= readingLine;
-        if (item.classList.contains('is-reached') !== active) item.classList.toggle('is-reached', active);
-      });
-      paths.forEach(function (path, i) {
-        var a = outPoints[i], b = points[i + 1];
-        var distance = Math.max(1, b.documentY - a.documentY);
-        var p = clamp((readingLine - a.documentY) / distance);
-        var rounded = Math.round(p * 1000) / 1000;
-        if (progress[i] === rounded) return;
-        progress[i] = rounded;
-        path.style.strokeDashoffset = String(1 - rounded);
-        echoes[i].style.strokeDashoffset = String(1 - rounded);
-        grains[i].style.strokeDashoffset = String(1 - rounded);
-        if (rounded >= 0.98) path.setAttribute('marker-end', 'url(#column-journey-arrow)');
-        else path.removeAttribute('marker-end');
-      });
-    }
-
-    function scheduleMeasure() {
-      needsMeasure = true;
-      scheduleUpdate();
-    }
-    function scheduleUpdate() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        // ResizeObserver 可能与本帧滚动回调交错；测量后仍使用最新滚动位置。
-        if (needsMeasure) {
-          needsMeasure = false;
-          measure();
-        }
-        update();
-      });
-    }
-    function applyMotionPreference() {
-      root.classList.toggle('is-static', reduced.matches);
-      if (reduced.matches) {
-        items.forEach(function (item) { item.classList.add('is-reached'); });
-      paths.forEach(function (path, i) {
-        path.removeAttribute('marker-end');
-        path.style.strokeDashoffset = '0';
-        echoes[i].style.strokeDashoffset = '0';
-        grains[i].style.strokeDashoffset = '0';
-      });
-      } else {
-        measure();
-        update();
-      }
-    }
-
-    // 先完成测量再开启隐藏态：任何初始化失败都保留完整的静态目录。
-    measure();
+    if (!root) return;
     root.classList.add('is-enhanced');
-    applyMotionPreference();
-    window.addEventListener('scroll', scheduleUpdate, { passive: true });
-    window.addEventListener('resize', scheduleMeasure);
-    window.addEventListener('load', scheduleMeasure);
-    if ('ResizeObserver' in window) new ResizeObserver(scheduleMeasure).observe(track);
-    if (document.fonts) document.fonts.ready.then(scheduleMeasure);
-    reduced.addEventListener('change', applyMotionPreference);
-  })();
-
-  // 封面浮层独立于卡片 transform，确保 fixed 始终相对视口定位。
-  (function () {
-    var root = document.querySelector('[data-journey]');
-    if (!(root instanceof HTMLElement)) return;
-    var previews = Array.from(root.querySelectorAll('[data-journey-preview]'));
-    if (!previews.length) return;
-    var finePointer = matchMedia('(min-width: 1001px) and (hover: hover) and (pointer: fine)');
-    var keyboardLayout = matchMedia('(min-width: 761px)');
-    var reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    var active = null, pointerX = 0, pointerY = 0, previewFrame = 0;
-
-    function hidePreview() {
-      if (active) active.classList.remove('is-visible');
-      active = null;
-      if (previewFrame) cancelAnimationFrame(previewFrame);
-      previewFrame = 0;
-    }
-    function placePreview(x, y) {
-      if (!active) return;
-      var width = active.offsetWidth, height = active.offsetHeight;
-      var margin = 14;
-      var px = Math.max(margin, Math.min(x, innerWidth - width - margin));
-      var py = Math.max(margin, Math.min(y, innerHeight - height - margin));
-      active.style.setProperty('--preview-x', px + 'px');
-      active.style.setProperty('--preview-y', py + 'px');
-    }
-    function showPreview(card, keyboard) {
-      var preview = root.querySelector('[data-journey-preview="' + card.getAttribute('data-preview') + '"]');
-      if (!(preview instanceof HTMLElement)) return;
-      if (active !== preview) hidePreview();
-      active = preview;
-      if (keyboard) {
-        var r = card.getBoundingClientRect();
-        var right = r.right + 24;
-        placePreview(right <= innerWidth - 274 ? right : r.left - 284, r.top + 24);
-      } else placePreview(pointerX + 24, pointerY - 70);
-      preview.classList.add('is-visible');
-    }
-    root.querySelectorAll('[data-preview]').forEach(function (card) {
-      card.addEventListener('pointerenter', function (event) {
-        if (!finePointer.matches || reduced.matches || event.pointerType === 'touch') return;
-        pointerX = event.clientX; pointerY = event.clientY;
-        showPreview(card, false);
+    var line = root.querySelector('[data-journey-line]');
+    var items = Array.prototype.slice.call(root.querySelectorAll('[data-journey-item]'));
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    function paint(progress) {
+      if (line) line.style.strokeDashoffset = String(1 - progress);
+      var gate = window.innerHeight * 0.72;
+      items.forEach(function (el) {
+        el.classList.toggle('is-reached', el.getBoundingClientRect().top < gate);
       });
-      card.addEventListener('pointermove', function (event) {
-        if (event.pointerType === 'touch') return;
-        pointerX = event.clientX; pointerY = event.clientY;
-        if (!active || previewFrame) return;
-        previewFrame = requestAnimationFrame(function () {
-          previewFrame = 0;
-          placePreview(pointerX + 24, pointerY - 70);
-        });
-      }, { passive: true });
-      card.addEventListener('pointerleave', hidePreview);
-      card.addEventListener('pointercancel', hidePreview);
-      card.addEventListener('focus', function () {
-        if (keyboardLayout.matches && !reduced.matches && card.matches(':focus-visible')) showPreview(card, true);
-      });
-      card.addEventListener('blur', hidePreview);
-    });
-    window.addEventListener('scroll', hidePreview, { passive: true });
-    window.addEventListener('resize', hidePreview);
-    window.addEventListener('blur', hidePreview);
-    reduced.addEventListener('change', hidePreview);
+    }
+    function update() {
+      if (reduced.matches) { paint(1); return; }
+      var rect = root.getBoundingClientRect();
+      var total = root.offsetHeight || 1;
+      var seen = Math.max(0, Math.min(total, gateSeen(rect, total)));
+      paint(seen / total);
+    }
+    function gateSeen(rect, total) {
+      return Math.min(total, Math.max(0, window.innerHeight * 0.72 - rect.top));
+    }
+    if (reduced.matches) {
+      paint(1);
+      return;
+    }
+    var ticking = false;
+    function schedule() {
+      if (!ticking) ticking = true, requestAnimationFrame(function () { ticking = false; update(); });
+    }
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
   })();
 </script>
 
 <style>
-  /* 蜡笔配色：主笔用主题红系，回声和圈记用偏色蜡笔，像一支笔涂两遍没对齐。 */
-  .journey {
-    --crayon: var(--red-2);
-    --crayon-deep: var(--red-1);
-    --crayon-echo: color-mix(in srgb, var(--red-3) 85%, var(--color-text) 15%);
-    --crayon-loop: color-mix(in srgb, var(--red-3) 72%, var(--red-2));
-    --board: #d9e4ef;
-    --board-deep: #bdcede;
-    --board-edge: rgba(44, 83, 130, .19);
-    --paper: #f8fafc;
-    --paper-back: #e1e9f1;
-    --ink: #263b55;
-    --pin-head: var(--red-2);
-    --pin-spot: rgba(255, 252, 246, .85);
-    position: relative; isolation: isolate; margin-top: clamp(48px, 7vw, 88px);
+  .journey { position: relative; margin: 48px 0 24px; padding-left: 28px; }
+  .journey-rule { position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; }
+  .journey-rule svg { width: 2px; height: 100%; display: block; }
+  .journey-line {
+    stroke: var(--color-accent); stroke-width: 2; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1; stroke-dashoffset: 1;
   }
-  .journey-heading { position: relative; padding-bottom: 26px; border-bottom: 1px solid color-mix(in srgb, var(--red-2) 28%, transparent); transform: rotate(-.15deg); }
-  .journey-heading::after { content: ''; position: absolute; left: 2px; right: 5px; bottom: -3px; border-bottom: .7px solid color-mix(in srgb, var(--red-2) 15%, transparent); transform: rotate(.18deg); }
-  .journey-heading h2 { display: inline; margin: 0 18px 0 0; font-size: clamp(24px, 3vw, 34px); font-weight: 500; letter-spacing: .08em; }
-  .journey-heading > span:not(.journey-total) { font-size: 9px; letter-spacing: .24em; color: var(--red-2); }
-  .journey-heading p { display: inline; margin: 0 0 0 20px; font-size: 12px; color: var(--color-text-muted); }
-  .journey-total { float: right; margin-top: 9px; font-family: var(--font-serif); font-size: 13px; color: var(--color-text-muted); }
-
-  /* 蓝灰纸张拼贴板：沿用博客的墨蓝与朱砂，而不是另起一套木色主题。 */
-  /* 板面用 vw 上下限：1350px 版心时 padding 约 30/68px，1920px 时约 34/77px，2048 封顶。 */
-  .journey-board {
-    position: relative; margin-top: 34px; padding: clamp(30px, 1.9vw, 44px) clamp(24px, 4vw, 96px) clamp(38px, 2.4vw, 54px);
-    border-radius: 7px;
-    background:
-      radial-gradient(ellipse 460px 190px at 16% 8%, rgba(255, 255, 255, .24), transparent 70%),
-      radial-gradient(ellipse 430px 210px at 84% 92%, rgba(44, 83, 130, .13), transparent 70%),
-      radial-gradient(circle at 27% 31%, rgba(44, 83, 130, .15) 0 .7px, transparent 1.5px),
-      radial-gradient(circle at 63% 68%, rgba(255, 255, 255, .2) 0 .6px, transparent 1.3px),
-      repeating-linear-gradient(37deg, transparent 0 9px, rgba(44, 83, 130, .045) 9px 11px),
-      linear-gradient(174deg, var(--board), var(--board-deep));
-    background-size: auto, auto, 11px 13px, 17px 19px, auto, auto;
-    box-shadow: inset 0 2px 5px rgba(255, 255, 255, .3), inset 0 -3px 9px rgba(44, 83, 130, .15), 0 24px 54px -20px rgba(28, 52, 84, .28);
-  }
-  .journey-board::before {
-    content: ''; position: absolute; inset: 9px; border-radius: 4px; pointer-events: none;
-    border: 1px solid var(--board-edge);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
-  }
-  .board-doodle { position: absolute; z-index: 0; font-family: var(--font-serif); color: var(--crayon-loop); opacity: .5; pointer-events: none; }
-  .board-doodle-star { top: 16px; right: 4.5%; font-size: 34px; line-height: 1; transform: rotate(14deg); }
-  .board-doodle-note { bottom: 14px; left: 3.5%; font-size: 12px; line-height: 1.7; letter-spacing: .12em; transform: rotate(-4deg); }
-
-  .journey-track { position: relative; z-index: 1; }
-  .journey-lines { position: absolute; inset: 0; z-index: 0; overflow: visible; color: var(--crayon); pointer-events: none; }
-  .journey-line { fill: none; stroke: currentColor; stroke-dasharray: 1; stroke-dashoffset: 0; vector-effect: non-scaling-stroke; }
-  /* 主蜡笔：圆头粗笔，笔芯是实色，边缘略叠偏色复笔。 */
-  .journey-line-crayon { stroke-width: 3.8; stroke-linecap: round; stroke-linejoin: round; opacity: .95; }
-  .journey-line-echo { stroke: var(--crayon-echo); stroke-width: 5.6; stroke-linecap: round; stroke-linejoin: round; opacity: .22; }
-  .journey-line-grain { stroke: var(--crayon-deep); stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: .028 .05; opacity: .4; }
-
-  .journey-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
-  .journey-item { position: relative; z-index: 1; width: var(--card-width); margin-bottom: var(--card-gap); }
-  .journey-item:nth-child(odd) { margin-left: max(10px, var(--card-shift)); }
-  .journey-item:nth-child(even) { align-self: flex-end; margin-right: max(10px, calc(-1 * var(--card-shift))); }
-  .journey-item:last-child { margin-bottom: 0; }
-
-  /* 上下端口：钉在卡片边缘外的小蜡笔点/小三角，连线从这里出发、到这里落脚。 */
-  .journey-port { position: absolute; z-index: 2; left: 50%; width: 10px; height: 10px; transform: translateX(-50%) rotate(-6deg); border-radius: 45% 55% 52% 48%; background: var(--crayon-deep); box-shadow: 0 0 0 2px rgba(248, 250, 252, .65), inset 1.5px 1.5px 2px rgba(255, 255, 255, .5), 0 1.5px 2.5px rgba(28, 52, 84, .25); pointer-events: none; }
-  .journey-port-in { top: -5px; }
-  .journey-port-out { top: auto; bottom: -9px; width: 12px; height: 12px; border-radius: 0; background: none; box-shadow: none; transform: translateX(-50%) rotate(4deg); }
-  .journey-port-out svg { display: block; width: 100%; height: 100%; overflow: visible; }
-  .journey-port-out path { fill: var(--crayon-deep); stroke: rgba(248, 250, 252, .55); stroke-width: .8; }
-
-  /* 便签卡：冷白纸面 + 底层蓝灰垫纸，图钉保留一点朱砂。 */
+  .journey-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-card-border); }
   .journey-card {
-    position: relative; display: block; min-height: 228px; padding: 34px 30px 26px;
-    border: 0; border-radius: 3px 6px 4px 8px / 6px 3px 7px 4px;
-    background:
-      radial-gradient(circle at 22% 30%, rgba(44, 83, 130, .045) 0 .6px, transparent 1.2px),
-      radial-gradient(circle at 68% 74%, rgba(44, 83, 130, .04) 0 .5px, transparent 1px),
-      var(--paper);
-    background-size: 13px 15px, 19px 21px, auto;
-    color: var(--ink);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset, 3px 7px 0 rgba(44, 83, 130, .11), 0 18px 36px rgba(28, 52, 84, .16);
-    transform: rotate(var(--card-turn));
-    transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s;
+    display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 16px; align-items: baseline;
+    padding: 16px 4px; border-bottom: 1px solid var(--color-card-border); color: var(--color-text-strong);
   }
-  .journey-paper-back { position: absolute; inset: 0; z-index: -1; border-radius: 4px 7px 5px 9px / 7px 4px 8px 5px; background: var(--paper-back); transform: translate(7px, 9px) rotate(calc(var(--card-turn) * -0.6)); box-shadow: 0 3px 8px rgba(28, 52, 84, .13); }
-  .journey-card-outline { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); overflow: visible; pointer-events: none; color: color-mix(in srgb, var(--crayon) 62%, var(--ink)); }
-  .journey-card-outline path { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: stroke .3s; }
-  .journey-card:hover, .journey-card:focus-visible { z-index: 3; transform: rotate(var(--card-turn)) translateY(-5px); box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset, 4px 10px 0 rgba(44, 83, 130, .13), 0 26px 48px rgba(28, 52, 84, .22); }
-  .journey-card:hover .journey-card-outline, .journey-card:focus-visible .journey-card-outline { color: var(--crayon-deep); }
-
-  /* 图钉：塑料头 + 高光 + 针影，独占卡顶预留区，不压文字。 */
-  .journey-pin { position: absolute; z-index: 3; top: -11px; left: 50%; width: 22px; height: 22px; transform: translateX(-50%) rotate(5deg); border-radius: 50%; background: radial-gradient(circle at 34% 30%, var(--pin-spot) 0 16%, var(--pin-head) 44%, color-mix(in srgb, var(--pin-head) 68%, #000) 100%); box-shadow: 0 3px 5px rgba(28, 52, 84, .28), 0 9px 14px rgba(28, 52, 84, .17); pointer-events: none; }
-  .journey-pin > span { position: absolute; left: 50%; top: 100%; width: 2px; height: 7px; margin-left: -1px; background: linear-gradient(rgba(44, 83, 130, .4), rgba(44, 83, 130, 0)); border-radius: 1px; }
-  .journey-item:nth-child(3n + 2) { --pin-head: var(--color-accent); }
-  .journey-item:nth-child(3n) { --pin-head: color-mix(in srgb, var(--red-3) 70%, var(--color-text)); }
-
-  .journey-card-top { position: relative; display: flex; align-items: baseline; gap: 10px; }
-  .journey-number { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 58px; font-family: var(--font-serif); font-size: 30px; line-height: 1; color: var(--crayon-deep); font-variant-numeric: tabular-nums; transform: rotate(-2.5deg); }
-  .journey-number svg { position: absolute; inset: -9px -8px; width: calc(100% + 16px); height: calc(100% + 18px); overflow: visible; pointer-events: none; }
-  .journey-number ellipse { fill: none; stroke: var(--crayon-loop); stroke-width: 2.4; stroke-linecap: round; opacity: .75; }
-  .journey-number > span { position: relative; }
-  .journey-chapter { font-size: 8px; line-height: 1.5; letter-spacing: .22em; color: color-mix(in srgb, var(--ink) 52%, var(--paper)); }
-  .journey-card time { margin-left: auto; padding: 3px 9px 2px; border: 1px solid color-mix(in srgb, var(--crayon) 42%, transparent); border-radius: 9px 3px 8px 3px / 3px 8px 3px 9px; font-size: 10px; letter-spacing: .04em; color: color-mix(in srgb, var(--ink) 62%, var(--paper)); transform: rotate(1.2deg); }
-  .journey-crayon-swatch { display: block; width: 56px; height: 6px; margin: 14px 0 0; border-radius: 4px; background: linear-gradient(90deg, var(--crayon) 0 46%, transparent 46% 54%, var(--crayon-loop) 54% 88%, transparent 88%); opacity: .8; transform: rotate(-1.4deg); }
-  .journey-card h3 { margin: 16px 0 12px; font-size: clamp(18px, 1.75vw, 23px); font-weight: 500; line-height: 1.6; }
-  .journey-card:hover h3, .journey-card:focus-visible h3 { color: var(--crayon-deep); }
-  .journey-card p { display: -webkit-box; overflow: hidden; margin: 0; font-size: 13px; line-height: 1.9; color: color-mix(in srgb, var(--ink) 72%, var(--paper)); -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
-  .journey-card-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px; padding-top: 14px; border-top: 1.5px dashed color-mix(in srgb, var(--crayon) 40%, transparent); }
-  .journey-read { font-size: 10.5px; letter-spacing: .14em; color: var(--crayon-deep); }
-  .journey-read > span { display: inline-block; margin-left: 5px; font-size: 15px; vertical-align: -1px; transition: transform .3s; }
-  .journey-card:hover .journey-read > span { transform: translate(3px, -3px); }
-  .journey-card-scribble { font-size: 21px; line-height: 1; color: var(--crayon-loop); opacity: .85; transform: rotate(-8deg); }
-
-  .journey-preview {
-    --preview-x: 0px; --preview-y: 0px;
-    position: fixed; left: 0; top: 0; z-index: 40; width: 260px; aspect-ratio: 1.45;
-    visibility: hidden; opacity: 0; pointer-events: none; overflow: hidden;
-    border: 5px solid var(--paper); outline: 1px solid color-mix(in srgb, var(--red-1) 38%, transparent);
-    background: var(--red-4); box-shadow: 3px 4px 0 color-mix(in srgb, var(--red-3) 32%, transparent), 0 20px 55px rgba(15,30,50,.25);
-    transform: translate3d(var(--preview-x), var(--preview-y), 0) rotate(3deg) scale(.9);
-    transform-origin: 50% 60%; transition: opacity .25s, transform .38s cubic-bezier(.2,.8,.2,1), visibility 0s .38s;
-  }
-  .journey-preview.is-visible { visibility: visible; opacity: 1; transform: translate3d(var(--preview-x), var(--preview-y), 0) rotate(-2.5deg) scale(1); transition-delay: 0s; }
-  .journey-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-  /* 端点挂在外层 li，不让卡片入场位移改变曲线测量坐标。 */
-  .journey.is-enhanced .journey-item { opacity: 0; transition: opacity .65s ease-out; }
-  .journey.is-enhanced .journey-item.is-reached { opacity: 1; }
-  .journey.is-enhanced .journey-card { opacity: 0; transform: rotate(var(--card-turn)) translateY(24px); transition: opacity .65s ease-out, transform .65s cubic-bezier(.2,.7,.2,1), box-shadow .45s; }
-  .journey.is-enhanced .journey-item.is-reached .journey-card { opacity: 1; transform: rotate(var(--card-turn)) translateY(0); }
-  .journey.is-enhanced .journey-item.is-reached .journey-card:hover,
-  .journey.is-enhanced .journey-item.is-reached .journey-card:focus-visible { transform: rotate(var(--card-turn)) translateY(-5px); }
-  .journey.is-static .journey-item { opacity: 1; transition: none; }
-  .journey.is-static .journey-card { opacity: 1; transform: rotate(var(--card-turn)); transition: none; }
-
-  /* 无 JS 时在相邻卡片之间画一段静态短箭头保住方向；脚本接管后换成逐段蜡笔曲线。 */
-  .journey:not(.is-enhanced) .journey-item:not(:last-child)::after { content: ''; position: absolute; top: calc(100% + 26px); left: 50%; width: 3px; height: calc(var(--card-gap) - 60px); background: var(--crayon); border-radius: 2px; opacity: .8; }
-  .journey:not(.is-enhanced) .journey-item:not(:last-child)::before { content: ''; position: absolute; z-index: 2; top: calc(100% + var(--card-gap) - 42px); left: calc(50% - 5.5px); border: 6px solid transparent; border-top: 10px solid var(--crayon); opacity: .8; }
-  .journey:not(.is-enhanced) .journey-lines { display: none; }
-
-  :global([data-theme='dark']) .journey {
-    --crayon: color-mix(in srgb, var(--red-2) 82%, #ffd9c8);
-    --crayon-deep: color-mix(in srgb, var(--red-1) 78%, #ffe4d6);
-    --crayon-echo: color-mix(in srgb, var(--red-3) 70%, #f3b9a2);
-    --board: #273c55;
-    --board-deep: #1b2b40;
-    --board-edge: rgba(157, 180, 207, .18);
-    --paper: #edf2f8;
-    --paper-back: #c4d2e1;
-    --ink: #263b55;
-  }
-  :global([data-theme='dark']) .journey-card h3 { color: var(--ink); }
-  @media (min-width: 1500px) {
-    .journey-card h3 { font-size: 21px; }
-  }
-  @media (max-width: 1000px) {
-    .board-doodle { display: none; }
-  }
-  @media (max-width: 760px) {
-    .journey { margin-top: 48px; }
-    .journey-heading p { display: block; margin: 12px 0 0; }
-    .journey-total { margin-top: 5px; }
-    .journey-board { margin-top: 26px; padding: 24px 14px 30px; }
-    .journey-item, .journey-item:nth-child(odd), .journey-item:nth-child(even) { width: 100%; margin: 0 0 100px; align-self: stretch; }
-    .journey-item:last-child { margin-bottom: 0; }
-    .journey-card, .journey-card:hover, .journey-card:focus-visible,
-    .journey.is-enhanced .journey-card, .journey.is-enhanced .journey-item.is-reached .journey-card,
-    .journey.is-enhanced .journey-item.is-reached .journey-card:hover,
-    .journey.is-enhanced .journey-item.is-reached .journey-card:focus-visible,
-    .journey.is-static .journey-card { min-height: 0; padding: 30px 22px 20px; transform: none; }
-    .journey-paper-back { transform: translate(5px, 6px); }
-    .journey-pin { top: -10px; width: 19px; height: 19px; }
-    .journey-number { font-size: 27px; }
-    .journey-card h3 { margin-top: 14px; font-size: 19px; }
-    .journey-card p { font-size: 12.5px; -webkit-line-clamp: 4; }
-    .journey-card time { font-size: 9px; }
-    .journey:not(.is-enhanced) .journey-item:not(:last-child)::after { top: calc(100% + 22px); height: 56px; }
-    .journey:not(.is-enhanced) .journey-item:not(:last-child)::before { top: calc(100% + 74px); }
-    .journey-preview { display: none; }
+  .journey-number { color: var(--color-accent); font-size: 13px; }
+  .journey-title { font-family: var(--font-serif); font-size: 18px; line-height: 1.5; }
+  .journey-card time { color: var(--color-text-muted); font-size: 13px; }
+  .journey-card:hover .journey-title { color: var(--color-accent); }
+  @media (max-width: 640px) {
+    .journey-card { grid-template-columns: 36px minmax(0, 1fr); }
+    .journey-card time { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .journey.is-enhanced .journey-item { opacity: 1; transition: none; }
-    .journey.is-enhanced .journey-card { opacity: 1; transform: rotate(var(--card-turn)); }
-    .journey-line { stroke-dashoffset: 0 !important; }
-    .journey-card, .journey-card-outline path, .journey-read > span { transition: none; }
-    .journey-preview { display: none; }
+    .journey-line { stroke-dashoffset: 0; }
+    .journey-item { opacity: 1; }
   }
 </style>

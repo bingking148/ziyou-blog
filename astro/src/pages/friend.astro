@@ -31,7 +31,7 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
         <button
           class="bc-copy"
           type="button"
-          data-copy={`- name: ${SITE_TITLE}\n  url: https://ziyou814.top\n  desc: ${SITE_DESCRIPTION}。\n  image: https://ziyou814.top/images/hero-bg-1280.jpg`}
+          data-copy={`- name: ${SITE_TITLE}\n  url: https://ziyou814.top\n  desc: ${SITE_DESCRIPTION}。\n  image: https://ziyou814.top/images/notebook-og.jpg`}
         >复制本站信息</button>
         <span class="seal" aria-hidden="true">留灯</span>
       </div>
@@ -148,15 +148,15 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
     display: flex; flex-direction: column; gap: 11px;
     background: var(--color-surface);
     border: 1px solid var(--color-card-border);
-    box-shadow: 11px 13px 0 var(--hard);
+    box-shadow: none;
     padding: 24px;
     transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease;
   }
-  .bizcard:hover { transform: translateY(-4px) rotate(0deg); box-shadow: 13px 16px 0 var(--hard); }
-  .mine { transform: rotate(-1.6deg); }
-  .mine:hover { transform: rotate(0deg) translateY(-4px); }
-  .fr { transform: rotate(.9deg); flex-direction: row; align-items: center; gap: 18px; box-shadow: 10px 12px 0 color-mix(in srgb, var(--hard) 85%, transparent); }
-  .fr:hover { transform: rotate(0deg) translateY(-4px); }
+  .bizcard:hover { transform: none; box-shadow: none; }
+  .mine { transform: none; }
+  .mine:hover { transform: none; }
+  .fr { transform: none; flex-direction: row; align-items: center; gap: 18px; box-shadow: none; }
+  .fr:hover { transform: none; }
   .slot { border: 1.5px dashed color-mix(in srgb, var(--color-text-faint) 45%, transparent); box-shadow: none; background: transparent; display: grid; place-items: center; text-align: center; padding: 28px 22px; }
   .slot .lamp { position: static; margin: 0 auto 12px; }
 

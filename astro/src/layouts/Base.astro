@@ -31,7 +31,7 @@ const {
 } = Astro.props;
 const pageTitle = title ? `${title} - ${SITE_TITLE}` : SITE_TITLE;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const coverAbs = cover ? new URL(cover, Astro.site) : new URL('/images/hero-bg-1280.jpg', Astro.site);
+    const coverAbs = cover ? new URL(cover, Astro.site) : new URL('/images/notebook-og.jpg', Astro.site);
 const coverInfo = responsive(coverAbs.pathname);
 const coverWidth = coverInfo.width ?? (cover ? 1600 : 1280);
 const coverHeight = coverInfo.height ?? (cover ? 900 : 853);
@@ -331,16 +331,14 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
       radial-gradient(70% 60% at 5% 30%, color-mix(in srgb, var(--red-2) 8%, transparent), transparent),
       radial-gradient(50% 50% at 95% 70%, color-mix(in srgb, var(--red-1) 5%, transparent), transparent);
   }
-  .pointer-aura {
-    position: fixed; left: 0; top: 0; z-index: -1; width: 600px; height: 600px;
-    border-radius: 50%; pointer-events: none; opacity: .24;
-    background: radial-gradient(circle, color-mix(in srgb, var(--red-2) 13%, transparent), transparent 65%);
-    will-change: transform;
-  }
+  .pointer-aura { display: none; }
   .site-header {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; gap: 24px; height: 96px;
-    padding: 0 clamp(24px, 4.5vw, 76px); color: #fff;
+    position: sticky; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; gap: 24px; height: 72px;
+    padding: 0 clamp(24px, 4.5vw, 64px);
+    color: var(--color-text-strong);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-card-border);
   }
   .site-brand {
     display: inline-flex; align-items: center; gap: 12px;
@@ -360,18 +358,18 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   }
   :global(.nav-pill) {
     position: absolute; z-index: -1; top: 2px; left: 0; height: calc(100% - 4px);
-    border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.13);
-    opacity: 0; pointer-events: none; backdrop-filter: blur(8px);
-    transition: transform .5s cubic-bezier(.34,1.56,.64,1), width .5s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    border-radius: 2px; background: var(--color-surface-muted); border: 1px solid transparent;
+    opacity: 0; pointer-events: none;
+    transition: transform .35s ease, width .35s ease, opacity .3s;
   }
   :global(.nav-pill.is-ready) { opacity: 1; }
   .header-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; }
   #theme-toggle, #nav-toggle {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
-    border: 1px solid rgba(255,255,255,.3); border-radius: 50%; background: transparent;
+    border: 1px solid var(--color-card-border); border-radius: 50%; background: transparent;
     color: inherit; cursor: pointer; transition: transform .25s, background .25s;
   }
-  #theme-toggle:hover, #nav-toggle:hover { background: rgba(255,255,255,.1); transform: rotate(12deg); }
+  #theme-toggle:hover, #nav-toggle:hover { background: var(--color-surface-muted); }
   #nav-toggle { display: none; }
   .icon-moon { display: none; }
   [data-theme="dark"] .icon-sun { display: none; }
@@ -399,25 +397,11 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .footer-links a:hover { color: var(--color-link-hover); }
   .footer-note { margin-left: auto; }
   .footer-stats { display: flex; gap: 14px; }
+  body.is-home .site-header,
+  body.is-post .site-header,
   body:not(.is-home):not(.is-post) .site-header {
-    position: relative; height: 84px; color: var(--color-text-strong);
+    position: sticky; height: 72px; color: var(--color-text-strong); background: var(--color-bg);
   }
-  body:not(.is-home):not(.is-post) .nav-pill { background: var(--red-5); border-color: transparent; }
-  body:not(.is-home):not(.is-post) #theme-toggle,
-  body:not(.is-home):not(.is-post) #nav-toggle { border-color: var(--color-card-border); }
-  body:not(.is-home):not(.is-post) #theme-toggle:hover,
-  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: var(--red-5); }
-  body.is-home .site-header { position: fixed; background: linear-gradient(180deg, rgba(8,16,26,.55), transparent 78%); }
-  body.is-home[data-scene="journal"] .site-header {
-    color: var(--color-text-strong);
-    background: color-mix(in srgb, var(--color-bg) 90%, transparent);
-    backdrop-filter: blur(12px);
-  }
-  body.is-home[data-scene="journal"] :global(.nav-pill) { background: var(--red-5); border-color: transparent; }
-  body.is-home[data-scene="journal"] #theme-toggle,
-  body.is-home[data-scene="journal"] #nav-toggle { border-color: var(--color-card-border); color: var(--color-text-strong); }
-  body.is-home[data-scene="journal"] #theme-toggle:hover,
-  body.is-home[data-scene="journal"] #nav-toggle:hover { background: var(--red-5); }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }
