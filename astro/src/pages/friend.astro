@@ -152,12 +152,12 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
     padding: 24px;
     transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease;
   }
-  .bizcard:hover { transform: translateY(-4px) rotate(0deg); box-shadow: 13px 16px 0 var(--hard); }
-  .mine { transform: rotate(-1.6deg); }
-  .mine:hover { transform: rotate(0deg) translateY(-4px); }
-  .fr { transform: rotate(.9deg); flex-direction: row; align-items: center; gap: 18px; box-shadow: 10px 12px 0 color-mix(in srgb, var(--hard) 85%, transparent); }
-  .fr:hover { transform: rotate(0deg) translateY(-4px); }
-  .slot { border: 1.5px dashed color-mix(in srgb, var(--color-text-faint) 45%, transparent); box-shadow: none; background: transparent; display: grid; place-items: center; text-align: center; padding: 28px 22px; }
+  .bizcard:hover { transform: translate(-4px, -4px); box-shadow: 16px 16px 0 var(--hard); }
+  .mine { transform: none; border: 3px solid #111; }
+  .mine:hover { transform: translate(-4px, -4px); }
+  .fr { transform: none; flex-direction: row; align-items: center; gap: 18px; border: 3px solid #111; box-shadow: 10px 10px 0 #c41e3a; }
+  .fr:hover { transform: translate(-3px, -3px); }
+  .slot { border: 3px solid #111; box-shadow: none; background: transparent; display: grid; place-items: center; text-align: center; padding: 28px 22px; }
   .slot .lamp { position: static; margin: 0 auto 12px; }
 
   .bc-tag { font-family: var(--font-code); font-size: 10px; letter-spacing: .22em; color: var(--color-accent); padding-left: 26px; }

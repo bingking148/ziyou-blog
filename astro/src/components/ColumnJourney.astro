@@ -306,22 +306,12 @@ const outlines = [
   /* 板面用 vw 上下限：1350px 版心时 padding 约 30/68px，1920px 时约 34/77px，2048 封顶。 */
   .journey-board {
     position: relative; margin-top: 34px; padding: clamp(30px, 1.9vw, 44px) clamp(24px, 4vw, 96px) clamp(38px, 2.4vw, 54px);
-    border-radius: 7px;
-    background:
-      radial-gradient(ellipse 460px 190px at 16% 8%, rgba(255, 255, 255, .24), transparent 70%),
-      radial-gradient(ellipse 430px 210px at 84% 92%, rgba(44, 83, 130, .13), transparent 70%),
-      radial-gradient(circle at 27% 31%, rgba(44, 83, 130, .15) 0 .7px, transparent 1.5px),
-      radial-gradient(circle at 63% 68%, rgba(255, 255, 255, .2) 0 .6px, transparent 1.3px),
-      repeating-linear-gradient(37deg, transparent 0 9px, rgba(44, 83, 130, .045) 9px 11px),
-      linear-gradient(174deg, var(--board), var(--board-deep));
-    background-size: auto, auto, 11px 13px, 17px 19px, auto, auto;
-    box-shadow: inset 0 2px 5px rgba(255, 255, 255, .3), inset 0 -3px 9px rgba(44, 83, 130, .15), 0 24px 54px -20px rgba(28, 52, 84, .28);
+    border-radius: 0;
+    background: var(--color-bg);
+    border-left: 14px solid #c41e3a;
+    box-shadow: none;
   }
-  .journey-board::before {
-    content: ''; position: absolute; inset: 9px; border-radius: 4px; pointer-events: none;
-    border: 1px solid var(--board-edge);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
-  }
+  .journey-board::before { content: none; }
   .board-doodle { position: absolute; z-index: 0; font-family: var(--font-serif); color: var(--crayon-loop); opacity: .5; pointer-events: none; }
   .board-doodle-star { top: 16px; right: 4.5%; font-size: 34px; line-height: 1; transform: rotate(14deg); }
   .board-doodle-note { bottom: 14px; left: 3.5%; font-size: 12px; line-height: 1.7; letter-spacing: .12em; transform: rotate(-4deg); }
@@ -350,18 +340,14 @@ const outlines = [
   /* 便签卡：冷白纸面 + 底层蓝灰垫纸，图钉保留一点朱砂。 */
   .journey-card {
     position: relative; display: block; min-height: 228px; padding: 34px 30px 26px;
-    border: 0; border-radius: 3px 6px 4px 8px / 6px 3px 7px 4px;
-    background:
-      radial-gradient(circle at 22% 30%, rgba(44, 83, 130, .045) 0 .6px, transparent 1.2px),
-      radial-gradient(circle at 68% 74%, rgba(44, 83, 130, .04) 0 .5px, transparent 1px),
-      var(--paper);
-    background-size: 13px 15px, 19px 21px, auto;
-    color: var(--ink);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset, 3px 7px 0 rgba(44, 83, 130, .11), 0 18px 36px rgba(28, 52, 84, .16);
+    border: 2px solid #111; border-radius: 0;
+    background: var(--color-surface);
+    color: var(--color-text-strong);
+    box-shadow: 8px 8px 0 #111;
     transform: rotate(var(--card-turn));
     transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s;
   }
-  .journey-paper-back { position: absolute; inset: 0; z-index: -1; border-radius: 4px 7px 5px 9px / 7px 4px 8px 5px; background: var(--paper-back); transform: translate(7px, 9px) rotate(calc(var(--card-turn) * -0.6)); box-shadow: 0 3px 8px rgba(28, 52, 84, .13); }
+  .journey-paper-back { position: absolute; inset: 0; z-index: -1; border-radius: 0; background: #c41e3a; transform: translate(8px, 8px); box-shadow: none; }
   .journey-card-outline { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); overflow: visible; pointer-events: none; color: color-mix(in srgb, var(--crayon) 62%, var(--ink)); }
   .journey-card-outline path { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: stroke .3s; }
   .journey-card:hover, .journey-card:focus-visible { z-index: 3; transform: rotate(var(--card-turn)) translateY(-5px); box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset, 4px 10px 0 rgba(44, 83, 130, .13), 0 26px 48px rgba(28, 52, 84, .22); }

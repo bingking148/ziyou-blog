@@ -133,19 +133,22 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     <main id="main" class="site-main" tabindex="-1"><slot /></main>
 
     <footer class="site-footer">
-      <div class="footer-inner">
-        <span>© {SINCE}—{new Date().getFullYear()} {AUTHOR}</span>
-        <nav class="footer-links" aria-label="站点导航">
-          <a href="/categories/">分类</a>
-          <a href="/tags/">标签</a>
-          <a href="/index.xml">RSS</a>
-          <a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
-        </nav>
-        <span class="footer-note">保持好奇，持续书写。</span>
-        <span class="footer-stats">
-          <span id="busuanzi_container_site_pv" style="display:none">访问 <span id="busuanzi_value_site_pv"></span></span>
-          <span id="busuanzi_container_site_uv" style="display:none">访客 <span id="busuanzi_value_site_uv"></span></span>
-        </span>
+      <p class="footer-mark" aria-hidden="true">ZIYOU</p>
+      <div class="footer-bar">
+        <div class="footer-inner">
+          <span>© {SINCE}—{new Date().getFullYear()} {AUTHOR}</span>
+          <nav class="footer-links" aria-label="站点导航">
+            <a href="/categories/">分类</a>
+            <a href="/tags/">标签</a>
+            <a href="/index.xml">RSS</a>
+            <a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
+          </nav>
+          <span class="footer-note">保持好奇，持续书写。</span>
+          <span class="footer-stats">
+            <span id="busuanzi_container_site_pv" style="display:none">访问 <span id="busuanzi_value_site_pv"></span></span>
+            <span id="busuanzi_container_site_uv" style="display:none">访客 <span id="busuanzi_value_site_uv"></span></span>
+          </span>
+        </div>
       </div>
     </footer>
     <script async src="/resources/busuanzi/bsz.pure.mini.js"></script>
@@ -329,15 +332,22 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     position: fixed; inset: 0; z-index: -2; pointer-events: none;
     background: var(--color-bg);
   }
-  .site-bg::after {
-    content: ""; position: absolute; top: 0; right: 0; width: 72px; height: 72px;
-    background: #e10600; clip-path: polygon(100% 0, 0 0, 100% 100%);
+  .site-bg::before {
+    content: ""; position: fixed; z-index: 80; left: 0; top: 0; bottom: 0; width: 10px;
+    background: #111; pointer-events: none;
   }
+  .site-bg::after {
+    content: ""; position: fixed; z-index: 81; left: 10px; top: 0; width: 10px; height: 56px;
+    background: #c41e3a; pointer-events: none;
+  }
+  [data-theme="dark"] .site-bg::before { background: #c41e3a; }
+  [data-theme="dark"] .site-bg::after { background: #f4f1ea; }
   .pointer-aura { display: none; }
   .site-header {
     position: absolute; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; gap: 24px; height: 96px;
-    padding: 0 clamp(24px, 4.5vw, 76px); color: #fff;
+    display: flex; align-items: stretch; gap: 0; height: 64px;
+    padding: 0 18px 0 20px; color: #f4f1ea; background: #111;
+    border-bottom: 6px solid #c41e3a;
   }
   .site-brand {
     display: inline-flex; align-items: center; gap: 12px;
@@ -348,16 +358,17 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .brand-mark { width: 26px; height: 26px; }
   #main-nav { position: relative; display: flex; gap: 8px; margin-left: auto; }
   .main-nav-link-wrap {
-    position: relative; padding: 8px 16px; font-size: 13px; letter-spacing: .12em; color: inherit;
+    position: relative; display: flex; align-items: center; padding: 0 14px;
+    font-size: 13px; letter-spacing: .12em; color: inherit;
+    border-left: 1px solid rgba(244,241,234,.22);
   }
   .main-nav-link-wrap:hover { color: inherit; }
   .main-nav-link-wrap.is-active::after { content: none; }
   :global(.nav-pill) {
     position: absolute; z-index: -1; top: 4px; left: 0; height: calc(100% - 8px);
-    border-radius: 0; background: var(--color-accent); border: 0;
+    border-radius: 0; background: #c41e3a; border: 0; min-width: 8px;
     opacity: 0; pointer-events: none;
-    transform: skewX(-12deg);
-    transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s cubic-bezier(.2,.8,.2,1), opacity .2s;
+    transition: width .35s cubic-bezier(.2,.8,.2,1), opacity .2s;
   }
   :global(.nav-pill.is-ready) { opacity: 1; }
   .header-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; }
@@ -385,28 +396,30 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     background: transparent;
     border: 0; border-bottom: 1px solid rgba(244,241,234,.2);
   }
-  .mobile-menu a[aria-current="page"] { color: #e10600; }
-  .site-main { min-height: 75vh; }
-  .site-footer { position: relative; overflow: hidden; padding: 36px clamp(24px,5vw,76px) 48px; background: #111; color: #f4f1ea; }
-  .site-footer::before {
-    content: "ZIYOU"; position: absolute; right: -1vw; bottom: -.28em; z-index: 0;
-    font-size: clamp(72px, 14vw, 180px); font-weight: 900; letter-spacing: -.07em; line-height: .8;
-    color: transparent; -webkit-text-stroke: 1px rgba(225,6,0,.75); pointer-events: none;
+  .mobile-menu a[aria-current="page"] { color: #c41e3a; }
+  .site-main { min-height: 75vh; background: var(--color-bg); }
+  .site-footer { background: #111; color: #f4f1ea; }
+  .footer-mark {
+    margin: 0; padding: 18px clamp(20px, 4vw, 64px) 0; overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif; font-weight: 900;
+    font-size: clamp(72px, 16vw, 200px); line-height: .78; letter-spacing: -.08em;
+    color: transparent; -webkit-text-stroke: 2px #c41e3a;
   }
-  .footer-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 22px; font-size: 12px; color: #f4f1ea; }
+  .footer-bar { border-top: 8px solid #c41e3a; padding: 16px clamp(20px, 4vw, 64px) 20px; }
+  .footer-inner { display: flex; align-items: center; gap: 22px; font-size: 12px; color: #f4f1ea; }
   .footer-links { display: flex; gap: 16px; }
   .footer-links a { color: #f4f1ea; }
   .footer-links a:hover { color: var(--color-link-hover); }
   .footer-note { margin-left: auto; }
   .footer-stats { display: flex; gap: 14px; }
   body:not(.is-home):not(.is-post) .site-header {
-    position: relative; height: 84px; color: #f4f1ea; background: #111;
+    position: relative; height: 64px; color: #f4f1ea; background: #111;
   }
-  body:not(.is-home):not(.is-post) .nav-pill { background: #e10600; }
+  body:not(.is-home):not(.is-post) .nav-pill { background: #c41e3a; }
   body:not(.is-home):not(.is-post) #theme-toggle,
   body:not(.is-home):not(.is-post) #nav-toggle { border-color: rgba(244,241,234,.4); color: #f4f1ea; }
   body:not(.is-home):not(.is-post) #theme-toggle:hover,
-  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: #e10600; }
+  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: #c41e3a; }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }

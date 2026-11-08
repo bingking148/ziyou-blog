@@ -855,8 +855,8 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene-scroll {
     position: absolute; z-index: 6; right: 4.5vw; bottom: 118px;
     display: grid; place-items: center; width: 58px; aspect-ratio: 1;
-    border-radius: 50%; color: #102434;
-    background: linear-gradient(165deg, #f2fafb, #cfe3ea);
+    border-radius: 0; color: #f4f1ea;
+    background: #c41e3a;
     box-shadow:
       0 10px 26px rgba(5, 18, 32, .38),
       0 0 0 1px rgba(216, 236, 242, .35) inset;
@@ -909,7 +909,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene.has-motion .scene-tears, .scene.has-motion .scene-incision { display: block; }
 
   /* ===== 正文 ===== */
-  .journal { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px,5vw,64px); }
+  .journal { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px,5vw,64px); background: var(--color-bg); }
   .section-no { display: block; margin-bottom: 22px; font-size: 10px; letter-spacing: .28em; color: var(--red-2); }
   .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 46px; }
   .section-head h2 { margin: 0; font-size: clamp(28px,3vw,42px); font-weight: 500; letter-spacing: .06em; }
@@ -925,8 +925,10 @@ const shortTitle = (t: string) => t.split('——')[0];
   .opening-mark { position: absolute; right: 3%; top: 64px; font-family: Georgia,serif; font-size: 230px; line-height: 1; color: var(--red-4); opacity: .65; }
 
   .series { padding-bottom: 150px; }
-  .series-grid { display: grid; grid-template-columns: 1.18fr 1fr; gap: clamp(28px,4.5vw,68px); align-items: start; }
-  .series-item-2 { margin-top: 104px; }
+  .series-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .series-item, .series-item-2, .series-item-3, .series-item-4 { margin: 0; display: grid; grid-template-columns: minmax(160px, 32%) 1fr; background: #111; color: #f4f1ea; border-bottom: 10px solid #c41e3a; }
+  .series-body h3 a, .series-body > p, .series-start { color: #f4f1ea; }
+  .series-body { padding: 28px 32px 24px; }
   .series-visual { position: relative; display: block; overflow: hidden; background: var(--red-4); }
   .series-item-1 .series-visual { aspect-ratio: 1.28; }
   .series-item-2 .series-visual { aspect-ratio: 1.05; }
@@ -1069,9 +1071,7 @@ const shortTitle = (t: string) => t.split('——')[0];
       padding: 0;
       align-items: start;
     }
-    .series-item-2 { margin-top: 88px; }
-    .series-item-3 { margin-top: 24px; }
-    .series-item-4 { margin-top: 116px; }
+    .series-item-2, .series-item-3, .series-item-4 { margin-top: 0; }
     .series-item-1 .series-visual { aspect-ratio: 1.28; }
     .series-item-2 .series-visual { aspect-ratio: 1.02; }
     .series-item-3 .series-visual { aspect-ratio: 1.22; }

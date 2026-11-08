@@ -4,8 +4,8 @@
    ============================================================ */
 :root {
   --red-0: #141414;
-  --red-1: #e10600;
-  --red-2: #b10500;
+  --red-1: #c41e3a;
+  --red-2: #8e1228;
   --red-3: #f0b4ae;
   --red-4: #f6d7d3;
   --red-5: #f8eeeb;
@@ -15,18 +15,18 @@
   --color-red-3-shadow: rgba(225, 6, 0, 0.22);
 
   /* 语义色不随氛围旋钮漂移：构成主义的黑、纸白、红 */
-  --color-bg: #f3f1ec;
-  --color-surface: #fffdf8;
-  --color-surface-muted: #ece8e1;
+  --color-bg: #f7f4ee;
+  --color-surface: #fffcf7;
+  --color-surface-muted: #efeae2;
   --color-text: #2a2a2a;
   --color-text-strong: #111111;
   --color-text-muted: #5c5c5c;
   --color-text-faint: #8a8a8a;
   --color-link: #111111;
-  --color-link-hover: #e10600;
-  --color-focus: #e10600;
-  --color-card-border: rgba(17, 17, 17, 0.16);
-  --color-accent: #e10600;
+  --color-link-hover: #c41e3a;
+  --color-focus: #c41e3a;
+  --color-card-border: rgba(17, 17, 17, 0.18);
+  --color-accent: #c41e3a;
   --shadow-soft: 6px 6px 0 rgba(17, 17, 17, 0.12);
   --shadow-lift: 12px 12px 0 #111111;
 
@@ -56,18 +56,18 @@
   --red-5-5: rgba(244, 241, 234, 0.06);
   --red-6: rgba(244, 241, 234, 0.1);
 
-  --color-bg: #111111;
-  --color-surface: #1a1a1a;
-  --color-surface-muted: #222222;
+  --color-bg: #0c0c0c;
+  --color-surface: #141414;
+  --color-surface-muted: #1c1c1c;
   --color-text: #d9d4cb;
   --color-text-strong: #f4f1ea;
   --color-text-muted: #a8a29a;
   --color-text-faint: #7d7870;
   --color-link: #f4f1ea;
-  --color-link-hover: #ff3b30;
-  --color-focus: #ff3b30;
-  --color-card-border: rgba(244, 241, 234, 0.16);
-  --color-accent: #ff3b30;
+  --color-link-hover: #c41e3a;
+  --color-focus: #c41e3a;
+  --color-card-border: rgba(244, 241, 234, 0.2);
+  --color-accent: #c41e3a;
   --shadow-soft: 6px 6px 0 rgba(0, 0, 0, 0.45);
   --shadow-lift: 12px 12px 0 #000;
 
@@ -91,7 +91,6 @@ body {
   line-height: 1.75;
   color: var(--color-text);
   background: var(--color-bg);
-  transition: background 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -109,8 +108,8 @@ a:hover { color: var(--color-link-hover); }
 
 img { max-width: 100%; height: auto; }
 
-::selection { background: #e10600; color: #fff; }
-[data-theme="dark"] ::selection { background: #ff3b30; color: #111; }
+::selection { background: #c41e3a; color: #fff; }
+[data-theme="dark"] ::selection { background: #c41e3a; color: #fff; }
 
 /* 键盘导航的一致性焦点；视觉隐藏元素不可进入 Tab 顺序 */
 :focus-visible {
@@ -124,7 +123,7 @@ img { max-width: 100%; height: auto; }
   left: 12px;
   z-index: 1000;
   padding: 10px 14px;
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--color-surface);
   color: var(--color-text-strong);
   border: 1px solid var(--color-card-border);
@@ -163,7 +162,7 @@ img { max-width: 100%; height: auto; }
 }
 .prose pre {
   padding: 16px 18px;
-  border-radius: 12px;
+  border-radius: 0;
   overflow-x: auto;
   font-family: var(--font-code);
   font-size: 14px;
@@ -173,7 +172,7 @@ img { max-width: 100%; height: auto; }
 .prose code { font-family: var(--font-code); }
 .prose :not(pre) > code {
   padding: 0.15em 0.45em;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--red-5);
   color: var(--red-1);
   font-size: 0.88em;
@@ -181,7 +180,7 @@ img { max-width: 100%; height: auto; }
 .prose .table-scroll {
   margin: 1.5em 0;
   overflow-x: auto;
-  border-radius: 8px;
+  border-radius: 0;
 }
 .prose .table-scroll:focus-visible { outline-offset: 2px; }
 .prose .table-scroll table {
@@ -236,12 +235,13 @@ img { max-width: 100%; height: auto; }
   display: flex;
   align-items: baseline;
   gap: clamp(16px, 2.5vw, 32px);
-  padding: 20px 4px;
-  border-bottom: 1px solid var(--color-card-border);
+  margin-top: -2px;
+  padding: 18px 14px;
+  border: 2px solid var(--color-text-strong);
+  background: var(--color-surface);
   color: var(--color-text-strong);
-  transition: background .3s ease;
 }
-.ed-row:hover { background: var(--color-surface); box-shadow: inset 6px 0 0 var(--color-accent); }
+.ed-row:hover { background: var(--color-bg); box-shadow: inset 10px 0 0 var(--color-accent); }
 .ed-row .row-no { flex-shrink: 0; font-size: 11px; color: var(--color-accent); letter-spacing: .08em; font-weight: 700; }
 .ed-row .row-title {
   flex: 1; min-width: 0;
