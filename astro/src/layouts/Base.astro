@@ -360,7 +360,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .main-nav-link-wrap {
     position: relative; display: flex; align-items: center; padding: 0 14px;
     font-size: 13px; letter-spacing: .12em; color: inherit;
-    border-left: 1px solid rgba(17,17,17,.18);
+    border-left: 1px solid color-mix(in srgb, var(--color-text-strong) 28%, transparent);
   }
   .main-nav-link-wrap:hover { color: inherit; }
   .main-nav-link-wrap.is-active { color: #fff; }
