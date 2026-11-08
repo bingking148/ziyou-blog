@@ -29,40 +29,21 @@ const shortTitle = (t: string) => t.split('——')[0];
   <!-- 开场：封面 → 胶片切片 → 最新作品卡，三幕共用一个滚动轨道 -->
   <section id="header" class="scene" aria-label="站点封面">
     <div class="scene-pin">
-      <div class="scene-card">
-        <div class="scene-media">
-          <ResponsiveImage
-            class="scene-image"
-            src="/images/hero-bg-1920.jpg"
-            sizes="100vw"
-            alt="夕阳下延伸至云海的山路"
-            loading="eager"
-            fetchpriority="high"
-          />
-        </div>
-        <div class="scene-shade" aria-hidden="true"></div>
-        <div class="scene-glint" aria-hidden="true"></div>
-      </div>
-
-      <div class="scene-tears" aria-hidden="true">
-        <div class="scene-tear scene-tear-a">
-          <ResponsiveImage src="/images/hero-bg-1920.jpg" sizes="100vw" alt="" loading="eager" />
-        </div>
-        <div class="scene-tear scene-tear-b">
-          <ResponsiveImage src="/images/hero-bg-1920.jpg" sizes="100vw" alt="" loading="eager" />
-        </div>
+      <div class="scene-card" aria-hidden="true">
+        <div class="geo-bar"></div>
+        <span class="geo-num">01</span>
       </div>
       <svg class="scene-incision" viewBox="0 0 1440 850" preserveAspectRatio="none" aria-hidden="true">
-        <path class="incision-glow" pathLength="1" d="M-40 760L620 0M0 820L680 0" />
-        <path class="incision-core" pathLength="1" d="M-40 760L620 0M0 820L680 0" />
+        <path class="incision-glow" pathLength="1" d="M980 860 L1440 180" />
+        <path class="incision-core" pathLength="1" d="M1040 860 L1440 260" />
       </svg>
 
       <div class="scene-after" aria-hidden="true">
         <div class="cx-field"></div>
         <div class="cx-red"></div>
         <svg class="after-lines" viewBox="0 0 1440 850" preserveAspectRatio="none">
-          <path class="cx-diag" pathLength="1" d="M760 0 L1180 520" />
-          <path class="cx-diag cx-diag-b" pathLength="1" d="M980 850 L1440 220" />
+          <path class="cx-diag" pathLength="1" d="M980 860 L1440 180" />
+          <path class="cx-diag cx-diag-b" pathLength="1" d="M1080 860 L1440 300" />
         </svg>
         <p class="after-kicker">CHAPTER 02 / NOTES ON CURIOSITY</p>
         <p class="cx-word cx-a">BEYOND</p>
@@ -342,7 +323,7 @@ const shortTitle = (t: string) => t.split('——')[0];
         var st = pin.style;
         st.setProperty('--scene-p', p.toFixed(4));
         st.setProperty('--hero-y', '0vh');
-        st.setProperty('--hero-scale', (1.18 - push * 0.14 + gate * 0.08).toFixed(3));
+        st.setProperty('--hero-scale', '1');
         st.setProperty('--hero-blur', (gate * (mobile ? 1.5 : 2.5)).toFixed(2) + 'px');
         st.setProperty('--hero-opacity', '1');
         st.setProperty('--glint', glint.toFixed(3));
@@ -357,8 +338,8 @@ const shortTitle = (t: string) => t.split('——')[0];
         st.setProperty('--title-a-y', '0vh');
         st.setProperty('--title-b-x', '0vw');
         st.setProperty('--title-b-y', '0vh');
-        st.setProperty('--incision-scale', easeOut(ramp(p, 0.06, 0.24)).toFixed(3));
-        st.setProperty('--incision-opacity', (1 - field).toFixed(3));
+        st.setProperty('--incision-scale', (0.34 + easeOut(ramp(p, 0, 0.62)) * 0.66).toFixed(3));
+        st.setProperty('--incision-opacity', '1');
         st.setProperty('--tear-gap', '0%');
         st.setProperty('--tear-opacity', '0');
         st.setProperty('--tear-a-x', '0vw');
@@ -630,7 +611,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   /* ===== 三幕开场 ===== */
   /* 高度直接写进基础样式：若等 JS 加 has-motion 才撑到 260svh，首帧按矮高度排版、
      脚本执行后整页内容下跳一截，就是打开首页时的闪屏。reduced 用户在下方媒体查询还原。 */
-  .scene { position: relative; height: 260svh; min-height: 1600px; overflow-x: clip; overflow-y: visible; color: #fff; background: #0a1420; }
+  .scene { position: relative; height: 260svh; min-height: 1600px; overflow-x: clip; overflow-y: visible; color: #111; background: var(--color-bg); }
   .scene-pin {
     --hero-y: 0vh; --hero-scale: 1.04; --hero-blur: 0px; --hero-opacity: 1;
     --copy-y: 0vh; --copy-opacity: 1; --copy-blur: 0px;
@@ -648,14 +629,21 @@ const shortTitle = (t: string) => t.split('——')[0];
     --scene-progress: 0%; --chapter: "01"; --scroll-cta-opacity: 1;
     position: sticky; top: 0; height: 100svh; min-height: 620px; overflow: hidden;
     isolation: isolate; perspective: 1400px; perspective-origin: 50% 46%;
-    background: #0a1420;
+    background: var(--color-bg);
   }
   .scene-card {
     position: absolute; inset: 0; overflow: hidden;
-    background: #26384c;
+    background: transparent;
     opacity: var(--hero-opacity);
     transform: translate3d(0, var(--hero-y), 0) scale(var(--hero-scale));
     will-change: transform, opacity;
+  }
+  .geo-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 14px; background: #111; }
+  .geo-num {
+    position: absolute; left: 4.5vw; top: 16%;
+    font-family: Arial, Helvetica, sans-serif; font-weight: 900;
+    font-size: clamp(42px, 4.5vw, 72px); line-height: .8; letter-spacing: -.04em; color: #c41e3a;
+    opacity: var(--copy-opacity, 1);
   }
   .scene-media { position: absolute; inset: 0; }
   .scene-image { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%; filter: blur(var(--hero-blur)); animation: scene-in 1.4s ease both; }
@@ -664,8 +652,8 @@ const shortTitle = (t: string) => t.split('——')[0];
     content: ""; position: absolute; left: 0; right: 0; height: var(--gate, 0vh);
     background: #111; z-index: 7; pointer-events: none;
   }
-  .scene-pin::before { top: 0; box-shadow: inset 0 -5px 0 #e10600; }
-  .scene-pin::after { bottom: 0; box-shadow: inset 0 5px 0 #e10600; }
+  .scene-pin::before { top: 0; box-shadow: inset 0 -4px 0 #c41e3a; }
+  .scene-pin::after { bottom: 0; box-shadow: inset 0 4px 0 #c41e3a; }
   .scene-shade {
     position: absolute; inset: 0;
     background:
@@ -710,22 +698,19 @@ const shortTitle = (t: string) => t.split('——')[0];
     fill: none; vector-effect: non-scaling-stroke;
     stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--incision-scale));
   }
-  .incision-glow { stroke: #e10600; stroke-width: 14; opacity: calc(var(--incision-scale) * .35); }
-  .incision-core { stroke: #e10600; stroke-width: 4; }
+  .incision-glow { stroke: #c41e3a; stroke-width: 14; opacity: calc(var(--incision-scale) * .28); }
+  .incision-core { stroke: #c41e3a; stroke-width: 4; }
   .scene-after {
     position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none;
     opacity: var(--after-opacity, 1);
   }
-  .cx-field {
-    position: absolute; inset: 0; z-index: 0; background: #111;
-    opacity: var(--field, 0);
-  }
+  .cx-field { display: none; }
   .cx-red {
-    position: absolute; z-index: 1; right: -18%; top: -28%;
-    width: 62%; height: 150%; background: #e10600;
-    transform: rotate(-18deg) scaleX(var(--block, 0));
-    transform-origin: 0% 70%;
-    opacity: min(1, calc(var(--block, 0) * 8));
+    position: absolute; z-index: 1; right: -6%; top: -18%;
+    width: 46%; height: 130%; background: #c41e3a;
+    transform: rotate(-16deg) scale(calc(0.42 + var(--block, 0) * 0.58));
+    transform-origin: 100% 0%;
+    opacity: 1;
   }
   .after-lines {
     position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none;
@@ -735,15 +720,15 @@ const shortTitle = (t: string) => t.split('——')[0];
     fill: none; stroke: #111; stroke-width: 10; vector-effect: non-scaling-stroke;
     stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--slash, 0));
   }
-  .cx-diag-b { stroke: #f4f1ea; stroke-width: 8; }
+  .cx-diag-b { stroke: #c41e3a; stroke-width: 8; }
   .after-kicker {
     position: absolute; z-index: 3; left: 3vw; top: 6.5%; margin: 0;
-    color: #f4f1ea; font-size: 11px; letter-spacing: .32em;
+    color: #111; font-size: 11px; letter-spacing: .32em;
     opacity: var(--hit-a, 0);
   }
   .cx-a {
     position: absolute; z-index: 3; left: 2.4vw; top: 12%; margin: 0;
-    color: #f4f1ea; font-family: Arial, Helvetica, sans-serif;
+    color: #111; font-family: Arial, Helvetica, sans-serif;
     font-size: clamp(88px, 12.4vw, 188px); font-weight: 900; line-height: .78;
     letter-spacing: -.07em; white-space: nowrap;
     opacity: var(--hit-a, 0);
@@ -769,7 +754,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   .after-caption-en {
     display: block; margin-top: 12px; max-width: 16em;
-    color: rgba(244,241,234,.78); font-size: 12px; letter-spacing: .18em; line-height: 1.6;
+    color: #333; font-size: 12px; letter-spacing: .18em; line-height: 1.6;
     opacity: var(--hit-c, 0);
   }
   .after-stamp {
@@ -813,7 +798,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   .focus-read i { font-size: 20px; font-style: normal; transition: transform .3s; }
   .scene-focus:hover .focus-read i { transform: translate(4px,-4px); }
   .focus-edge { position: absolute; z-index: 4; inset: 0; border: 1px solid rgba(16,36,52,.35); pointer-events: none; }
-  .scene-frame { position: absolute; z-index: 4; inset: 112px 4.5vw 118px; border: 1px solid rgba(255,255,255,.13); pointer-events: none; opacity: var(--copy-opacity); }
+  .scene-frame { position: absolute; z-index: 4; inset: 88px 4.5vw 108px; border: 2px solid #111; pointer-events: none; opacity: var(--copy-opacity); }
   .scene-content {
     position: absolute; z-index: 4; left: clamp(40px,8vw,140px); top: 50%; width: min(76vw,1400px); padding-right: 5vw;
     opacity: var(--copy-opacity); pointer-events: auto;
@@ -823,9 +808,9 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene.has-motion .scene-content { pointer-events: auto; }
   .scene-pin.is-after .scene-content { pointer-events: none; }
   .scene-pin.is-after .scene-side { opacity: 0; }
-  .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 30px; font-size: 10px; letter-spacing: .36em; color: rgba(255,255,255,.72); opacity: var(--intro-opacity); animation: rise-in 1s .25s both; }
-  .scene-eyebrow span { width: 36px; height: 1px; background: rgba(255,255,255,.65); }
-  .scene-title { margin: 0; font-weight: 400; font-size: clamp(46px,6.8vw,104px); line-height: 1.32; letter-spacing: .04em; color: #fff; text-shadow: 0 3px 30px rgba(10,20,35,.25); }
+  .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 30px; font-size: 11px; letter-spacing: .28em; color: #111; opacity: var(--intro-opacity); animation: rise-in 1s .25s both; }
+  .scene-eyebrow span { width: 36px; height: 2px; background: #c41e3a; }
+  .scene-title { margin: 0; font-weight: 700; font-size: clamp(46px,6.8vw,104px); line-height: 1.2; letter-spacing: -.03em; color: #111; }
   .title-shift { display: block; will-change: transform; }
   .title-shift-a { transform: translate3d(var(--title-a-x), var(--title-a-y), 0); }
   .title-shift-b { transform: translate3d(var(--title-b-x), var(--title-b-y), 0); }
@@ -835,20 +820,20 @@ const shortTitle = (t: string) => t.split('——')[0];
   .title-indent { padding-left: 1.15em; }
   @keyframes rise-in { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
   .scene-intro { display: flex; align-items: center; gap: 42px; margin-top: 44px; padding-left: 1.3em; opacity: var(--intro-opacity); animation: rise-in 1s .85s both; }
-  .scene-typing { margin: 0; min-height: 1.5em; font-size: 13px; letter-spacing: .12em; color: rgba(255,255,255,.74); }
+  .scene-typing { margin: 0; min-height: 1.5em; font-size: 14px; letter-spacing: .08em; color: #111; }
   .typing-cursor { display: inline-block; width: 1px; height: 1em; margin-left: 5px; background: currentColor; vertical-align: -2px; animation: blink 1.2s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .scene-link { display: inline-flex; align-items: center; gap: 18px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.55); color: #fff; font-size: 13px; letter-spacing: .14em; }
+  .scene-link { display: inline-flex; align-items: center; gap: 18px; padding-bottom: 8px; border-bottom: 2px solid #111; color: #111; font-size: 14px; letter-spacing: .08em; }
   .scene-link svg { transition: transform .35s; }
   .scene-link:hover svg { transform: translateX(7px); }
-  .scene-side { position: absolute; right: 6.6vw; top: 50%; display: flex; align-items: center; gap: 16px; writing-mode: vertical-rl; font-size: 9px; letter-spacing: .42em; color: rgba(255,255,255,.65); transform: translateY(-70%); }
-  .scene-side i { width: 1px; height: 36px; background: rgba(255,255,255,.35); }
-  .scene-bottom { position: absolute; z-index: 5; left: 4.5vw; right: 4.5vw; bottom: 0; display: flex; align-items: stretch; border-top: 1px solid rgba(255,255,255,.2); }
-  .scene-edition { display: flex; flex-direction: column; justify-content: center; gap: 7px; width: 24%; padding: 24px 24px 24px 0; font-size: 9px; letter-spacing: .24em; color: rgba(255,255,255,.65); }
+  .scene-side { position: absolute; right: 6.6vw; top: 50%; display: flex; align-items: center; gap: 16px; writing-mode: vertical-rl; font-size: 11px; letter-spacing: .28em; color: #111; transform: translateY(-70%); }
+  .scene-side i { width: 2px; height: 36px; background: #c41e3a; }
+  .scene-bottom { position: absolute; z-index: 5; left: 4.5vw; right: 4.5vw; bottom: 0; display: flex; align-items: stretch; border-top: 2px solid #111; background: var(--color-bg); }
+  .scene-edition { display: flex; flex-direction: column; justify-content: center; gap: 7px; width: 24%; padding: 24px 24px 24px 0; font-size: 11px; letter-spacing: .16em; color: #111; }
   .scene-index { display: grid; grid-template-columns: repeat(3,1fr); flex: 1; }
-  .scene-index-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 26px 24px; border-left: 1px solid rgba(255,255,255,.18); color: #fff; transition: background .35s; }
-  .scene-index-item:hover { background: rgba(255,255,255,.09); color: #fff; }
-  .index-no { font-size: 10px; color: rgba(255,255,255,.5); letter-spacing: .1em; }
+  .scene-index-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 26px 24px; border-left: 2px solid #111; color: #111; transition: background .35s; }
+  .scene-index-item:hover { background: #fff; color: #111; }
+  .index-no { font-size: 11px; color: #c41e3a; letter-spacing: .08em; font-weight: 700; }
   .index-title { font-size: 12px; letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .index-arrow { opacity: .6; transition: transform .3s; }
   .scene-index-item:hover .index-arrow { transform: translate(3px,-3px); opacity: 1; }
@@ -857,24 +842,17 @@ const shortTitle = (t: string) => t.split('——')[0];
     display: grid; place-items: center; width: 58px; aspect-ratio: 1;
     border-radius: 0; color: #f4f1ea;
     background: #c41e3a;
-    box-shadow:
-      0 10px 26px rgba(5, 18, 32, .38),
-      0 0 0 1px rgba(216, 236, 242, .35) inset;
+    box-shadow: 6px 6px 0 #111;
     opacity: var(--scroll-cta-opacity);
     transition: opacity .35s ease, color .3s ease, transform .3s cubic-bezier(.2,.7,.2,1);
     animation: cta-intro 2.6s cubic-bezier(.2,.7,.2,1) 1.2s 2 both;
   }
   /* 唯一的引导动效：圆盘落定后外扩一圈冰蓝涟漪，呼吸三次即静，不与三幕争戏。 */
-  .scene-scroll::after {
-    content: ''; position: absolute; inset: 0; border-radius: 50%;
-    border: 1.5px solid rgba(216, 236, 242, .85);
-    animation: cta-ripple 2.6s ease-out 1.2s 2;
-  }
+  .scene-scroll::after { content: none; }
   .scene-scroll svg { position: relative; z-index: 1; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
   .scroll-label {
     position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-    font-size: 8px; letter-spacing: .22em; white-space: nowrap; color: rgba(216,236,242,.9);
-    text-shadow: 0 1px 8px rgba(5, 18, 32, .8);
+    font-size: 9px; letter-spacing: .16em; white-space: nowrap; color: #111;
   }
   .scene-scroll:hover { color: var(--red-2); transform: scale(1.06); }
   .scene-scroll:hover svg { transform: translateY(3px); }
@@ -893,12 +871,12 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene-progress {
     position: absolute; z-index: 6; left: 4.5vw; right: 4.5vw; bottom: 0;
     display: flex; align-items: center; gap: 18px; height: 72px; pointer-events: none;
-    border-top: 1px solid rgba(255,255,255,.2);
-    opacity: var(--field, 0); color: rgba(244,241,234,.72);
+    border-top: 2px solid #111;
+    opacity: var(--field, 0); color: #111; background: var(--color-bg);
     font-size: 9px; letter-spacing: .24em;
   }
-  .progress-track { width: 130px; height: 1px; background: rgba(255,255,255,.22); overflow: hidden; }
-  .progress-track i { display: block; width: var(--scene-progress); height: 100%; background: #fff; }
+  .progress-track { width: 130px; height: 2px; background: rgba(17,17,17,.2); overflow: hidden; }
+  .progress-track i { display: block; width: var(--scene-progress); height: 100%; background: #111; }
   .progress-no { margin-left: auto; font-size: 12px; }
   .progress-no::before { content: var(--chapter); }
   /* JS 未启动时保持原始封面，不让装饰层挡住文字与链接。 */
