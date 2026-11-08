@@ -327,16 +327,13 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
 <style>
   .site-bg {
     position: fixed; inset: 0; z-index: -2; pointer-events: none;
-    background:
-      radial-gradient(70% 60% at 5% 30%, color-mix(in srgb, var(--red-2) 8%, transparent), transparent),
-      radial-gradient(50% 50% at 95% 70%, color-mix(in srgb, var(--red-1) 5%, transparent), transparent);
+    background: var(--color-bg);
   }
-  .pointer-aura {
-    position: fixed; left: 0; top: 0; z-index: -1; width: 600px; height: 600px;
-    border-radius: 50%; pointer-events: none; opacity: .24;
-    background: radial-gradient(circle, color-mix(in srgb, var(--red-2) 13%, transparent), transparent 65%);
-    will-change: transform;
+  .site-bg::after {
+    content: ""; position: absolute; top: 0; right: 0; width: 72px; height: 72px;
+    background: #e10600; clip-path: polygon(100% 0, 0 0, 100% 100%);
   }
+  .pointer-aura { display: none; }
   .site-header {
     position: absolute; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; gap: 24px; height: 96px;
@@ -354,21 +351,19 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     position: relative; padding: 8px 16px; font-size: 13px; letter-spacing: .12em; color: inherit;
   }
   .main-nav-link-wrap:hover { color: inherit; }
-  .main-nav-link-wrap.is-active::after {
-    content: ''; position: absolute; left: 50%; bottom: 0; width: 3px; height: 3px;
-    border-radius: 50%; background: currentColor; transform: translateX(-50%); opacity: .75;
-  }
+  .main-nav-link-wrap.is-active::after { content: none; }
   :global(.nav-pill) {
-    position: absolute; z-index: -1; top: 2px; left: 0; height: calc(100% - 4px);
-    border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.13);
-    opacity: 0; pointer-events: none; backdrop-filter: blur(8px);
-    transition: transform .5s cubic-bezier(.34,1.56,.64,1), width .5s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    position: absolute; z-index: -1; top: 4px; left: 0; height: calc(100% - 8px);
+    border-radius: 0; background: var(--color-accent); border: 0;
+    opacity: 0; pointer-events: none;
+    transform: skewX(-12deg);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s cubic-bezier(.2,.8,.2,1), opacity .2s;
   }
   :global(.nav-pill.is-ready) { opacity: 1; }
   .header-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; }
   #theme-toggle, #nav-toggle {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
-    border: 1px solid rgba(255,255,255,.3); border-radius: 50%; background: transparent;
+    border: 1px solid currentColor; border-radius: 0; background: transparent;
     color: inherit; cursor: pointer; transition: transform .25s, background .25s;
   }
   #theme-toggle:hover, #nav-toggle:hover { background: rgba(255,255,255,.1); transform: rotate(12deg); }
@@ -379,34 +374,39 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .mobile-menu {
     position: fixed; inset: 0; z-index: 95;
     padding: 96px 24px 40px;
-    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
-    backdrop-filter: blur(18px);
+    background: #111;
+    color: #f4f1ea;
   }
-  .mobile-menu nav { display: grid; gap: 8px; }
+  .mobile-menu nav { display: grid; gap: 0; }
   .mobile-menu a {
-    display: flex; align-items: center; min-height: 52px;
-    padding: 0 18px; border-radius: 12px;
-    color: var(--color-text-strong); font-size: 17px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-card-border);
+    display: flex; align-items: center; min-height: 56px;
+    padding: 0 8px; border-radius: 0;
+    color: #f4f1ea; font-size: clamp(28px, 8vw, 40px); font-weight: 800; letter-spacing: -.03em;
+    background: transparent;
+    border: 0; border-bottom: 1px solid rgba(244,241,234,.2);
   }
-  .mobile-menu a[aria-current="page"] { border-color: var(--red-2); }
+  .mobile-menu a[aria-current="page"] { color: #e10600; }
   .site-main { min-height: 75vh; }
-  .site-footer { padding: 28px clamp(24px,5vw,76px); border-top: 1px solid var(--color-card-border); }
-  .footer-inner { display: flex; align-items: center; gap: 22px; font-size: 12px; color: var(--color-text-muted); }
+  .site-footer { position: relative; overflow: hidden; padding: 36px clamp(24px,5vw,76px) 48px; background: #111; color: #f4f1ea; }
+  .site-footer::before {
+    content: "ZIYOU"; position: absolute; right: -1vw; bottom: -.28em; z-index: 0;
+    font-size: clamp(72px, 14vw, 180px); font-weight: 900; letter-spacing: -.07em; line-height: .8;
+    color: transparent; -webkit-text-stroke: 1px rgba(225,6,0,.75); pointer-events: none;
+  }
+  .footer-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 22px; font-size: 12px; color: #f4f1ea; }
   .footer-links { display: flex; gap: 16px; }
-  .footer-links a { color: var(--color-text-muted); }
+  .footer-links a { color: #f4f1ea; }
   .footer-links a:hover { color: var(--color-link-hover); }
   .footer-note { margin-left: auto; }
   .footer-stats { display: flex; gap: 14px; }
   body:not(.is-home):not(.is-post) .site-header {
-    position: relative; height: 84px; color: var(--color-text-strong);
+    position: relative; height: 84px; color: #f4f1ea; background: #111;
   }
-  body:not(.is-home):not(.is-post) .nav-pill { background: var(--red-5); border-color: transparent; }
+  body:not(.is-home):not(.is-post) .nav-pill { background: #e10600; }
   body:not(.is-home):not(.is-post) #theme-toggle,
-  body:not(.is-home):not(.is-post) #nav-toggle { border-color: var(--color-card-border); }
+  body:not(.is-home):not(.is-post) #nav-toggle { border-color: rgba(244,241,234,.4); color: #f4f1ea; }
   body:not(.is-home):not(.is-post) #theme-toggle:hover,
-  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: var(--red-5); }
+  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: #e10600; }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }

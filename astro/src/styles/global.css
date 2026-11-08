@@ -3,32 +3,32 @@
    --red-* 变量名不可改：封面取色与氛围旋钮脚本都写这组变量
    ============================================================ */
 :root {
-  --red-0: #1c3454;
-  --red-1: #2c5382;
-  --red-2: #4a76a8;
-  --red-3: #9db4cf;
-  --red-4: #d8e2ee;
-  --red-5: #edf2f8;
-  --red-5-5: #f2f6fa;
-  --red-6: #f7fafc;
-  --color-red-6-shadow: rgba(44, 83, 130, 0.5);
-  --color-red-3-shadow: rgba(44, 83, 130, 0.25);
+  --red-0: #141414;
+  --red-1: #e10600;
+  --red-2: #b10500;
+  --red-3: #f0b4ae;
+  --red-4: #f6d7d3;
+  --red-5: #f8eeeb;
+  --red-5-5: #f6f3ee;
+  --red-6: #f3f1ec;
+  --color-red-6-shadow: rgba(20, 20, 20, 0.45);
+  --color-red-3-shadow: rgba(225, 6, 0, 0.22);
 
-  /* 语义色：正文与链接必须稳定可读，不随氛围旋钮漂移 */
-  --color-bg: #f7fafc;
-  --color-surface: #ffffff;
-  --color-surface-muted: var(--red-5-5);
-  --color-text: #3a4454;
-  --color-text-strong: #1c2430;
-  --color-text-muted: #5d6b7e;
-  --color-text-faint: #7a879a;
-  --color-link: #2c5382;
-  --color-link-hover: #bf4136;
-  --color-focus: #bf4136;
-  --color-card-border: rgba(44, 83, 130, 0.12);
-  --color-accent: #bf4136; /* 朱砂点睛 */
-  --shadow-soft: 0 6px 28px rgba(44, 83, 130, 0.12);
-  --shadow-lift: 0 14px 48px rgba(44, 83, 130, 0.18);
+  /* 语义色不随氛围旋钮漂移：构成主义的黑、纸白、红 */
+  --color-bg: #f3f1ec;
+  --color-surface: #fffdf8;
+  --color-surface-muted: #ece8e1;
+  --color-text: #2a2a2a;
+  --color-text-strong: #111111;
+  --color-text-muted: #5c5c5c;
+  --color-text-faint: #8a8a8a;
+  --color-link: #111111;
+  --color-link-hover: #e10600;
+  --color-focus: #e10600;
+  --color-card-border: rgba(17, 17, 17, 0.16);
+  --color-accent: #e10600;
+  --shadow-soft: 6px 6px 0 rgba(17, 17, 17, 0.12);
+  --shadow-lift: 12px 12px 0 #111111;
 
   /* 字体 */
   --font-article: "Mulish", "LXGW WenKai Screen", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -41,31 +41,35 @@
   --wide-content: 1350px;
   --wide-gutter: clamp(24px, 5vw, 64px);
   --wide-gap: clamp(36px, 3.5vw, 68px);
-  --radius: 16px;
+  --radius: 0px;
 
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --red-4: rgba(130, 167, 204, 0.5);
-  --red-5: rgba(130, 167, 204, 0.15);
-  --red-5-5: rgba(130, 167, 204, 0.05);
-  --red-6: rgba(130, 167, 204, 0.2);
+  --red-0: #f4f1ea;
+  --red-1: #ff3b30;
+  --red-2: #ff6a5c;
+  --red-3: rgba(255, 59, 48, 0.45);
+  --red-4: rgba(255, 59, 48, 0.28);
+  --red-5: rgba(255, 59, 48, 0.14);
+  --red-5-5: rgba(244, 241, 234, 0.06);
+  --red-6: rgba(244, 241, 234, 0.1);
 
-  --color-bg: #14181f;
-  --color-surface: #1e232c;
-  --color-surface-muted: #232933;
-  --color-text: #b8c2d0;
-  --color-text-strong: #e6edf5;
-  --color-text-muted: #a3b0c2;
-  --color-text-faint: #7a879a;
-  --color-link: #82a7d6;
-  --color-link-hover: #d98063;
-  --color-focus: #d98063;
-  --color-card-border: rgba(130, 167, 204, 0.14);
-  --color-accent: #d98063;
-  --shadow-soft: 0 6px 28px rgba(0, 0, 0, 0.35);
-  --shadow-lift: 0 14px 48px rgba(0, 0, 0, 0.5);
+  --color-bg: #111111;
+  --color-surface: #1a1a1a;
+  --color-surface-muted: #222222;
+  --color-text: #d9d4cb;
+  --color-text-strong: #f4f1ea;
+  --color-text-muted: #a8a29a;
+  --color-text-faint: #7d7870;
+  --color-link: #f4f1ea;
+  --color-link-hover: #ff3b30;
+  --color-focus: #ff3b30;
+  --color-card-border: rgba(244, 241, 234, 0.16);
+  --color-accent: #ff3b30;
+  --shadow-soft: 6px 6px 0 rgba(0, 0, 0, 0.45);
+  --shadow-lift: 12px 12px 0 #000;
 
   color-scheme: dark;
 }
@@ -105,8 +109,8 @@ a:hover { color: var(--color-link-hover); }
 
 img { max-width: 100%; height: auto; }
 
-::selection { background: #bf4136; color: #fff; }
-[data-theme="dark"] ::selection { background: #c9553f; }
+::selection { background: #e10600; color: #fff; }
+[data-theme="dark"] ::selection { background: #ff3b30; color: #111; }
 
 /* 键盘导航的一致性焦点；视觉隐藏元素不可进入 Tab 顺序 */
 :focus-visible {
@@ -150,11 +154,12 @@ img { max-width: 100%; height: auto; }
 .prose p { margin: 1em 0; }
 .prose blockquote {
   margin: 1.5em 0;
-  padding: 0.6em 1.2em;
-  border-left: 4px solid var(--red-2);
-  background: var(--red-5);
-  border-radius: 0 10px 10px 0;
-  color: var(--color-text-muted);
+  padding: 0.7em 1.1em;
+  border-left: 8px solid var(--color-accent);
+  background: var(--color-surface);
+  border-radius: 0;
+  color: var(--color-text-strong);
+  box-shadow: 6px 6px 0 #111;
 }
 .prose pre {
   padding: 16px 18px;
@@ -198,7 +203,7 @@ img { max-width: 100%; height: auto; }
   text-align: left;
 }
 .prose th { background: var(--red-5); color: var(--color-text-strong); }
-.prose img { border-radius: 10px; }
+.prose img { border-radius: 0; border: 1px solid var(--color-card-border); }
 
 /* 首字下沉（编辑排版） */
 .prose > p:first-of-type::first-letter {
@@ -208,7 +213,7 @@ img { max-width: 100%; height: auto; }
   padding: 0.04em 0.14em 0.02em 0;
   font-family: var(--font-serif);
   font-weight: 700;
-  color: var(--red-1);
+  color: var(--color-accent);
 }
 
 /* ============================================================
@@ -236,8 +241,8 @@ img { max-width: 100%; height: auto; }
   color: var(--color-text-strong);
   transition: background .3s ease;
 }
-.ed-row:hover { background: var(--red-5-5); }
-.ed-row .row-no { flex-shrink: 0; font-size: 11px; color: var(--red-2); letter-spacing: .08em; }
+.ed-row:hover { background: var(--color-surface); box-shadow: inset 6px 0 0 var(--color-accent); }
+.ed-row .row-no { flex-shrink: 0; font-size: 11px; color: var(--color-accent); letter-spacing: .08em; font-weight: 700; }
 .ed-row .row-title {
   flex: 1; min-width: 0;
   font-family: var(--font-serif);

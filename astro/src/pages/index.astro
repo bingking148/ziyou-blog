@@ -1002,7 +1002,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: relative;
     transform-style: preserve-3d;
     transform: translate3d(var(--fc-drift), 0, var(--fc-tz)) rotateX(var(--fc-rx)) rotateY(var(--fc-ry)) rotateZ(var(--fc-rz)) scale(var(--fc-scale));
-    box-shadow: 0 1px 0 rgba(255,255,255,.5), 0 18px 50px rgba(12,28,48,.13);
+    box-shadow: 10px 10px 0 #111;
     backface-visibility: hidden;
     will-change: transform;
   }
@@ -1017,9 +1017,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     opacity: var(--fc-holo);
     background:
       radial-gradient(circle at var(--fc-gx) var(--fc-gy), rgba(255,255,255,.58), transparent 24%),
-      conic-gradient(from calc(210deg + var(--fc-hue)) at var(--fc-gx) var(--fc-gy),
-        rgba(255,70,145,.34), rgba(255,215,95,.25), rgba(72,255,202,.3),
-        rgba(80,152,255,.34), rgba(190,90,255,.26), rgba(255,70,145,.34));
+      linear-gradient(115deg, transparent 42%, rgba(225,6,0,.28) 49%, rgba(255,255,255,.35) 50%, transparent 58%);
     background-size: 100% 100%, 180% 180%;
     background-position: center, var(--fc-gx) var(--fc-gy);
     mix-blend-mode: color-dodge;

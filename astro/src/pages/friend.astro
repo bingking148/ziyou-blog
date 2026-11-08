@@ -128,8 +128,8 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
 </script>
 
 <style>
-  .friend-page { --hard: #102434; }
-  :global([data-theme="dark"]) .friend-page { --hard: rgba(0, 0, 0, .55); }
+  .friend-page { --hard: #111; }
+  :global([data-theme="dark"]) .friend-page { --hard: #e10600; }
 
   .lamp-lede { display: flex; align-items: baseline; gap: clamp(16px, 3vw, 36px); flex-wrap: wrap; margin-top: 40px; }
   .lamp-lede h1 { margin: 0; font-size: clamp(30px, 3.4vw, 46px); font-weight: 500; letter-spacing: .05em; color: var(--color-text-strong); }
@@ -137,8 +137,8 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
   .lamp-lede span { font-family: var(--font-code); font-size: 10px; letter-spacing: .24em; color: var(--color-text-muted); }
 
   /* 灯：本页唯一的循环动效 */
-  .lamp { position: absolute; left: 16px; top: 16px; width: 10px; height: 10px; border-radius: 50%; }
-  .lamp.on { background: var(--color-accent); box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 65%, transparent); animation: lamp-breathe 3.6s ease-in-out infinite; }
+  .lamp { position: absolute; left: 16px; top: 16px; width: 12px; height: 12px; border-radius: 0; transform: rotate(45deg); }
+  .lamp.on { background: var(--color-accent); box-shadow: 4px 4px 0 #111; animation: lamp-breathe 3.6s ease-in-out infinite; }
   .lamp.off { background: transparent; border: 1px solid color-mix(in srgb, var(--color-text-faint) 45%, transparent); }
   @keyframes lamp-breathe { 50% { box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 85%, transparent); } }
 
