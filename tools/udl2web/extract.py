@@ -200,6 +200,12 @@ def extract_side(page, left=True, fig_rects=(), math_rects=(), collect_inline=No
             kind = "note"      # 8-9pt non-figure text = margin note / note heading
         else:
             kind = "body"
+        # 章节标题行以编号开头（"17.4"/"C.1.2"）时，按编号深度定级；
+        # 不依赖字号——部分中文版标题用小号字排版（如 ch17 的 17.4 只有 8.4pt）
+        m_num = re.match(r"^([A-Z]?\d+(?:\.\d+)*)\s+\S", txt_all)
+        if m_num and (bold_dom or "Bold" in {s["font"] for s in ln["spans"]}) and kind not in ("h1",):
+            depth = len(m_num.group(1).lstrip("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split("."))
+            kind = "h2" if depth <= 2 else "h3"
         # anything set in the left margin column (left of the body text block)
         # is a margin note regardless of point size (except headings, whose
         # numbers also hang into the margin on chapter opener pages)
@@ -294,13 +300,16 @@ def extract_side(page, left=True, fig_rects=(), math_rects=(), collect_inline=No
     flush()
 
     # merge heading-number-only blocks into the following heading block
+    # (章节号 "1.1" / "C.1.4" 独立成块时并入下一个标题；字母前缀附录号也支持)
     merged = []
     for b in blocks:
         if (
             merged
             and b["type"] in ("h2", "h3")
             and merged[-1]["type"] == b["type"]
-            and re.fullmatch(r"\d+(\.\d+)*", merged[-1]["text"].strip())
+            and merged[-1].get("page") == b.get("page")
+            and abs(merged[-1].get("y", 0) - b.get("y", 0)) < 40
+            and re.fullmatch(r"[A-Z](?:\.\d+)+|\d+(?:\.\d+)*", merged[-1]["text"].strip())
         ):
             merged[-1]["text"] += " " + b["text"]
             continue
@@ -678,7 +687,9 @@ def pair_figures(all_en, all_zh, all_figs):
 
     for _, blocks in all_en + all_zh:
         for b in blocks:
-            b.pop("y", None)
+            # 标题块保留 y：渲染端按 (page, y) 锚点对齐中英标题流
+            if b["type"] not in ("h1", "h2", "h3"):
+                b.pop("y", None)
 
 
 if __name__ == "__main__":
