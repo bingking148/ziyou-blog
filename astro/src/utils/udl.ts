@@ -32,8 +32,15 @@ function flatten(blocks: any[]): any[] {
   return out;
 }
 
+function plain(text: string) {
+  return (text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function isHeading(b: any) {
-  return ['h1', 'h2', 'h3'].includes(b.type);
+  if (!['h1', 'h2', 'h3'].includes(b.type)) return false;
+  // 单字母不是标题。第 15 章中文栏有一处孤立的 “n”，被标成 h2 后把 15.3 整节中文拆走。
+  if (/^[A-Za-z]$/.test(plain(b.text || ''))) return false;
+  return true;
 }
 
 /** 按标题切流：返回 [{title, level, page, y, blocks}]，标题前的前言归入首节 */
@@ -41,6 +48,7 @@ function splitByHeadings(stream: any[]): { title: string; level: number; page: n
   const out: { title: string; level: number; page: number; y: number; blocks: any[] }[] = [];
   let cur: { title: string; level: number; page: number; y: number; blocks: any[] } | null = null;
   for (const b of stream) {
+    if (['h1', 'h2', 'h3'].includes(b.type) && !isHeading(b)) continue;
     if (isHeading(b)) {
       if (cur) out.push(cur);
       cur = { title: b.text ?? '', level: Number(b.type[1]), page: b.page ?? 0, y: b.y ?? 0, blocks: [] };
@@ -85,12 +93,38 @@ function alignSections(enSecs: any[], zhSecs: any[]) {
   return items;
 }
 
+/** 无编号、且不是「注释/习题」这类结构标题的单侧节，并回上一节。
+ *  第 12 章英文有 h1 “Transformers”，中文对应标题落在正文里，两栏因此被拆开。 */
+function foldOrphanTitles(items: { en?: any; zh?: any }[]) {
+  const numbered = (t: string) => /^([A-Z](?:\.\d+)+|\d+(?:\.\d+)*)\b/.test(plain(t));
+  const structural = (t: string) => /^(Notes|Problems|Summary|Appendix|Notation|References|注释|习题|问题|小结|总结|附录|符号)\b/i.test(plain(t));
+  const out: { en?: any; zh?: any }[] = [];
+  for (const it of items) {
+    const prev = out[out.length - 1];
+    const title = it.zh?.title || it.en?.title || '';
+    const onlyEn = !!it.en && !it.zh;
+    const onlyZh = !!it.zh && !it.en;
+    if (prev && (onlyEn || onlyZh) && !numbered(title) && !structural(title)) {
+      if (onlyEn && prev.en) {
+        prev.en.blocks.push({ type: 'body', text: it.en.title, page: it.en.page }, ...it.en.blocks);
+        continue;
+      }
+      if (onlyZh && prev.zh) {
+        prev.zh.blocks.push({ type: 'body', text: it.zh.title, page: it.zh.page }, ...it.zh.blocks);
+        continue;
+      }
+    }
+    out.push(it);
+  }
+  return out;
+}
+
 export function buildSections(ch: any): ReaderSection[] {
   const enAll = flatten(ch.pages.flatMap((p: any) => p.en));
   const zhAll = flatten(ch.pages.flatMap((p: any) => p.zh));
   const enSecs = splitByHeadings(enAll);
   const zhSecs = splitByHeadings(zhAll);
-  const items = alignSections(enSecs, zhSecs);
+  const items = foldOrphanTitles(alignSections(enSecs, zhSecs));
   return items
     .map((it, k) => ({
       id: `sec-${k}`,

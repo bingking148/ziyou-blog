@@ -21,45 +21,103 @@ const rows = pairs.map((p) => {
 });
 
 const FUSE = ['figure', 'equation', 'eqimg'];
+const isAnchor = (b: any) => !!b && FUSE.includes(b.type);
+// 配对组里常把图/公式和前后正文捆在一起。按锚点拆开，图和公式仍单独跨栏，正文对齐保持原样。
+const flat = rows.flatMap((p) => {
+  if (FUSE.includes(p.kind)) return [p];
+  const en = p.en || [];
+  const zh = p.zh || [];
+  const out: any[] = [];
+  let i = 0;
+  let j = 0;
+  let dropLeft = !!p.drop;
+  while (i < en.length || j < zh.length) {
+    const eb = en[i];
+    const zb = zh[j];
+    if (isAnchor(eb) && isAnchor(zb) && eb.type === zb.type) {
+      out.push({ kind: eb.type, en: [eb], zh: [zb] });
+      i++; j++;
+      continue;
+    }
+    if (isAnchor(eb) && (!zb || !isAnchor(zb) || eb.type !== zb.type)) {
+      out.push({ kind: eb.type, en: [eb] });
+      i++;
+      continue;
+    }
+    if (isAnchor(zb)) {
+      out.push({ kind: zb.type, zh: [zb] });
+      j++;
+      continue;
+    }
+    const er: any[] = [];
+    const zr: any[] = [];
+    while (i < en.length && !isAnchor(en[i])) er.push(en[i++]);
+    while (j < zh.length && !isAnchor(zh[j])) zr.push(zh[j++]);
+    if (!er.length && !zr.length) break;
+    const row: any = { kind: 'body', en: er, zh: zr };
+    if (dropLeft && zr.some((b) => b.type !== 'note')) { row.drop = true; dropLeft = false; }
+    out.push(row);
+  }
+  return out;
+});
 ---
 
-{rows.map((p) => {
+{flat.map((p) => {
+  const cleanTex = (raw: string, hasImg = false) => {
+    let t = (raw || '').trim();
+    const blank = t.search(/\n\s*\n/);
+    if (blank > 0) t = t.slice(0, blank).trim();
+    t = t.replace(/\n?\*\*Note:[\s\S]*$/, '').trim();
+    t = t.replace(/\$\$\s*$/, '').replace(/^\$\$/, '').trim();
+    // 残片公式（如只剩 “h_1^T, h_2^T]”）改走原书裁图，避免 KaTeX 失败后把图盖掉。
+    if (hasImg && t.length < 80 && !t.includes('=') && !t.includes('\\begin')) return '';
+    return t;
+  };
   if (FUSE.includes(p.kind)) {
     const b = (p.en ?? p.zh ?? [])[0];
     if (!b) return null;
     if (p.kind === 'figure') {
       return (
         <figure class="udl-fig">
-          <img src={b.img} alt={(p.zh?.[0]?.text ?? p.en?.[0]?.text ?? '').slice(0, 80)} loading="lazy" />
+          <img src={b.img} alt={(p.zh?.[0]?.text ?? p.en?.[0]?.text ?? '').replace(/<[^>]+>/g, '').slice(0, 80)} loading="lazy" />
           {(p.zh?.[0]?.text || p.en?.[0]?.text) && (
             <figcaption>
-              {p.zh?.[0]?.text && <span class="cap-zh">{p.zh[0].text}</span>}
-              {p.en?.[0]?.text && <span class="cap-en">{p.en[0].text}</span>}
+              {p.zh?.[0]?.text && <span class="cap-zh" set:html={p.zh[0].text} />}
+              {p.en?.[0]?.text && <span class="cap-en" set:html={p.en[0].text} />}
             </figcaption>
           )}
         </figure>
       );
     }
-    // 公式：优先 KaTeX 内联渲染，无法解析时回退到原书裁图
-    const tex = ((p.en?.[0]?.latex || p.zh?.[0]?.latex || '') as string).trim();
     const img = (p.en?.[0]?.img || p.zh?.[0]?.img) as string | undefined;
+    const tex = cleanTex((p.en?.[0]?.latex || p.zh?.[0]?.latex || '') as string, !!img);
     if (tex) return <div class="udl-eq" data-tex={tex} />;
     if (img) return <div class="udl-eqimg"><img src={img} alt="公式" loading="lazy" /></div>;
     return null;
   }
-  // body / note：两栏对照；一侧多段时并列（翻译合并/拆分段落的 1:N 对齐组）
+  const block = (b: any, lang: 'en' | 'zh', dropcapOn: boolean) => {
+    if (b.type === 'figure' && b.img) {
+      return (
+        <figure class="udl-fig">
+          <img src={b.img} alt={(b.text || '').replace(/<[^>]+>/g, '').slice(0, 80)} loading="lazy" />
+          {b.text && <figcaption><span class={lang === 'zh' ? 'cap-zh' : 'cap-en'} set:html={b.text} /></figcaption>}
+        </figure>
+      );
+    }
+    if (b.type === 'equation' || b.type === 'eqimg') {
+      const tex = cleanTex(b.latex || '', !!b.img);
+      if (tex) return <div class="udl-eq" data-tex={tex} />;
+      if (b.img) return <div class="udl-eqimg"><img src={b.img} alt="公式" loading="lazy" /></div>;
+      return null;
+    }
+    if (!b.text) return null;
+    if (b.type === 'note') return <aside class="udl-note" set:html={b.text} />;
+    return <p class:list={['udl-p', lang === 'zh' ? 'udl-zh' : 'udl-en', { 'udl-drop': dropcapOn }]} set:html={b.text} />;
+  };
   return (
     <div class="udl-row" data-kind={p.kind}>
-      <div class="cell cell-en">
-        {p.en?.map((b) => (b.type === 'note'
-          ? <aside class="udl-note" set:html={b.text} />
-          : <p class="udl-p udl-en" set:html={b.text} />))}
-      </div>
-      <div class="cell cell-zh">
-        {p.zh?.map((b, bi) => (b.type === 'note'
-          ? <aside class="udl-note" set:html={b.text} />
-          : <p class:list={['udl-p', 'udl-zh', { 'udl-drop': p.drop && bi === 0 }]} set:html={b.text} />))}
-      </div>
+      <div class="cell cell-en">{p.en?.map((b) => block(b, 'en', false))}</div>
+      <div class="cell cell-zh">{p.zh?.map((b, bi) => block(b, 'zh', !!(p.drop && bi === 0 && b.type !== 'note')))}</div>
     </div>
   );
 })}
