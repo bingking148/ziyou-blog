@@ -58,17 +58,20 @@ const shortTitle = (t: string) => t.split('——')[0];
       </svg>
 
       <div class="scene-after" aria-hidden="true">
-        <div class="after-plate">
-          <p class="after-kicker"><span></span> CHAPTER 02 / NOTES ON CURIOSITY</p>
-          <p class="after-ghost"><span>BEYOND</span><span class="after-indent"><em>THE</em> <b>CODE</b></span></p>
-          <div class="after-foot">
-            <p class="after-caption">
-              <span>代码之外，仍有世界。</span>
-              <span class="after-caption-en">A QUIET ARCHIVE OF LOUD IDEAS.</span>
-            </p>
-            <span class="after-stamp">02</span>
-          </div>
-        </div>
+        <div class="cx-field"></div>
+        <div class="cx-red"></div>
+        <svg class="after-lines" viewBox="0 0 1440 850" preserveAspectRatio="none">
+          <path class="cx-diag" pathLength="1" d="M760 0 L1180 520" />
+          <path class="cx-diag cx-diag-b" pathLength="1" d="M980 850 L1440 220" />
+        </svg>
+        <p class="after-kicker">CHAPTER 02 / NOTES ON CURIOSITY</p>
+        <p class="cx-word cx-a">BEYOND</p>
+        <p class="cx-plate"><span><em>THE</em> <b>CODE</b></span></p>
+        <p class="after-caption">
+          <span class="cx-zh">代码之外，仍有世界。</span>
+          <span class="after-caption-en">A QUIET ARCHIVE OF LOUD IDEAS.</span>
+        </p>
+        <span class="after-stamp">02</span>
       </div>
 
       <a class="scene-focus" href={postUrl(latest)} aria-label={`阅读最新文章：${latest.data.title}`}>
@@ -313,36 +316,49 @@ const shortTitle = (t: string) => t.split('——')[0];
         var distance = scene.offsetHeight - pin.offsetHeight;
         if (distance <= 0) return;
         var p = clamp(-rect.top / distance);
-        /* 镜头：只对画面做推近和对焦。中文标题和英文海报都以整块透明度进出，
-           不位移、不模糊、不遮罩，避免字被撕开或裁成半个。 */
-        var rack = ramp(p, 0.02, 0.28);
-        var dip = ramp(p, 0.3, 0.4);
-        var rise = ramp(p, 0.46, 0.58);
-        var exit = ramp(p, 0.9, 1);
+        /* 字只做整块透明度。光闸合上之前标题已经消失，海报字不用遮罩，避免裁成半个。 */
+        var easeIn = function (v) { v = clamp(v); return v * v * v; };
+        var easeOut = function (v) { v = clamp(v); return 1 - Math.pow(1 - v, 3); };
+        var push = ramp(p, 0, 0.26);
+        var dip = ramp(p, 0.24, 0.33);
         var gate = (function () {
-          if (p < 0.32) return 0;
-          if (p < 0.42) return ramp(p, 0.32, 0.42);
-          if (p < 0.54) return 1 - ramp(p, 0.42, 0.54);
+          if (p < 0.33) return 0;
+          if (p < 0.44) return easeIn((p - 0.33) / 0.11);
+          if (p < 0.48) return 1;
+          if (p < 0.58) return 1 - easeOut((p - 0.48) / 0.1);
           return 0;
         })();
+        /* 斜切口长成红块，黑场补上，字块再沿同一方向撞到位。 */
+        var block = p < 0.28 ? 0 : easeOut((p - 0.28) / 0.18);
+        var field = p < 0.38 ? 0 : easeOut((p - 0.38) / 0.12);
+        var hitA = p < 0.5 ? 0 : easeOut((p - 0.5) / 0.1);
+        var hitB = p < 0.58 ? 0 : easeOut((p - 0.58) / 0.1);
+        var hitC = p < 0.64 ? 0 : easeOut((p - 0.64) / 0.08);
+        var slash = p < 0.46 ? 0 : easeOut((p - 0.46) / 0.14);
+        var arrive = ramp(p, 0.74, 0.88);
+        var exit = ramp(p, 0.93, 1);
+        var glint = ramp(p, 0.04, 0.22);
         var mobile = window.innerWidth <= 760;
         var st = pin.style;
         st.setProperty('--scene-p', p.toFixed(4));
         st.setProperty('--hero-y', '0vh');
-        st.setProperty('--hero-scale', (1.06 - rack * 0.04).toFixed(3));
-        st.setProperty('--hero-blur', '0px');
+        st.setProperty('--hero-scale', (1.18 - push * 0.14 + gate * 0.08).toFixed(3));
+        st.setProperty('--hero-blur', (gate * (mobile ? 1.5 : 2.5)).toFixed(2) + 'px');
         st.setProperty('--hero-opacity', '1');
+        st.setProperty('--glint', glint.toFixed(3));
+        st.setProperty('--glint-opacity', (Math.sin(glint * Math.PI) * (1 - dip)).toFixed(3));
         st.setProperty('--copy-y', '0vh');
         st.setProperty('--copy-opacity', (1 - dip).toFixed(3));
+        st.setProperty('--copy-scale', (1.06 - push * 0.06).toFixed(3));
         st.setProperty('--copy-blur', '0px');
-        st.setProperty('--intro-opacity', (1 - ramp(p, 0.18, 0.3)).toFixed(3));
+        st.setProperty('--intro-opacity', (1 - ramp(p, 0.16, 0.28)).toFixed(3));
         st.setProperty('--intro-y', '0vh');
         st.setProperty('--title-a-x', '0vw');
         st.setProperty('--title-a-y', '0vh');
         st.setProperty('--title-b-x', '0vw');
         st.setProperty('--title-b-y', '0vh');
-        st.setProperty('--incision-scale', ramp(p, 0.08, 0.26).toFixed(3));
-        st.setProperty('--incision-opacity', (1 - dip).toFixed(3));
+        st.setProperty('--incision-scale', easeOut(ramp(p, 0.06, 0.24)).toFixed(3));
+        st.setProperty('--incision-opacity', (1 - field).toFixed(3));
         st.setProperty('--tear-gap', '0%');
         st.setProperty('--tear-opacity', '0');
         st.setProperty('--tear-a-x', '0vw');
@@ -351,38 +367,38 @@ const shortTitle = (t: string) => t.split('——')[0];
         st.setProperty('--tear-b-x', '0vw');
         st.setProperty('--tear-b-y', '0vh');
         st.setProperty('--tear-b-r', '0deg');
-        st.setProperty('--gate', (gate * (mobile ? 42 : 46)).toFixed(2) + 'vh');
+        st.setProperty('--gate', (gate * (mobile ? 14 : 16)).toFixed(2) + 'vh');
         st.setProperty('--paper-gap', '120%');
-        st.setProperty('--after-opacity', rise.toFixed(3));
-        st.setProperty('--after-scale', (0.985 + rise * 0.015).toFixed(3));
-        st.setProperty('--after-title-a-x', '0vw');
-        st.setProperty('--after-title-b-x', '0vw');
-        st.setProperty('--after-title-y', '0px');
+        st.setProperty('--after-opacity', '1');
+        st.setProperty('--after-scale', '1');
+        st.setProperty('--block', block.toFixed(3));
+        st.setProperty('--field', field.toFixed(3));
+        st.setProperty('--hit-a', hitA.toFixed(3));
+        st.setProperty('--hit-b', hitB.toFixed(3));
+        st.setProperty('--hit-c', hitC.toFixed(3));
+        st.setProperty('--slash', slash.toFixed(3));
         st.setProperty('--after-title-mask', '0%');
-        st.setProperty('--after-lines-x', '0px');
-        st.setProperty('--after-lines-opacity', '0');
-        st.setProperty('--after-line', '0');
-        st.setProperty('--after-meta', '1');
-        st.setProperty('--after-stamp', '1');
-        /* 文章卡和左栏一起出现，第二幕不会先空出一整张海报。 */
-        st.setProperty('--focus-opacity', (rise * (1 - exit)).toFixed(3));
-        st.setProperty('--focus-x', '0vw');
-        st.setProperty('--focus-y', ((1 - rise) * (mobile ? 3 : 2)).toFixed(2) + 'vh');
+        st.setProperty('--after-lines-opacity', slash.toFixed(3));
+        st.setProperty('--after-line', slash.toFixed(3));
+        st.setProperty('--after-stamp', hitC.toFixed(3));
+        st.setProperty('--focus-opacity', (arrive * (1 - exit)).toFixed(3));
+        st.setProperty('--focus-x', ((1 - arrive) * (mobile ? 7 : 9)).toFixed(2) + 'vw');
+        st.setProperty('--focus-y', ((1 - arrive) * (mobile ? 5 : 6)).toFixed(2) + 'vh');
         st.setProperty('--focus-ry', '0deg');
         st.setProperty('--focus-rz', '0deg');
-        st.setProperty('--focus-scale', '1');
+        st.setProperty('--focus-scale', (0.9 + arrive * 0.1).toFixed(3));
         st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
-        st.setProperty('--scroll-cta-opacity', (1 - ramp(p, 0.12, 0.24)).toFixed(3));
-        st.setProperty('--chapter', p < 0.34 ? '"01"' : '"02"');
-        pin.classList.toggle('is-after', p > 0.5);
-        pin.classList.toggle('is-past-intro', p > 0.22 || playing);
+        st.setProperty('--scroll-cta-opacity', (1 - ramp(p, 0.1, 0.2)).toFixed(3));
+        st.setProperty('--chapter', p < 0.4 ? '"01"' : '"02"');
+        pin.classList.toggle('is-after', field > 0.55);
+        pin.classList.toggle('is-past-intro', p > 0.2 || playing);
         pin.classList.toggle('is-end', p > 0.96);
-        bottom.style.opacity = String(1 - ramp(p, 0.16, 0.3));
+        bottom.style.opacity = String(1 - ramp(p, 0.14, 0.28));
         bottom.style.transform = 'none';
-        bottom.style.visibility = p > 0.34 ? 'hidden' : 'visible';
+        bottom.style.visibility = p > 0.32 ? 'hidden' : 'visible';
         var focus = scene.querySelector('.scene-focus');
         if (focus) {
-          var active = p > 0.5 && p < 0.97;
+          var active = p > 0.78 && p < 0.97;
           focus.toggleAttribute('inert', !active);
           focus.setAttribute('aria-hidden', String(!active));
         }
@@ -646,10 +662,10 @@ const shortTitle = (t: string) => t.split('——')[0];
   @keyframes scene-in { from { opacity: .35; } to { opacity: 1; } }
   .scene-pin::before, .scene-pin::after {
     content: ""; position: absolute; left: 0; right: 0; height: var(--gate, 0vh);
-    background: #07090d; z-index: 7; pointer-events: none;
+    background: #111; z-index: 7; pointer-events: none;
   }
-  .scene-pin::before { top: 0; }
-  .scene-pin::after { bottom: 0; }
+  .scene-pin::before { top: 0; box-shadow: inset 0 -5px 0 #e10600; }
+  .scene-pin::after { bottom: 0; box-shadow: inset 0 5px 0 #e10600; }
   .scene-shade {
     position: absolute; inset: 0;
     background:
@@ -657,7 +673,13 @@ const shortTitle = (t: string) => t.split('——')[0];
       linear-gradient(0deg, rgba(10,21,34,.88) 0%, transparent 42%),
       linear-gradient(180deg, rgba(10,21,34,.35), transparent 30%);
   }
-  .scene-glint { display: none; }
+  .scene-glint {
+    display: block; position: absolute; inset: -12% 0; pointer-events: none;
+    background: linear-gradient(100deg, transparent 42%, rgba(255,255,255,.28) 50%, transparent 58%);
+    transform: translateX(calc((var(--glint, 0) - .5) * 130%));
+    opacity: var(--glint-opacity, 0);
+    mix-blend-mode: screen;
+  }
   .scene-tears {
     display: none; position: absolute; inset: 0; z-index: 2; pointer-events: none;
     opacity: var(--tear-opacity); transform: scale(var(--hero-scale));
@@ -688,54 +710,87 @@ const shortTitle = (t: string) => t.split('——')[0];
     fill: none; vector-effect: non-scaling-stroke;
     stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--incision-scale));
   }
-  .incision-glow { stroke: #d8ecf2; stroke-width: 8; opacity: calc(var(--incision-scale) * .22); }
-  .incision-core { stroke: #b74c3b; stroke-width: 3; }
+  .incision-glow { stroke: #e10600; stroke-width: 14; opacity: calc(var(--incision-scale) * .35); }
+  .incision-core { stroke: #e10600; stroke-width: 4; }
   .scene-after {
     position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none;
-    opacity: var(--after-opacity);
-    background: linear-gradient(90deg, rgba(8,16,28,.58) 0%, rgba(8,16,28,.28) 52%, rgba(8,16,28,.1) 100%);
+    opacity: var(--after-opacity, 1);
   }
-  .after-plate {
-    position: absolute; z-index: 2;
-    left: clamp(40px, 8vw, 140px); top: 50%; width: min(46vw, 640px);
-    transform: translateY(-52%);
-    color: #fff;
+  .cx-field {
+    position: absolute; inset: 0; z-index: 0; background: #111;
+    opacity: var(--field, 0);
   }
+  .cx-red {
+    position: absolute; z-index: 1; right: -18%; top: -28%;
+    width: 62%; height: 150%; background: #e10600;
+    transform: rotate(-18deg) scaleX(var(--block, 0));
+    transform-origin: 0% 70%;
+    opacity: min(1, calc(var(--block, 0) * 8));
+  }
+  .after-lines {
+    position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none;
+    opacity: var(--slash, 0);
+  }
+  .cx-diag {
+    fill: none; stroke: #111; stroke-width: 10; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--slash, 0));
+  }
+  .cx-diag-b { stroke: #f4f1ea; stroke-width: 8; }
   .after-kicker {
-    display: flex; align-items: center; gap: 14px; margin: 0 0 30px;
-    font-size: 10px; letter-spacing: .36em; color: rgba(255,255,255,.72);
+    position: absolute; z-index: 3; left: 3vw; top: 6.5%; margin: 0;
+    color: #f4f1ea; font-size: 11px; letter-spacing: .32em;
+    opacity: var(--hit-a, 0);
   }
-  .after-kicker span { width: 36px; height: 1px; background: rgba(255,255,255,.65); flex: none; }
-  .after-ghost {
-    margin: 0; color: #fff;
-    font-family: var(--font-serif); font-weight: 400;
-    font-size: clamp(46px, 6.2vw, 96px); line-height: 1.2; letter-spacing: .04em;
-    text-shadow: 0 3px 30px rgba(10,20,35,.25);
+  .cx-a {
+    position: absolute; z-index: 3; left: 2.4vw; top: 12%; margin: 0;
+    color: #f4f1ea; font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(88px, 12.4vw, 188px); font-weight: 900; line-height: .78;
+    letter-spacing: -.07em; white-space: nowrap;
+    opacity: var(--hit-a, 0);
+    transform: translate3d(calc((1 - var(--hit-a, 0)) * -5vw), calc((1 - var(--hit-a, 0)) * -3vh), 0);
   }
-  .after-ghost > span { display: block; }
-  .after-indent { padding-left: .55em; font-style: italic; }
-  .after-ghost b { color: #fff; font-weight: 400; font-style: italic; }
-  .after-foot {
-    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
-    margin-top: 36px; padding-left: .7em;
+  .cx-plate {
+    position: absolute; z-index: 4; left: 34%; top: 34%; margin: 0;
+    background: #f4f1ea; color: #111; padding: .02em .16em .08em;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(58px, 8.2vw, 132px); font-style: italic; font-weight: 400;
+    line-height: .84; letter-spacing: -.04em; white-space: nowrap;
+    opacity: var(--hit-b, 0);
+    transform: translate3d(calc((1 - var(--hit-b, 0)) * 7vw), calc((1 - var(--hit-b, 0)) * 4vh), 0) rotate(-7deg);
   }
-  .after-caption { margin: 0; color: rgba(255,255,255,.74); font-size: 13px; letter-spacing: .12em; line-height: 1.7; }
-  .after-caption-en { display: block; margin-top: 6px; font-size: 11px; letter-spacing: .16em; color: rgba(255,255,255,.55); }
+  .cx-plate b { color: #e10600; font-weight: 400; }
+  .after-caption { position: absolute; z-index: 4; left: 3vw; top: 62%; margin: 0; }
+  .cx-zh {
+    display: inline-block; background: #f4f1ea; color: #111;
+    padding: 10px 16px; font-family: var(--font-serif);
+    font-size: clamp(20px, 1.8vw, 30px); letter-spacing: .12em; line-height: 1.4;
+    opacity: var(--hit-c, 0);
+    transform: translate3d(calc((1 - var(--hit-c, 0)) * -3vw), 0, 0);
+  }
+  .after-caption-en {
+    display: block; margin-top: 12px; max-width: 16em;
+    color: rgba(244,241,234,.78); font-size: 12px; letter-spacing: .18em; line-height: 1.6;
+    opacity: var(--hit-c, 0);
+  }
   .after-stamp {
-    display: grid; place-items: center; flex: none;
-    width: 42px; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.45); border-radius: 50%;
-    color: rgba(255,255,255,.8); font-size: 13px; letter-spacing: .08em;
+    position: absolute; z-index: 4; left: 46%; top: 63%;
+    display: grid; place-items: center; width: 78px; aspect-ratio: 1;
+    background: #e10600; color: #f4f1ea;
+    font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 900;
+    opacity: var(--after-stamp, 0);
+    transform: rotate(-8deg) scale(var(--after-stamp, 0));
   }
   .scene-focus {
-    position: absolute; z-index: 3; right: clamp(48px, 5.5vw, 96px); bottom: 132px; width: min(28vw, 400px);
+    position: absolute; z-index: 5; right: 4vw; bottom: 12vh; width: min(22vw, 320px);
     color: #fff; opacity: var(--focus-opacity); pointer-events: none;
     transform: translate3d(var(--focus-x), var(--focus-y), 0) rotateY(var(--focus-ry)) rotateZ(var(--focus-rz)) scale(var(--focus-scale));
     transform-style: preserve-3d; will-change: transform, opacity;
   }
   .scene-pin.is-after .scene-focus { pointer-events: auto; }
   .focus-card {
-    position: relative; aspect-ratio: 1.05; overflow: hidden; background: #26465c;
-    box-shadow: 0 22px 50px rgba(5, 16, 28, .38);
+    position: relative; aspect-ratio: .92; overflow: hidden; background: #111;
+    border: 5px solid #111;
+    box-shadow: 14px 14px 0 #e10600;
     transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s;
   }
   .focus-card::before {
@@ -747,7 +802,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     filter: grayscale(.65) saturate(.55) contrast(1.06);
     transition: transform 1.2s cubic-bezier(.2,.7,.2,1), filter .6s;
   }
-  .scene-focus:hover .focus-card { transform: translateY(-6px); box-shadow: 0 28px 60px rgba(5, 16, 28, .46); }
+  .scene-focus:hover .focus-card { transform: translate(-4px, -4px); box-shadow: 18px 18px 0 #e10600; }
   .scene-focus:hover .focus-card::before { opacity: 0; }
   .scene-focus:hover .focus-card > img { transform: scale(1.04); filter: grayscale(0) saturate(1) contrast(1); }
   .focus-card-shade { position: absolute; z-index: 2; inset: 0; background: linear-gradient(0deg, rgba(11,28,42,.95), rgba(11,28,42,.03) 75%); }
@@ -758,15 +813,16 @@ const shortTitle = (t: string) => t.split('——')[0];
   .focus-read i { font-size: 20px; font-style: normal; transition: transform .3s; }
   .scene-focus:hover .focus-read i { transform: translate(4px,-4px); }
   .focus-edge { position: absolute; z-index: 4; inset: 0; border: 1px solid rgba(16,36,52,.35); pointer-events: none; }
-  .scene-frame { position: absolute; z-index: 4; inset: 112px 4.5vw 118px; border: 1px solid rgba(255,255,255,.13); pointer-events: none; opacity: max(var(--copy-opacity), var(--after-opacity)); }
+  .scene-frame { position: absolute; z-index: 4; inset: 112px 4.5vw 118px; border: 1px solid rgba(255,255,255,.13); pointer-events: none; opacity: var(--copy-opacity); }
   .scene-content {
     position: absolute; z-index: 4; left: clamp(40px,8vw,140px); top: 50%; width: min(76vw,1400px); padding-right: 5vw;
     opacity: var(--copy-opacity); pointer-events: auto;
-    transform: translateY(calc(-52% + var(--copy-y)));
+    transform: translateY(calc(-52% + var(--copy-y))) scale(var(--copy-scale, 1));
     will-change: transform, opacity;
   }
   .scene.has-motion .scene-content { pointer-events: auto; }
   .scene-pin.is-after .scene-content { pointer-events: none; }
+  .scene-pin.is-after .scene-side { opacity: 0; }
   .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 30px; font-size: 10px; letter-spacing: .36em; color: rgba(255,255,255,.72); opacity: var(--intro-opacity); animation: rise-in 1s .25s both; }
   .scene-eyebrow span { width: 36px; height: 1px; background: rgba(255,255,255,.65); }
   .scene-title { margin: 0; font-weight: 400; font-size: clamp(46px,6.8vw,104px); line-height: 1.32; letter-spacing: .04em; color: #fff; text-shadow: 0 3px 30px rgba(10,20,35,.25); }
@@ -838,7 +894,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: absolute; z-index: 6; left: 4.5vw; right: 4.5vw; bottom: 0;
     display: flex; align-items: center; gap: 18px; height: 72px; pointer-events: none;
     border-top: 1px solid rgba(255,255,255,.2);
-    opacity: var(--after-opacity); color: rgba(255,255,255,.65);
+    opacity: var(--field, 0); color: rgba(244,241,234,.72);
     font-size: 9px; letter-spacing: .24em;
   }
   .progress-track { width: 130px; height: 1px; background: rgba(255,255,255,.22); overflow: hidden; }
@@ -1072,9 +1128,9 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-title { font-size: clamp(42px,7.4vw,72px); }
     .scene-side { display: none; }
     .scene-edition { display: none; }
-    .after-plate { width: min(44vw, 460px); }
-    .scene-focus { right: 4vw; bottom: 96px; width: min(34vw, 340px); }
-    .after-ghost { font-size: clamp(40px, 5.4vw, 64px); }
+    .cx-a { font-size: clamp(64px, 11vw, 120px); }
+    .cx-plate { left: 22%; top: 36%; font-size: clamp(42px, 7vw, 88px); }
+    .scene-focus { right: 3vw; bottom: 11vh; width: min(30vw, 280px); }
     .latest-preview { display: none; }
     .colophon { gap: 30px; }
   }
@@ -1096,17 +1152,17 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-scroll { right: 18px; bottom: 104px; width: 48px; }
     .scene-scroll svg { width: 17px; height: 17px; }
     .scroll-label { font-size: 7px; letter-spacing: .18em; }
-    .after-plate { left: 24px; right: 24px; top: 108px; width: auto; transform: none; }
-    .after-kicker { margin-bottom: 18px; font-size: 8px; letter-spacing: .22em; }
-    .after-ghost { font-size: clamp(34px, 8.4vw, 48px); line-height: 1.28; }
-    .after-indent { padding-left: .4em; }
-    .after-foot { margin-top: 22px; padding-left: .45em; }
-    .after-caption { font-size: 12px; }
+    .cx-red { width: 130%; right: -55%; top: -8%; height: 70%; }
+    .cx-a { left: 16px; top: 10%; font-size: clamp(52px, 16vw, 72px); }
+    .cx-plate { left: 10px; top: 20%; font-size: clamp(34px, 10.5vw, 48px); transform: translate3d(calc((1 - var(--hit-b, 0)) * 6vw), 0, 0) rotate(-4deg); }
+    .after-kicker { left: 16px; top: 7%; font-size: 8px; letter-spacing: .18em; }
+    .after-caption { left: 16px; right: 16px; top: 36%; }
+    .cx-zh { font-size: 16px; letter-spacing: .08em; padding: 8px 12px; }
     .after-caption-en { display: none; }
-    .scene-focus { left: 0; right: 0; top: 292px; bottom: 56px; width: auto; height: auto; transform: none; }
-    .scene-focus .focus-card { height: 100%; aspect-ratio: auto; border-radius: 0; }
-    .focus-card { aspect-ratio: 1.35; box-shadow: 0 16px 36px rgba(5, 16, 28, .35); }
-    .scene-focus:hover .focus-card { box-shadow: 0 18px 40px rgba(5, 16, 28, .42); }
+    .after-stamp { left: auto; right: 16px; top: 7%; width: 48px; font-size: 18px; }
+    .scene-focus { left: 16px; right: 16px; top: auto; bottom: 64px; width: auto; }
+    .focus-card { aspect-ratio: 1.25; border-width: 4px; box-shadow: 8px 8px 0 #e10600; }
+    .scene-focus:hover .focus-card { box-shadow: 10px 10px 0 #e10600; }
     .focus-card-copy h2 { font-size: clamp(18px, 4.6vw, 24px); margin: 8px 0 12px; }
     .focus-label { font-size: 7px; }
     .focus-read { padding-top: 10px; font-size: 9px; }

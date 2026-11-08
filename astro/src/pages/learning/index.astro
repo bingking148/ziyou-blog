@@ -48,26 +48,17 @@ const appendix = UDL_CHAPTERS.filter((c) => c.num >= 22);
 
   <style>
     .learn {
-      --paper: #faf7f0;
-      --paper-deep: #f4f0e6;
-      --ink: #2c2a26;
-      --ink-soft: #6f6a5c;
-      --ink-faint: #9a9182;
-      --line: #e4ddd0;
-      --accent: #7a4a2a;
+      --paper: var(--color-bg);
+      --paper-deep: var(--color-surface-muted);
+      --ink: var(--color-text-strong);
+      --ink-soft: var(--color-text-muted);
+      --ink-faint: var(--color-text-faint);
+      --line: var(--color-card-border);
+      --accent: var(--color-accent);
       background: var(--paper);
       color: var(--ink);
       font-family: var(--font-serif);
       min-height: 75vh;
-    }
-    :global([data-theme="dark"]) .learn {
-      --paper: #171a1f;
-      --paper-deep: #1f242c;
-      --ink: #ddd8cc;
-      --ink-soft: #b3ac9a;
-      --ink-faint: #948b7a;
-      --line: #363b44;
-      --accent: #d9a077;
     }
     .learn-wrap {
       max-width: 1440px; margin: 0 auto;
