@@ -69,7 +69,7 @@ const shortTitle = (t: string) => t.split('——')[0];
       <div class="scene-after" aria-hidden="true">
         <div class="field-quiet"><i></i><i></i><i></i></div>
         <p class="after-kicker">学习资料 · 还在改</p>
-        <p class="cx-word cx-a">草稿</p>
+        <p class="cx-word cx-a"><span>草</span><span>稿</span></p>
         <p class="cx-plate"><span>没贴进正文</span></p>
         <p class="after-caption">
           <span class="cx-zh">公开的是改过的那版。</span>
@@ -320,11 +320,11 @@ const shortTitle = (t: string) => t.split('——')[0];
         var p = clamp(-rect.top / distance);
         /* 同一条进度驱动形变和换色，中间没有 0/1 跳切。 */
         var drift = ramp(p, 0, 0.16);
-        var morph = ramp(p, 0.08, 0.70);
-        var flat = ramp(p, 0.04, 0.28);
-        var copy = ramp(p, 0.10, 0.32);
-        var arrive = ramp(p, 0.16, 0.58);
-        var tint = 1 - Math.pow(1 - morph, 1.7);
+        /* 颜色和色块用同一条 smoothstep，中点就是一半红一半赭、一半黑一半松绿。 */
+        var morph = ramp(p, 0.05, 0.82);
+        var flat = 1 - Math.pow(1 - morph, 4);
+        var copy = ramp(p, 0.12, 0.42);
+        var arrive = ramp(p, 0.22, 0.74);
         var mobile = window.innerWidth <= 760;
         var slab0 = mobile ? 0.055 : 0.16;
         var slab1 = mobile ? 1 : 0.56;
@@ -333,7 +333,7 @@ const shortTitle = (t: string) => t.split('——')[0];
         st.setProperty('--drift', drift.toFixed(4));
         st.setProperty('--morph', morph.toFixed(4));
         st.setProperty('--flat', flat.toFixed(4));
-        st.setProperty('--tint', tint.toFixed(4));
+        st.setProperty('--tint', morph.toFixed(4));
         st.setProperty('--copy', copy.toFixed(4));
         st.setProperty('--arrive', arrive.toFixed(4));
         st.setProperty('--slab-x', (slab0 + (slab1 - slab0) * morph).toFixed(4));
@@ -607,7 +607,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   .mass {
     position: absolute; z-index: 2; right: 5vw; top: 0; width: 48vw; height: 100%;
     background: color-mix(in srgb, var(--s2-ochre) calc(var(--tint) * 100%), #c41e3a);
-    transform-origin: 100% 40%;
+    transform-origin: 100% 42%;
     transform: scaleX(calc(0.05 + var(--flat) * 0.95)) scaleY(calc(1 - var(--flat) * 0.986));
     pointer-events: none; will-change: transform;
   }
@@ -676,10 +676,16 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: absolute; z-index: 6; right: 4.5vw; top: 18%; margin: 0;
     color: var(--s2-ink); font-family: var(--font-serif), "Songti SC", serif;
     font-size: clamp(92px, 12vw, 176px); font-weight: 700; line-height: .86;
-    letter-spacing: .04em;
+    letter-spacing: calc(.04em + (1 - var(--arrive)) * .38em);
     opacity: var(--arrive);
-    transform: translate3d(0, calc((1 - var(--arrive)) * 22px), 0);
+    transform: translate3d(0, calc((1 - var(--arrive)) * 18px), 0);
   }
+  .cx-a span {
+    display: inline-block;
+    transform: scaleY(calc(.62 + var(--arrive) * .38));
+    transform-origin: 50% 80%;
+  }
+  .cx-a span:last-child { transform: scaleY(calc(.48 + var(--arrive) * .52)) translateY(calc((1 - var(--arrive)) * -.08em)); }
   .cx-plate {
     position: absolute; z-index: 6; right: 5vw; top: 46%; margin: 0;
     color: var(--s2-ochre);
@@ -745,10 +751,11 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; font-size: 12px; letter-spacing: .22em; color: var(--muted); font-weight: 700; }
   .scene-eyebrow span { width: 42px; height: 4px; background: #c41e3a; }
   .scene-title { margin: 0; font-weight: 700; font-size: clamp(44px, 5.2vw, 78px); line-height: 1.05; letter-spacing: .01em; color: var(--ink); font-family: var(--font-serif), "Songti SC", serif; }
-  .title-shift { display: block; }
+  .title-shift { display: block; transform-origin: left center; }
   .title-line { display: block; width: fit-content; }
-  .title-shift-b { margin-top: 10px; margin-left: 12%; }
-  .title-shift-b .title-line { box-shadow: inset 0 -0.28em 0 #c41e3a; }
+  .title-shift-a { transform: scaleX(calc(1 + var(--copy) * .05)) translateY(calc(var(--copy) * -8px)); }
+  .title-shift-b { margin-top: 10px; margin-left: 12%; transform: scaleX(calc(1 - var(--copy) * .14)); }
+  .title-shift-b .title-line { box-shadow: inset 0 -0.28em 0 color-mix(in srgb, var(--s2-ochre) calc(var(--morph) * 100%), #c41e3a); }
   .scene-intro { display: flex; align-items: center; gap: 28px; margin-top: 26px; }
   .scene-typing { margin: 0; min-height: 1.5em; font-size: 14px; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
   .typing-cursor { display: inline-block; width: 1px; height: 1em; margin-left: 5px; background: currentColor; vertical-align: -2px; animation: blink 1.2s step-end infinite; }
