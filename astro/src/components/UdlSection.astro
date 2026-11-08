@@ -13,7 +13,7 @@ const { pairs, dropcap = false } = Astro.props;
 let zhBodySeen = false;
 const rows = pairs.map((p) => {
   const row = { ...p };
-  if (p.kind === 'body' && p.zh && !zhBodySeen) {
+  if (p.kind === 'body' && p.zh?.length && !zhBodySeen) {
     zhBodySeen = true;
     row.drop = dropcap;
   }
@@ -25,39 +25,39 @@ const FUSE = ['figure', 'equation', 'eqimg'];
 
 {rows.map((p) => {
   if (FUSE.includes(p.kind)) {
-    const b = p.en ?? p.zh;
+    const b = (p.en ?? p.zh ?? [])[0];
     if (p.kind === 'figure') {
       return (
         <figure class="udl-fig">
-          <img src={b.img} alt={(p.zh?.text ?? p.en?.text ?? '').slice(0, 80)} loading="lazy" />
-          {(p.zh?.text || p.en?.text) && (
+          <img src={b.img} alt={(p.zh?.[0]?.text ?? p.en?.[0]?.text ?? '').slice(0, 80)} loading="lazy" />
+          {(p.zh?.[0]?.text || p.en?.[0]?.text) && (
             <figcaption>
-              {p.zh?.text && <span class="cap-zh">{p.zh.text}</span>}
-              {p.en?.text && <span class="cap-en">{p.en.text}</span>}
+              {p.zh?.[0]?.text && <span class="cap-zh">{p.zh[0].text}</span>}
+              {p.en?.[0]?.text && <span class="cap-en">{p.en[0].text}</span>}
             </figcaption>
           )}
         </figure>
       );
     }
     // 公式：优先 KaTeX 内联渲染，无法解析时回退到原书裁图
-    const tex = ((p.en?.latex || p.zh?.latex || '') as string).trim();
-    const img = (p.en?.img || p.zh?.img) as string | undefined;
+    const tex = ((p.en?.[0]?.latex || p.zh?.[0]?.latex || '') as string).trim();
+    const img = (p.en?.[0]?.img || p.zh?.[0]?.img) as string | undefined;
     if (tex) return <div class="udl-eq" data-tex={tex} />;
     if (img) return <div class="udl-eqimg"><img src={img} alt="公式" loading="lazy" /></div>;
     return null;
   }
-  // body / note：两栏对照（正文里嵌有 <span class="imath"> 行内数学）
+  // body / note：两栏对照；一侧多段时并列渲染（翻译合并/拆分段落的 1:N 对齐组）
   return (
     <div class="udl-row" data-kind={p.kind}>
       <div class="cell cell-en">
-        {p.en && (p.kind === 'note'
-          ? <aside class="udl-note" set:html={p.en.text} />
-          : <p class="udl-p udl-en" set:html={p.en.text} />)}
+        {p.en?.map((b) => (b.type === 'note'
+          ? <aside class="udl-note" set:html={b.text} />
+          : <p class="udl-p udl-en" set:html={b.text} />))}
       </div>
       <div class="cell cell-zh">
-        {p.zh && (p.kind === 'note'
-          ? <aside class="udl-note" set:html={p.zh.text} />
-          : <p class:list={['udl-p', 'udl-zh', { 'udl-drop': p.drop }]} set:html={p.zh.text} />)}
+        {p.zh?.map((b, bi) => (b.type === 'note'
+          ? <aside class="udl-note" set:html={b.text} />
+          : <p class:list={['udl-p', 'udl-zh', { 'udl-drop': p.drop && bi === 0 }]} set:html={b.text} />))}
       </div>
     </div>
   );
