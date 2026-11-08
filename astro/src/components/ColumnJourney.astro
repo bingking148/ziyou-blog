@@ -36,14 +36,14 @@ const outlines = [
 <section class="journey" aria-labelledby="journey-heading" data-journey>
   <header class="journey-heading">
     <h2 id="journey-heading">阅读路线</h2>
-    <span>READING PATH</span>
+    <span>一篇一篇</span>
     <p>沿着这条线，一篇一篇读下去。</p>
     <span class="journey-total">{String(total).padStart(2, '0')} 篇</span>
   </header>
 
   <div class="journey-board">
     <span class="board-doodle board-doodle-star" aria-hidden="true">✳</span>
-    <span class="board-doodle board-doodle-note" aria-hidden="true">one page<br />at a time ↓</span>
+    <span class="board-doodle board-doodle-note" aria-hidden="true">一篇<br />一篇 ↓</span>
     <div class="journey-track" data-journey-track>
     <svg class="journey-lines" data-journey-lines aria-hidden="true" focusable="false">
       <defs>
@@ -75,7 +75,7 @@ const outlines = [
             </svg>
             <span class="journey-card-top">
               <span class="journey-number"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><ellipse cx="32" cy="22" rx="29" ry="17" transform={`rotate(${(i % 2 ? 1 : -1) * 3} 32 22)`} /></svg><span>{num(p.data.weight)}</span></span>
-              <span class="journey-chapter">READING<br />NOTE</span>
+              <span class="journey-chapter">笔记</span>
               <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
             </span>
             <span class="journey-crayon-swatch" aria-hidden="true"></span>

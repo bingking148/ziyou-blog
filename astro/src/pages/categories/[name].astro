@@ -54,11 +54,11 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
           lede={column.data.description}
         />
         <figure class="column-visual" data-reveal>
-          <div class="column-visual-top"><span>CURATED NOTES</span><span>VOL. 05</span></div>
-          <div class="column-banner">
+          <div class="column-visual-top"><span>按顺序</span><span>{String(columnList.length).padStart(2, '0')} 篇</span></div>
+          <div class="column-banner ink-plate">
             <ResponsiveImage src={column.data.cover} alt={column.data.title} sizes="(max-width: 1000px) 100vw, 46vw" loading="eager" />
           </div>
-          <figcaption><span>按顺序，慢慢读懂。</span><span aria-hidden="true">READ / THINK / MAKE</span></figcaption>
+          <figcaption><span>按顺序，慢慢读懂。</span></figcaption>
         </figure>
       </div>
       <div class="prose column-intro" data-reveal>

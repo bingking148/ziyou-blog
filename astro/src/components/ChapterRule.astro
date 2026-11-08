@@ -7,12 +7,12 @@ interface Props {
   title?: string;
   lede?: string;
 }
-const { no, label, en, value, title, lede } = Astro.props;
+const { label, value, title, lede } = Astro.props;
 ---
 <header class="chapter-rule" data-reveal>
   <p class="cr-line-row">
-    <span class="cr-no">{no}</span>
-    <span class="cr-label">{label}{en && <> / {en}</>}</span>
+    <span class="cr-mark" aria-hidden="true"></span>
+    <span class="cr-label">{label}</span>
     <span class="cr-line" aria-hidden="true"></span>
     {value && <span class="cr-value">{value}</span>}
   </p>
@@ -35,12 +35,12 @@ const { no, label, en, value, title, lede } = Astro.props;
     align-items: center;
     gap: 14px;
     margin: 0;
-    font-family: var(--font-code);
-    font-size: 11px;
-    letter-spacing: .18em;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    letter-spacing: .14em;
   }
-  .cr-no { font-weight: 700; color: var(--color-accent); }
-  .cr-label { color: var(--color-text-strong); letter-spacing: .22em; }
+  .cr-mark { width: 18px; height: 1px; background: var(--color-accent); flex-shrink: 0; }
+  .cr-label { color: var(--color-text-strong); }
   .cr-line { flex: 1; height: 1px; background: var(--color-card-border); }
   .cr-value { white-space: nowrap; }
   .cr-head { display: flex; align-items: baseline; gap: clamp(16px, 3vw, 36px); flex-wrap: wrap; margin: 26px 0 36px; }

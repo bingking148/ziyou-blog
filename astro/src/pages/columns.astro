@@ -35,15 +35,15 @@ const MAX_VISIBLE = 5;
         const url = `/categories/${slugifyTaxonomy(c.data.category)}/`;
         return (
           <section class="column-block" data-reveal>
-            <span class="column-spine" aria-hidden="true">SERIAL / {num(ci + 1)}</span>
+            <span class="column-spine" aria-hidden="true">辑 {num(ci + 1)}</span>
             <div class="column-top">
-              <a class="column-cover" href={url} tabindex="-1" aria-hidden="true">
+              <a class="column-cover ink-plate" href={url} tabindex="-1" aria-hidden="true">
                 <ResponsiveImage src={c.data.cover} alt="" sizes="(max-width: 760px) 32vw, 200px" loading="lazy" />
                 <span class="column-seal" aria-hidden="true">辑</span>
               </a>
               <div class="column-intro">
                 <div class="column-kicker">
-                  <span>SERIES {num(ci + 1)}</span>
+                  <span>专栏 {num(ci + 1)}</span>
                   <span>{num(list.length)} 篇</span>
                 </div>
                 <h2 class="column-title"><a href={url}>{c.data.title}</a></h2>

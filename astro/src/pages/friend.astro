@@ -10,23 +10,23 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
 <Base title="友情链接" description="友情链接与交换方式">
   <link slot="head" rel="stylesheet" href="/resources/waline/waline.css" />
   <div class="ed-wrap ed-wrap--wide friend-page">
-    <ChapterRule no="03" label="友链" en="LAMPS" value={`${FRIENDS.length} LIT · EST. ${SINCE}`} />
+    <ChapterRule no="03" label="友链" value={`${FRIENDS.length} 盏 · 自 ${SINCE} 年`} />
 
     <div class="lamp-lede" data-reveal>
       <h1>互相留<em>一盏灯</em>。</h1>
-      <span>EVERY CARD KEEPS A LIGHT ON</span>
+      <span>每张名片留着一盏灯</span>
     </div>
 
     <!-- 名片阵列 -->
     <div class="deck">
       <div class="bizcard mine" data-reveal style="--i:1">
         <i class="lamp on" aria-hidden="true"></i>
-        <span class="bc-tag">THIS SITE / 本站</span>
+        <span class="bc-tag">本站</span>
         <b class="bc-name">{SITE_TITLE}</b>
         <span class="bc-desc">{SITE_DESCRIPTION}。</span>
         <div class="bc-meta">
           <span>ziyou814.top</span>
-          <span>EST. {SINCE} · {AUTHOR}</span>
+          <span>自 {SINCE} · {AUTHOR}</span>
         </div>
         <button
           class="bc-copy"
@@ -61,7 +61,7 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
         <i class="lamp off" aria-hidden="true"></i>
         <div class="slot-copy">
           <b>你的名片留在这里</b>
-          <small>申请交换 · EXCHANGE</small>
+          <small>申请交换</small>
         </div>
       </div>
     </div>
@@ -81,7 +81,7 @@ import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SINCE } from '../consts.ts';
     <div class="friend-comments" data-reveal>
       <div class="comments-head" aria-hidden="true">
         <span>留言 · 交换记录</span>
-        <b>WALINE / OPEN</b>
+        <b>留一句</b>
       </div>
       <Comments path="/friend/" />
     </div>

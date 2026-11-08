@@ -94,7 +94,7 @@ const fmt = (d: Date) =>
   <!-- 页边阅读标尺：只负责进度，章节跳转交给左侧目录 -->
   <div class="reading-ruler is-on-hero" role="progressbar" aria-label="文章阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
     <div class="ruler-readout"><output class="ruler-percent">00</output><span class="ruler-unit">%</span></div>
-    <span class="ruler-caption">READ</span>
+    <span class="ruler-caption">读</span>
     <div class="ruler-scale" aria-hidden="true">
       <span class="ruler-fill"></span>
       <ol class="ruler-ticks">
@@ -106,7 +106,7 @@ const fmt = (d: Date) =>
       </ol>
       <span class="ruler-cursor"></span>
     </div>
-    <span class="ruler-end" aria-hidden="true">100 / END</span>
+    <span class="ruler-end" aria-hidden="true">尽</span>
   </div>
 
   <article class="post-layout">
@@ -117,7 +117,7 @@ const fmt = (d: Date) =>
       <div class="post-hero-shade" aria-hidden="true"></div>
       <div class="post-hero-content">
         <div class="post-kicker">
-          <span>ZIYOU / {column ? 'SERIES' : 'ESSAY'}</span>
+          <span>{column ? '专栏' : '随笔'}</span>
           <i></i>
           <span>{fmt(post.data.date).replaceAll('-', '.')}</span>
         </div>
@@ -137,16 +137,16 @@ const fmt = (d: Date) =>
         </div>
       </div>
       <div class="post-hero-foot" aria-hidden="true">
-        <span>READING NOTES</span>
+        <span>阅读</span>
         <span class="hero-foot-line"></span>
-        <span>SCROLL TO EXPLORE ↓</span>
+        <span>向下读</span>
       </div>
     </header>
 
     <div class="post-body-grid">
       <aside class="post-toc-aside">
         <div class="toc-sticky">
-          <span class="sidebar-label">IN THIS ARTICLE</span>
+          <span class="sidebar-label">目录</span>
           {post.data.toc && <Toc headings={headings} />}
         </div>
       </aside>
@@ -286,7 +286,7 @@ const fmt = (d: Date) =>
 
       <aside class="post-mood-aside">
         <div class="mood-sticky">
-          <span class="sidebar-label">ARTICLE NOTES</span>
+          <span class="sidebar-label">这篇</span>
           <dl class="post-side-meta">
             <div><dt>发布日期</dt><dd>{fmt(post.data.date)}</dd></div>
             <div><dt>全文</dt><dd>{wordCount} 字</dd></div>
@@ -294,7 +294,7 @@ const fmt = (d: Date) =>
             {column && <div><dt>所属专栏</dt><dd><a href={`/categories/${slugifyTaxonomy(column.data.category)}/`}>{column.data.title}</a></dd></div>}
           </dl>
           <div class="sidebar-mood">
-            <span class="sidebar-label">SET THE MOOD</span>
+            <span class="sidebar-label">色调</span>
             <MoodKnob />
           </div>
         </div>
@@ -559,15 +559,15 @@ const fmt = (d: Date) =>
   }
   .post-hero { position: relative; height: min(88svh, 900px); min-height: 620px; overflow: hidden; color: #fff; background: #172334; }
   .post-hero-media { position: absolute; inset: 0; }
-  .post-cover { width: 100%; height: 100%; object-fit: cover; object-position: center; animation: cover-enter 1.8s cubic-bezier(.2,.7,.2,1) both; }
+  .post-cover { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; filter: grayscale(.5) saturate(.35) contrast(1.04); animation: cover-enter 1.2s cubic-bezier(.2,.7,.2,1) both; }
   @keyframes cover-enter { from { opacity: .2; transform: scale(1.07); } to { opacity: 1; transform: scale(1); } }
-  .post-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(9,17,28,.78) 0%, rgba(9,17,28,.38) 55%, rgba(9,17,28,.13)), linear-gradient(0deg, rgba(8,16,26,.72), transparent 55%), linear-gradient(180deg, rgba(8,16,26,.3), transparent 30%); }
-  .post-hero-content { position: absolute; left: clamp(32px,8vw,140px); bottom: clamp(100px,15vh,160px); width: min(900px, 80vw); }
+  .post-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #101c2b 0%, #101c2b 46%, rgba(16,28,43,.45) 62%, rgba(16,28,43,.12) 100%), linear-gradient(0deg, rgba(8,16,26,.55), transparent 40%); }
+  .post-hero-content { position: absolute; left: clamp(32px,8vw,140px); bottom: clamp(100px,15vh,160px); width: min(34rem, 42vw); }
   .post-kicker { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; font-size: 10px; letter-spacing: .28em; color: rgba(255,255,255,.75); animation: post-rise .8s .15s both; }
   .post-kicker i { width: 32px; height: 1px; background: rgba(255,255,255,.55); }
   .post-column-badge { display: inline-block; margin-bottom: 18px; color: rgba(255,255,255,.85); font-size: 12px; letter-spacing: .18em; }
   .post-column-badge:hover { color: #fff; }
-  .post-title { max-width: 960px; margin: 0; font-size: clamp(36px,4.8vw,70px); font-weight: 500; line-height: 1.42; letter-spacing: .035em; color: #fff; text-wrap: balance; text-shadow: 0 2px 24px rgba(0,0,0,.2); animation: post-rise 1s .28s both; }
+  .post-title { max-width: 11em; margin: 0; font-size: clamp(32px,4vw,60px); font-weight: 500; line-height: 1.42; letter-spacing: .035em; color: #fff; text-wrap: balance; animation: post-rise 1s .28s both; }
   .post-description { max-width: 660px; margin: 24px 0 0; font-size: 14px; line-height: 1.9; letter-spacing: .04em; color: rgba(255,255,255,.78); animation: post-rise 1s .4s both; }
   .post-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 30px; font-size: 11px; letter-spacing: .1em; color: rgba(255,255,255,.65); animation: post-rise 1s .5s both; }
   @keyframes post-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
@@ -576,7 +576,7 @@ const fmt = (d: Date) =>
 
   .post-body-grid { display: grid; grid-template-columns: 200px minmax(0, 790px) 200px; justify-content: center; gap: clamp(40px,5vw,80px); align-items: start; max-width: 1500px; margin: 0 auto; padding: 100px clamp(24px,4vw,56px) 80px; }
   @media (min-width: 1440px) {
-    .post-hero-content { left: var(--wide-gutter); width: min(1080px, 72vw); }
+    .post-hero-content { left: var(--wide-gutter); width: min(36rem, 42vw); }
     .post-hero-foot { left: var(--wide-gutter); right: var(--wide-gutter); }
     .post-body-grid { grid-template-columns: 200px minmax(0, 820px) 220px; gap: clamp(32px, 2.8vw, 56px); max-width: none; padding-right: calc(var(--wide-gutter) + 64px); padding-left: var(--wide-gutter); }
     .post-inner :global(.prose) { font-size: 17.5px; }
@@ -764,6 +764,7 @@ const fmt = (d: Date) =>
 
   @media (max-width: 760px) {
     .post-hero { height: 82svh; min-height: 540px; }
+    .post-hero-shade { background: linear-gradient(180deg, rgba(16,28,43,.72), rgba(16,28,43,.94) 28%, #101c2b); }
     .post-hero-content { left: 24px; bottom: 96px; width: calc(100% - 48px); }
     .post-title { font-size: clamp(28px,7.4vw,40px); line-height: 1.5; }
     .post-description { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

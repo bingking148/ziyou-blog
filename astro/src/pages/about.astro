@@ -63,18 +63,18 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
 
 <Base title="关于" description={`关于 ${AUTHOR}：${SITE_DESCRIPTION}`}>
   <div class="ed-wrap ed-wrap--wide about-page">
-    <ChapterRule no="01" label="档案" en="DOSSIER" value={`EST. ${SINCE}`} />
+    <ChapterRule no="01" label="档案" value={`自 ${SINCE} 年`} />
 
     <!-- 档案卷宗 -->
     <section class="dossier" data-reveal style="--i:1" aria-label="站主档案">
-      <span class="dos-tab">FILE NO. 001 · OPEN</span>
+      <span class="dos-tab">卷一 · 在写</span>
       <span class="dos-seal" aria-hidden="true">自由</span>
 
       <dl class="dos-form">
-        <div><dt>姓名 NAME</dt><dd>{AUTHOR}</dd></div>
-        <div><dt>坐标 SITE</dt><dd>ziyou814.top<small>EST. {SINCE}</small></dd></div>
-        <div class="wide"><dt>站训 MOTTO</dt><dd>在键盘上，<em>写下又一行注释</em>。</dd></div>
-        <div class="wide"><dt>导语 NOTE</dt><dd>不追热点，只记录真正想明白的事——技术笔记、学习心得，和代码解释不了的问题。</dd></div>
+        <div><dt>姓名</dt><dd>{AUTHOR}</dd></div>
+        <div><dt>坐标</dt><dd>ziyou814.top<small>自 {SINCE}</small></dd></div>
+        <div class="wide"><dt>站训</dt><dd>在键盘上，<em>写下又一行注释</em>。</dd></div>
+        <div class="wide"><dt>导语</dt><dd>不追热点，只记录真正想明白的事——技术笔记、学习心得，和代码解释不了的问题。</dd></div>
       </dl>
 
       <dl class="dos-metrics" aria-label="写作数据">
@@ -104,11 +104,11 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
 
     <!-- 技术栈 -->
     <section class="about-section" data-reveal>
-      <h2 class="sec-k"><b>TOOLBOX</b>趁手的工具 · FILE ENTRIES</h2>
+      <h2 class="sec-k">趁手的工具</h2>
       <div class="tech-grid">
         {techGroups.map((g) => (
           <div class="tech-group">
-            <h3>{g.name}<span>{g.en}</span></h3>
+            <h3>{g.name}</h3>
             <ul>
               {g.items.map((t) => (
                 <li><span class="tech-dot" style={`--tech-color:${t.color}`}></span>{t.name}</li>
@@ -122,7 +122,7 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
     <!-- 兴趣与联系 -->
     <div class="about-lower">
       <section class="about-section" data-reveal>
-        <h2 class="sec-k"><b>INTERESTS</b>平时在做</h2>
+        <h2 class="sec-k">平时在做</h2>
         <ol class="ledger">
           {hobbies.map((h, i) => (
             <li><span class="no">0{i + 1}</span>{h}</li>
@@ -131,11 +131,11 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
       </section>
 
       <section class="about-section" data-reveal>
-        <h2 class="sec-k"><b>CONTACT</b>找到我</h2>
+        <h2 class="sec-k">找到我</h2>
         <div class="contact">
           <span><span class="k">QQ</span><span class="v">1605726649</span></span>
-          <span><span class="k">WECHAT</span><span class="v">18239772567</span></span>
-          <a href={SOCIAL.github} target="_blank" rel="noopener"><span class="k">GITHUB</span><span class="v">github.com/bingking148 ↗</span></a>
+          <span><span class="k">微信</span><span class="v">18239772567</span></span>
+          <a href={SOCIAL.github} target="_blank" rel="noopener"><span class="k">代码</span><span class="v">github.com/bingking148 ↗</span></a>
         </div>
       </section>
     </div>

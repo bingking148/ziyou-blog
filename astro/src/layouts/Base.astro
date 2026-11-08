@@ -407,6 +407,17 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   body:not(.is-home):not(.is-post) #nav-toggle { border-color: var(--color-card-border); }
   body:not(.is-home):not(.is-post) #theme-toggle:hover,
   body:not(.is-home):not(.is-post) #nav-toggle:hover { background: var(--red-5); }
+  body.is-home .site-header { position: fixed; background: linear-gradient(180deg, rgba(8,16,26,.55), transparent 78%); }
+  body.is-home[data-scene="journal"] .site-header {
+    color: var(--color-text-strong);
+    background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+    backdrop-filter: blur(12px);
+  }
+  body.is-home[data-scene="journal"] :global(.nav-pill) { background: var(--red-5); border-color: transparent; }
+  body.is-home[data-scene="journal"] #theme-toggle,
+  body.is-home[data-scene="journal"] #nav-toggle { border-color: var(--color-card-border); color: var(--color-text-strong); }
+  body.is-home[data-scene="journal"] #theme-toggle:hover,
+  body.is-home[data-scene="journal"] #nav-toggle:hover { background: var(--red-5); }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }

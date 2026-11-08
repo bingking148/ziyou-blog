@@ -11,10 +11,10 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
 
 <Base title="搜索" description="站内搜索" noindex>
   <div class="ed-wrap ed-wrap--wide search-page">
-    <ChapterRule no="02" label="检索" en="CATALOG" value={`${posts.length} FILES INDEXED`} />
+    <ChapterRule no="02" label="检索" value={`${posts.length} 篇在目录里`} />
 
     <div class="catalog" data-reveal style="--i:1">
-      <span class="cat-tab">INDEX CARD / 目录卡</span>
+      <span class="cat-tab">目录卡</span>
       <div class="cat-card">
         <div class="search-field">
           <svg class="search-icon" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -27,7 +27,7 @@ const hotTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).ma
           />
         </div>
         <div class="cat-read">
-          <span class="cat-meta">INDEX {posts.length} FILES · CJK + FUZE</span>
+          <span class="cat-meta">目录 {posts.length} 篇</span>
           <p id="search-status" class="search-status" role="status" aria-live="polite">
             {posts.length} 篇文章在目录里 · 输入即搜；也可以 <a href="/archives/">浏览全部归档</a>
           </p>

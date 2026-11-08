@@ -71,9 +71,9 @@ const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(
   .archive-year-title i { flex: 1; height: 1px; background: var(--color-card-border); }
   .archive-year .ed-list { border-top: none; }
   .archive-year li { position: relative; }
-  .archive-preview { position: absolute; right: 18%; top: 50%; z-index: 5; display: block; width: 240px; aspect-ratio: 1.45; overflow: hidden; pointer-events: none; visibility: hidden; opacity: 0; background: var(--red-4); box-shadow: 0 24px 60px rgba(15,30,50,.28); transform: translateY(-42%) rotate(4deg) scale(.9); transition: opacity .35s, transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s .45s; }
-  .archive-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .ed-row:hover .archive-preview, .ed-row:focus-visible .archive-preview { visibility: visible; opacity: 1; transform: translateY(-50%) rotate(-3deg) scale(1); transition-delay: 0s; }
+  .archive-preview { position: relative; flex: 0 0 0; width: 0; height: 52px; overflow: hidden; pointer-events: none; visibility: hidden; opacity: 0; background: #1c3454; transition: flex-basis .35s ease, width .35s ease, opacity .35s ease, visibility 0s .35s; }
+  .archive-preview img { display: block; width: 84px; height: 52px; object-fit: cover; filter: grayscale(.55) saturate(.35); }
+  .ed-row:hover .archive-preview, .ed-row:focus-visible .archive-preview { flex-basis: 84px; width: 84px; visibility: visible; opacity: 1; transition-delay: 0s; }
   @media (min-width: 1440px) {
     .archive-year { margin-bottom: 104px; }
     .archive-year-title { margin-bottom: 30px; }

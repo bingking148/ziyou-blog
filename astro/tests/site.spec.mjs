@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 test('桌面首页无横向溢出，移动菜单键盘可用', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  await expect(page.locator('.scene-title')).toBeVisible();
+  await expect(page.locator('h1.scene-title')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: '打开导航菜单' }).click();
@@ -410,7 +410,7 @@ test('内页三装置：目录卡、档案卷宗与名片灯', async ({ page }) 
 
   // 关于 · 卷宗指标与索引对账（数量随内容增长仍然成立）
   await page.goto('/about/');
-  await expect(page.locator('.dos-tab')).toHaveText('FILE NO. 001 · OPEN');
+  await expect(page.locator('.dos-tab')).toHaveText('卷一 · 在写');
   await expect(page.locator('.dos-seal')).toHaveText('自由');
   const total = (await (await page.request.get('/search.json')).json()).length;
   const nums = await page.locator('.dos-metrics .metric dd').allTextContents();
