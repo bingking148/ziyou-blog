@@ -143,17 +143,17 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
 </Base>
 
 <style>
-  .about-page { --hard: #111; --band: #111; --band-text: #f4f1ea; --band-muted: rgba(244,241,234,.62); --band-line: rgba(225,6,0,.7); }
-  :global([data-theme="dark"]) .about-page { --hard: #e10600; --band: #e10600; --band-text: #111; --band-muted: rgba(17,17,17,.7); }
+  .about-page { --hard: #c41e3a; --band: var(--color-bg); --band-text: #111; --band-muted: #111; --band-line: #c41e3a; }
+  :global([data-theme="dark"]) .about-page { --hard: #c41e3a; --band: var(--color-surface); --band-text: #f4f1ea; --band-muted: #f4f1ea; --band-line: #c41e3a; }
 
   /* 卷宗卡 */
   .dossier {
     position: relative;
     margin-top: 46px;
     background: var(--color-surface);
-    border: 1px solid var(--color-card-border);
-    box-shadow: 13px 15px 0 var(--hard);
-    transform: rotate(-.35deg);
+    border: 2px solid var(--color-text-strong);
+    box-shadow: 12px 12px 0 var(--hard);
+    transform: none;
     padding: 34px 0 0;
   }
   .dos-tab {
