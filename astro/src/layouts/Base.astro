@@ -47,7 +47,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content={AUTHOR} />
-    <meta name="theme-color" content="#f7fafc" />
+    <meta name="theme-color" content="#0c1016" />
     {noindex && <meta name="robots" content="noindex,follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/index.xml" />
@@ -166,7 +166,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
         }
         function applyTheme(theme, save) {
           root.dataset.theme = theme;
-          if (themeMeta) themeMeta.setAttribute('content', theme === 'dark' ? '#14181f' : '#f7fafc');
+          if (themeMeta) themeMeta.setAttribute('content', theme === 'dark' ? '#07090d' : '#0c1016');
           if (themeBtn) {
             var label = theme === 'dark' ? '切换到浅色模式' : '切换到深色模式';
             themeBtn.setAttribute('aria-label', label);
@@ -334,11 +334,11 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .pointer-aura { display: none; }
   .site-header {
     position: sticky; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; gap: 24px; height: 72px;
-    padding: 0 clamp(24px, 4.5vw, 64px);
-    color: var(--color-text-strong);
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-card-border);
+    display: flex; align-items: center; gap: 24px; height: 64px;
+    padding: 0 clamp(20px, 4vw, 56px);
+    color: var(--slate-ink, #f4efe6);
+    background: var(--slate, #0c1016);
+    border-bottom: 2px solid #d4532c;
   }
   .site-brand {
     display: inline-flex; align-items: center; gap: 12px;
@@ -352,43 +352,40 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     position: relative; padding: 8px 16px; font-size: 13px; letter-spacing: .12em; color: inherit;
   }
   .main-nav-link-wrap:hover { color: inherit; }
-  .main-nav-link-wrap.is-active::after {
-    content: ''; position: absolute; left: 50%; bottom: 0; width: 3px; height: 3px;
-    border-radius: 50%; background: currentColor; transform: translateX(-50%); opacity: .75;
-  }
+  .main-nav-link-wrap.is-active::after { content: none; }
   :global(.nav-pill) {
-    position: absolute; z-index: -1; top: 2px; left: 0; height: calc(100% - 4px);
-    border-radius: 2px; background: var(--color-surface-muted); border: 1px solid transparent;
+    position: absolute; z-index: 1; bottom: 0; left: 0; height: 2px; min-width: 8px;
+    border-radius: 0; background: #d4532c; border: 0;
     opacity: 0; pointer-events: none;
-    transition: transform .35s ease, width .35s ease, opacity .3s;
+    transition: transform .45s var(--ease-shot, ease), width .45s var(--ease-shot, ease), opacity .3s;
   }
   :global(.nav-pill.is-ready) { opacity: 1; }
   .header-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; }
   #theme-toggle, #nav-toggle {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
-    border: 1px solid var(--color-card-border); border-radius: 50%; background: transparent;
-    color: inherit; cursor: pointer; transition: transform .25s, background .25s;
+    border: 1px solid rgba(244,239,230,.35); border-radius: 50%; background: transparent;
+    color: inherit; cursor: pointer; transition: background .25s;
   }
-  #theme-toggle:hover, #nav-toggle:hover { background: var(--color-surface-muted); }
+  #theme-toggle:hover, #nav-toggle:hover { background: rgba(244,239,230,.08); }
   #nav-toggle { display: none; }
   .icon-moon { display: none; }
   [data-theme="dark"] .icon-sun { display: none; }
   [data-theme="dark"] .icon-moon { display: block; }
   .mobile-menu {
     position: fixed; inset: 0; z-index: 95;
-    padding: 96px 24px 40px;
-    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
-    backdrop-filter: blur(18px);
+    padding: 88px 22px 40px;
+    background: var(--slate, #0c1016);
   }
-  .mobile-menu nav { display: grid; gap: 8px; }
+  .mobile-menu nav { display: grid; gap: 0; }
   .mobile-menu a {
     display: flex; align-items: center; min-height: 52px;
-    padding: 0 18px; border-radius: 12px;
-    color: var(--color-text-strong); font-size: 17px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-card-border);
+    padding: 0 4px;
+    color: var(--slate-ink, #f4efe6); font-family: var(--font-serif); font-size: 22px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(244,239,230,.16);
   }
-  .mobile-menu a[aria-current="page"] { border-color: var(--red-2); }
+  .mobile-menu a[aria-current="page"] { color: #d4532c; }
   .site-main { min-height: 75vh; }
   .site-footer { padding: 28px clamp(24px,5vw,76px); border-top: 1px solid var(--color-card-border); }
   .footer-inner { display: flex; align-items: center; gap: 22px; font-size: 12px; color: var(--color-text-muted); }
@@ -400,10 +397,10 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   body.is-home .site-header,
   body.is-post .site-header,
   body:not(.is-home):not(.is-post) .site-header {
-    position: sticky; height: 72px; color: var(--color-text-strong); background: var(--color-bg);
+    position: sticky; height: 64px; color: var(--slate-ink, #f4efe6); background: var(--slate, #0c1016);
   }
   @media (max-width: 900px) {
-    .site-header { height: 76px; gap: 12px; }
+    .site-header { height: 64px; gap: 12px; }
     #main-nav { display: none; }
     .header-actions { margin-left: auto; }
     #nav-toggle { display: grid; }

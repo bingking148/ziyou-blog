@@ -14,19 +14,22 @@
   --color-red-6-shadow: rgba(42, 36, 32, 0.35);
   --color-red-3-shadow: rgba(42, 36, 32, 0.16);
 
-  /* 语义色：正文不随氛围旋钮漂移。纸色与松烟是站点本色。 */
-  --color-bg: #f4f1ea;
-  --color-surface: #fbf8f3;
-  --color-surface-muted: #efeae2;
-  --color-text: #3a342c;
-  --color-text-strong: #1a1612;
-  --color-text-muted: #6b6258;
-  --color-text-faint: #8a8076;
-  --color-link: #1a1612;
-  --color-link-hover: #8f2d2d;
-  --color-focus: #8f2d2d;
-  --color-card-border: rgba(26, 22, 18, 0.14);
-  --color-accent: #8f2d2d;
+  /* 场记：夜戏顶栏用 --slate，内页是暖场记纸。印章红只标「这一条」。 */
+  --slate: #0c1016;
+  --slate-ink: #f4efe6;
+  --ease-shot: cubic-bezier(.16, .84, .24, 1);
+  --color-bg: #e6dece;
+  --color-surface: #f3ecdf;
+  --color-surface-muted: #ddd4c4;
+  --color-text: #3a332c;
+  --color-text-strong: #14110e;
+  --color-text-muted: #5e564c;
+  --color-text-faint: #7d7368;
+  --color-link: #14110e;
+  --color-link-hover: #d4532c;
+  --color-focus: #d4532c;
+  --color-card-border: rgba(20, 17, 14, 0.16);
+  --color-accent: #d4532c;
   --shadow-soft: none;
   --shadow-lift: none;
 

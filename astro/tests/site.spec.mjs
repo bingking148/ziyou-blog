@@ -30,7 +30,7 @@ test('跳正文、明暗主题与无 JS 内容回退', async ({ page }) => {
   // nav-pill 装饰层在动画中会拦截 pointer；用键盘激活按钮，避免测试依赖动画帧。
   await page.getByRole('button', { name: '切换到深色模式' }).press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#14181f');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#07090d');
 });
 
 test('禁用 JavaScript 时正文与导航仍可见', async ({ browser }) => {

@@ -782,24 +782,25 @@ const fmt = (d: Date) =>
     .post-cover, .post-kicker, .post-title, .post-description, .post-meta { animation: none; }
   }
 
-  /* 文章开篇是纸页，不再用照片当底。后写的规则压过旧的全屏暗色封面。 */
+  /* 文章开篇是一场字幕卡：夜底、文楷标题、右侧片门。 */
   .post-hero {
     position: relative; height: auto !important; min-height: 0 !important; overflow: visible;
     display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, 220px);
-    gap: clamp(28px, 4vw, 64px); align-items: end;
-    max-width: 1080px; margin: 0 auto;
-    padding: 56px clamp(24px, 5vw, 72px) 28px;
-    color: var(--color-text); background: transparent;
+    gap: clamp(28px, 4vw, 72px); align-items: end;
+    max-width: none; margin: 0;
+    padding: 48px clamp(24px, 6vw, 88px) 40px;
+    color: #f4efe6; background: #0c1016;
   }
-  .post-hero-content { position: static !important; left: auto !important; right: auto !important; bottom: auto !important; width: auto !important; }
-  .post-kicker, .post-column-badge, .post-description, .post-meta { color: var(--color-text-muted) !important; text-shadow: none; }
-  .post-kicker i { background: var(--color-accent) !important; }
-  .post-title { color: var(--color-text-strong) !important; text-shadow: none !important; max-width: 16em; animation: none; }
-  .post-column-badge:hover { color: var(--color-accent) !important; }
-  .post-hero-plate :global(.ink-plate-svg) { width: 100%; aspect-ratio: 1; border: 1px solid var(--color-card-border); }
+  .post-hero-content { position: static !important; left: auto !important; right: auto !important; bottom: auto !important; width: auto !important; max-width: 920px; }
+  .post-kicker, .post-column-badge, .post-description, .post-meta { color: rgba(244,239,230,.72) !important; text-shadow: none; }
+  .post-kicker i { background: #d4532c !important; }
+  .post-title { color: #f7f1e8 !important; text-shadow: none !important; max-width: 14em; animation: none; font-size: clamp(36px, 4.6vw, 68px) !important; }
+  .post-column-badge:hover { color: #f7f1e8 !important; }
+  .post-hero-plate { background: #07090d; padding: 10px 12px 12px; border-left: 3px solid #d4532c; --plate-paper: #141820; --color-text-strong: #f4efe6; --color-card-border: rgba(244,239,230,.28); }
+  .post-hero-plate :global(.ink-plate-svg) { width: 100%; aspect-ratio: 1; }
   @media (max-width: 760px) {
-    .post-hero { grid-template-columns: 1fr !important; padding: 28px 22px 12px; height: auto !important; min-height: 0 !important; }
-    .post-hero-plate { max-width: 148px; }
-    .post-title { font-size: clamp(28px, 8vw, 36px) !important; }
+    .post-hero { grid-template-columns: 1fr !important; padding: 28px 22px 24px; height: auto !important; min-height: 0 !important; }
+    .post-hero-plate { max-width: 160px; }
+    .post-title { font-size: clamp(30px, 8vw, 40px) !important; }
   }
 </style>
