@@ -1,0 +1,123 @@
+---
+/**
+ * UDL 小节渲染：配对块流
+ * - body/note：桌面左英右中同高对照；移动端英文在上中文在下
+ * - figure/equation：跨全栏渲染一次（图注中英合并显示）
+ */
+interface Props {
+  pairs: any[];
+  dropcap?: boolean; // 本节第一个中文 body 段应用首字下沉
+}
+const { pairs, dropcap = false } = Astro.props;
+
+let zhBodySeen = false;
+const rows = pairs.map((p) => {
+  const row = { ...p };
+  if (p.kind === 'body' && p.zh && !zhBodySeen) {
+    zhBodySeen = true;
+    row.drop = dropcap;
+  }
+  return row;
+});
+
+const FUSE = ['figure', 'equation', 'eqimg'];
+---
+
+{rows.map((p) => {
+  if (FUSE.includes(p.kind)) {
+    const b = p.en ?? p.zh;
+    if (p.kind === 'figure') {
+      return (
+        <figure class="udl-fig">
+          <img src={b.img} alt={(p.zh?.text ?? p.en?.text ?? '').slice(0, 80)} loading="lazy" />
+          {(p.zh?.text || p.en?.text) && (
+            <figcaption>
+              {p.zh?.text && <span class="cap-zh">{p.zh.text}</span>}
+              {p.en?.text && <span class="cap-en">{p.en.text}</span>}
+            </figcaption>
+          )}
+        </figure>
+      );
+    }
+    // 公式：优先 KaTeX 内联渲染，无法解析时回退到原书裁图
+    const tex = ((p.en?.latex || p.zh?.latex || '') as string).trim();
+    const img = (p.en?.img || p.zh?.img) as string | undefined;
+    if (tex) return <div class="udl-eq" data-tex={tex} />;
+    if (img) return <div class="udl-eqimg"><img src={img} alt="公式" loading="lazy" /></div>;
+    return null;
+  }
+  // body / note：两栏对照（正文里嵌有 <span class="imath"> 行内数学）
+  return (
+    <div class="udl-row" data-kind={p.kind}>
+      <div class="cell cell-en">
+        {p.en && (p.kind === 'note'
+          ? <aside class="udl-note" set:html={p.en.text} />
+          : <p class="udl-p udl-en" set:html={p.en.text} />)}
+      </div>
+      <div class="cell cell-zh">
+        {p.zh && (p.kind === 'note'
+          ? <aside class="udl-note" set:html={p.zh.text} />
+          : <p class:list={['udl-p', 'udl-zh', { 'udl-drop': p.drop }]} set:html={p.zh.text} />)}
+      </div>
+    </div>
+  );
+})}
+
+<style>
+  .udl-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 46px; align-items: start; }
+  .cell { min-width: 0; }
+  .udl-p { margin: 0 0 16px; text-align: justify; }
+  .udl-p.udl-en { font-size: 13px; line-height: 1.85; color: #6f6a5c; }
+  .udl-p.udl-zh { font-size: 15px; line-height: 2; text-indent: 2em; }
+  /* 行内数学：数学斜体 + 上下标 */
+  .udl-p :global(.imath), .udl-note :global(.imath) {
+    font-family: 'Latin Modern Math', 'Cambria Math', Georgia, serif;
+    font-style: italic;
+  }
+  .udl-p :global(.imath sub), .udl-p :global(.imath sup),
+  .udl-note :global(.imath sub), .udl-note :global(.imath sup) {
+    font-size: .72em; font-style: normal;
+  }
+  .udl-p.udl-drop::first-letter {
+    float: left; font-size: 2.9em; line-height: .95; padding: 4px 8px 0 0;
+    color: #7a4a2a; font-weight: 700;
+  }
+  :global([data-theme="dark"]) .udl-p.udl-en { color: #b3ac9a; }
+  :global([data-theme="dark"]) .udl-p.udl-drop::first-letter { color: #d9a077; }
+  .udl-note {
+    font-size: 11.5px; color: #9a9182; line-height: 1.8;
+    border-top: 1px solid #e4ddd0; padding-top: 8px; margin: 14px 0 16px;
+  }
+  :global([data-theme="dark"]) .udl-note { color: #948b7a; border-color: #363b44; }
+  .udl-fig { margin: 18px 0 22px; text-align: center; }
+  .udl-fig img {
+    max-width: 100%; border: 1px solid #a89f88; background: #f4f0e6;
+    padding: 6px; border-radius: 2px;
+  }
+  :global([data-theme="dark"]) .udl-fig img { border-color: #3a3f49; background: #10131a; }
+  .udl-fig figcaption { margin-top: 9px; line-height: 1.75; }
+  .cap-zh { display: block; font-size: 11.5px; color: #9a9182; font-style: italic; }
+  .cap-en { display: block; font-size: 11px; color: #b3aa97; font-style: italic; margin-top: 4px; }
+  :global([data-theme="dark"]) .udl-fig figcaption { color: #948b7a; }
+  :global([data-theme="dark"]) .cap-en { color: #7d7666; }
+  .udl-eq { text-align: center; margin: 16px 0 20px; overflow-x: auto; }
+  .udl-eq.katex-fallback::before { content: attr(data-tex); font-family: Georgia, serif; font-style: italic; }
+  .udl-eqimg { text-align: center; margin: 14px 0 18px; }
+  .udl-eqimg img {
+    max-width: 100%; height: auto;
+    /* 白底图融入米色纸面：multiply 让白色变透明效果 */
+    mix-blend-mode: multiply;
+  }
+  :global([data-theme="dark"]) .udl-eqimg img {
+    mix-blend-mode: screen;
+    filter: invert(1) hue-rotate(180deg);
+  }
+  @media (max-width: 960px) {
+    .udl-row { grid-template-columns: 1fr; column-gap: 0; }
+    .cell-en { border-bottom: 1px dashed #e4ddd0; padding-bottom: 10px; margin-bottom: 12px; }
+    :global([data-theme="dark"]) .cell-en { border-color: #2c3038; }
+    .udl-p.udl-en { font-size: 12.5px; }
+    .udl-p.udl-zh { font-size: 14.5px; line-height: 1.95; }
+    .udl-p.udl-drop::first-letter { font-size: 2.3em; }
+  }
+</style>

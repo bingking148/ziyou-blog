@@ -11,3 +11,13 @@ nul
 
 # ZCode 本地会话目录
 .zcode/
+
+# UDL 转换中间产物与 QA 截图（不入库）
+tools/udl2web/qa/
+tools/udl2web/out_*/
+tools/udl2web/out_dbg/
+tools/udl2web/tex_cache.json
+
+# Python 缓存
+__pycache__/
+*.pyc

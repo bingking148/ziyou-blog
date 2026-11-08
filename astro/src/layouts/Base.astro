@@ -311,13 +311,13 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           var a = e.target.closest && e.target.closest('a[href^="/"]');
           if (!a) return;
           var href = a.getAttribute('href');
-          if (/^\/(post|archives|columns|categories|about|friend)\//.test(href)) prefetch(href);
+          if (/^\/(post|archives|columns|categories|about|friend|learning)\//.test(href)) prefetch(href);
         }, { passive: true });
         document.addEventListener('focusin', function (e) {
           var a = e.target.closest && e.target.closest('a[href^="/"]');
           if (!a) return;
           var href = a.getAttribute('href');
-          if (/^\/(post|archives|columns|categories|about|friend)\//.test(href)) prefetch(href);
+          if (/^\/(post|archives|columns|categories|about|friend|learning)\//.test(href)) prefetch(href);
         });
       })();
     </script>

@@ -1,0 +1,246 @@
+---
+import Base from '../../../layouts/Base.astro';
+import UdlSection from '../../../components/UdlSection.astro';
+import { UDL_CHAPTERS, UDL_META } from '../../../data/udl/index.ts';
+import { buildSections, firstProseIndex } from '../../../utils/udl.ts';
+
+export function getStaticPaths() {
+  return UDL_CHAPTERS.map((ch) => ({ params: { chapter: ch.id } }));
+}
+
+const { chapter } = Astro.params;
+const ch = UDL_CHAPTERS.find((c) => c.id === chapter)!;
+const sections = buildSections(ch);
+const proseIdx = firstProseIndex(sections);
+const toc = sections.filter((s) => s.zhTitle && s.level >= 2);
+const title = `《${UDL_META.bookZh}》第 ${ch.num} 章 ${ch.zhTitle}`;
+---
+
+<Base title={title} description={`${UDL_META.bookEn} — ${ch.enTitle}. 中英对照学习笔记`} pageClass="is-learning">
+  <link slot="head" rel="stylesheet" href="/resources/katex/katex.min.css" />
+  <script slot="head" is:inline src="/resources/katex/katex.min.js" defer></script>
+
+  <div class="reader" data-mode="both">
+    <div class="reader-top">
+      <div class="reader-crumb">
+        <a href="/learning/">学习资料</a>
+        <span aria-hidden="true">/</span>
+        <a href="/learning/">{UDL_META.bookZh}</a>
+        <span aria-hidden="true">/</span>
+        <span>第 {ch.num} 章 · {ch.zhTitle}</span>
+      </div>
+      <div class="reader-modes" role="group" aria-label="显示语言">
+        <button type="button" data-set="both" class="on" aria-pressed="true">双语</button>
+        <button type="button" data-set="zh" aria-pressed="false">中文</button>
+        <button type="button" data-set="en" aria-pressed="false">English</button>
+      </div>
+    </div>
+
+    <div class="reader-frame">
+      <aside class="reader-toc" aria-label="本章目录">
+        <h3>本章目录</h3>
+        <nav>
+          {toc.map((s) => (
+            <a class:list={[{ sub: s.level === 3 }]} href={`#${s.id}`}>{s.zhTitle}</a>
+          ))}
+        </nav>
+        <h3>全部章节</h3>
+        <nav>
+          {UDL_CHAPTERS.map((c) => (
+            <a class:list={[{ on: c.id === ch.id }]} href={`/learning/udl/${c.id}/`}>第 {c.num} 章 · {c.zhTitle}</a>
+          ))}
+        </nav>
+        <p class="reader-src">原著：{UDL_META.author} · {UDL_META.source}<br />{UDL_META.license}</p>
+      </aside>
+
+      <div class="reader-body">
+        <header class="reader-hero">
+          <span class="k">学 习 资 料 · 中 英 对 照</span>
+          <h1>第 {ch.num} 章 · {ch.zhTitle}</h1>
+          <p class="sub">{UDL_META.bookEn} — {ch.enTitle}</p>
+        </header>
+
+        {sections.map((s, i) => (
+          <section class="biloc" id={s.id}>
+            {(s.zhTitle || s.enTitle) && (
+              <div class="biloc-head">
+                <div class="h-zh">{s.zhTitle}</div>
+                <div class="h-en">{s.enTitle}</div>
+              </div>
+            )}
+            <UdlSection pairs={s.pairs} dropcap={i === proseIdx} />
+          </section>
+        ))}
+
+        <footer class="reader-foot">
+          <span>— 本章完 · <a href="/learning/">返回目录</a> —</span>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .reader {
+      --paper: #faf7f0;
+      --paper-deep: #f4f0e6;
+      --ink: #2c2a26;
+      --ink-soft: #6f6a5c;
+      --ink-faint: #9a9182;
+      --line: #e4ddd0;
+      --accent: #7a4a2a;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 60vh;
+    }
+    :global([data-theme="dark"]) .reader {
+      --paper: #171a1f;
+      --paper-deep: #1f242c;
+      --ink: #ddd8cc;
+      --ink-soft: #b3ac9a;
+      --ink-faint: #948b7a;
+      --line: #363b44;
+      --accent: #d9a077;
+    }
+    .reader-top {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      padding: 16px clamp(20px, 4vw, 64px);
+      max-width: 1440px; margin: 0 auto;
+      font-family: var(--font-serif);
+    }
+    .reader-crumb { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-faint); }
+    .reader-crumb a { color: var(--ink-soft); }
+    .reader-crumb a:hover { color: var(--accent); }
+    .reader-modes { margin-left: auto; display: flex; background: var(--paper-deep); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+    .reader-modes button {
+      border: 0; background: transparent; cursor: pointer;
+      font-family: inherit; font-size: 12px; padding: 5px 16px; border-radius: 999px; color: var(--ink-soft);
+    }
+    .reader-modes button.on { background: var(--paper); color: var(--ink); font-weight: 700; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
+    .reader-frame { display: grid; grid-template-columns: 230px minmax(0, 1fr); max-width: 1440px; margin: 0 auto; width: 100%; }
+    .reader-toc {
+      border-right: 1px solid var(--line); padding: 34px 18px 40px;
+      font-size: 13px; position: sticky; top: 0; align-self: start; max-height: 100vh; overflow: auto;
+      font-family: var(--font-serif); width: 230px; box-sizing: border-box;
+    }
+    .reader-toc h3 { font-size: 11px; letter-spacing: .3em; color: var(--ink-faint); margin: 18px 0 10px; font-weight: 400; }
+    .reader-toc h3:first-child { margin-top: 0; }
+    .reader-toc a {
+      display: block; padding: 6px 12px; border-radius: 6px; color: var(--ink-soft); line-height: 1.5;
+    }
+    .reader-toc a:hover { background: var(--paper-deep); color: var(--ink); }
+    .reader-toc a.sub { padding-left: 26px; font-size: 12.5px; color: var(--ink-faint); }
+    .reader-toc a.on { background: var(--paper-deep); color: var(--accent); font-weight: 700; }
+    .reader-src { margin-top: 26px; font-size: 11px; line-height: 1.8; color: var(--ink-faint); }
+    .reader-body { padding: 8px clamp(20px, 4vw, 64px) 90px; font-family: var(--font-serif); }
+    .reader-hero { text-align: center; border-bottom: 2px solid var(--ink); padding: 26px 0 20px; margin-bottom: 14px; }
+    .reader-hero .k { font-size: 11px; letter-spacing: .35em; color: var(--ink-faint); }
+    .reader-hero h1 { font-size: clamp(22px, 3vw, 30px); margin: 10px 0 4px; font-weight: 700; letter-spacing: .08em; }
+    .reader-hero .sub { font-size: 13px; color: var(--ink-faint); font-style: italic; }
+    /* —— 每个小节：英 | 花饰 | 中 —— */
+    .biloc { padding: 8px 0 14px; }
+    .biloc + .biloc { border-top: 1px dashed var(--line); }
+    .biloc-head { grid-column: 1 / -1; text-align: center; margin: 18px 0 18px; }
+    .biloc-head .h-zh { font-size: 15px; letter-spacing: .25em; color: var(--accent); font-weight: 700; }
+    .biloc-head .h-en { font-size: 12px; letter-spacing: .18em; color: var(--ink-faint); font-style: italic; margin-top: 3px; }
+    .reader-foot { text-align: center; margin-top: 44px; font-size: 12.5px; color: var(--ink-faint); border-top: 1px solid var(--line); padding-top: 22px; }
+    .reader-foot a { color: var(--accent); }
+    /* —— 语言模式：隐藏对应侧的对照格 —— */
+    .reader[data-mode="zh"] :global(.cell-en) { display: none; }
+    .reader[data-mode="zh"] :global(.udl-row) { grid-template-columns: 1fr; }
+    .reader[data-mode="en"] :global(.cell-zh) { display: none; }
+    .reader[data-mode="en"] :global(.udl-row) { grid-template-columns: 1fr; }
+    .reader[data-mode="zh"] :global(.cap-en) { display: none; }
+    .reader[data-mode="en"] :global(.cap-zh) { display: none; }
+    @media (max-width: 960px) {
+      .reader-frame { grid-template-columns: 1fr; }
+      .reader-toc { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+    }
+    @media (max-width: 600px) {
+      .reader-body { padding: 26px 16px 60px; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      var root = document.querySelector('.reader');
+      if (!root) return;
+      var KEY = 'udl-mode';
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (e) {}
+      if (saved === 'both' || saved === 'zh' || saved === 'en') setMode(saved);
+      function setMode(m) {
+        root.dataset.mode = m;
+        root.querySelectorAll('.reader-modes button').forEach(function (b) {
+          var on = b.dataset.set === m;
+          b.classList.toggle('on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        try { localStorage.setItem(KEY, m); } catch (e) {}
+      }
+      root.querySelectorAll('.reader-modes button').forEach(function (b) {
+        b.addEventListener('click', function () { setMode(b.dataset.set); });
+      });
+
+      // KaTeX 渲染
+      function renderEq() {
+        if (!window.katex) return false;
+        root.querySelectorAll('.udl-eq').forEach(function (el) {
+          var tex = el.getAttribute('data-tex');
+          if (!tex || el.dataset.done) return;
+          el.dataset.done = '1';
+          try { window.katex.render(tex, el, { displayMode: true, throwOnError: true }); }
+          catch (e) { el.classList.add('katex-fallback'); }
+        });
+        renderInline();
+        return true;
+      }
+
+      // 行内公式：把正文里的 $...$ 解析成 KaTeX
+      function renderInline() {
+        if (!window.katex) return;
+        root.querySelectorAll('[data-textext]').forEach(function (el) {
+          if (el.dataset.texdone) return;
+          var txt = el.textContent || '';
+          if (txt.indexOf('$') < 0) { el.dataset.texdone = '1'; return; }
+          el.dataset.texdone = '1';
+          var parts = txt.split(/(\$[^$]+\$)/g);
+          if (parts.length < 2) return;
+          var frag = document.createDocumentFragment();
+          parts.forEach(function (seg) {
+            if (seg.length > 2 && seg.charAt(0) === '$' && seg.charAt(seg.length - 1) === '$') {
+              var span = document.createElement('span');
+              try {
+                window.katex.render(seg.slice(1, -1), span, { displayMode: false, throwOnError: true });
+                frag.appendChild(span);
+              } catch (e) {
+                frag.appendChild(document.createTextNode(seg.slice(1, -1)));
+              }
+            } else if (seg) {
+              frag.appendChild(document.createTextNode(seg));
+            }
+          });
+          el.textContent = '';
+          el.appendChild(frag);
+        });
+      }
+      if (!renderEq()) document.addEventListener('DOMContentLoaded', function () { if (!renderEq()) { var t = setInterval(function () { if (renderEq()) clearInterval(t); }, 300); setTimeout(function () { clearInterval(t); }, 5000); } });
+
+      // 目录滚动高亮
+      var links = Array.prototype.slice.call(root.querySelectorAll('.reader-toc nav a[href^="#"]'));
+      var byId = {};
+      links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              links.forEach(function (a) { a.classList.remove('on'); });
+              var a = byId[en.target.id];
+              if (a) { a.classList.add('on'); a.scrollIntoView({ block: 'nearest' }); }
+            }
+          });
+        }, { rootMargin: '-20% 0px -65% 0px' });
+        root.querySelectorAll('.biloc').forEach(function (s) { io.observe(s); });
+      }
+    })();
+  </script>
+</Base>

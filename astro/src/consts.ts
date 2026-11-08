@@ -9,6 +9,7 @@ export const MENU = [
   { name: '归档', url: '/archives/' },
   { name: '搜索', url: '/search/' },
   { name: '专栏', url: '/columns/' },
+  { name: '学习资料', url: '/learning/' },
   { name: '关于', url: '/about/' },
   { name: '友链', url: '/friend/' },
 ] as const;
