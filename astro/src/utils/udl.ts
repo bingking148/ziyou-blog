@@ -21,11 +21,24 @@ export interface ReaderSection {
 
 function flatten(blocks: any[]): any[] {
   const out: any[] = [];
-  for (const b of blocks) {
-    const prev = out[out.length - 1];
-    if (b.cont && prev && prev.type === 'body' && b.type === 'body') {
-      prev.text = (prev.text ?? '').replace(/\s+$/, '') + ' ' + (b.text ?? '').replace(/^\s+/, '');
-      continue;
+  for (const raw of blocks) {
+    // 浅拷贝：后面的拼接会改 text。JSON 模块在 dev 里是单例，原地改会一次请求叠一层。
+    const b = { ...raw };
+    // cont 表示这一段接着上一页的正文。中间若插了图或公式，仍并回最近的正文，
+    // 避免同一句在图前、图后各出现一次。
+    if (b.cont && b.type === 'body') {
+      let prev: any = null;
+      for (let i = out.length - 1; i >= 0; i--) {
+        if (out[i].type === 'h1' || out[i].type === 'h2' || out[i].type === 'h3') break;
+        if (out[i].type === 'body') { prev = out[i]; break; }
+      }
+      if (prev) {
+        const left = plain(prev.text || '');
+        const right = plain(b.text || '');
+        const gap = /[\u4e00-\u9fff]$/.test(left) || /^[\u4e00-\u9fff]/.test(right) ? '' : ' ';
+        prev.text = (prev.text ?? '').replace(/\s+$/, '') + gap + (b.text ?? '').replace(/^\s+/, '');
+        continue;
+      }
     }
     out.push(b);
   }

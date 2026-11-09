@@ -152,6 +152,30 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
       </div>
     </footer>
     <script async src="/resources/busuanzi/bsz.pure.mini.js"></script>
+    <script>
+      // 不蒜子在 localhost / 异常域名上会回一个共享的超大计数。只展示像样的整数。
+      (function () {
+        var ids = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
+        function sane(el) {
+          if (!el) return;
+          var raw = (el.textContent || '').replace(/[,\s]/g, '');
+          var n = Number(raw);
+          var host = location.hostname;
+          var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host.endsWith('.local');
+          var box = el.parentElement;
+          if (!raw || local || !Number.isFinite(n) || n < 0 || n > 1000000) {
+            if (box) box.style.display = 'none';
+            return;
+          }
+          el.textContent = n.toLocaleString('zh-CN');
+        }
+        var obs = new MutationObserver(function () { ids.forEach(function (id) { sane(document.getElementById(id)); }); });
+        ids.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) obs.observe(el, { childList: true, characterData: true, subtree: true });
+        });
+      })();
+    </script>
     <BackToTop />
 
     <script>
