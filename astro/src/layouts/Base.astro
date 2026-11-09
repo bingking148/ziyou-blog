@@ -89,7 +89,14 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   <body class={pageClass}>
     <a class="skip-link" href="#main">跳到正文</a>
     <div class="site-bg" aria-hidden="true"></div>
-    <div class="pointer-aura" aria-hidden="true"></div>
+    <div class="edge-marks" aria-hidden="true">
+      <i class="em-ticks"></i>
+      <i class="em-ticks em-r"></i>
+      <i class="em-chip"></i>
+      <i class="em-dash"></i>
+      <i class="em-corner"></i>
+    </div>
+    {pageClass.split(/\s+/).includes('is-home') && <div class="pointer-aura" aria-hidden="true"></div>}
 
     <header class="site-header">
       <a class="site-brand" href="/" aria-label={`${SITE_TITLE} 首页`}>
@@ -133,22 +140,49 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     <main id="main" class="site-main" tabindex="-1"><slot /></main>
 
     <footer class="site-footer">
-      <div class="footer-inner">
-        <span>© {SINCE}—{new Date().getFullYear()} {AUTHOR}</span>
-        <nav class="footer-links" aria-label="站点导航">
-          <a href="/categories/">分类</a>
-          <a href="/tags/">标签</a>
-          <a href="/index.xml">RSS</a>
-          <a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
-        </nav>
-        <span class="footer-note">保持好奇，持续书写。</span>
-        <span class="footer-stats">
-          <span id="busuanzi_container_site_pv" style="display:none">访问 <span id="busuanzi_value_site_pv"></span></span>
-          <span id="busuanzi_container_site_uv" style="display:none">访客 <span id="busuanzi_value_site_uv"></span></span>
-        </span>
+      <p class="footer-mark" aria-hidden="true">ZIYOU</p>
+      <div class="footer-bar">
+        <div class="footer-inner">
+          <span>© {SINCE}—{new Date().getFullYear()} {AUTHOR}</span>
+          <nav class="footer-links" aria-label="站点导航">
+            <a href="/categories/">分类</a>
+            <a href="/tags/">标签</a>
+            <a href="/index.xml">RSS</a>
+            <a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
+          </nav>
+          <span class="footer-note">保持好奇，持续书写。</span>
+          <span class="footer-stats">
+            <span id="busuanzi_container_site_pv" style="display:none">访问 <span id="busuanzi_value_site_pv"></span></span>
+            <span id="busuanzi_container_site_uv" style="display:none">访客 <span id="busuanzi_value_site_uv"></span></span>
+          </span>
+        </div>
       </div>
     </footer>
     <script async src="/resources/busuanzi/bsz.pure.mini.js"></script>
+    <script>
+      // 不蒜子在 localhost / 异常域名上会回一个共享的超大计数。只展示像样的整数。
+      (function () {
+        var ids = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
+        function sane(el) {
+          if (!el) return;
+          var raw = (el.textContent || '').replace(/[,\s]/g, '');
+          var n = Number(raw);
+          var host = location.hostname;
+          var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host.endsWith('.local');
+          var box = el.parentElement;
+          if (!raw || local || !Number.isFinite(n) || n < 0 || n > 1000000) {
+            if (box) box.style.display = 'none';
+            return;
+          }
+          el.textContent = n.toLocaleString('zh-CN');
+        }
+        var obs = new MutationObserver(function () { ids.forEach(function (id) { sane(document.getElementById(id)); }); });
+        ids.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) obs.observe(el, { childList: true, characterData: true, subtree: true });
+        });
+      })();
+    </script>
     <BackToTop />
 
     <script>
@@ -277,15 +311,63 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
             els.forEach(function (el) { io.observe(el); });
           }
         }
-        if (window.matchMedia('(hover: none), (prefers-reduced-motion: reduce)').matches) return;
-        var aura = document.querySelector('.pointer-aura'), frame = null;
-        document.addEventListener('pointermove', function (e) {
-          if (frame) return;
-          frame = requestAnimationFrame(function () {
-            frame = null;
-            aura.style.transform = 'translate3d(' + (e.clientX - 300) + 'px,' + (e.clientY - 300) + 'px,0)';
-          });
-        }, { passive: true });
+        if (!document.body.classList.contains('is-home')) return;
+        if (window.matchMedia('(hover: none), (pointer: coarse), (prefers-reduced-motion: reduce)').matches) return;
+        var aura = document.querySelector('.pointer-aura');
+        if (!aura) return;
+        var R = 22, x = 0, y = 0, tx = 0, ty = 0, scale = 1, ts = 1, running = false, primed = false, inside = false;
+        var jellyT0 = 0, jellyAng = 0;
+        var hotSel = 'a, button, h1, h2, .scene-title, .s2-title, .focus-card, .book-plate, .series-visual';
+        function show(e) {
+          if (e.pointerType && e.pointerType !== 'mouse') return;
+          inside = true;
+          tx = e.clientX; ty = e.clientY;
+          if (!primed) { x = tx; y = ty; primed = true; }
+          aura.classList.add('is-on');
+          wake();
+        }
+        function jellyDeform() {
+          if (!jellyT0) return 0;
+          var t = (performance.now() - jellyT0) / 1000;
+          if (t >= 0.55) { jellyT0 = 0; return 0; }
+          return Math.exp(-5.3 * t) * Math.sin((Math.PI * 2 / 0.36) * t) * 0.209;
+        }
+        function tick() {
+          var dx = tx - x, dy = ty - y, ds = ts - scale;
+          x += dx * 0.16;
+          y += dy * 0.16;
+          scale += ds * 0.14;
+          var d = jellyDeform();
+          var base = 'translate3d(' + (x - R) + 'px,' + (y - R) + 'px,0) scale(' + scale.toFixed(3) + ')';
+          if (!jellyT0) {
+            aura.style.transform = base;
+          } else {
+            var along = 1 + d;
+            aura.style.transform = base + ' rotate(' + jellyAng.toFixed(1) + 'deg) scale(' + along.toFixed(3) + ',' + (1 / along).toFixed(3) + ') rotate(' + (-jellyAng).toFixed(1) + 'deg)';
+          }
+          if (!inside && !jellyT0 && Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25 && Math.abs(ds) < 0.004) { running = false; return; }
+          requestAnimationFrame(tick);
+        }
+        function wake() { if (!running) { running = true; requestAnimationFrame(tick); } }
+        document.addEventListener('pointermove', show, { passive: true });
+        document.addEventListener('pointerdown', function (e) {
+          show(e);
+          if (e.button !== 0) return;
+          if (e.pointerType && e.pointerType !== 'mouse') return;
+          jellyAng = Math.random() * 180;
+          jellyT0 = performance.now();
+          wake();
+        });
+        document.addEventListener('pointerover', function (e) {
+          var t = e.target && e.target.closest && e.target.closest(hotSel);
+          ts = t ? 1.35 : 1;
+          wake();
+        });
+        document.addEventListener('pointerout', function (e) {
+          if (e.relatedTarget) return;
+          inside = false;
+          aura.classList.remove('is-on');
+        });
       })();
     </script>
     <script>
@@ -327,20 +409,50 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
 <style>
   .site-bg {
     position: fixed; inset: 0; z-index: -2; pointer-events: none;
-    background:
-      radial-gradient(70% 60% at 5% 30%, color-mix(in srgb, var(--red-2) 8%, transparent), transparent),
-      radial-gradient(50% 50% at 95% 70%, color-mix(in srgb, var(--red-1) 5%, transparent), transparent);
+    background: var(--color-bg);
   }
-  .pointer-aura {
-    position: fixed; left: 0; top: 0; z-index: -1; width: 600px; height: 600px;
-    border-radius: 50%; pointer-events: none; opacity: .24;
-    background: radial-gradient(circle, color-mix(in srgb, var(--red-2) 13%, transparent), transparent 65%);
+  .site-bg::before {
+    content: ""; position: fixed; z-index: 80; left: 0; top: 0; bottom: 0; width: 10px;
+    background: #111; pointer-events: none;
+  }
+  .site-bg::after {
+    content: ""; position: fixed; z-index: 81; left: 10px; top: 0; width: 10px; height: 56px;
+    background: #c41e3a; pointer-events: none;
+  }
+  [data-theme="dark"] .site-bg::before { background: #c41e3a; }
+  [data-theme="dark"] .site-bg::after { background: #f4f1ea; }
+  /* 页边小构件：刻度、色块、短杠、角框。只占左右外侧，不进正文。 */
+  .edge-marks { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+  .edge-marks i { position: absolute; display: block; }
+  .em-ticks {
+    top: 92px; bottom: 88px; left: 14px; width: 8px;
+    background: repeating-linear-gradient(to bottom, var(--color-text-strong) 0 7px, transparent 7px 24px);
+    opacity: .38;
+  }
+  .em-r { left: auto; right: 14px; width: 2px; opacity: .32; }
+  .em-chip { left: 13px; top: 42%; width: 9px; height: 9px; background: #c41e3a; }
+  .em-dash { right: 12px; top: 28%; width: 18px; height: 3px; background: var(--color-text-strong); opacity: .45; }
+  .em-corner { right: 12px; bottom: 64px; width: 14px; height: 14px; border-right: 2px solid #c41e3a; border-bottom: 2px solid #c41e3a; }
+  body.is-home .edge-marks { display: none; }
+  body.is-post .em-r, body.is-post .em-dash, body.is-post .em-corner { display: none; }
+  body.is-home .pointer-aura {
+    display: none;
+    position: fixed; top: 0; left: 0; z-index: 140;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 42%, rgba(255,255,255,.55) 68%, transparent 100%);
+    mix-blend-mode: difference;
+    pointer-events: none; opacity: 0;
     will-change: transform;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    body.is-home .pointer-aura { display: block; }
+    body.is-home .pointer-aura.is-on { opacity: 1; }
   }
   .site-header {
     position: absolute; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; gap: 24px; height: 96px;
-    padding: 0 clamp(24px, 4.5vw, 76px); color: #fff;
+    display: flex; align-items: stretch; gap: 0; height: 64px;
+    padding: 0 18px 0 20px; color: var(--color-text-strong); background: var(--color-bg);
+    border-bottom: 3px solid var(--color-text-strong);
   }
   .site-brand {
     display: inline-flex; align-items: center; gap: 12px;
@@ -351,24 +463,24 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .brand-mark { width: 26px; height: 26px; }
   #main-nav { position: relative; display: flex; gap: 8px; margin-left: auto; }
   .main-nav-link-wrap {
-    position: relative; padding: 8px 16px; font-size: 13px; letter-spacing: .12em; color: inherit;
+    position: relative; display: flex; align-items: center; padding: 0 14px;
+    font-size: 13px; letter-spacing: .12em; color: inherit;
+    border-left: 1px solid color-mix(in srgb, var(--color-text-strong) 28%, transparent);
   }
   .main-nav-link-wrap:hover { color: inherit; }
-  .main-nav-link-wrap.is-active::after {
-    content: ''; position: absolute; left: 50%; bottom: 0; width: 3px; height: 3px;
-    border-radius: 50%; background: currentColor; transform: translateX(-50%); opacity: .75;
-  }
+  .main-nav-link-wrap.is-active { color: #fff; }
+  .main-nav-link-wrap.is-active::after { content: none; }
   :global(.nav-pill) {
-    position: absolute; z-index: -1; top: 2px; left: 0; height: calc(100% - 4px);
-    border-radius: 99px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.13);
-    opacity: 0; pointer-events: none; backdrop-filter: blur(8px);
-    transition: transform .5s cubic-bezier(.34,1.56,.64,1), width .5s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    position: absolute; z-index: -1; top: 4px; left: 0; height: calc(100% - 8px);
+    border-radius: 0; background: #c41e3a; border: 0; min-width: 8px;
+    opacity: 0; pointer-events: none;
+    transition: width .35s cubic-bezier(.2,.8,.2,1), opacity .2s;
   }
   :global(.nav-pill.is-ready) { opacity: 1; }
   .header-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; }
   #theme-toggle, #nav-toggle {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
-    border: 1px solid rgba(255,255,255,.3); border-radius: 50%; background: transparent;
+    border: 1px solid currentColor; border-radius: 0; background: transparent;
     color: inherit; cursor: pointer; transition: transform .25s, background .25s;
   }
   #theme-toggle:hover, #nav-toggle:hover { background: rgba(255,255,255,.1); transform: rotate(12deg); }
@@ -379,34 +491,44 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .mobile-menu {
     position: fixed; inset: 0; z-index: 95;
     padding: 96px 24px 40px;
-    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
-    backdrop-filter: blur(18px);
+    background: var(--color-bg);
+    color: var(--color-text-strong);
   }
-  .mobile-menu nav { display: grid; gap: 8px; }
+  .mobile-menu nav { display: grid; gap: 0; }
   .mobile-menu a {
-    display: flex; align-items: center; min-height: 52px;
-    padding: 0 18px; border-radius: 12px;
-    color: var(--color-text-strong); font-size: 17px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-card-border);
+    display: flex; align-items: center; min-height: 56px;
+    padding: 0 8px; border-radius: 0;
+    color: var(--color-text-strong); font-size: clamp(28px, 8vw, 40px); font-weight: 800; letter-spacing: -.03em;
+    background: transparent;
+    border: 0; border-bottom: 2px solid var(--color-text-strong);
   }
-  .mobile-menu a[aria-current="page"] { border-color: var(--red-2); }
-  .site-main { min-height: 75vh; }
-  .site-footer { padding: 28px clamp(24px,5vw,76px); border-top: 1px solid var(--color-card-border); }
-  .footer-inner { display: flex; align-items: center; gap: 22px; font-size: 12px; color: var(--color-text-muted); }
+  .mobile-menu a[aria-current="page"] { color: #c41e3a; }
+  .site-main { min-height: 75vh; background: var(--color-bg); }
+  .site-footer { background: var(--color-bg); color: var(--color-text-strong); border-top: 3px solid var(--color-text-strong); }
+  .footer-mark {
+    margin: 0; padding: 18px clamp(20px, 4vw, 64px) 0; overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif; font-weight: 900;
+    font-size: clamp(72px, 16vw, 200px); line-height: .78; letter-spacing: -.08em;
+    color: transparent; -webkit-text-stroke: 2px #c41e3a;
+  }
+  .footer-bar { border-top: 8px solid #c41e3a; padding: 16px clamp(20px, 4vw, 64px) 20px; }
+  .footer-inner { display: flex; align-items: center; gap: 22px; font-size: 13px; color: var(--color-text-strong); }
   .footer-links { display: flex; gap: 16px; }
-  .footer-links a { color: var(--color-text-muted); }
+  .footer-links a { color: var(--color-text-strong); }
   .footer-links a:hover { color: var(--color-link-hover); }
   .footer-note { margin-left: auto; }
   .footer-stats { display: flex; gap: 14px; }
   body:not(.is-home):not(.is-post) .site-header {
-    position: relative; height: 84px; color: var(--color-text-strong);
+    position: relative; height: 64px; color: var(--color-text-strong); background: var(--color-bg);
   }
-  body:not(.is-home):not(.is-post) .nav-pill { background: var(--red-5); border-color: transparent; }
+  body:not(.is-home):not(.is-post) .nav-pill { background: #c41e3a; }
   body:not(.is-home):not(.is-post) #theme-toggle,
-  body:not(.is-home):not(.is-post) #nav-toggle { border-color: var(--color-card-border); }
+  body:not(.is-home):not(.is-post) #nav-toggle { border-color: #111; color: var(--color-text-strong); }
   body:not(.is-home):not(.is-post) #theme-toggle:hover,
-  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: var(--red-5); }
+  body:not(.is-home):not(.is-post) #nav-toggle:hover { background: #c41e3a; }
+  @media (max-width: 760px) {
+    .edge-marks { display: none; }
+  }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }
@@ -421,7 +543,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     .footer-note { width: 100%; order: 3; margin-left: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .pointer-aura { display: none; }
+    .pointer-aura { display: none !important; }
     .nav-pill { transition: opacity .3s; }
   }
 </style>

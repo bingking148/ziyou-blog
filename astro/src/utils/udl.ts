@@ -21,19 +21,39 @@ export interface ReaderSection {
 
 function flatten(blocks: any[]): any[] {
   const out: any[] = [];
-  for (const b of blocks) {
-    const prev = out[out.length - 1];
-    if (b.cont && prev && prev.type === 'body' && b.type === 'body') {
-      prev.text = (prev.text ?? '').replace(/\s+$/, '') + ' ' + (b.text ?? '').replace(/^\s+/, '');
-      continue;
+  for (const raw of blocks) {
+    // 浅拷贝：后面的拼接会改 text。JSON 模块在 dev 里是单例，原地改会一次请求叠一层。
+    const b = { ...raw };
+    // cont 表示这一段接着上一页的正文。中间若插了图或公式，仍并回最近的正文，
+    // 避免同一句在图前、图后各出现一次。
+    if (b.cont && b.type === 'body') {
+      let prev: any = null;
+      for (let i = out.length - 1; i >= 0; i--) {
+        if (out[i].type === 'h1' || out[i].type === 'h2' || out[i].type === 'h3') break;
+        if (out[i].type === 'body') { prev = out[i]; break; }
+      }
+      if (prev) {
+        const left = plain(prev.text || '');
+        const right = plain(b.text || '');
+        const gap = /[\u4e00-\u9fff]$/.test(left) || /^[\u4e00-\u9fff]/.test(right) ? '' : ' ';
+        prev.text = (prev.text ?? '').replace(/\s+$/, '') + gap + (b.text ?? '').replace(/^\s+/, '');
+        continue;
+      }
     }
     out.push(b);
   }
   return out;
 }
 
+function plain(text: string) {
+  return (text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function isHeading(b: any) {
-  return ['h1', 'h2', 'h3'].includes(b.type);
+  if (!['h1', 'h2', 'h3'].includes(b.type)) return false;
+  // 单字母不是标题。第 15 章中文栏有一处孤立的 “n”，被标成 h2 后把 15.3 整节中文拆走。
+  if (/^[A-Za-z]$/.test(plain(b.text || ''))) return false;
+  return true;
 }
 
 /** 按标题切流：返回 [{title, level, page, y, blocks}]，标题前的前言归入首节 */
@@ -41,6 +61,7 @@ function splitByHeadings(stream: any[]): { title: string; level: number; page: n
   const out: { title: string; level: number; page: number; y: number; blocks: any[] }[] = [];
   let cur: { title: string; level: number; page: number; y: number; blocks: any[] } | null = null;
   for (const b of stream) {
+    if (['h1', 'h2', 'h3'].includes(b.type) && !isHeading(b)) continue;
     if (isHeading(b)) {
       if (cur) out.push(cur);
       cur = { title: b.text ?? '', level: Number(b.type[1]), page: b.page ?? 0, y: b.y ?? 0, blocks: [] };
@@ -85,13 +106,239 @@ function alignSections(enSecs: any[], zhSecs: any[]) {
   return items;
 }
 
+/** 无编号、且不是「注释/习题」这类结构标题的单侧节，并回上一节。
+ *  第 12 章英文有 h1 “Transformers”，中文对应标题落在正文里，两栏因此被拆开。 */
+function foldOrphanTitles(items: { en?: any; zh?: any }[]) {
+  const numbered = (t: string) => /^([A-Z](?:\.\d+)+|\d+(?:\.\d+)*)\b/.test(plain(t));
+  const structural = (t: string) => /^(Notes|Problems|Summary|Appendix|Notation|References|注释|习题|问题|小结|总结|附录|符号)\b/i.test(plain(t));
+  const out: { en?: any; zh?: any }[] = [];
+  for (const it of items) {
+    const prev = out[out.length - 1];
+    const title = it.zh?.title || it.en?.title || '';
+    const onlyEn = !!it.en && !it.zh;
+    const onlyZh = !!it.zh && !it.en;
+    if (prev && (onlyEn || onlyZh) && !numbered(title) && !structural(title)) {
+      if (onlyEn && prev.en) {
+        prev.en.blocks.push({ type: 'body', text: it.en.title, page: it.en.page }, ...it.en.blocks);
+        continue;
+      }
+      if (onlyZh && prev.zh) {
+        prev.zh.blocks.push({ type: 'body', text: it.zh.title, page: it.zh.page }, ...it.zh.blocks);
+        continue;
+      }
+    }
+    out.push(it);
+  }
+  return out;
+}
+
+/** 边注插进未完句时，把前后正文接回；「背｜景数学」这类残片并回原词。 */
+function repairStream(blocks: any[]): any[] {
+  const out: any[] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const a = blocks[i];
+    const note = blocks[i + 1];
+    const b = blocks[i + 2];
+    if (a?.type === 'body' && note?.type === 'note' && b?.type === 'body') {
+      const at = plain(a.text || '');
+      const bt = plain(b.text || '');
+      const continues = /(?:是|为|的|and|the|of|is|are|a|an)$/i.test(at);
+      if (at && bt && continues && !/[.。！？!?：:]$/.test(at) && bt.length < 100) {
+        const gap = /[\u4e00-\u9fff]$/.test(at) || /^[\u4e00-\u9fff]/.test(bt) ? '' : ' ';
+        a.text = (a.text || '').replace(/\s+$/, '') + gap + (b.text || '').replace(/^\s+/, '');
+        out.push(a, note);
+        i += 2;
+        continue;
+      }
+    }
+    out.push(a);
+  }
+  for (let i = 0; i < out.length; i++) {
+    const frag = plain(out[i].text || '');
+    if (out[i].type !== 'note' || !/^[\u4e00-\u9fff]{1,4}$/.test(frag)) continue;
+    let prev = i - 1;
+    while (prev >= 0 && out[prev].type !== 'note') prev--;
+    if (prev < 0) continue;
+    const pt = plain(out[prev].text || '');
+    const nearby = out.slice(Math.max(0, i - 4), Math.min(out.length, i + 4))
+      .filter((b) => b.type === 'body').map((b) => plain(b.text || '')).join('');
+    for (let k = 1; k <= 2; k++) {
+      const tail = pt.slice(-k);
+      if (!/^[\u4e00-\u9fff]+$/.test(tail) || !nearby.includes(tail + frag)) continue;
+      const chars = [...out[prev].text];
+      let left = k;
+      for (let c = chars.length - 1; c >= 0 && left > 0; c--) {
+        if (/[\u4e00-\u9fff]/.test(chars[c])) { chars.splice(c, 1); left--; }
+      }
+      out[prev].text = chars.join('');
+      out.splice(i, 1);
+      i--;
+      break;
+    }
+  }
+  return out;
+}
+
+function figKey(b: any): string | undefined {
+  const m = plain(b?.text || '').match(/(?:Figure|图)\s*(\d+\.\d+)/i);
+  return m?.[1];
+}
+function eqKey(b: any): string {
+  return String(b?.latex || '').replace(/\s+/g, '');
+}
+
+/** 图按图号跨节对齐，公式按清洗后的 LaTeX 在节内对齐。正文分组不动。 */
+function realignAnchors(sections: ReaderSection[]) {
+  const enFigs: any[] = [];
+  const zhFigs: any[] = [];
+  for (const s of sections) for (const p of s.pairs) {
+    for (const b of p.en || []) if (b.type === 'figure') enFigs.push(b);
+    for (const b of p.zh || []) if (b.type === 'figure') zhFigs.push(b);
+  }
+  const usedFig = new Set<any>();
+  const figMate = new Map<any, any>();
+  for (const e of enFigs) {
+    const k = figKey(e);
+    if (!k) continue;
+    const z = zhFigs.find((b) => !usedFig.has(b) && figKey(b) === k);
+    if (z) { usedFig.add(z); figMate.set(e, z); }
+  }
+  const movedFig = new Set(figMate.values());
+
+  for (const s of sections) {
+    const enEq: any[] = [];
+    const zhEq: any[] = [];
+    for (const p of s.pairs) {
+      for (const b of p.en || []) if (b.type === 'equation' || b.type === 'eqimg') enEq.push(b);
+      for (const b of p.zh || []) if (b.type === 'equation' || b.type === 'eqimg') zhEq.push(b);
+    }
+    const usedEq = new Set<any>();
+    const eqMate = new Map<any, any>();
+    for (const e of enEq) {
+      const k = eqKey(e);
+      if (k.length < 12) continue;
+      const z = zhEq.find((b) => !usedEq.has(b) && eqKey(b) === k);
+      if (z) { usedEq.add(z); eqMate.set(e, z); }
+    }
+    const movedEq = new Set(eqMate.values());
+    const out: Pair[] = [];
+    for (const p of s.pairs) {
+      const enKeep: any[] = [];
+      const zhKeep: any[] = [];
+      const anchors: any[] = [];
+      for (const b of p.en || []) {
+        if (b.type === 'figure' && figMate.has(b)) { anchors.push(b); continue; }
+        if ((b.type === 'equation' || b.type === 'eqimg') && eqMate.has(b)) { anchors.push(b); continue; }
+        enKeep.push(b);
+      }
+      for (const b of p.zh || []) {
+        if (b.type === 'figure' && movedFig.has(b)) continue;
+        if ((b.type === 'equation' || b.type === 'eqimg') && movedEq.has(b)) continue;
+        zhKeep.push(b);
+      }
+      if (enKeep.length || zhKeep.length) {
+        const only = enKeep.length + zhKeep.length === 1 ? (enKeep[0] || zhKeep[0]) : null;
+        const bothSame = enKeep.length === 1 && zhKeep.length === 1 && enKeep[0].type === zhKeep[0].type && FUSE.includes(enKeep[0].type);
+        const kind = bothSame ? enKeep[0].type : only && FUSE.includes(only.type) ? only.type : 'body';
+        out.push({ kind, en: enKeep.length ? enKeep : undefined, zh: zhKeep.length ? zhKeep : undefined });
+      }
+      for (const b of anchors) {
+        const mate = b.type === 'figure' ? figMate.get(b) : eqMate.get(b);
+        out.push({ kind: b.type, en: [b], zh: mate ? [mate] : undefined });
+      }
+    }
+    s.pairs = out;
+  }
+}
+
+const PHRASES: [string, string][] = [
+  ['learning rate', '学习率'],
+  ['minimum', '最小值'],
+  ['flat', '平坦'],
+  ['loss is small', '损失很小'],
+  ['indirect', '间接'],
+  ['architecture', '架构'],
+  ['variational', '变分'],
+  ['binomial', '二项式'],
+  ['gradient descent', '梯度下降'],
+];
+
+function phraseHits(en: string, zh: string) {
+  const e = en.toLowerCase();
+  let n = 0;
+  for (const [a, b] of PHRASES) if (e.includes(a) && zh.includes(b)) n++;
+  return n;
+}
+
+/** 整句中文落在下一节开头、上一节英文明显偏长时，把这句挪回去。 */
+function stitchDangling(sections: ReaderSection[]) {
+  for (let i = 1; i < sections.length; i++) {
+    const first = sections[i].pairs[0];
+    if (!first?.zh?.length) continue;
+    const curEn = (first.en || []).map((b) => b.text || '').join(' ');
+    for (const block of [...first.zh]) {
+      const bt = plain(block.text || '');
+      if (bt.length < 40) continue;
+      const here = phraseHits(curEn, bt);
+      for (let back = 1; back <= 2 && i - back >= 0; back++) {
+        const prev = sections[i - back];
+        const last = [...prev.pairs].reverse().find((p) => plain((p.en || []).map((b) => b.text || '').join(' ')).length > 120);
+        if (!last) continue;
+        const lastEn = (last.en || []).map((b) => b.text || '').join(' ');
+        const enL = plain(lastEn).length;
+        const zhL = plain((last.zh || []).map((b) => b.text || '').join(' ')).length;
+        if (!enL || zhL > enL * 0.4) continue;
+        if (phraseHits(lastEn, bt) <= here) continue;
+        first.zh = first.zh!.filter((b) => b !== block);
+        if (!first.zh.length) delete first.zh;
+        last.zh = [...(last.zh || []), block];
+        break;
+      }
+    }
+  }
+  for (const s of sections) s.pairs = s.pairs.filter((p) => (p.en && p.en.length) || (p.zh && p.zh.length));
+}
+
+/** 一句中文的关键词更像后面那条还没配上的英文时，把这句移过去。 */
+function relocateProse(sections: ReaderSection[]) {
+  for (const s of sections) {
+    for (let i = 0; i < s.pairs.length; i++) {
+      const zhBlocks = (s.pairs[i].zh || []).filter((b) => b.type === 'body' || b.type === 'note');
+      const enText = (s.pairs[i].en || []).map((b) => b.text || '').join(' ');
+      for (const block of [...zhBlocks]) {
+        const bt = plain(block.text || '');
+        if (bt.length < 40) continue;
+        const here = phraseHits(enText, bt);
+        if (here > 0) continue;
+        let best = -1;
+        let bestH = 0;
+        for (let k = -3; k <= 3; k++) {
+          if (k === 0 || i + k < 0 || i + k >= s.pairs.length) continue;
+          const nxt = s.pairs[i + k];
+          const nxtEn = (nxt.en || []).map((b) => b.text || '').join(' ');
+          const nxtZh = plain((nxt.zh || []).map((b) => b.text || '').join(' '));
+          if (nxtZh.length > 60 || plain(nxtEn).length < 80) continue;
+          const h = phraseHits(nxtEn, bt);
+          if (h > bestH) { bestH = h; best = i + k; }
+        }
+        if (best < 0) continue;
+        s.pairs[i].zh = (s.pairs[i].zh || []).filter((b) => b !== block);
+        if (!s.pairs[i].zh!.length) delete s.pairs[i].zh;
+        const dest = s.pairs[best];
+        dest.zh = [...(dest.zh || []), block];
+      }
+    }
+    s.pairs = s.pairs.filter((p) => (p.en && p.en.length) || (p.zh && p.zh.length));
+  }
+}
+
 export function buildSections(ch: any): ReaderSection[] {
-  const enAll = flatten(ch.pages.flatMap((p: any) => p.en));
-  const zhAll = flatten(ch.pages.flatMap((p: any) => p.zh));
+  const enAll = repairStream(flatten(ch.pages.flatMap((p: any) => p.en)));
+  const zhAll = repairStream(flatten(ch.pages.flatMap((p: any) => p.zh)));
   const enSecs = splitByHeadings(enAll);
   const zhSecs = splitByHeadings(zhAll);
-  const items = alignSections(enSecs, zhSecs);
-  return items
+  const items = foldOrphanTitles(alignSections(enSecs, zhSecs));
+  const sections = items
     .map((it, k) => ({
       id: `sec-${k}`,
       zhTitle: it.zh?.title || undefined,
@@ -100,6 +347,10 @@ export function buildSections(ch: any): ReaderSection[] {
       pairs: pairStreams(it.en?.blocks ?? [], it.zh?.blocks ?? []),
     }))
     .filter((s) => s.pairs.length);
+  realignAnchors(sections);
+  stitchDangling(sections);
+  relocateProse(sections);
+  return sections;
 }
 
 const FUSE = ['figure', 'equation', 'eqimg'];

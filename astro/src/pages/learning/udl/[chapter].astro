@@ -41,7 +41,7 @@ const title = `《${UDL_META.bookZh}》第 ${ch.num} 章 ${ch.zhTitle}`;
         <h3>本章目录</h3>
         <nav>
           {toc.map((s) => (
-            <a class:list={[{ sub: s.level === 3 }]} href={`#${s.id}`}>{s.zhTitle}</a>
+            <a class:list={[{ sub: s.level === 3 }]} href={`#${s.id}`} set:html={s.zhTitle} />
           ))}
         </nav>
         <h3>全部章节</h3>
@@ -64,8 +64,8 @@ const title = `《${UDL_META.bookZh}》第 ${ch.num} 章 ${ch.zhTitle}`;
           <section class="biloc" id={s.id}>
             {(s.zhTitle || s.enTitle) && (
               <div class="biloc-head">
-                <div class="h-zh">{s.zhTitle}</div>
-                <div class="h-en">{s.enTitle}</div>
+                <div class="h-zh" set:html={s.zhTitle} />
+                <div class="h-en" set:html={s.enTitle} />
               </div>
             )}
             <UdlSection pairs={s.pairs} dropcap={i === proseIdx} />
@@ -81,25 +81,16 @@ const title = `《${UDL_META.bookZh}》第 ${ch.num} 章 ${ch.zhTitle}`;
 
   <style>
     .reader {
-      --paper: #faf7f0;
-      --paper-deep: #f4f0e6;
-      --ink: #2c2a26;
-      --ink-soft: #6f6a5c;
-      --ink-faint: #9a9182;
-      --line: #e4ddd0;
-      --accent: #7a4a2a;
+      --paper: var(--color-bg);
+      --paper-deep: var(--color-surface-muted);
+      --ink: var(--color-text-strong);
+      --ink-soft: var(--color-text-muted);
+      --ink-faint: var(--color-text-faint);
+      --line: var(--color-card-border);
+      --accent: var(--color-accent);
       background: var(--paper);
       color: var(--ink);
       min-height: 60vh;
-    }
-    :global([data-theme="dark"]) .reader {
-      --paper: #171a1f;
-      --paper-deep: #1f242c;
-      --ink: #ddd8cc;
-      --ink-soft: #b3ac9a;
-      --ink-faint: #948b7a;
-      --line: #363b44;
-      --accent: #d9a077;
     }
     .reader-top {
       display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
@@ -128,7 +119,11 @@ const title = `《${UDL_META.bookZh}》第 ${ch.num} 章 ${ch.zhTitle}`;
       display: block; padding: 6px 12px; border-radius: 6px; color: var(--ink-soft); line-height: 1.5;
     }
     .reader-toc a:hover { background: var(--paper-deep); color: var(--ink); }
-    .reader-toc a.sub { padding-left: 26px; font-size: 12.5px; color: var(--ink-faint); }
+    .reader-toc a.sub { padding-left: 26px; font-size: 12.5px; color: var(--ink-soft); }
+    .reader-toc :global(.imath) { font-family: 'Latin Modern Math', Georgia, serif; font-style: italic; }
+    :global([data-theme="dark"]) .reader-toc a { color: #e4ddd2; }
+    :global([data-theme="dark"]) .reader-toc a.sub { color: #d2cbc0; }
+    :global([data-theme="dark"]) .reader-toc h3 { color: #b7b0a6; }
     .reader-toc a.on { background: var(--paper-deep); color: var(--accent); font-weight: 700; }
     .reader-src { margin-top: 26px; font-size: 11px; line-height: 1.8; color: var(--ink-faint); }
     .reader-body { padding: 8px clamp(20px, 4vw, 64px) 90px; font-family: var(--font-serif); }

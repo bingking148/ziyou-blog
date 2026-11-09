@@ -6,7 +6,7 @@
 <div class="mood-knob-widget widget-wrap card">
   <h3 class="widget-title">氛围旋钮</h3>
   <div class="mk-stage" id="mood-knob" role="slider" tabindex="0"
-       aria-label="站点氛围色相" aria-valuemin="0" aria-valuemax="360" aria-valuenow="214">
+       aria-label="站点氛围色相" aria-valuemin="0" aria-valuemax="360" aria-valuenow="8">
     <div class="mk-lamp-box" id="mk-lamp-box" aria-hidden="true"></div>
     <div class="mk-ring" aria-hidden="true">
       <div class="mk-ring-inner">
@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <div class="mk-readout"><span class="mk-dot"></span><span id="mk-name">墨蓝 · 214°</span></div>
+  <div class="mk-readout"><span class="mk-dot"></span><span id="mk-name">朱砂 · 8°</span></div>
   <p class="mk-hint">拖动旋转全站色调 · 滚轮微调 · 双击复位</p>
 </div>
 
@@ -32,7 +32,7 @@
     color: var(--color-text-strong);
   }
   .mk-stage {
-    --mk-hue: 214;
+    --mk-hue: 8;
     position: relative;
     width: 150px;
     height: 150px;
@@ -208,7 +208,7 @@
     var pointerBox = document.getElementById('mk-pointer-box');
     var pointer = document.getElementById('mk-pointer');
     var nameEl = document.getElementById('mk-name');
-    var MIN = -112.5, MAX = 112.5, TOTAL = 19, DEFAULT_HUE = 214;
+    var MIN = -112.5, MAX = 112.5, TOTAL = 19, DEFAULT_HUE = 8;
     var angle = 0, moodHue = null;
     var lamps = [];
     var i;
@@ -294,8 +294,8 @@
       pointer.classList.remove('off');
       mkWidget.style.setProperty('--mk-hue', String(DEFAULT_HUE));
       stage.setAttribute('aria-valuenow', String(DEFAULT_HUE));
-      stage.setAttribute('aria-valuetext', '墨蓝 默认 214 度');
-      nameEl.textContent = '墨蓝 · 默认';
+      stage.setAttribute('aria-valuetext', '朱砂 默认 8 度');
+      nameEl.textContent = '朱砂 · 默认';
     }
     var dragging = false, startY = 0, startA = 0;
     stage.addEventListener('pointerdown', function (e) {
