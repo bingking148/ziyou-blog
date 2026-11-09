@@ -163,22 +163,28 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     <script async src="/resources/busuanzi/bsz.pure.mini.js"></script>
     <script>
       // 不蒜子在 localhost / 异常域名上会回一个共享的超大计数。只展示像样的整数。
+      // 每个节点只改一次：textContent 会换掉文本节点，观察器若再写一次就会自己把自己叫起来，
+      // 微任务队列不再交还主线程，手机上就滑不动、也点不了。
       (function () {
         var ids = ['busuanzi_value_site_pv', 'busuanzi_value_site_uv', 'busuanzi_value_page_pv'];
+        var done = Object.create(null);
+        var obs = new MutationObserver(function () { ids.forEach(function (id) { sane(document.getElementById(id)); }); });
         function sane(el) {
-          if (!el) return;
-          var raw = (el.textContent || '').replace(/[,\s]/g, '');
+          if (!el || done[el.id]) return;
+          var raw = (el.textContent || '').replace(/[,\s\u00a0\u202f]/g, '');
+          if (!raw) return;
+          done[el.id] = true;
           var n = Number(raw);
           var host = location.hostname;
           var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host.endsWith('.local');
           var box = el.parentElement;
-          if (!raw || local || !Number.isFinite(n) || n < 0 || n > 1000000) {
+          if (local || !Number.isFinite(n) || n < 0 || n > 1000000) {
             if (box) box.style.display = 'none';
             return;
           }
-          el.textContent = n.toLocaleString('zh-CN');
+          var formatted = n.toLocaleString('zh-CN');
+          if (el.textContent !== formatted) el.textContent = formatted;
         }
-        var obs = new MutationObserver(function () { ids.forEach(function (id) { sane(document.getElementById(id)); }); });
         ids.forEach(function (id) {
           var el = document.getElementById(id);
           if (el) obs.observe(el, { childList: true, characterData: true, subtree: true });
