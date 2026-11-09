@@ -316,6 +316,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
         var aura = document.querySelector('.pointer-aura');
         if (!aura) return;
         var R = 22, x = 0, y = 0, tx = 0, ty = 0, scale = 1, ts = 1, running = false, primed = false, inside = false;
+        var jellyT0 = 0;
         var hotSel = 'a, button, h1, h2, .scene-title, .s2-title, .focus-card, .book-plate, .series-visual';
         function show(e) {
           if (e.pointerType && e.pointerType !== 'mouse') return;
@@ -325,18 +326,35 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           aura.classList.add('is-on');
           wake();
         }
+        function jelly() {
+          if (!jellyT0) return [1, 1];
+          var t = (performance.now() - jellyT0) / 420;
+          if (t >= 1) { jellyT0 = 0; return [1, 1]; }
+          var e;
+          if (t < 0.38) { e = Math.sin((t / 0.38) * Math.PI); return [1 + 0.16 * e, 1 - 0.14 * e]; }
+          if (t < 0.72) { e = Math.sin(((t - 0.38) / 0.34) * Math.PI); return [1 - 0.1 * e, 1 + 0.1 * e]; }
+          e = Math.sin(((t - 0.72) / 0.28) * Math.PI);
+          return [1 + 0.04 * e, 1 - 0.035 * e];
+        }
         function tick() {
           var dx = tx - x, dy = ty - y, ds = ts - scale;
           x += dx * 0.16;
           y += dy * 0.16;
           scale += ds * 0.14;
-          aura.style.transform = 'translate3d(' + (x - R) + 'px,' + (y - R) + 'px,0) scale(' + scale.toFixed(3) + ')';
-          if (!inside && Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25 && Math.abs(ds) < 0.004) { running = false; return; }
+          var j = jelly();
+          aura.style.transform = 'translate3d(' + (x - R) + 'px,' + (y - R) + 'px,0) scale(' + (scale * j[0]).toFixed(3) + ',' + (scale * j[1]).toFixed(3) + ')';
+          if (!inside && !jellyT0 && Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25 && Math.abs(ds) < 0.004) { running = false; return; }
           requestAnimationFrame(tick);
         }
         function wake() { if (!running) { running = true; requestAnimationFrame(tick); } }
         document.addEventListener('pointermove', show, { passive: true });
-        document.addEventListener('pointerdown', show);
+        document.addEventListener('pointerdown', function (e) {
+          show(e);
+          if (e.button !== 0) return;
+          if (e.pointerType && e.pointerType !== 'mouse') return;
+          jellyT0 = performance.now();
+          wake();
+        });
         document.addEventListener('pointerover', function (e) {
           var t = e.target && e.target.closest && e.target.closest(hotSel);
           ts = t ? 1.35 : 1;
@@ -346,37 +364,6 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           if (e.relatedTarget) return;
           inside = false;
           aura.classList.remove('is-on');
-        });
-      })();
-    </script>
-    <script>
-      (function () {
-        'use strict';
-        if (!document.body.classList.contains('is-home')) return;
-        if (window.matchMedia('(hover: none), (pointer: coarse), (prefers-reduced-motion: reduce)').matches) return;
-        document.addEventListener('pointerdown', function (e) {
-          if (e.button !== 0) return;
-          if (e.pointerType && e.pointerType !== 'mouse') return;
-          var root = document.createElement('div');
-          root.className = 'jelly-burst';
-          root.setAttribute('aria-hidden', 'true');
-          root.style.left = e.clientX + 'px';
-          root.style.top = e.clientY + 'px';
-          var blob = document.createElement('i');
-          blob.className = 'jelly-blob';
-          root.appendChild(blob);
-          var base = Math.random() * Math.PI * 2;
-          for (var i = 0; i < 3; i++) {
-            var drop = document.createElement('i');
-            drop.className = 'jelly-drop d' + i;
-            var ang = base + (Math.PI * 2 * i) / 3 + (Math.random() - 0.5) * 0.35;
-            var dist = 22 + Math.random() * 14;
-            drop.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(1) + 'px');
-            drop.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(1) + 'px');
-            root.appendChild(drop);
-          }
-          document.body.appendChild(root);
-          window.setTimeout(function () { root.remove(); }, 820);
         });
       })();
     </script>
@@ -553,50 +540,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     .footer-note { width: 100%; order: 3; margin-left: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .pointer-aura, :global(.jelly-burst) { display: none !important; }
+    .pointer-aura { display: none !important; }
     .nav-pill { transition: opacity .3s; }
-  }
-</style>
-<style is:global>
-  .jelly-burst {
-    position: fixed; z-index: 145; width: 0; height: 0;
-    pointer-events: none;
-  }
-  .jelly-burst i { position: absolute; display: block; pointer-events: none; }
-  .jelly-blob, .jelly-drop {
-    border-radius: 46% 54% 50% 50% / 58% 42% 58% 42%;
-    background: radial-gradient(circle at 38% 34%, rgba(255, 236, 210, .55), transparent 42%), #c46a18;
-    box-shadow: inset 0 -5px 0 rgba(90, 42, 8, .28), 0 0 0 2px rgba(17, 17, 17, .72);
-  }
-  .jelly-blob {
-    left: -18px; top: -18px; width: 36px; height: 36px;
-    animation: jelly-pop .78s linear forwards;
-  }
-  .jelly-drop {
-    width: 16px; height: 16px; left: -8px; top: -8px;
-    animation: jelly-drop .76s linear forwards;
-  }
-  .jelly-drop.d1 { width: 13px; height: 13px; left: -6px; top: -6px; background: radial-gradient(circle at 38% 34%, rgba(255, 236, 210, .45), transparent 46%), #e7b07a; animation-delay: .02s; }
-  .jelly-drop.d2 { width: 18px; height: 18px; left: -9px; top: -9px; background: radial-gradient(circle at 38% 34%, rgba(255, 220, 220, .4), transparent 46%), #c41e3a; animation-delay: .04s; }
-  @keyframes jelly-pop {
-    0% { transform: scale(.2, .2); opacity: 1; }
-    16% { transform: scale(1.72, .52); }
-    32% { transform: scale(.66, 1.48); }
-    46% { transform: scale(1.28, .78); }
-    60% { transform: scale(.88, 1.16); }
-    74% { transform: scale(1.08, .94); }
-    88% { transform: scale(.98, 1.03); opacity: 1; }
-    100% { transform: scale(.92); opacity: 0; }
-  }
-  @keyframes jelly-drop {
-    0% { transform: translate3d(0, 0, 0) scale(.45, .8); opacity: 1; }
-    26% { transform: translate3d(calc(var(--dx) * 1.22), calc(var(--dy) * 1.22), 0) scale(1.35, .58); }
-    44% { transform: translate3d(calc(var(--dx) * .68), calc(var(--dy) * .68), 0) scale(.72, 1.28); }
-    62% { transform: translate3d(calc(var(--dx) * 1.08), calc(var(--dy) * 1.08), 0) scale(1.12, .84); }
-    78% { transform: translate3d(var(--dx), var(--dy), 0) scale(.96, 1.06); opacity: 1; }
-    100% { transform: translate3d(var(--dx), var(--dy), 0) scale(.7); opacity: 0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .jelly-burst { display: none !important; }
   }
 </style>
