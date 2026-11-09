@@ -102,8 +102,10 @@ const shortTitle = (t: string) => t.split('——')[0];
         <div class="s2-board">
           <div class="s2-copy">
             <p class="s2-kicker">02 · 进门之后</p>
-            <h2 class="s2-title">在键盘上，<br />写下注释。</h2>
-            <p class="s2-plate">又一行。</p>
+            <h2 class="s2-title">
+              <span class="s2-line s2-line-a">TYPE</span>
+              <span class="s2-line s2-line-b">slow<i>.</i></span>
+            </h2>
             <p class="s2-note">不追热点，只记录真正想明白的事。</p>
             <p class="s2-meta"><span>ZIYOU</span><span>注释</span><span>2026</span></p>
           </div>
@@ -875,18 +877,29 @@ const shortTitle = (t: string) => t.split('——')[0];
     margin: 0 0 12px; font-size: 12px; letter-spacing: .28em; font-weight: 800; color: var(--s2-cyan);
   }
   .s2-title {
-    margin: 0 0 18px;
-    font-family: var(--s2-display);
-    font-weight: 800; font-style: normal;
-    font-size: clamp(52px, 5.6vw, 88px);
-    line-height: .96; letter-spacing: -.03em;
-    color: #fff;
+    margin: 4px 0 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900; font-style: normal;
+    font-size: clamp(76px, 7.6vw, 118px);
+    line-height: .76; letter-spacing: -.06em;
+    color: #fff; text-transform: uppercase;
   }
-  .s2-plate {
-    display: inline-block; margin: 0 0 16px; padding: 8px 14px;
-    background: var(--s2-white); color: var(--s2-deep);
-    font-family: var(--s2-display); font-weight: 800; font-style: normal;
-    font-size: clamp(22px, 2vw, 32px); letter-spacing: .04em;
+  .s2-line { display: block; }
+  .s2-line-a {
+    font-weight: 900; letter-spacing: -.08em;
+    transform: rotate(-2.2deg); transform-origin: 0 80%;
+  }
+  .s2-line-b {
+    margin: -.02em 0 0 .48em;
+    font-weight: 500; font-size: .52em; letter-spacing: .16em;
+    text-transform: lowercase;
+    transform: rotate(1.6deg); transform-origin: 0 0;
+  }
+  .s2-line-b i {
+    display: inline-block; margin-left: .04em;
+    font-style: normal; font-weight: 900; font-size: 1.7em; line-height: .5;
+    letter-spacing: 0; color: #c41e3a;
+    transform: translateY(-.12em) rotate(8deg);
   }
   .s2-note {
     margin: 0 0 18px; max-width: 28em;
@@ -1326,7 +1339,8 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-side { display: none; }
     .scene-edition { display: none; }
     .scene-content { left: 16%; width: min(70vw, 640px); }
-    .s2-title { font-size: clamp(40px, 6vw, 64px); }
+    .s2-title { font-size: clamp(64px, 9vw, 92px); }
+    .s2-line-b { margin-left: .28em; }
     .s2-board { grid-template-columns: 1fr; top: 10%; bottom: 18%; }
     .scene-focus { width: min(28vw, 240px); }
     .latest-preview { display: none; }
@@ -1355,7 +1369,9 @@ const shortTitle = (t: string) => t.split('——')[0];
     .slab { width: 46%; }
     .s2-orn, .s2-meta, .numstrip, .red-index, .micro { display: none; }
     .s2-board { left: 16px; right: 16px; grid-template-columns: 1fr; gap: 12px; top: 8%; }
-    .s2-title { font-size: clamp(36px, 10vw, 52px); }
+    .s2-title { font-size: clamp(58px, 18vw, 76px); }
+    .s2-line-a { transform: rotate(-1.4deg); }
+    .s2-line-b { margin-left: .12em; letter-spacing: .08em; }
     .s2-panel { margin-top: 0; }
     .scene-focus { left: auto; right: 16px; top: auto; bottom: 72px; width: min(46vw, 180px); }
     .focus-card { aspect-ratio: 1.15; border-width: 3px; box-shadow: 8px 8px 0 #c41e3a; }
