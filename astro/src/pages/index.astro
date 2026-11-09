@@ -24,6 +24,7 @@ const shortTitle = (t: string) => t.split('——')[0];
 
 <Base pageClass="is-home">
   <link slot="head" rel="stylesheet" href="/resources/act2-display/display.css" />
+  <div class="page-exit" aria-hidden="true"></div>
   <!-- 开场：封面 → 胶片切片 → 最新作品卡，三幕共用一个滚动轨道 -->
   <section id="header" class="scene" aria-label="站点封面">
     <div class="scene-pin">
@@ -403,6 +404,8 @@ const shortTitle = (t: string) => t.split('——')[0];
         }
         var sceneLink = scene.querySelector('.scene-link');
         if (sceneLink) sceneLink.toggleAttribute('inert', copy > 0.55);
+        var sceneTitle = scene.querySelector('.scene-title');
+        if (sceneTitle) sceneTitle.toggleAttribute('inert', copy > 0.45);
         if (cta) {
           cta.toggleAttribute('inert', p > 0.18 || playing);
           if (playing) cta.setAttribute('aria-disabled', 'true');
@@ -621,6 +624,76 @@ const shortTitle = (t: string) => t.split('——')[0];
       window.addEventListener('load', schedule);
       update();
       // 只在指针移动期间启动缓动帧，不为每张卡建立永久 rAF。
+    })();
+  </script>
+  <script>
+    /* 开场大字的字母呼吸，以及首页离页前的短幕帘。都不改开门进度。 */
+    (function () {
+      'use strict';
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function split(el) {
+        Array.prototype.forEach.call(Array.from(el.childNodes), function (node) {
+          if (node.nodeType !== 3) return;
+          var frag = document.createDocumentFragment();
+          var n = 0;
+          Array.from(node.textContent).forEach(function (ch) {
+            if (ch === ' ' || ch === '\n') {
+              frag.appendChild(document.createTextNode('\u00a0'));
+              return;
+            }
+            var s = document.createElement('span');
+            s.className = 'live-ch';
+            s.style.setProperty('--i', String(n++));
+            s.textContent = ch;
+            frag.appendChild(s);
+          });
+          el.replaceChild(frag, node);
+        });
+      }
+      if (!reduced) {
+        document.querySelectorAll('.title-line, .s2-line').forEach(split);
+        document.querySelectorAll('.scene-title, .s2-title, .scene-focus').forEach(function (el) {
+          el.addEventListener('pointermove', function (e) {
+            if (e.pointerType === 'touch') return;
+            var r = el.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            el.style.setProperty('--px', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3));
+            el.style.setProperty('--py', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
+          });
+          el.addEventListener('pointerleave', function () {
+            el.style.setProperty('--px', '0');
+            el.style.setProperty('--py', '0');
+          });
+        });
+      }
+
+      var root = document.documentElement;
+      var leaving = false;
+      window.addEventListener('pageshow', function () { leaving = false; root.classList.remove('is-leaving'); });
+      document.addEventListener('click', function (event) {
+        if (reduced || leaving || event.defaultPrevented) return;
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        var a = event.target.closest && event.target.closest('a[href]');
+        if (!a || a.target === '_blank' || a.hasAttribute('download') || a.hasAttribute('data-cinematic-scroll')) return;
+        var raw = a.getAttribute('href') || '';
+        if (!raw || raw.charAt(0) === '#' || raw.indexOf('mailto:') === 0) return;
+        var url;
+        try { url = new URL(a.href, location.href); } catch (err) { return; }
+        if (url.origin !== location.origin) return;
+        if (url.pathname === location.pathname && url.search === location.search) return;
+        event.preventDefault();
+        leaving = true;
+        root.classList.add('is-leaving');
+        var gone = false;
+        function go() {
+          if (gone) return;
+          gone = true;
+          location.href = url.href;
+        }
+        var curtain = document.querySelector('.page-exit');
+        if (curtain) curtain.addEventListener('transitionend', go, { once: true });
+        window.setTimeout(go, 520);
+      });
     })();
   </script>
 </Base>
@@ -886,7 +959,14 @@ const shortTitle = (t: string) => t.split('——')[0];
     line-height: .86; letter-spacing: -.03em;
     font-weight: 400; color: #fff;
   }
-  .s2-line { display: block; width: max-content; max-width: 100%; }
+  .s2-line { display: block; width: max-content; max-width: 100%; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .scene.has-motion .s2-title { pointer-events: auto; cursor: default; }
+  .scene.has-motion .s2-title:hover :global(.live-ch) { animation-play-state: paused; }
+  .scene.has-motion .s2-title:hover .s2-a { transform: rotate(-3.2deg) translate3d(calc(10px + var(--px, 0) * 8px), -6px, 0); }
+  .scene.has-motion .s2-title:hover .s2-b { transform: rotate(4deg) translate3d(calc(16px + var(--px, 0) * 10px), 0, 0); }
+  .scene.has-motion .s2-title:hover .s2-c { transform: rotate(-2.2deg) translate3d(calc(-8px + var(--px, 0) * 8px), 3px, 0); }
+  .scene.has-motion .s2-title:hover .s2-d { transform: rotate(-3deg) translate3d(calc(20px + var(--px, 0) * 8px), 2px, 0); }
+  .scene.has-motion .s2-title:hover .s2-e { transform: rotate(2.2deg) translate3d(calc(6px + var(--px, 0) * 8px), 5px, 0); text-shadow: 8px 8px 0 color-mix(in srgb, #c41e3a 45%, transparent); }
   .s2-a, .s2-c, .s2-e {
     font-family: "Archivo Black", "Arial Black", Arial, sans-serif;
     font-weight: 400; text-transform: uppercase; letter-spacing: -.035em;
@@ -941,20 +1021,44 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: absolute; z-index: 8; right: max(36px, 7%); top: 52%; width: min(24vw, 340px);
     color: var(--s2-ink); pointer-events: none;
     opacity: var(--open, 0);
+    transform: translate3d(0, calc((1 - var(--arrive, 0)) * 26px), 0);
   }
   .scene.has-motion .scene-focus { pointer-events: auto; }
   .focus-card {
     position: relative; aspect-ratio: 1.35; overflow: hidden; background: var(--s2-deep);
     border: 3px solid var(--s2-white);
     box-shadow: 10px 10px 0 #c41e3a;
+    transition: box-shadow .4s ease, transform .45s cubic-bezier(.2,.7,.2,1);
   }
-  .focus-card > img { width: 100%; height: 100%; max-width: none; object-fit: cover; filter: grayscale(.15) saturate(1.05); }
+  .scene.has-motion .focus-card { animation: focus-idle 5.4s ease-in-out infinite alternate; }
+  @keyframes focus-idle {
+    from { transform: translate3d(0, 0, 0) rotate(-0.4deg); }
+    to { transform: translate3d(0, -8px, 0) rotate(0.45deg); }
+  }
+  .scene.has-motion .scene-focus:hover .focus-card {
+    animation: none;
+    transform: translate3d(calc(var(--px, 0) * 12px), calc(-12px + var(--py, 0) * 8px), 0) rotate(calc(var(--px, 0) * -2deg));
+    box-shadow: 18px 18px 0 #c41e3a;
+  }
+  .focus-card > img { width: 100%; height: 100%; max-width: none; object-fit: cover; filter: grayscale(.15) saturate(1.05); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .scene.has-motion .scene-focus:hover .focus-card > img { transform: scale(1.06) translate3d(calc(var(--px, 0) * -8px), calc(var(--py, 0) * -6px), 0); }
+  .focus-card-copy { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+  .scene.has-motion .scene-focus:hover .focus-card-copy { transform: translate3d(calc(var(--px, 0) * 6px), calc(var(--py, 0) * -4px), 0); }
+  .scene.has-motion .scene-focus:hover .focus-read i { transform: translate(5px, -4px); }
   .focus-card-shade { position: absolute; z-index: 2; inset: 0; background: linear-gradient(0deg, rgba(6,40,74,.88), rgba(6,40,74,.04) 62%); }
   .focus-card-copy { position: absolute; z-index: 3; left: 8%; right: 8%; bottom: 8%; }
   .focus-label { font-family: var(--s2-ui); font-size: 11px; letter-spacing: .18em; color: var(--s2-cyan); }
   .focus-card-copy h2 { margin: 8px 0 12px; color: #f7fbff; font-family: var(--s2-display); font-size: clamp(16px, 1.2vw, 22px); line-height: 1.35; font-weight: 700; }
   .focus-read { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(247,251,255,.45); padding-top: 10px; font-size: 12px; letter-spacing: .12em; color: #f7fbff; }
-  .focus-read i { font-style: normal; }
+  .focus-read i { font-style: normal; display: inline-block; transition: transform .35s; }
+  .page-exit {
+    position: fixed; inset: 0; z-index: 500; pointer-events: none;
+    background: var(--color-bg);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .48s cubic-bezier(.7, 0, .2, 1);
+  }
+  .page-exit::after { content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 12px; background: #c41e3a; }
+  :global(html.is-leaving) .page-exit { transform: scaleX(1); pointer-events: auto; }
   .focus-edge { display: none; }
   .scene-content {
     position: absolute; z-index: 8; left: 22%; top: 26%; width: min(58vw, 820px);
@@ -962,15 +1066,27 @@ const shortTitle = (t: string) => t.split('——')[0];
     transform: translate3d(0, calc(var(--drift) * -10px + var(--copy) * -18px), 0);
     pointer-events: none;
   }
-  .scene.has-motion .scene-content { pointer-events: auto; }
+  .scene.has-motion .scene-content { pointer-events: none; }
+  .scene.has-motion .scene-title,
+  .scene.has-motion .scene-intro { pointer-events: auto; }
   .scene-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; font-size: 12px; letter-spacing: .22em; color: var(--muted); font-weight: 700; }
   .scene-eyebrow span { width: 42px; height: 4px; background: #c41e3a; }
   .scene-title { margin: 0; font-weight: 700; font-size: clamp(44px, 5.2vw, 78px); line-height: 1.05; letter-spacing: .01em; color: var(--ink); font-family: var(--font-serif), "Songti SC", serif; }
   .title-shift { display: block; transform-origin: left center; }
-  .title-line { display: block; width: fit-content; }
+  .title-line { display: block; width: fit-content; transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s, text-shadow .45s; }
   .title-shift-a { transform: scaleX(calc(1 + var(--copy) * .05)) translateY(calc(var(--copy) * -8px)); }
   .title-shift-b { margin-top: 10px; margin-left: 12%; transform: scaleX(calc(1 - var(--copy) * .14)); }
   .title-shift-b .title-line { box-shadow: inset 0 -0.28em 0 color-mix(in srgb, var(--s2-ochre) calc(var(--morph) * 100%), #c41e3a); }
+  .scene.has-motion .scene-title { cursor: default; }
+  .scene.has-motion .scene-title:hover .title-shift-a .title-line {
+    transform: translate3d(calc(8px + var(--px, 0) * 7px), calc(-4px + var(--py, 0) * 4px), 0) rotate(-0.6deg);
+    text-shadow: 7px 7px 0 color-mix(in srgb, #c41e3a 40%, transparent);
+  }
+  .scene.has-motion .scene-title:hover .title-shift-b .title-line {
+    transform: translate3d(calc(14px + var(--px, 0) * 8px), 2px, 0);
+    box-shadow: inset 0 -0.2em 0 #c41e3a;
+  }
+  .scene.has-motion .scene-title:hover :global(.live-ch) { animation-play-state: paused; }
   .scene-intro { display: flex; align-items: center; gap: 28px; margin-top: 26px; }
   .scene-typing { margin: 0; min-height: 1.5em; font-size: 14px; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
   .typing-cursor { display: inline-block; width: 1px; height: 1em; margin-left: 5px; background: currentColor; vertical-align: -2px; animation: blink 1.2s step-end infinite; }
@@ -1418,7 +1534,9 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-glint { display: none; }
     .scene-content { opacity: 1 !important; }
     .scene-image, .title-line, .scene-eyebrow, .scene-intro,
-    .sqs, .sqs-b, .hatch, .chip, .chip-b, .dash-line, .micro i, .s2-rail-top, .s2-grid i, .s2-float, .s2-bars-mid i, .s2-float-c { animation: none; }
+    .sqs, .sqs-b, .hatch, .chip, .chip-b, .dash-line, .micro i, .s2-rail-top, .s2-grid i, .s2-float, .s2-bars-mid i, .s2-float-c,
+    .live-ch, .focus-card, .s2-line { animation: none; }
+    .page-exit { display: none; }
     .scene-scroll, .scene-scroll::after { animation: none; }
     .latest-preview { display: none; }
     .flashcard-shadow, .flashcard-foil,
@@ -1426,5 +1544,16 @@ const shortTitle = (t: string) => t.split('——')[0];
     .interlude-image::before, .interlude-image::after,
     .preview-card::before, .preview-card::after { display: none; }
     .series-visual, .interlude-image, .preview-card { transform: none !important; }
+  }
+</style>
+<style is:global>
+  .scene.has-motion .live-ch {
+    display: inline-block;
+    animation: letter-bob 3.1s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * 0.07s);
+  }
+  @keyframes letter-bob { to { transform: translateY(-0.07em); } }
+  @media (prefers-reduced-motion: reduce) {
+    .live-ch { animation: none; }
   }
 </style>
