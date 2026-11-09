@@ -526,14 +526,21 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   body:not(.is-home):not(.is-post) #nav-toggle { border-color: #111; color: var(--color-text-strong); }
   body:not(.is-home):not(.is-post) #theme-toggle:hover,
   body:not(.is-home):not(.is-post) #nav-toggle:hover { background: #c41e3a; }
-  @media (max-width: 760px) {
+  @media (max-width: 1000px) {
     .edge-marks { display: none; }
+    html, body { overflow-x: clip; }
   }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }
     .header-actions { margin-left: auto; }
     #nav-toggle { display: grid; }
+    /* 汉堡菜单不能跟着封面滚走，否则开场滚到第二幕就没有导航。 */
+    body.is-home .site-header,
+    body.is-post .site-header {
+      position: fixed; top: 0; left: 0; right: 0;
+    }
+    body:not(.is-home):not(.is-post) .site-header { position: sticky; top: 0; }
   }
   @media (max-width: 600px) {
     .site-header { padding: 0 18px; gap: 10px; }

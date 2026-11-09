@@ -246,6 +246,9 @@ const hobbies = ['写代码，也写那些代码解释不了的问题', '折腾�
     .about-lower { gap: var(--wide-gap); }
     .tech-grid { gap: var(--wide-gap); }
   }
+  @media (max-width: 1100px) and (min-width: 761px) {
+    .dos-form > div:nth-child(2) { padding-right: 72px; }
+  }
   @media (max-width: 760px) {
     .dossier { margin-top: 34px; padding-top: 26px; box-shadow: 7px 8px 0 var(--hard); transform: rotate(-.5deg); }
     .dos-tab { top: -27px; padding: 7px 12px 6px; }
