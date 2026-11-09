@@ -316,7 +316,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
         var aura = document.querySelector('.pointer-aura');
         if (!aura) return;
         var R = 22, x = 0, y = 0, tx = 0, ty = 0, scale = 1, ts = 1, running = false, primed = false, inside = false;
-        var jellyT0 = 0;
+        var jellyT0 = 0, jellyAng = 0;
         var hotSel = 'a, button, h1, h2, .scene-title, .s2-title, .focus-card, .book-plate, .series-visual';
         function show(e) {
           if (e.pointerType && e.pointerType !== 'mouse') return;
@@ -326,23 +326,25 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           aura.classList.add('is-on');
           wake();
         }
-        function jelly() {
-          if (!jellyT0) return [1, 1];
-          var t = (performance.now() - jellyT0) / 420;
-          if (t >= 1) { jellyT0 = 0; return [1, 1]; }
-          var e;
-          if (t < 0.38) { e = Math.sin((t / 0.38) * Math.PI); return [1 + 0.16 * e, 1 - 0.14 * e]; }
-          if (t < 0.72) { e = Math.sin(((t - 0.38) / 0.34) * Math.PI); return [1 - 0.1 * e, 1 + 0.1 * e]; }
-          e = Math.sin(((t - 0.72) / 0.28) * Math.PI);
-          return [1 + 0.04 * e, 1 - 0.035 * e];
+        function jellyDeform() {
+          if (!jellyT0) return 0;
+          var t = (performance.now() - jellyT0) / 1000;
+          if (t >= 0.55) { jellyT0 = 0; return 0; }
+          return Math.exp(-5.3 * t) * Math.sin((Math.PI * 2 / 0.36) * t) * 0.209;
         }
         function tick() {
           var dx = tx - x, dy = ty - y, ds = ts - scale;
           x += dx * 0.16;
           y += dy * 0.16;
           scale += ds * 0.14;
-          var j = jelly();
-          aura.style.transform = 'translate3d(' + (x - R) + 'px,' + (y - R) + 'px,0) scale(' + (scale * j[0]).toFixed(3) + ',' + (scale * j[1]).toFixed(3) + ')';
+          var d = jellyDeform();
+          var base = 'translate3d(' + (x - R) + 'px,' + (y - R) + 'px,0) scale(' + scale.toFixed(3) + ')';
+          if (!jellyT0) {
+            aura.style.transform = base;
+          } else {
+            var along = 1 + d;
+            aura.style.transform = base + ' rotate(' + jellyAng.toFixed(1) + 'deg) scale(' + along.toFixed(3) + ',' + (1 / along).toFixed(3) + ') rotate(' + (-jellyAng).toFixed(1) + 'deg)';
+          }
           if (!inside && !jellyT0 && Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25 && Math.abs(ds) < 0.004) { running = false; return; }
           requestAnimationFrame(tick);
         }
@@ -352,6 +354,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           show(e);
           if (e.button !== 0) return;
           if (e.pointerType && e.pointerType !== 'mouse') return;
+          jellyAng = Math.random() * 180;
           jellyT0 = performance.now();
           wake();
         });
