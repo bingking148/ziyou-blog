@@ -138,7 +138,7 @@ const shortTitle = (t: string) => t.split('——')[0];
 
       <a class="scene-focus" href={postUrl(latest)} aria-label={`阅读最新文章：${latest.data.title}`}>
         <div class="focus-card">
-          {latest.data.cover && <ResponsiveImage src={latest.data.cover} sizes="(max-width: 760px) 72vw, 42vw" alt="" loading="lazy" />}
+          {latest.data.cover && <ResponsiveImage src={latest.data.cover} sizes="(max-width: 760px) 160px, (max-width: 1000px) 220px, 42vw" alt="" loading="lazy" />}
           <div class="focus-card-shade"></div>
           <div class="focus-card-copy">
             <span class="focus-label">最新一篇</span>
@@ -232,7 +232,7 @@ const shortTitle = (t: string) => t.split('——')[0];
               <div class="flashcard-stage">
                 <span class="flashcard-shadow" aria-hidden="true"></span>
                 <a class="series-visual" href={`/categories/${slugifyTaxonomy(c.data.category)}/`} data-flashcard="series">
-                  <ResponsiveImage src={c.data.cover} sizes="(max-width: 760px) 100vw, 55vw" alt={c.data.title} loading="lazy" />
+                  <ResponsiveImage src={c.data.cover} sizes="(max-width: 760px) 92vw, (max-width: 1000px) 40vw, 55vw" alt={c.data.title} loading="lazy" />
                   <span class="flashcard-foil" aria-hidden="true"></span>
                   <span class="series-count">{String(list.length).padStart(2, '0')} 篇</span>
                   <span class="series-ord">SERIES 0{i + 1}</span>
@@ -1160,7 +1160,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   .scene.has-motion .scene-progress { visibility: visible; }
 
   /* ===== 正文 ===== */
-  .journal { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px,5vw,64px); background: var(--color-bg); }
+  .journal { max-width: 1280px; margin: 0 auto; padding: 0 clamp(24px,5vw,64px); background: var(--color-bg); overflow-x: clip; }
   .section-no { display: block; margin-bottom: 22px; font-size: 10px; letter-spacing: .28em; color: var(--red-2); }
   .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 46px; }
   .section-head h2 { margin: 0; font-size: clamp(28px,3vw,42px); font-weight: 500; letter-spacing: .06em; }
@@ -1383,6 +1383,13 @@ const shortTitle = (t: string) => t.split('——')[0];
     --fc-hue: 0deg; --fc-px: 0px; --fc-py: 0px;
     pointer-events: none;
   }
+  /* 触控没有悬停。滚动倾角保留，箔面和 will-change 图层拿掉，避免手机上一直重绘。 */
+  @media (hover: none), (pointer: coarse) {
+    .flashcard-foil,
+    .series-visual::after, .interlude-image::after, .preview-card::after { display: none; }
+    .series-visual, .interlude-image, .preview-card,
+    .series-visual img, .interlude-image img, .preview-card img { will-change: auto; }
+  }
   @supports (transform: translateZ(1px)) {
     .series-visual, .interlude-image, .preview-card { transform-origin: 50% 48%; }
   }
@@ -1469,60 +1476,104 @@ const shortTitle = (t: string) => t.split('——')[0];
     .latest-row { min-height: 142px; }
   }
 
+  /* 平板竖屏到大手机：黑条仍留在左侧，正文从黑条右边起笔。
+     第二幕恢复「左文案 / 右目录，焦点卡落在右下」而不是单栏叠在一起。
+     门开到 87°，合页剩下一窄条，不再盖住第二幕的行首。电脑端（>1000px）不进这里。 */
   @media (max-width: 1000px) {
-    .scene-pin { --slab-x: 0.1; }
-    .mega { font-size: clamp(72px, 14vw, 120px); left: 28px; }
+    .scene-pin {
+      --slab-x: 0.1;
+      height: 100svh; min-height: 0; max-height: 100svh;
+      perspective: 1200px;
+    }
+    .door-l { transform: rotateY(calc(var(--open, 0) * -87deg)); }
+    .door-r { transform: rotateY(calc(var(--open, 0) * 87deg)); }
+    .mega { font-size: clamp(64px, 12vw, 104px); left: 20px; top: 84px; }
     .rule-v { display: none; }
-    .scene-title { font-size: clamp(36px, 6vw, 56px); }
+    .scene-title { font-size: clamp(34px, 5vw, 52px); }
     .scene-side { display: none; }
     .scene-edition { display: none; }
-    .scene-content { left: 16%; width: min(70vw, 640px); }
-    .s2-title { font-size: clamp(56px, 7.2vw, 84px); }
-    .s2-d { margin-left: 1.4em; }
-    .s2-board { grid-template-columns: 1fr; top: 10%; bottom: 18%; }
-    .scene-focus { width: min(28vw, 240px); }
+    .scene-content {
+      left: calc(18% + 28px); right: calc(10% + 24px); width: auto;
+      top: max(168px, 18%);
+    }
+    .scene-scroll { right: calc(10% + 24px); bottom: 112px; }
+    .s2-orn { display: none; }
+    .s2-title { font-size: clamp(40px, 5.2vw, 64px); }
+    .s2-b { margin-left: .8em; }
+    .s2-d { margin-left: 1.15em; }
+    .s2-board {
+      left: 28px; right: 24px;
+      top: 104px; bottom: 72px;
+      grid-template-columns: minmax(0, 1.25fr) minmax(180px, .72fr);
+      align-content: start; align-items: start;
+      gap: 12px 18px;
+    }
+    .s2-copy { grid-column: 1; grid-row: 1; }
+    .s2-panel {
+      grid-column: 2; grid-row: 1;
+      width: 100%; justify-self: stretch; margin-top: 36px;
+    }
+    .scene-focus {
+      top: auto; bottom: 112px; left: auto;
+      right: 28px; width: min(26vw, 210px);
+    }
     .latest-preview { display: none; }
     .colophon { gap: 30px; }
   }
   @media (max-width: 760px) {
-    .scene { min-height: 620px; }
-    .scene.has-motion { height: 230svh; min-height: 1400px; }
-    .scene-pin { min-height: 580px; perspective: 1000px; }
+    .scene { min-height: 0; }
+    .scene.has-motion { height: 220svh; min-height: 0; }
+    .scene-pin { perspective: 900px; }
     .scene-image, .scene-tear img { object-position: 58% center; }
     .rule-v, .slash, .marks, .field-quiet, .act-spec { display: none; }
     .scene-pin { --slab-x: 0.055; }
-    .scene-content { left: 28px; right: 20px; width: auto; padding: 0; top: 22%; }
-    .scene-eyebrow { font-size: 11px; letter-spacing: .16em; margin-bottom: 16px; }
-    .scene-title { font-size: clamp(36px, 9vw, 52px); line-height: 1.05; }
-    .title-indent { padding-left: .55em; }
-    .scene-intro { flex-direction: column; align-items: flex-start; gap: 24px; margin-top: 30px; padding-left: .6em; }
-    .scene-bottom { left: 24px; right: 24px; }
+    /* 手机放不下桌面上那条宽黑条，收成页边，标题才能整行落在纸色上。 */
+    .slab { width: 14px; }
+    .mass { width: 12px; right: 0; }
+    .mega { font-size: 56px; left: 22px; top: 86px; }
+    .scene-content { left: 24px; right: 18px; width: auto; padding: 0; top: 158px; }
+    .scene-eyebrow { font-size: 11px; letter-spacing: .16em; margin-bottom: 14px; }
+    .scene-title { font-size: clamp(30px, 8vw, 40px); line-height: 1.12; }
+    .title-indent { padding-left: .4em; }
+    .scene-intro { flex-direction: column; align-items: flex-start; gap: 16px; margin-top: 18px; padding-left: 0; }
+    .scene-bottom { left: 16px; right: 16px; }
     .scene-index { grid-template-columns: 1fr; }
     .scene-index-item { padding: 13px 0; border-left: none; }
     .scene-index-item:nth-child(n+2) { display: none; }
-    .scene-scroll { right: 18px; bottom: 104px; width: 48px; }
+    .scene-scroll { right: 28px; bottom: 78px; width: 48px; }
     .scene-scroll svg { width: 17px; height: 17px; }
     .scroll-label { display: none; }
-    .mass { width: 28%; right: 0; }
-    .slab { width: 46%; }
     .s2-orn, .s2-meta, .numstrip, .red-index, .micro { display: none; }
     .s2-seam-desk { display: none; }
     .s2-seam-mob { display: block; }
-    .s2-board { left: 16px; right: 16px; grid-template-columns: 1fr; gap: 12px; top: 8%; }
-    .s2-title { font-size: clamp(46px, 12.5vw, 58px); }
-    .s2-b { margin-left: .55em; }
-    .s2-d { margin-left: .9em; }
-    .s2-panel { margin-top: 28px; }
-    .scene-focus { left: auto; right: 16px; top: auto; bottom: 72px; width: min(46vw, 180px); }
-    .focus-card { aspect-ratio: 1.15; border-width: 3px; box-shadow: 8px 8px 0 #c41e3a; }
-    .scene-progress { left: 16px; right: 16px; color: var(--s2-onfield); background: transparent; }
-    .scene-focus:hover .focus-card { box-shadow: 10px 10px 0 var(--s2-ochre); }
-    .focus-card-copy h2 { font-size: clamp(18px, 4.6vw, 24px); margin: 8px 0 12px; }
-    .focus-label { font-size: 7px; }
-    .focus-read { padding-top: 10px; font-size: 9px; }
-    .scene-progress { left: 24px; right: 24px; bottom: 0; height: 56px; }
-    .progress-label { font-size: 7px; letter-spacing: .18em; }
-    .progress-track { width: 60px; }
+    .s2-board {
+      left: 18px; right: 16px; top: 88px; bottom: 52px;
+      grid-template-columns: 1fr; gap: 10px;
+      align-content: space-between;
+    }
+    .s2-copy, .s2-panel { grid-column: 1; grid-row: auto; }
+    .s2-title { font-size: clamp(30px, 8.2vw, 40px); }
+    .s2-b { margin-left: .45em; }
+    .s2-d { margin-left: .7em; }
+    .s2-note { margin-bottom: 0; font-size: 14px; }
+    .s2-panel {
+      width: calc(100% - min(42vw, 168px) - 24px);
+      justify-self: start; margin-top: 0; padding: 12px 12px 8px;
+    }
+    .s2-menu span { padding: 8px 6px; font-size: 13px; letter-spacing: .08em; }
+    .scene-focus { left: auto; right: 22px; top: auto; bottom: 78px; width: min(40vw, 156px); }
+    .focus-card { aspect-ratio: 1.2; border-width: 3px; box-shadow: 6px 6px 0 #c41e3a; }
+    .scene-focus:hover .focus-card { box-shadow: 8px 8px 0 #c41e3a; }
+    .focus-card-copy { left: 8%; right: 8%; bottom: 8%; }
+    .focus-card-copy h2 { font-size: 14px; line-height: 1.35; margin: 4px 0 6px; }
+    .focus-label { font-size: 10px; letter-spacing: .12em; }
+    .focus-read { padding-top: 6px; font-size: 11px; letter-spacing: .08em; }
+    .scene-progress {
+      left: 16px; right: auto; bottom: 8px; width: auto; height: 32px;
+      color: var(--s2-onfield); background: transparent;
+    }
+    .progress-label { font-size: 11px; letter-spacing: .12em; }
+    .progress-track { width: 72px; }
     .opening { padding: 90px 0 80px; }
     .opening-text { font-size: 22px; line-height: 1.95; }
     .desktop-br { display: none; }
@@ -1530,9 +1581,14 @@ const shortTitle = (t: string) => t.split('——')[0];
     .section-head { margin-bottom: 30px; }
     .section-aside { display: none; }
     .series { padding-bottom: 90px; }
-    .series-grid { grid-template-columns: 1fr; gap: 52px; }
-    .series-item-2 { margin-top: 0; }
-    .series-item-1 .series-visual, .series-item-2 .series-visual { aspect-ratio: 1.35; }
+    .series-grid { grid-template-columns: 1fr; gap: 28px; }
+    .series-item,
+    .series-item-2,
+    .series-item-3,
+    .series-item-4 { grid-template-columns: 1fr; margin-top: 0; }
+    .series-body { padding: 18px 16px 16px; }
+    .series-item-1 .series-visual, .series-item-2 .series-visual,
+    .series-item-3 .series-visual, .series-item-4 .series-visual { aspect-ratio: 1.5; }
     .interlude { grid-template-columns: 1fr; gap: 30px; margin-bottom: 90px; padding-top: 48px; padding-bottom: 48px; }
     .plate-title { font-size: 34px; }
     .plate-en { font-size: 10px; letter-spacing: .12em; bottom: 48px; }
@@ -1545,8 +1601,23 @@ const shortTitle = (t: string) => t.split('——')[0];
     .colophon { grid-template-columns: 1fr; padding: 50px 0 70px; }
     .colophon-knob { max-width: 280px; }
   }
+  /* 横屏手机：高度不够同时放下目录和三行标题，收成左文案 + 右下小卡。 */
+  @media (max-width: 1000px) and (max-height: 520px) {
+    .mega, .scene-bottom, .s2-panel, .s2-meta, .scene-progress, .marks { display: none; }
+    .slab { width: 12px; }
+    .mass { width: 10px; }
+    .scene.has-motion { height: 180svh; min-height: 0; }
+    .scene-content { top: 88px; left: 28px; right: 20px; }
+    .scene-title { font-size: 26px; }
+    .scene-intro { flex-direction: row; align-items: center; gap: 16px; margin-top: 10px; padding-left: 0; }
+    .s2-board { top: 96px; right: 20px; bottom: 12px; left: 24px; grid-template-columns: 1fr; }
+    .s2-title { font-size: 26px; }
+    .s2-note { font-size: 13px; }
+    .scene-focus { display: none; }
+    .scene-scroll { right: 16px; bottom: 12px; width: 40px; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .scene { height: 100svh; min-height: 660px; overflow: hidden; }
+    .scene { height: 100svh; min-height: min(660px, 100svh); overflow: hidden; }
     .scene-media { transform: none !important; }
     .scene-card { transform: none !important; }
     .scene-glint { display: none; }
