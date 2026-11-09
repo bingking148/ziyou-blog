@@ -4,7 +4,8 @@ import Base from '../layouts/Base.astro';
 import MoodKnob from '../components/MoodKnob.astro';
 import ResponsiveImage from '../components/ResponsiveImage.astro';
 import { responsive } from '../utils/images.ts';
-import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
+import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
+import { UDL_CHAPTERS, UDL_META } from '../data/udl/index.ts';
 import { TYPING_STRINGS, SOCIAL, AUTHOR } from '../consts.ts';
 
 const posts = (await getCollection('post')).sort(
@@ -14,10 +15,6 @@ const columns = (await getCollection('columns')).sort((a, b) => a.data.order - b
 const latest = posts[0];
 const heroIndex = posts.slice(0, 3);
 const recent = posts.slice(1, 7);
-// 随想位：从「人工智能学习」专栏随机抽一篇（构建时随机；dev 下每次刷新都换）
-const aiColumn = columns.find((c) => c.data.category === '人工智能学习');
-const aiPool = aiColumn ? columnPosts(aiColumn, posts) : [];
-const essays = aiPool.length ? [aiPool[Math.floor(Math.random() * aiPool.length)]] : [];
 const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
 
 const fmt = (d: Date) =>
@@ -194,9 +191,7 @@ const shortTitle = (t: string) => t.split('——')[0];
       <span class="opening-ticks" aria-hidden="true"></span>
       <span class="section-no">00 / 笔记</span>
       <p class="opening-text">
-        这里不追逐热点，只记录那些<span>真正想明白的事</span>。<br />
-        从大模型的原理，到 Python 的第一行代码，<br class="desktop-br" />
-        再到数学与世界运作的方式——慢慢写，认真想。
+        这里不追逐热点，只记录那些<span>真正想明白的事</span>。
       </p>
       <div class="opening-mark" aria-hidden="true">“</div>
     </section>
@@ -240,25 +235,29 @@ const shortTitle = (t: string) => t.split('——')[0];
       </div>
     </section>
 
-    <!-- 随想：大尺幅横图 + 文字 -->
-    {essays[0] && (
-      <section class="interlude" data-reveal aria-label="数理随想">
-        <div class="flashcard-stage">
-          <span class="flashcard-shadow" aria-hidden="true"></span>
-          <a class="interlude-image" href={postUrl(essays[0])} data-flashcard="interlude">
-            <ResponsiveImage src={essays[0].data.cover} sizes="(max-width: 760px) 100vw, 60vw" alt={essays[0].data.title} loading="lazy" />
-            <span class="flashcard-foil" aria-hidden="true"></span>
-          </a>
-        </div>
-        <div class="interlude-copy">
-          <span class="section-no">02 / ESSAY</span>
-          <p class="interlude-kicker">在公式之外</p>
-          <h2><a href={postUrl(essays[0])}>{essays[0].data.title}</a></h2>
-          <p>{essays[0].data.description}</p>
-          <a class="text-link" href={postUrl(essays[0])}>读这篇随想 <span>↗</span></a>
-        </div>
-      </section>
-    )}
+    <!-- 书：理解深度学习。图位没有封面，用一块同尺寸的书脊色板。 -->
+    <section class="interlude" data-reveal aria-label={`《${UDL_META.bookZh}》`}>
+      <div class="flashcard-stage">
+        <span class="flashcard-shadow" aria-hidden="true"></span>
+        <a class="interlude-image book-plate" href="/learning/" data-flashcard="interlude">
+          <span class="plate-spine" aria-hidden="true"></span>
+          <span class="plate-kicker">N° {String(UDL_CHAPTERS.length).padStart(2, '0')}</span>
+          <span class="plate-title">理解<br />深度学习</span>
+          <span class="plate-en">{UDL_META.bookEn}</span>
+          <span class="plate-eq" aria-hidden="true">f(x, φ)</span>
+          <span class="plate-grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="plate-chip" aria-hidden="true"></span>
+          <span class="flashcard-foil" aria-hidden="true"></span>
+        </a>
+      </div>
+      <div class="interlude-copy">
+        <span class="section-no">02 / BOOK</span>
+        <p class="interlude-kicker">{UDL_META.author}</p>
+        <h2><a href="/learning/">《{UDL_META.bookZh}》</a></h2>
+        <p>边读边译的对照笔记。电脑上左右对照，手机上逐段上下对照，公式和插图按原书样式嵌在正文里。</p>
+        <a class="text-link" href="/learning/">翻开这本书 <span>↗</span></a>
+      </div>
+    </section>
 
     <!-- 最新：编号目录，悬停浮图 -->
     <section class="latest" aria-labelledby="latest-title">
@@ -1096,6 +1095,43 @@ const shortTitle = (t: string) => t.split('——')[0];
   .interlude-image { display: block; overflow: hidden; aspect-ratio: 1.5; }
   .interlude-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s; }
   .interlude-image:hover img { transform: scale(1.04); }
+  .book-plate {
+    position: relative;
+    background:
+      linear-gradient(#c41e3a, #c41e3a) 0 0 / 18px 100% no-repeat,
+      repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-text-strong) 16%, transparent) 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(color-mix(in srgb, var(--color-text-strong) 12%, transparent) 0 1px, transparent 1px 32px),
+      var(--color-surface);
+    color: var(--color-text-strong);
+  }
+  .plate-spine { position: absolute; inset: 0 auto 0 0; width: 18px; background: #c41e3a; }
+  .plate-kicker {
+    position: absolute; top: 22px; left: 40px;
+    font-size: 12px; letter-spacing: .32em; font-weight: 800;
+  }
+  .plate-title {
+    position: absolute; left: 40px; top: 22%;
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 4.2vw, 68px);
+    font-weight: 700; line-height: 1.02; letter-spacing: .06em;
+  }
+  .plate-en {
+    position: absolute; left: 40px; bottom: 58px; max-width: 62%;
+    font-size: 12px; letter-spacing: .18em; font-weight: 800;
+  }
+  .plate-eq {
+    position: absolute; right: 7%; top: 16%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic; font-size: clamp(26px, 2.6vw, 40px);
+    color: #c41e3a; transform: rotate(-8deg);
+  }
+  .plate-grid {
+    position: absolute; right: 22px; bottom: 20px;
+    display: grid; grid-template-columns: repeat(6, 11px); gap: 6px;
+  }
+  .plate-grid i { display: block; height: 11px; background: var(--color-text-strong); }
+  .plate-grid i:nth-child(3n) { background: #c41e3a; }
+  .plate-chip { position: absolute; top: 0; right: 0; width: 64px; height: 16px; background: #c41e3a; }
   .interlude-kicker { margin: 0 0 12px; font-size: 12px; letter-spacing: .2em; color: var(--red-2); }
   .interlude-copy h2 { margin: 0 0 20px; font-size: clamp(24px,2.4vw,34px); line-height: 1.55; font-weight: 500; }
   .interlude-copy h2 a { color: var(--color-text-strong); }
@@ -1342,6 +1378,11 @@ const shortTitle = (t: string) => t.split('——')[0];
     .series-item-2 { margin-top: 0; }
     .series-item-1 .series-visual, .series-item-2 .series-visual { aspect-ratio: 1.35; }
     .interlude { grid-template-columns: 1fr; gap: 30px; margin-bottom: 90px; padding-top: 48px; padding-bottom: 48px; }
+    .plate-title { font-size: 34px; }
+    .plate-en { font-size: 10px; letter-spacing: .12em; bottom: 48px; }
+    .plate-eq { font-size: 22px; right: 16px; }
+    .plate-grid { right: 14px; bottom: 14px; gap: 4px; grid-template-columns: repeat(6, 8px); }
+    .plate-grid i { height: 8px; }
     .latest { padding-bottom: 80px; }
     .latest-row { gap: 14px; padding: 22px 0; }
     .latest-row time { display: none; }
