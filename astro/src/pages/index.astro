@@ -371,14 +371,41 @@ const shortTitle = (t: string) => t.split('——')[0];
       var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
       var smooth = function (v) { v = clamp(v); return v * v * (3 - 2 * v); };
       var ramp = function (p, a, b) { return smooth((p - a) / (b - a)); };
+      var focus = scene.querySelector('.scene-focus');
+      var sceneLink = scene.querySelector('.scene-link');
+      var sceneTitle = scene.querySelector('.scene-title');
+      var metrics = { top: 0, distance: 1 };
+      var written = {};
+      var flags = {};
+      /* 几何只在加载和尺寸变化时读一次。滚动帧用 scrollY 推同一条进度，
+         避免每帧 getBoundingClientRect 把开门动画打回同步布局。 */
+      function measure() {
+        var rect = scene.getBoundingClientRect();
+        metrics.top = rect.top + window.scrollY;
+        var distance = scene.offsetHeight - pin.offsetHeight;
+        metrics.distance = distance > 0 ? distance : 0;
+        var mobile = window.innerWidth <= 760;
+        write('--slab-x', (mobile ? 0.055 : 0.16).toFixed(4));
+        write('--push', '0');
+      }
+      function write(name, value) {
+        if (written[name] === value) return;
+        written[name] = value;
+        pin.style.setProperty(name, value);
+      }
+      function setFlag(key, el, on, attr) {
+        if (!el || flags[key] === on) return;
+        flags[key] = on;
+        if (attr === 'inert') el.toggleAttribute('inert', on);
+        else if (attr === 'aria-hidden') el.setAttribute(attr, on ? 'true' : 'false');
+        else if (on) el.setAttribute(attr, 'true');
+        else el.removeAttribute(attr);
+      }
       function update() {
         ticking = false;
-        var rect = scene.getBoundingClientRect();
-        /* 用 pin 高度而不是 window.innerHeight：pin 是 100svh，工具栏收放不改变，
-           平板上地址栏一弹一收 innerHeight 会跳，进度 p 跟着闪。 */
-        var distance = scene.offsetHeight - pin.offsetHeight;
-        if (distance <= 0) return;
-        var p = clamp(-rect.top / distance);
+        if (metrics.distance <= 0) return;
+        /* 与 -rect.top / distance 相同：top 在 measure 里记成文档坐标。 */
+        var p = clamp((window.scrollY - metrics.top) / metrics.distance);
         /* 同一条进度驱动形变和换色，中间没有 0/1 跳切。 */
         var drift = ramp(p, 0, 0.16);
         /* 只开门，不推镜头。open 拉长到后段，中段仍能看见门；正反向同一条 smoothstep。 */
@@ -388,39 +415,29 @@ const shortTitle = (t: string) => t.split('——')[0];
         /* 第一幕字先让开，门还在开；两条都是 p 的 smoothstep，回滚不抖。 */
         var copy = ramp(p, 0.14, 0.5);
         var arrive = ramp(p, 0.46, 0.82);
-        var mobile = window.innerWidth <= 760;
-        var slab0 = mobile ? 0.055 : 0.16;
-        var slab1 = mobile ? 1 : 0.56;
-        var st = pin.style;
-        st.setProperty('--scene-p', p.toFixed(4));
-        st.setProperty('--drift', drift.toFixed(4));
-        st.setProperty('--morph', morph.toFixed(4));
-        st.setProperty('--open', open.toFixed(4));
-        st.setProperty('--push', '0');
-        st.setProperty('--flat', flat.toFixed(4));
-        st.setProperty('--tint', morph.toFixed(4));
-        st.setProperty('--copy', copy.toFixed(4));
-        st.setProperty('--arrive', arrive.toFixed(4));
-        st.setProperty('--slab-x', (slab0 + (slab1 - slab0) * 0).toFixed(4));
-        st.setProperty('--scene-progress', (p * 100).toFixed(2) + '%');
-        st.setProperty('--scroll-cta-opacity', (1 - ramp(p, 0.04, 0.18)).toFixed(4));
-        st.setProperty('--chapter', morph < 0.55 ? '"01"' : '"02"');
+        write('--scene-p', p.toFixed(4));
+        write('--drift', drift.toFixed(4));
+        write('--morph', morph.toFixed(4));
+        write('--open', open.toFixed(4));
+        write('--flat', flat.toFixed(4));
+        write('--tint', morph.toFixed(4));
+        write('--copy', copy.toFixed(4));
+        write('--arrive', arrive.toFixed(4));
+        write('--scene-progress', (p * 100).toFixed(2) + '%');
+        write('--scroll-cta-opacity', (1 - ramp(p, 0.04, 0.18)).toFixed(4));
+        write('--chapter', morph < 0.55 ? '"01"' : '"02"');
         pin.classList.toggle('is-past-intro', p > 0.08 || playing);
         pin.classList.toggle('is-end', p > 0.96);
-        var focus = scene.querySelector('.scene-focus');
-        if (focus) {
-          var active = arrive > 0.82 && p < 0.98;
-          focus.toggleAttribute('inert', !active);
-          focus.setAttribute('aria-hidden', String(!active));
-        }
-        var sceneLink = scene.querySelector('.scene-link');
-        if (sceneLink) sceneLink.toggleAttribute('inert', copy > 0.55);
-        var sceneTitle = scene.querySelector('.scene-title');
-        if (sceneTitle) sceneTitle.toggleAttribute('inert', copy > 0.45);
+        /* 门还在画面里才保留合成层；开完并离开这段进度后放掉，滚动正文不再挂着两扇全屏层。 */
+        pin.classList.toggle('is-live', p < 0.999);
+        var focusOn = !(arrive > 0.82 && p < 0.98);
+        setFlag('focus-inert', focus, focusOn, 'inert');
+        setFlag('focus-hidden', focus, focusOn, 'aria-hidden');
+        setFlag('link-inert', sceneLink, copy > 0.55, 'inert');
+        setFlag('title-inert', sceneTitle, copy > 0.45, 'inert');
         if (cta) {
-          cta.toggleAttribute('inert', p > 0.18 || playing);
-          if (playing) cta.setAttribute('aria-disabled', 'true');
-          else cta.removeAttribute('aria-disabled');
+          setFlag('cta-inert', cta, p > 0.18 || playing, 'inert');
+          setFlag('cta-disabled', cta, playing, 'aria-disabled');
         }
       }
       var root = document.documentElement;
@@ -498,9 +515,12 @@ const shortTitle = (t: string) => t.split('——')[0];
       function schedule() {
         if (!ticking) { ticking = true; requestAnimationFrame(update); }
       }
+      function onResize() { measure(); schedule(); }
       window.addEventListener('scroll', schedule, { passive: true });
-      window.addEventListener('resize', schedule);
-      window.addEventListener('load', schedule);
+      window.addEventListener('resize', onResize);
+      window.addEventListener('load', onResize);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', onResize);
+      measure();
       update();
     })();
   </script>
@@ -603,7 +623,11 @@ const shortTitle = (t: string) => t.split('——')[0];
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (en) {
             for (var j = 0; j < items.length; j++) {
-              if (items[j].card === en.target) { items[j].on = en.isIntersecting; break; }
+              if (items[j].card === en.target) {
+                items[j].on = en.isIntersecting;
+                items[j].host.classList.toggle('is-fx', en.isIntersecting);
+                break;
+              }
             }
           });
           schedule();
@@ -741,8 +765,9 @@ const shortTitle = (t: string) => t.split('——')[0];
     position: absolute; top: 0; bottom: 0; z-index: 5;
     background: var(--paper);
     backface-visibility: hidden;
-    pointer-events: none; will-change: transform;
+    pointer-events: none;
   }
+  .scene-pin.is-live .door { will-change: transform; }
   .door-l {
     left: 0; width: calc(50% + 10px);
     transform-origin: left center;
@@ -1339,11 +1364,17 @@ const shortTitle = (t: string) => t.split('——')[0];
     transform: translate3d(var(--fc-drift), 0, var(--fc-tz)) rotateX(var(--fc-rx)) rotateY(var(--fc-ry)) rotateZ(var(--fc-rz)) scale(var(--fc-scale));
     box-shadow: 10px 10px 0 #111;
     backface-visibility: hidden;
-    will-change: transform;
   }
   .series-visual img, .interlude-image img, .preview-card img {
     transform: scale(1.09) translate3d(var(--fc-px), var(--fc-py), 0);
-    will-change: transform;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .flashcard-stage.is-fx .series-visual,
+    .flashcard-stage.is-fx .interlude-image,
+    .flashcard-stage.is-fx .preview-card,
+    .flashcard-stage.is-fx .series-visual img,
+    .flashcard-stage.is-fx .interlude-image img,
+    .flashcard-stage.is-fx .preview-card img { will-change: transform; }
   }
   .series-visual:hover img { transform: scale(1.13) translate3d(var(--fc-px), var(--fc-py), 0); }
   .interlude-image:hover img { transform: scale(1.12) translate3d(var(--fc-px), var(--fc-py), 0); }

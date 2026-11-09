@@ -83,8 +83,8 @@
       if (cached) { applyVars(cached); return; }
       var img = document.querySelector('#header img');
       if (!img) return;
-      var src = img.currentSrc || img.src || '';
-      if (src.indexOf('/covers/') === -1) return;
+      var src = (img.getAttribute('src') || '') + ' ' + (img.currentSrc || img.src || '');
+      if (src.indexOf('/covers/') === -1 && src.indexOf('/images/optimized/') === -1) return;
       var go = function () {
         var a = extract(img);
         if (a) { cached = a; applyVars(a); }

@@ -8,7 +8,14 @@ interface Props {
   loading?: 'lazy' | 'eager';
   fetchpriority?: 'high' | 'low' | 'auto';
   crossorigin?: string;
+  /** 文章封面已由 CSS 撑满格子，再写宽高会多出一个宽高比约束。 */
+  intrinsic?: boolean;
 }
-const { src, alt, class: className, sizes = '100vw', loading = 'lazy', ...rest } = Astro.props;
+const { src, alt, class: className, sizes = '100vw', loading = 'lazy', intrinsic = true, ...rest } = Astro.props;
+const attrs = responsive(src, sizes);
+if (!intrinsic) {
+  delete attrs.width;
+  delete attrs.height;
+}
 ---
-<img {...responsive(src, sizes)} alt={alt} class={className} loading={loading} {...rest} />
+<img {...attrs} alt={alt} class={className} loading={loading} {...rest} />
