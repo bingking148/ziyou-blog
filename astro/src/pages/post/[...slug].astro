@@ -7,6 +7,7 @@ import PostNav from '../../components/PostNav.astro';
 import Toc from '../../components/Toc.astro';
 import AccentColor from '../../components/AccentColor.astro';
 import MoodKnob from '../../components/MoodKnob.astro';
+import ResponsiveImage from '../../components/ResponsiveImage.astro';
 import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
 import { AUTHOR, OUTDATE_DAYS, DEFAULT_COVER } from '../../consts.ts';
 
@@ -112,7 +113,7 @@ const fmt = (d: Date) =>
   <article class="post-layout">
     <header id="header" class="post-hero">
       <div class="post-hero-media">
-        <img class="post-cover" src={cover} alt={post.data.title} crossorigin="anonymous" fetchpriority="high" />
+        <ResponsiveImage class="post-cover" src={cover} alt={post.data.title} sizes="(max-width: 1000px) 100vw, 48vw" loading="eager" fetchpriority="high" crossorigin="anonymous" intrinsic={false} />
       </div>
       <div class="post-hero-shade" aria-hidden="true"></div>
       <div class="post-hero-content">

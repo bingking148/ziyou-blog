@@ -80,8 +80,10 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
         document.documentElement.dataset.theme = valid || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       })();
     </script>
-    <link rel="stylesheet" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/lxgwwenkaiscreen.css" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/lxgwwenkaiscreen.css" /></noscript>
+    <link rel="preload" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/lxgwwenkaiscreen-critical.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/resources/mulish/mulish-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/lxgwwenkaiscreen-used.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="/resources/lxgw-wenkai-screen-webfont@1.1.0/lxgwwenkaiscreen-used.css" /></noscript>
     <link rel="stylesheet" href="/resources/mulish/mulish.css" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="/resources/mulish/mulish.css" /></noscript>
     <slot name="head" />
@@ -333,6 +335,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           return Math.exp(-5.3 * t) * Math.sin((Math.PI * 2 / 0.36) * t) * 0.209;
         }
         function tick() {
+          if (document.hidden) { running = false; return; }
           var dx = tx - x, dy = ty - y, ds = ts - scale;
           x += dx * 0.16;
           y += dy * 0.16;
@@ -367,6 +370,10 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
           if (e.relatedTarget) return;
           inside = false;
           aura.classList.remove('is-on');
+        });
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) { running = false; return; }
+          if (inside) wake();
         });
       })();
     </script>

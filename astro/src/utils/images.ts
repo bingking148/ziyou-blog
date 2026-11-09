@@ -7,9 +7,10 @@ const images = manifest as Record<string, ImageInfo>;
 /** 构建期静态资源映射；未知外链/动图不经过转换。 */
 export function responsive(src: string, sizes = '100vw') {
   const info = images[src];
-  if (!info) return { src };
+  if (!info || !info.variants.length) return { src };
+  const fallback = info.variants[info.variants.length - 1];
   return {
-    src,
+    src: fallback.src,
     srcset: info.variants.map((v) => `${v.src} ${v.width}w`).join(', '),
     sizes,
     width: info.width,

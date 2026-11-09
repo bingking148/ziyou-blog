@@ -8,6 +8,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const sourceDir = path.join(root, 'public/images');
 const outputDir = path.join(sourceDir, 'optimized');
 const widths = [480, 768, 1280, 1600, 1920];
+const maxWidth = 1920;
 const manifest = {};
 await mkdir(outputDir, { recursive: true });
 await mkdir(path.join(root, 'src/generated'), { recursive: true });
@@ -29,7 +30,7 @@ for (const file of await walk(sourceDir)) {
   const meta = await image.metadata();
   const basename = path.basename(file).replace(/\.(?:jpe?g|png)$/i, '');
   const hash = createHash('sha256').update(input).digest('hex').slice(0, 10);
-  const prefix = `/images/optimized/${basename}-${hash}`;
+  const prefix = `/images/optimized/${basename}-${hash}-q80`;
   const variants = [];
   async function saveVariant(url, width) {
     const dest = path.join(root, 'public', url.slice(1));
@@ -38,15 +39,22 @@ for (const file of await walk(sourceDir)) {
       const existing = await sharp(await readFile(dest)).metadata();
       valid = existing.width === width && existing.format === 'webp';
     } catch { /* 首次生成或损坏文件 */ }
-    if (!valid) await image.clone().resize({ width, withoutEnlargement: true }).webp({ quality: 80 }).toFile(dest);
+    if (!valid) {
+      await image.clone().resize({ width, withoutEnlargement: true }).webp({
+        quality: 80,
+        effort: 6,
+        smartSubsample: true,
+      }).toFile(dest);
+    }
     variants.push({ src: url, width });
   }
-  for (const width of widths.filter((w) => w < (meta.width ?? 0))) {
+  const capped = Math.min(meta.width ?? 0, maxWidth);
+  for (const width of widths.filter((w) => w < (meta.width ?? 0) && w < capped)) {
     await saveVariant(`${prefix}-${width}.webp`, width);
   }
-  const url = `${prefix}-${meta.width}.webp`;
-  await saveVariant(url, meta.width ?? 0);
-  variants.push({ src: url, width: meta.width });
+  if (capped > 0 && !variants.some((variant) => variant.width === capped)) {
+    await saveVariant(`${prefix}-${capped}.webp`, capped);
+  }
   manifest[src] = { width: meta.width, height: meta.height, variants };
 }
 manifest['/images/hero-bg-1920.jpg'] = {

@@ -33,6 +33,13 @@ const { path } = Astro.props;
     function load() {
       if (loaded || loading) return;
       loading = true;
+      if (!document.querySelector('link[data-wenkai-full]')) {
+        var fontCss = document.createElement('link');
+        fontCss.rel = 'stylesheet';
+        fontCss.href = '/resources/lxgw-wenkai-screen-webfont@1.1.0/lxgwwenkaiscreen.css';
+        fontCss.setAttribute('data-wenkai-full', '');
+        document.head.appendChild(fontCss);
+      }
       if (btn) { btn.textContent = '加载中…'; btn.disabled = true; }
       // Vite 不会打包 /resources/ 下的 vendored 文件，得在运行时拼 URL，
       // 让浏览器自己走 <script type="module"> 的路径解析。
