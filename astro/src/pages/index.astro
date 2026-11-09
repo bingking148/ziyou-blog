@@ -78,15 +78,29 @@ const shortTitle = (t: string) => t.split('——')[0];
         <div class="s2-wash"></div>
         <div class="s2-orn" aria-hidden="true">
           <i class="s2-rail s2-rail-top"></i>
+          <i class="s2-rail s2-rail-bot"></i>
           <i class="s2-rail s2-rail-side"></i>
-          <div class="s2-ticks-v"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <i class="s2-rail s2-rail-join"></i>
+          <i class="s2-frame-line"></i>
+          <i class="s2-corner s2-c1"></i>
+          <i class="s2-corner s2-c2"></i>
+          <i class="s2-corner s2-c3"></i>
+          <i class="s2-corner s2-c4"></i>
+          <div class="s2-ticks-v"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="s2-ticks-h"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="s2-bars-mid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <div class="s2-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="s2-grid s2-grid-b"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <i class="s2-shard s2-shard-a"></i>
           <i class="s2-shard s2-shard-b"></i>
+          <i class="s2-shard s2-shard-c"></i>
           <i class="s2-tri s2-tri-a"></i>
           <i class="s2-tri s2-tri-b"></i>
+          <i class="s2-tri s2-tri-c"></i>
           <span class="s2-float">02</span>
           <span class="s2-float s2-float-b">ZIYOU</span>
+          <span class="s2-float s2-float-c">N°02</span>
+          <span class="s2-float s2-float-d">DRAFT</span>
         </div>
         <div class="s2-board">
           <div class="s2-copy">
@@ -764,51 +778,93 @@ const shortTitle = (t: string) => t.split('——')[0];
       var(--s2-bg);
   }
   .s2-orn { position: absolute; inset: 0; pointer-events: none; }
-  .s2-orn::after {
-    content: ""; position: absolute; left: 48%; top: 22%; bottom: 26%; width: 2px;
-    background: repeating-linear-gradient(var(--s2-cyan) 0 10px, transparent 10px 16px);
+  .s2-orn::before, .s2-orn::after {
+    content: ""; position: absolute; width: 2px;
+    background: repeating-linear-gradient(var(--s2-cyan) 0 8px, transparent 8px 14px);
   }
+  .s2-orn::before { left: 42%; top: 18%; bottom: 18%; }
+  .s2-orn::after { left: 58%; top: 28%; bottom: 22%; background: repeating-linear-gradient(var(--s2-white) 0 6px, transparent 6px 12px); }
   .s2-rail-top {
-    position: absolute; left: 8%; right: 6%; top: 7%; height: 8px;
-    background: repeating-linear-gradient(90deg, var(--s2-white) 0 12px, transparent 12px 20px);
+    position: absolute; left: 5%; right: 4%; top: 5.5%; height: 8px;
+    background: repeating-linear-gradient(90deg, var(--s2-white) 0 10px, transparent 10px 16px);
+  }
+  .s2-rail-bot {
+    position: absolute; left: 8%; right: 28%; bottom: 7%; height: 3px; background: var(--s2-white);
   }
   .s2-rail-side {
-    position: absolute; left: 4.2%; top: 14%; bottom: 16%; width: 3px; background: var(--s2-white);
+    position: absolute; left: 3.2%; top: 12%; bottom: 12%; width: 3px; background: var(--s2-white);
   }
+  .s2-rail-join {
+    position: absolute; left: 34%; right: 30%; top: 46%; height: 2px;
+    background: color-mix(in srgb, var(--s2-white) 70%, transparent);
+  }
+  .s2-frame-line {
+    position: absolute; left: 36%; top: 18%; width: 18%; height: 28%;
+    border: 2px solid color-mix(in srgb, var(--s2-white) 55%, transparent);
+  }
+  .s2-corner { position: absolute; width: 18px; height: 18px; border: 0 solid var(--s2-white); }
+  .s2-c1 { left: 6%; top: 11%; border-top-width: 3px; border-left-width: 3px; }
+  .s2-c2 { right: 5%; top: 11%; border-top-width: 3px; border-right-width: 3px; }
+  .s2-c3 { left: 6%; bottom: 9%; border-bottom-width: 3px; border-left-width: 3px; }
+  .s2-c4 { right: 5%; bottom: 9%; border-bottom-width: 3px; border-right-width: 3px; border-color: #c41e3a; }
+  .s2-ticks-h {
+    position: absolute; left: 12%; top: 72%; display: flex; gap: 7px; align-items: flex-end;
+  }
+  .s2-ticks-h i { width: 16px; height: 3px; background: var(--s2-white); }
+  .s2-ticks-h i:nth-child(3n) { height: 10px; background: #c41e3a; }
+  .s2-bars-mid {
+    position: absolute; left: 40%; top: 22%; width: 120px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .s2-bars-mid i { display: block; height: 4px; background: var(--s2-white); }
+  .s2-bars-mid i:nth-child(2) { width: 72%; background: var(--s2-cyan); }
+  .s2-bars-mid i:nth-child(3) { width: 48%; background: #c41e3a; }
+  .s2-bars-mid i:nth-child(4) { width: 86%; }
+  .s2-bars-mid i:nth-child(5) { width: 34%; background: var(--s2-cyan); }
+  .s2-bars-mid i:nth-child(6) { width: 60%; }
   .s2-ticks-v {
     position: absolute; right: 3.2%; top: 18%; display: flex; flex-direction: column; gap: 8px;
   }
   .s2-ticks-v i { width: 14px; height: 3px; background: var(--s2-white); }
   .s2-ticks-v i:nth-child(3n) { width: 22px; background: #c41e3a; }
   .s2-grid {
-    position: absolute; left: 18%; bottom: 14%;
+    position: absolute; left: 14%; bottom: 11%;
     display: grid; grid-template-columns: repeat(8, 8px); gap: 5px;
+  }
+  .s2-grid-b {
+    left: auto; right: 31%; top: 58%; bottom: auto;
+    grid-template-columns: repeat(4, 9px);
   }
   .s2-grid i { width: 8px; height: 8px; background: var(--s2-white); }
   .s2-grid i:nth-child(4n) { background: #c41e3a; }
   .s2-grid i:nth-child(5n) { background: var(--s2-cyan); }
   .s2-shard { position: absolute; background: var(--s2-white); }
   .s2-shard-a { left: 12%; top: 10%; width: 54px; height: 16px; background: #c41e3a; transform: skewX(-18deg); }
-  .s2-shard-b { right: 28%; top: 9%; width: 28px; height: 28px; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .s2-shard-b { left: 51%; top: 13%; width: 22px; height: 22px; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .s2-shard-c { left: 46%; bottom: 16%; width: 42px; height: 8px; background: var(--s2-cyan); }
   .s2-tri { position: absolute; width: 0; height: 0; border-style: solid; }
   .s2-tri-a { left: 10%; bottom: 22%; border-width: 0 0 14px 12px; border-color: transparent transparent var(--s2-white) transparent; }
   .s2-tri-b { right: 18%; bottom: 18%; border-width: 12px 12px 0 0; border-color: var(--s2-cyan) transparent transparent transparent; }
+  .s2-tri-c { left: 36%; top: 62%; border-width: 0 10px 12px 0; border-color: transparent #c41e3a transparent transparent; }
   .s2-float {
     position: absolute; left: 9%; top: 78%;
     padding: 4px 8px; background: #c41e3a; color: #fff;
     font-family: Arial, Helvetica, sans-serif; font-weight: 900; font-size: 13px;
   }
-  .s2-float-b { left: auto; right: 22%; top: 16%; background: var(--s2-white); color: var(--s2-deep); letter-spacing: .16em; font-size: 11px; }
+  .s2-float-b { left: auto; right: 31%; top: 14%; background: var(--s2-white); color: var(--s2-deep); letter-spacing: .16em; font-size: 11px; }
+  .s2-float-c { left: 44%; top: 34%; background: transparent; color: var(--s2-white); border: 2px solid var(--s2-white); letter-spacing: .12em; }
+  .s2-float-d { left: auto; right: 34%; bottom: 20%; top: auto; background: var(--s2-deep); color: var(--s2-cyan); letter-spacing: .18em; font-size: 11px; }
   .scene.has-motion .s2-rail-top { animation: s2-dash 1.8s linear infinite; }
   .scene.has-motion .s2-grid i:nth-child(odd) { animation: chip-blink 2.2s steps(2) infinite; }
-  .scene.has-motion .s2-float { animation: drift-y 4.2s ease-in-out infinite alternate; }
+  .scene.has-motion .s2-bars-mid i:nth-child(odd) { animation: chip-blink 2.8s steps(2) infinite; }
+  .scene.has-motion .s2-float-c { animation: drift-y 4.2s ease-in-out infinite alternate; }
   @keyframes s2-dash { to { background-position: 20px 0; } }
   .s2-board {
     position: absolute; z-index: 2;
     left: max(36px, 8%); right: max(36px, 7%);
-    top: 13%; bottom: 13%;
-    display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .78fr);
-    gap: 28px; align-items: center;
+    top: 11%; bottom: 16%;
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(280px, .9fr);
+    gap: 18px; align-items: start;
   }
   .s2-copy { position: relative; padding: 12px 12px 12px 22px; }
   .s2-copy::before {
@@ -842,7 +898,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   .s2-meta span:nth-child(2) { background: #c41e3a; color: #fff; }
   .s2-panel {
-    align-self: start; margin-top: 6%;
+    align-self: start; margin-top: 0; width: min(100%, 420px); justify-self: end;
     padding: 18px 18px 14px;
     background: var(--s2-white); color: var(--s2-deep);
     border: 3px solid var(--s2-white);
@@ -862,7 +918,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   .s2-menu span:nth-child(3) { background: var(--s2-deep); color: #fff; }
   .s2-menu span:nth-child(3) b { color: var(--s2-cyan); }
   .scene-focus {
-    position: absolute; z-index: 8; right: max(36px, 8%); bottom: 14%; width: min(22vw, 280px);
+    position: absolute; z-index: 8; right: max(36px, 7%); top: 52%; width: min(24vw, 340px);
     color: var(--s2-ink); pointer-events: none;
     opacity: var(--open, 0);
   }
@@ -1237,7 +1293,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-glint { display: none; }
     .scene-content { opacity: 1 !important; }
     .scene-image, .title-line, .scene-eyebrow, .scene-intro,
-    .sqs, .sqs-b, .hatch, .chip, .chip-b, .dash-line, .micro i, .s2-rail-top, .s2-grid i, .s2-float { animation: none; }
+    .sqs, .sqs-b, .hatch, .chip, .chip-b, .dash-line, .micro i, .s2-rail-top, .s2-grid i, .s2-float, .s2-bars-mid i, .s2-float-c { animation: none; }
     .scene-scroll, .scene-scroll::after { animation: none; }
     .latest-preview { display: none; }
     .flashcard-shadow, .flashcard-foil,
