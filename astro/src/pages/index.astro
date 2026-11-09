@@ -74,7 +74,18 @@ const shortTitle = (t: string) => t.split('——')[0];
       </div>
 
       <div class="scene-after" aria-hidden="true">
-        <div class="s2-wash"></div>
+        <div class="s2-wash">
+          <svg class="s2-seam s2-seam-desk" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="0,0 64,0 36,100 0,100" fill="#f5c518" />
+            <line x1="64" y1="0" x2="36" y2="100" stroke="#111" stroke-width="18" vector-effect="non-scaling-stroke" />
+            <line class="s2-seam-run" x1="64" y1="0" x2="36" y2="100" stroke="#f5c518" stroke-width="5" vector-effect="non-scaling-stroke" stroke-dasharray="16 18" />
+          </svg>
+          <svg class="s2-seam s2-seam-mob" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="0,0 100,0 100,44 0,70" fill="#f5c518" />
+            <line x1="100" y1="44" x2="0" y2="70" stroke="#111" stroke-width="14" vector-effect="non-scaling-stroke" />
+            <line class="s2-seam-run" x1="100" y1="44" x2="0" y2="70" stroke="#f5c518" stroke-width="4" vector-effect="non-scaling-stroke" stroke-dasharray="14 16" />
+          </svg>
+        </div>
         <div class="s2-orn" aria-hidden="true">
           <i class="s2-rail s2-rail-top"></i>
           <i class="s2-rail s2-rail-bot"></i>
@@ -852,17 +863,18 @@ const shortTitle = (t: string) => t.split('——')[0];
   }
   .s2-wash {
     position: absolute; inset: 0;
-    background: linear-gradient(90deg, #f5c518 0 50%, var(--s2-bg) 50% 100%);
+    background: var(--s2-bg);
   }
-  .s2-wash::after {
-    content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 8px; background: #111;
-  }
+  .s2-seam { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .s2-seam-mob { display: none; }
+  .scene.has-motion .s2-seam-run { animation: seam-crawl 1.35s linear infinite; }
+  @keyframes seam-crawl { to { stroke-dashoffset: -34; } }
   .s2-orn { position: absolute; inset: 0; pointer-events: none; }
   .s2-orn::before, .s2-orn::after {
     content: ""; position: absolute; width: 2px;
     background: repeating-linear-gradient(var(--s2-cyan) 0 8px, transparent 8px 14px);
   }
-  .s2-orn::before { left: 46%; top: 18%; bottom: 18%; background: repeating-linear-gradient(#111 0 8px, transparent 8px 14px); }
+  .s2-orn::before { display: none; }
   .s2-orn::after { left: 58%; top: 28%; bottom: 22%; background: repeating-linear-gradient(var(--s2-white) 0 6px, transparent 6px 12px); }
   .s2-rail-top {
     position: absolute; left: 5%; right: 4%; top: 5.5%; height: 8px;
@@ -1494,13 +1506,13 @@ const shortTitle = (t: string) => t.split('——')[0];
     .mass { width: 28%; right: 0; }
     .slab { width: 46%; }
     .s2-orn, .s2-meta, .numstrip, .red-index, .micro { display: none; }
-    .s2-wash { background: linear-gradient(#f5c518 0 48%, var(--s2-bg) 48%); }
-    .s2-wash::after { left: 0; top: 48%; bottom: auto; width: 100%; height: 8px; }
+    .s2-seam-desk { display: none; }
+    .s2-seam-mob { display: block; }
     .s2-board { left: 16px; right: 16px; grid-template-columns: 1fr; gap: 12px; top: 8%; }
     .s2-title { font-size: clamp(46px, 12.5vw, 58px); }
     .s2-b { margin-left: .55em; }
     .s2-d { margin-left: .9em; }
-    .s2-panel { margin-top: 0; }
+    .s2-panel { margin-top: 28px; }
     .scene-focus { left: auto; right: 16px; top: auto; bottom: 72px; width: min(46vw, 180px); }
     .focus-card { aspect-ratio: 1.15; border-width: 3px; box-shadow: 8px 8px 0 #c41e3a; }
     .scene-progress { left: 16px; right: 16px; color: var(--s2-onfield); background: transparent; }
@@ -1541,7 +1553,7 @@ const shortTitle = (t: string) => t.split('——')[0];
     .scene-content { opacity: 1 !important; }
     .scene-image, .title-line, .scene-eyebrow, .scene-intro,
     .sqs, .sqs-b, .hatch, .chip, .chip-b, .dash-line, .micro i, .s2-rail-top, .s2-grid i, .s2-float, .s2-bars-mid i, .s2-float-c,
-    .live-ch, .focus-card, .s2-line { animation: none; }
+    .live-ch, .focus-card, .s2-line, .s2-seam-run { animation: none; }
     .page-exit { display: none; }
     .scene-scroll, .scene-scroll::after { animation: none; }
     .latest-preview { display: none; }
