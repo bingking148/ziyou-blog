@@ -311,15 +311,38 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
             els.forEach(function (el) { io.observe(el); });
           }
         }
-        if (window.matchMedia('(hover: none), (prefers-reduced-motion: reduce)').matches) return;
-        var aura = document.querySelector('.pointer-aura'), frame = null;
+        if (window.matchMedia('(hover: none), (pointer: coarse), (prefers-reduced-motion: reduce)').matches) return;
+        var aura = document.querySelector('.pointer-aura');
+        if (!aura) return;
+        var R = 120, x = 0, y = 0, tx = 0, ty = 0, scale = 1, ts = 1, running = false, primed = false, inside = false;
+        var hotSel = 'a, button, h1, h2, .scene-title, .s2-title, .focus-card, .book-plate, .series-visual';
+        function tick() {
+          var dx = tx - x, dy = ty - y, ds = ts - scale;
+          x += dx * 0.16;
+          y += dy * 0.16;
+          scale += ds * 0.14;
+          aura.style.transform = 'translate3d(' + (x - R) + 'px,' + (y - R) + 'px,0) scale(' + scale.toFixed(3) + ')';
+          if (!inside && Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25 && Math.abs(ds) < 0.004) { running = false; return; }
+          requestAnimationFrame(tick);
+        }
+        function wake() { if (!running) { running = true; requestAnimationFrame(tick); } }
         document.addEventListener('pointermove', function (e) {
-          if (frame) return;
-          frame = requestAnimationFrame(function () {
-            frame = null;
-            aura.style.transform = 'translate3d(' + (e.clientX - 300) + 'px,' + (e.clientY - 300) + 'px,0)';
-          });
+          if (e.pointerType && e.pointerType !== 'mouse') return;
+          inside = true;
+          tx = e.clientX; ty = e.clientY;
+          if (!primed) { x = tx; y = ty; primed = true; aura.classList.add('is-on'); }
+          wake();
         }, { passive: true });
+        document.addEventListener('pointerover', function (e) {
+          var t = e.target && e.target.closest && e.target.closest(hotSel);
+          ts = t ? 1.22 : 1;
+          wake();
+        });
+        document.addEventListener('pointerout', function (e) {
+          if (e.relatedTarget) return;
+          inside = false;
+          aura.classList.remove('is-on');
+        });
       })();
     </script>
     <script>
@@ -387,7 +410,19 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   .em-corner { right: 12px; bottom: 64px; width: 14px; height: 14px; border-right: 2px solid #c41e3a; border-bottom: 2px solid #c41e3a; }
   body.is-home .edge-marks { display: none; }
   body.is-post .em-r, body.is-post .em-dash, body.is-post .em-corner { display: none; }
-  .pointer-aura { display: none; }
+  .pointer-aura {
+    display: none;
+    position: fixed; top: 0; left: 0; z-index: 140;
+    width: 240px; height: 240px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 56%, rgba(255,255,255,.5) 74%, transparent 100%);
+    mix-blend-mode: difference;
+    pointer-events: none; opacity: 0;
+    will-change: transform;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pointer-aura { display: block; }
+    .pointer-aura.is-on { opacity: 1; }
+  }
   .site-header {
     position: absolute; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: stretch; gap: 0; height: 64px;
@@ -483,7 +518,7 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
     .footer-note { width: 100%; order: 3; margin-left: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .pointer-aura { display: none; }
+    .pointer-aura { display: none !important; }
     .nav-pill { transition: opacity .3s; }
   }
 </style>
