@@ -1,6 +1,6 @@
 // 站点常量（移植自 config/_default/params.yml）
 export const SITE_TITLE = 'ZIYOU';
-export const SITE_DESCRIPTION = '笔记、草稿，和还在改的学习资料';
+export const SITE_DESCRIPTION = '在键盘上写下又一行注释';
 export const AUTHOR = 'ZIYOU';
 export const SINCE = 2025;
 
@@ -19,12 +19,12 @@ export const SOCIAL = {
 };
 
 export const TYPING_STRINGS = [
-  '草稿比正文长',
-  '这处梯度还是不太对',
+  '在键盘上写下又一行注释',
   '今天也靠咖啡续命',
   '代码能跑，先别碰',
-  '学习资料写到损失函数',
-  '提交之前再看一眼',
+  '写过的最好的代码，是没写的那段',
+  '先把需求理清，再谈架构',
+  '下班前的最后一次 commit',
 ];
 
 export const WALINE = {
