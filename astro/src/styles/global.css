@@ -219,9 +219,24 @@ img { max-width: 100%; height: auto; }
    内页编辑式共享类
    ============================================================ */
 .ed-wrap {
+  position: relative;
   max-width: 1080px;
   margin: 0 auto;
   padding: 0 clamp(24px, 5vw, 64px) 100px;
+}
+.ed-wrap::after {
+  content: "";
+  position: absolute;
+  left: clamp(24px, 5vw, 64px);
+  bottom: 28px;
+  width: min(220px, 40%);
+  height: 28px;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-text-strong) 70%, transparent) 0 8px, transparent 8px 18px) 0 8px / 120px 3px no-repeat,
+    linear-gradient(#c41e3a, #c41e3a) 132px 4px / 10px 10px no-repeat,
+    radial-gradient(circle, var(--color-text-strong) 1.3px, transparent 1.5px) 0 20px / 10px 10px no-repeat;
+  opacity: .7;
 }
 .ed-label {
   font-size: 10px;

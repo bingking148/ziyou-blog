@@ -26,9 +26,26 @@ const { no, label, en, value, title, lede } = Astro.props;
 
 <style>
   .chapter-rule {
+    position: relative;
     margin: 0;
     padding: 88px 0 0;
     color: var(--color-text-muted);
+  }
+  .chapter-rule::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    top: 28px;
+    width: min(240px, 46%);
+    height: 36px;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(90deg, var(--color-text-strong) 0 9px, transparent 9px 20px) 0 0 / 140px 3px no-repeat,
+      linear-gradient(#c41e3a, #c41e3a) 152px 0 / 12px 12px no-repeat,
+      linear-gradient(var(--color-text-strong), var(--color-text-strong)) 0 18px / 48px 2px no-repeat,
+      radial-gradient(circle, var(--color-text-strong) 1.4px, transparent 1.6px) 64px 22px / 8px 8px no-repeat;
+    opacity: .55;
   }
   .cr-line-row {
     display: flex;
@@ -49,6 +66,7 @@ const { no, label, en, value, title, lede } = Astro.props;
   @media (min-width: 1440px) { .chapter-rule { padding-top: 112px; } }
   @media (max-width: 760px) {
     .chapter-rule { padding-top: 56px; }
+    .chapter-rule::before { top: 12px; width: 108px; height: 22px; }
     .cr-line-row { gap: 10px; font-size: 10px; }
     .cr-head { margin: 20px 0 28px; }
   }

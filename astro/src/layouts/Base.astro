@@ -89,6 +89,13 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   <body class={pageClass}>
     <a class="skip-link" href="#main">跳到正文</a>
     <div class="site-bg" aria-hidden="true"></div>
+    <div class="edge-marks" aria-hidden="true">
+      <i class="em-ticks"></i>
+      <i class="em-ticks em-r"></i>
+      <i class="em-chip"></i>
+      <i class="em-dash"></i>
+      <i class="em-corner"></i>
+    </div>
     <div class="pointer-aura" aria-hidden="true"></div>
 
     <header class="site-header">
@@ -366,6 +373,20 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   }
   [data-theme="dark"] .site-bg::before { background: #c41e3a; }
   [data-theme="dark"] .site-bg::after { background: #f4f1ea; }
+  /* 页边小构件：刻度、色块、短杠、角框。只占左右外侧，不进正文。 */
+  .edge-marks { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+  .edge-marks i { position: absolute; display: block; }
+  .em-ticks {
+    top: 92px; bottom: 88px; left: 14px; width: 8px;
+    background: repeating-linear-gradient(to bottom, var(--color-text-strong) 0 7px, transparent 7px 24px);
+    opacity: .38;
+  }
+  .em-r { left: auto; right: 14px; width: 2px; opacity: .32; }
+  .em-chip { left: 13px; top: 42%; width: 9px; height: 9px; background: #c41e3a; }
+  .em-dash { right: 12px; top: 28%; width: 18px; height: 3px; background: var(--color-text-strong); opacity: .45; }
+  .em-corner { right: 12px; bottom: 64px; width: 14px; height: 14px; border-right: 2px solid #c41e3a; border-bottom: 2px solid #c41e3a; }
+  body.is-home .edge-marks { display: none; }
+  body.is-post .em-r, body.is-post .em-dash, body.is-post .em-corner { display: none; }
   .pointer-aura { display: none; }
   .site-header {
     position: absolute; top: 0; left: 0; right: 0; z-index: 100;
@@ -445,6 +466,9 @@ const json = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
   body:not(.is-home):not(.is-post) #nav-toggle { border-color: #111; color: var(--color-text-strong); }
   body:not(.is-home):not(.is-post) #theme-toggle:hover,
   body:not(.is-home):not(.is-post) #nav-toggle:hover { background: #c41e3a; }
+  @media (max-width: 760px) {
+    .edge-marks { display: none; }
+  }
   @media (max-width: 900px) {
     .site-header { height: 76px; gap: 12px; }
     #main-nav { display: none; }

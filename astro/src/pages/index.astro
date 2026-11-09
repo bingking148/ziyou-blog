@@ -191,6 +191,7 @@ const shortTitle = (t: string) => t.split('——')[0];
   <div id="journal" class="journal">
     <!-- 序：让内容自己说话 -->
     <section class="opening" data-reveal>
+      <span class="opening-ticks" aria-hidden="true"></span>
       <span class="section-no">00 / 笔记</span>
       <p class="opening-text">
         这里不追逐热点，只记录那些<span>真正想明白的事</span>。<br />
@@ -1020,6 +1021,51 @@ const shortTitle = (t: string) => t.split('——')[0];
   .text-link:hover span { transform: translate(3px,-3px); }
 
   .opening { position: relative; padding: 150px 0 140px; }
+  .opening::before,
+  .opening::after,
+  .series::after,
+  .latest::after,
+  .interlude::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .opening::before {
+    left: 0; top: 28px; width: min(280px, 42%); height: 52px;
+    background:
+      repeating-linear-gradient(90deg, var(--color-text-strong) 0 10px, transparent 10px 22px) 0 0 / 160px 3px no-repeat,
+      linear-gradient(#c41e3a, #c41e3a) 0 16px / 16px 16px no-repeat,
+      linear-gradient(var(--color-text-strong), var(--color-text-strong)) 28px 22px / 54px 3px no-repeat,
+      radial-gradient(circle, var(--color-text-strong) 1.5px, transparent 1.7px) 96px 28px / 12px 12px no-repeat;
+    opacity: .5;
+  }
+  .opening::after {
+    left: 0; right: 0; bottom: 36px; height: 22px;
+    background:
+      repeating-linear-gradient(90deg, var(--color-text-strong) 0 12px, transparent 12px 28px) left center / min(420px, 70%) 3px no-repeat,
+      linear-gradient(#c41e3a, #c41e3a) right 0 center / 22px 8px no-repeat;
+    opacity: .45;
+  }
+  .opening-ticks { display: none; }
+  .series, .latest, .interlude { position: relative; }
+  .series::after, .latest::after {
+    left: 0; bottom: 42px; width: min(260px, 48%); height: 34px;
+    background:
+      repeating-linear-gradient(90deg, var(--color-text-strong) 0 8px, transparent 8px 18px) 0 0 / 140px 3px no-repeat,
+      linear-gradient(#c41e3a, #c41e3a) 152px 0 / 11px 11px no-repeat,
+      linear-gradient(var(--color-text-strong), var(--color-text-strong)) 0 18px / 42px 2px no-repeat,
+      radial-gradient(circle, #c41e3a 1.6px, transparent 1.8px) 56px 22px / 8px 8px no-repeat;
+    opacity: .5;
+  }
+  .latest::after { left: auto; right: 0; }
+  .interlude::after {
+    left: 8%; bottom: -78px; width: 120px; height: 28px;
+    background:
+      linear-gradient(var(--color-text-strong), var(--color-text-strong)) 0 0 / 36px 3px no-repeat,
+      repeating-linear-gradient(90deg, #c41e3a 0 6px, transparent 6px 14px) 0 14px / 70px 6px no-repeat;
+    opacity: .55;
+  }
   .opening-text { position: relative; z-index: 1; margin: 0; font-family: var(--font-serif); font-size: clamp(23px,2.7vw,36px); line-height: 1.95; letter-spacing: .05em; color: var(--color-text-strong); }
   .opening-text span { color: var(--red-1); box-shadow: inset 0 -.35em 0 var(--red-4); }
   .opening-mark { position: absolute; right: 3%; top: 64px; font-family: Georgia,serif; font-size: 230px; line-height: 1; color: var(--red-4); opacity: .65; }
@@ -1160,6 +1206,21 @@ const shortTitle = (t: string) => t.split('——')[0];
     /* 全宽画幅中倾斜闪卡的装饰性投影可以出画，但不能扩大页面滚动区域。 */
     .journal { overflow-x: clip; }
     .opening { display: grid; grid-template-columns: minmax(130px, .34fr) minmax(0, 1.8fr); gap: var(--wide-gap); padding: 160px 0 170px; }
+    .opening-ticks {
+      display: block;
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      top: 250px;
+      bottom: 190px;
+      width: 72px;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(to bottom, var(--color-text-strong) 0 8px, transparent 8px 22px) 0 0 / 2px 100% no-repeat,
+        linear-gradient(#c41e3a, #c41e3a) 16px 8px / 14px 14px no-repeat,
+        linear-gradient(var(--color-text-strong), var(--color-text-strong)) 16px 32px / 40px 3px no-repeat;
+      opacity: .45;
+    }
     .opening .section-no { padding-top: 17px; }
     .opening-text { max-width: 1080px; font-size: clamp(30px, 2.35vw, 42px); }
     .opening-mark { right: 0; top: 56px; font-size: 280px; }
