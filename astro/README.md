@@ -1,6 +1,6 @@
 # Astro 站点（线上版本，2026-10-31 起上线）
 
-本目录是博客 https://ziyou814.top/ 的**线上版本**（Astro 5，2026-10-31 完成切站）。仓库根的 Hugo 站已下线，源码保留作回滚备份。
+本目录是博客 https://ziyou814.top/ 的**线上版本**（Astro 5，2026-10-31 完成切站）。仓库根的 Hugo 站已下线，源码保留作回滚备份。怎么跑、怎么写、怎么部署见仓库根目录 [README.md](../README.md)。本文件只记这个目录里的约定。
 
 ## 开发
 
@@ -22,7 +22,7 @@ npm run test:ui   # Playwright 回归（自动启动 preview；首次先 npx pla
 - **`--red-*` CSS 变量名不可改**：封面取色与氛围旋钮脚本都写这组变量
 - 氛围旋钮持久化键 `yzrt-mood-hue`、主题键 `theme`，与旧站共享
 - 全部第三方资源 vendored 在 `public/resources/`，零公共 CDN（Waline 表情包 unpkg 按需加载除外）
-- 文章 frontmatter 同 Hugo，仅 `lastmod` → `updatedDate`；新文章放 `src/content/post/`
+- 文章 frontmatter 同 Hugo，仅 `lastmod` → `updatedDate`。线上读 `src/content/post/`；新文章写在仓库根 `content/post/`，再用下面的同步脚本生成这边的副本
 - 专栏定义在 `src/content/columns/*.md`（`category` 精确匹配文章 categories 项）；专栏内篇号用 `weight`（从 1 起）
 
 ## 双写同步

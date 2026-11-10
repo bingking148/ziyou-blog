@@ -63,7 +63,7 @@ python -I scripts/verify_build.py              # Hugo 产物（回滚备份用�
 
 ## 图片约定
 
-- 封面统一为宽 ≤1600px 的 JPEG（q80 渐进式）。2026-10 批量压缩过一次（34MB → 3MB），原图备份在仓库外 `E:/blog_image_backup/`，脚本见 `scripts/optimize_images.py`。新封面不要直接扔相机原图。
+- 封面统一为宽 ≤1600px 的 JPEG（q80 渐进式）。2026-10 批量压缩过一次（34MB → 3MB），原图备份在仓库外 `E:/blog_image_backup/`（当时的一次性脚本已从仓库移除）。新封面不要直接扔相机原图。线上用的图放 `astro/public/images/`，构建时由 `astro/scripts/optimize-images.mjs` 生成 WebP；Hugo 备份若要一起更新，同一文件再放一份到 `static/images/`。
 - 首页横幅 `hero-bg-{760,1280,1920}.jpg` 三档 srcset（`params.yml` 的 `banner_srcset`），手机只下 23KB 的小图。
 
 ## 站内搜索

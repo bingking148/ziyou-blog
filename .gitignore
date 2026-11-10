@@ -21,3 +21,7 @@ tools/udl2web/tex_cache.json
 # Python 缓存
 __pycache__/
 *.pyc
+
+# 本地编辑器 / 代理会话（不入库）
+.claude/
+.superpowers/
