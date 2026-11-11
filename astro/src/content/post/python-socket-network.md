@@ -102,6 +102,32 @@ client_socket.close()
 
 客户端和服务器是对称的：服务器 `accept` 到的那个新 socket，和客户端 `connect` 之后的 socket，就是这根「电话线」的两端，一个 `send`、另一个就 `recv` 到。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-accept-second-socket" viewBox="0 0 680 400" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>服务器 listen 的套接字只负责等连接，accept 得到的是另一根通信用的 socket</title>
+  <style>
+    .diag-accept-second-socket { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-accept-second-socket { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M34,39 Q169.5,40.8 306,39.7 Q320.3,40.1 320.3,54 Q320.4,190.2 320.5,326 Q320,339.7 306,340.7 Q169.4,339.7 34,339.1 Q19.6,340.2 20.5,326 Q19.4,190 19.1,54 Q20.4,40.2 34,39 Z" fill="none" stroke="var(--blue)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="170" y="64" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">服务器</text>
+  <text x="170" y="86" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">(192.168.1.13, 10086)</text>
+  <path d="M70,121 Q169.5,119.6 270,120.9 Q279.9,119.8 279.9,130 Q279.5,154.8 279.6,180 Q279.9,189.8 270,189.1 Q170.2,190.9 70,190.1 Q59.6,189.9 59.5,180 Q60.7,155.5 60.4,130 Q59.7,120.1 70,121 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="170" y="144.4" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">socket · listen</text><text x="170" y="165.6" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">等连接</text>
+  <text x="170" y="210" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">accept</text>
+  <line x1="170" y1="190" x2="170" y2="222" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round"/><path d="M170,230 L173.2,222 L166.8,222 Z" fill="var(--blue)"/>
+  <path d="M70,236.8 Q170.6,235.9 270,236.9 Q280,235.6 280.4,246 Q281,271.4 279.2,296 Q279.8,306.3 270,305.2 Q169.7,305 70,306.8 Q59.8,305.9 59.6,296 Q59.2,271.3 59.7,246 Q60.3,236.2 70,236.8 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="170" y="260.4" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">新 socket</text><text x="170" y="281.6" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">这次通信</text>
+  <path d="M514,39.7 Q579.8,39.2 646,39.1 Q659.7,39.7 660.7,54 Q659.3,190.1 659.5,326 Q660.3,340.2 646,340.8 Q579.8,339.9 514,340.9 Q500.3,339.8 499.9,326 Q500.4,189.8 500.2,54 Q500,40.2 514,39.7 Z" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="580" y="64" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--amber)" font-weight="bold">客户端</text>
+  <path d="M530,235.1 Q580.6,235.2 630,235.1 Q639.9,236.1 640.9,246 Q639.7,270.6 639.7,296 Q640.3,306.2 630,305.1 Q579.4,306 530,305.3 Q520.1,305.9 520.8,296 Q519.8,270.9 520.5,246 Q520,235.8 530,235.1 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="260.4" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">socket</text><text x="580" y="281.6" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">connect</text>
+  <line x1="280" y1="271" x2="520" y2="271" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+  <text x="400" y="250" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--green)" font-weight="bold">send</text>
+  <text x="400" y="296" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--green)" font-weight="bold">recv</text>
+  <text x="400" y="330" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">这根「电话线」的两端</text>
+  <text x="170" y="360" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">监听用的那个不进这根线</text>
+</svg>
+</figure>
+
+
 ## 4. 一个能循环服务的服务器
 
 上面第 2 节的服务器只服务一个客户端就结束了。真实的服务器要一直开着，来一个处理一个，还要处理各种意外：

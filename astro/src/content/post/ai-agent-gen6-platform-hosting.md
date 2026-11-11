@@ -47,6 +47,40 @@ toc: true
 
 最关键的一点：登录密码模型是看不到的，因为凭证单独保存——这是这一代 Agent 的安全设计。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-credential-out-of-context" viewBox="0 0 680 450" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>登录密码保存在上下文之外的保险柜里，不经过模型</title>
+  <style>
+    .diag-credential-out-of-context { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-credential-out-of-context { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <circle cx="80" cy="134.4" r="12.8" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7"/><path d="M62.4,153.2 Q80,147.2 97.6,153.2 L92.3,190.4 Q80,193.4 67.7,190.4 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="80" y="214" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">用户</text>
+  <line x1="110" y1="150" x2="159" y2="150" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M168,150 L159,146.4 L159,153.6 Z" fill="currentColor"/>
+  <path d="M184,40 Q310.3,40.6 436,39.5 Q449.9,39.9 450.3,54 Q449.5,179.8 449,306 Q450.4,319.9 436,321 Q310,320.4 184,320.3 Q169.6,320.3 169.2,306 Q170.3,179.6 170.4,54 Q170.3,39.9 184,40 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="310" y="62" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">云端电脑上的 Agent</text>
+  <text x="310" y="82" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--teal)">电脑默认隔离</text>
+  <path d="M200,99.6 Q309.5,99.6 420,100.6 Q429.8,99.6 429.8,110 Q429.7,175.1 430.8,240 Q429.7,250 420,249.2 Q310.3,250.1 200,249.3 Q190.1,250.2 190.5,240 Q190,174.6 189.9,110 Q190.1,100.3 200,99.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="310" y="122" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">上下文</text>
+  <path d="M220,143.8 Q310.5,144.8 400,143.8 Q410.2,144.3 409.6,154 Q411,164.4 410.7,174 Q410.3,184.3 400,183 Q309.7,184.6 220,185 Q210.1,184 209.3,174 Q209.8,164.2 210.2,154 Q210.2,144.1 220,143.8 Z" fill="none" stroke="var(--blue)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/><text x="310" y="164" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">任务</text>
+  <path d="M220,192 Q310.3,192.6 400,192 Q409.7,191.8 409.7,202 Q410.3,212.3 410.1,222 Q409.7,231.6 400,232.9 Q310.5,232.3 220,232.5 Q210.2,231.9 209.5,222 Q209,212 209.6,202 Q210.1,192.3 220,192 Z" fill="none" stroke="var(--blue)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/><text x="310" y="212" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">页面内容</text>
+  <text x="310" y="268" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--green)">这里没有密码</text>
+  <path d="M510,200 Q575.6,200.9 640,199.4 Q650,200.2 650.5,210 Q649,245.3 650.7,280 Q650.2,289.8 640,289.2 Q575,289.5 510,289.8 Q500.3,290.2 500.1,280 Q499,244.7 499.9,210 Q500.2,199.8 510,200 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="575" y="233.1" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">保险柜</text><text x="575" y="256.9" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">凭证</text>
+  <text x="575" y="188" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--purple)">平台保管</text>
+  <path d="M510,40.4 Q575.1,40 640,40.3 Q649.8,39.6 650.7,50 Q649.5,68.1 649.2,86 Q649.8,95.8 640,95.3 Q574.8,96.7 510,96.3 Q500,96.4 499.5,86 Q500.9,67.7 500.7,50 Q499.8,40.2 510,40.4 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="575" y="68" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor">网站</text>
+  <line x1="575" y1="200" x2="575" y2="105" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round"/><path d="M575,96 L571.4,105 L578.6,105 Z" fill="var(--teal)"/>
+  <text x="620" y="140" font-size="15" text-anchor="start" dominant-baseline="central" fill="var(--teal)">登录</text>
+  <path d="M500,245 C430,310 360,310 310,250" fill="none" stroke="var(--red)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5"/><path d="M310,250 L312.7,258.2 L317.6,254.1 Z" fill="var(--red)"/>
+  <text x="400" y="328" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--red)">密码写进上下文</text>
+  <line x1="250" y1="250" x2="205.8" y2="303.1" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 5"/><path d="M200,310 L208.5,305.4 L203,300.8 Z" fill="var(--red)"/>
+  <text x="200" y="348" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--red)">模型可能把它发出去</text>
+  <circle cx="370" cy="348" r="12" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.5"/><line x1="361.6" y1="339.6" x2="378.4" y2="356.4" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/><line x1="378.4" y1="339.6" x2="361.6" y2="356.4" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="20" y="390" width="400" height="40" rx="8" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.4" stroke-linejoin="round"/>
+  <text x="220" y="410" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">高风险动作先询问（付款前停下来确认）</text>
+</svg>
+</figure>
+
+
 回想前面的问题：如果把密码直接暴露给 Agent，它一进上下文，你就控制不了它会把这玩意发到哪里。再加上电脑默认隔离、高风险动作先询问——这些都是前面几代的事故换来的教训。所以它其实比你想象的要安全。
 
 ## 分发渠道：只有大厂在做

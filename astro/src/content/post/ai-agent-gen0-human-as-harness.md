@@ -30,7 +30,40 @@ ChatGPT 是 2022 年 11 月 30 号发布的。那一天，可能很多人没意�
 
 那 Harness 是谁？**是你。** 人，就是那个 Harness。
 
-你在网页上让它"帮我写个脚本"，AI 给出代码，你得把代码复制出来、粘到自己电脑上运行，再把报错复制回去交给它改。你会发现——复制粘贴的工具是人做的，粘贴报错的反馈也是人做的，来回几轮的循环是人在推动，记住之前聊过什么也很大程度上靠人来管理。
+你在网页上让它"帮我写个脚本"，AI 给出代码，你得把代码复制出来、粘到自己电脑上运行，再把报错复制回去交给它改。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-human-loop" viewBox="0 0 680 440" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>第零代里，人自己把任务、复制、运行和报错循环转起来</title>
+  <style>
+    .diag-human-loop { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-human-loop { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M235,36 Q339.9,37.4 445,36.2 Q454.7,36.6 454.2,47 Q454.4,64.3 454.2,81 Q455.4,90.9 445,90.3 Q340.2,90.2 235,91.5 Q224.8,90.9 225.1,81 Q224.8,64.6 224.9,47 Q224.9,37.4 235,36 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="64" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">网页里的 ChatGPT</text>
+  <path d="M532,202.1 Q569.8,203.8 608,202.4 Q617.6,203.2 618,213 Q617.2,230 618.5,247 Q618.3,257.3 608,257.7 Q570.6,257.8 532,257 Q522.4,256.8 521.7,247 Q522.5,229.5 521,213 Q521.7,202.7 532,202.1 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="570" y="230" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">人</text>
+  <path d="M265,363.1 Q340.4,362.5 415,363.3 Q424.8,362.8 425.3,373 Q425.9,389.6 425.8,407 Q425,416.6 415,417.3 Q340,418 265,417.2 Q255.1,417.2 255.1,407 Q255.9,390.2 254.9,373 Q254.9,363.3 265,363.1 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="390" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">自己的电脑</text>
+  <path d="M70,203.1 Q110.4,203.8 150,203.2 Q159.7,202.6 160.8,213 Q160.9,229.9 159.7,247 Q159.8,257 150,256.6 Q110,256.3 70,256.1 Q60.3,257.2 59.5,247 Q60.6,230.3 60.2,213 Q60.3,203.1 70,203.1 Z" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="110" y="230" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">报错</text>
+  <text x="340" y="230" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--amber)" font-weight="bold">人 = Harness</text>
+  <path d="M570,203 C600,120 500,40 455,37" fill="none" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M455,37 L463.7,41.2 L464.2,34 Z" fill="var(--amber)"/>
+  <text x="590" y="88" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">把任务交给它</text>
+  <path d="M450,91 Q500,150 522,203" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M522,203 L521.9,193.3 L515.2,196.1 Z" fill="var(--blue)"/>
+  <text x="508" y="148" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">给出代码</text>
+  <path d="M522,257 Q500,330 425,363" fill="none" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M425,363 L434.7,362.7 L431.8,356.1 Z" fill="var(--amber)"/>
+  <text x="530" y="330" font-size="13" text-anchor="start" dominant-baseline="central" fill="var(--amber)">复制到电脑上运行</text>
+  <path d="M255,390 Q180,360 160,257" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M160,257 L158.2,266.5 L165.2,265.1 Z" fill="var(--teal)"/>
+  <text x="148" y="340" font-size="13" text-anchor="end" dominant-baseline="central" fill="var(--teal)">吐出报错</text>
+  <path d="M110,203 C90,100 200,40 225,37" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M225,37 L215.6,34.5 L216.5,41.6 Z" fill="var(--red)"/>
+  <text x="90" y="88" font-size="13" text-anchor="start" dominant-baseline="central" fill="var(--red)">把报错粘回去</text>
+  <rect x="470" y="400" width="88" height="28" rx="6" fill="none" stroke="var(--gray)" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="7 5"/>
+  <text x="514" y="414" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">没有手</text>
+  <line x1="514" y1="400" x2="514" y2="384" stroke="var(--gray)" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="6 5"/>
+  <line x1="500" y1="400" x2="528" y2="400" stroke="var(--gray)" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="6 5"/>
+  <rect x="30" y="30" width="102" height="28" rx="6" fill="none" stroke="var(--gray)" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="7 5"/>
+  <text x="81" y="44" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">知识截止</text>
+  <line x1="81" y1="58" x2="81" y2="74" stroke="var(--gray)" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="6 5"/>
+</svg>
+</figure>
+你会发现——复制粘贴的工具是人做的，粘贴报错的反馈也是人做的，来回几轮的循环是人在推动，记住之前聊过什么也很大程度上靠人来管理。
 
 这个阶段，人就是 Harness。所以它算不上真正意义上的 AI Agent，我管它叫第零代。
 

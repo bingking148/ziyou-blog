@@ -103,6 +103,40 @@ f1(100)    # 求和结果：110
 
 这就是闭包（Closure）。闭包 = 函数 + 被它记住的变量。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-closure-two-memories" viewBox="0 0 680 360" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>外部函数返回之后，f1 和 f2 各自记住一块互不干扰的变量</title>
+  <style>
+    .diag-closure-two-memories { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-closure-two-memories { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <line x1="40" y1="36" x2="632" y2="36" stroke="var(--gray)" stroke-width="1.5" stroke-linecap="round"/><path d="M640,36 L632,32.8 L632,39.2 Z" fill="var(--gray)"/>
+  <text x="40" y="22" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--gray)">时间</text>
+  <path d="M48,69.4 Q115.1,70 182,70.9 Q190,70.1 190.4,78 Q189.5,97.9 190.2,118 Q190.1,125.9 182,125.5 Q114.5,127 48,127 Q40.3,126.3 39.4,118 Q40.6,97.7 40.6,78 Q39.9,70.1 48,69.4 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 5" opacity="0.85"/>
+  <text x="115" y="90" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">fn_outer(10)</text>
+  <text x="115" y="110" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">执行完后消失</text>
+  <line x1="190" y1="98" x2="223" y2="98" stroke="var(--gray)" stroke-width="1.4" stroke-linecap="round"/><path d="M230,98 L223,95.2 L223,100.8 Z" fill="var(--gray)"/>
+  <path d="M368,69.9 Q434.6,69 502,71 Q510.2,69.9 510.7,78 Q510.6,98.3 510.2,118 Q510.4,126.2 502,125.5 Q434.7,125.3 368,125.9 Q360,126.2 359.5,118 Q359.1,97.7 359.2,78 Q359.7,70.1 368,69.9 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 5" opacity="0.85"/>
+  <text x="435" y="90" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">fn_outer(50)</text>
+  <text x="435" y="110" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">执行完后消失</text>
+  <line x1="510" y1="98" x2="543" y2="98" stroke="var(--gray)" stroke-width="1.4" stroke-linecap="round"/><path d="M550,98 L543,95.2 L543,100.8 Z" fill="var(--gray)"/>
+  <path d="M240,149.6 Q280,149.7 320,150.1 Q330,150.2 329.7,160 Q329,175.1 329.4,190 Q330.4,199.9 320,200.9 Q279.6,199.6 240,200.6 Q229.7,200.3 230.1,190 Q231,175.3 229.4,160 Q230.4,149.8 240,149.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="280" y="175" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">f1</text>
+  <path d="M240,230.5 Q300.6,230.8 360,230.7 Q370.3,230 369.8,240 Q370.6,258.3 370.2,276 Q369.9,286.1 360,285.2 Q300.3,285 240,285.9 Q230.1,285.9 230,276 Q230.2,258.2 229.5,240 Q229.7,230.2 240,230.5 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="300" y="258" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">number1 = 10</text>
+  <line x1="280" y1="200" x2="280" y2="230" stroke="var(--purple)" stroke-width="1.7" stroke-linecap="round"/>
+  <text x="360" y="258" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--purple)">记忆</text>
+  <path d="M560,150.3 Q600.1,150 640,150.4 Q649.9,150 649.6,160 Q650.5,175.5 650.8,190 Q649.6,199.9 640,200.8 Q599.5,200.5 560,200.3 Q550,199.7 550.2,190 Q550.9,175.6 549.9,160 Q549.7,149.7 560,150.3 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="600" y="175" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">f2</text>
+  <path d="M540,230.6 Q599.8,230 660,230 Q669.8,230.1 669.6,240 Q671,257.7 670.4,276 Q670,285.8 660,286.3 Q599.4,286.9 540,286.6 Q529.9,286.1 529.8,276 Q530.7,258 529.4,240 Q530,229.7 540,230.6 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="600" y="258" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">number1 = 50</text>
+  <line x1="600" y1="200" x2="600" y2="230" stroke="var(--teal)" stroke-width="1.7" stroke-linecap="round"/>
+  <text x="520" y="258" font-size="14" text-anchor="end" dominant-baseline="central" fill="var(--teal)">记忆</text>
+  <path d="M50,151 Q90.2,149.9 130,150.1 Q139.7,150.3 139.4,160 Q140.2,174.4 139.8,190 Q140.1,199.7 130,201 Q90.4,200.1 50,199.1 Q40.1,200.1 39,190 Q39.6,174.6 40.1,160 Q40,150.1 50,151 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="90" y="175" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor">f1(1)</text>
+  <line x1="140" y1="175" x2="221" y2="175" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round"/><path d="M230,175 L221,171.4 L221,178.6 Z" fill="var(--amber)"/>
+  <path d="M90,229.4 Q129.8,229.2 170,229.9 Q179.7,230 180.1,240 Q180.3,255.1 179,270 Q180.1,280.3 170,279 Q130,280.6 90,280.1 Q80.3,280 80.7,270 Q79,255.3 79.9,240 Q80.4,229.8 90,229.4 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="130" y="255" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">10 + 1</text>
+  <path d="M280,230 Q200,220 180,255" fill="none" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M180,255 L185.9,250.3 L181,247.5 Z" fill="var(--amber)"/>
+  <text x="340" y="330" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">记住的是变量本身，不是复制一份冻结的数</text>
+</svg>
+</figure>
+
+
 判断一个函数是不是闭包，看三条，缺一不可：
 
 1. 有嵌套——外部函数里嵌套定义了内部函数；

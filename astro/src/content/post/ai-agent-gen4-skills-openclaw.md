@@ -30,6 +30,38 @@ Agent Skills 最关键的设计是**渐进式加载**，分三层：
 - 只有当用户请求匹配上某个技能，才把全文读进来
 - 相关的资源文件（.py、.md）执行到了才加载
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-skill-progressive-load" viewBox="0 0 680 430" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>技能分三层渐进式加载：先名字和描述，命中后再拉全文和资源</title>
+  <style>
+    .diag-skill-progressive-load { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-skill-progressive-load { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <text x="154" y="30" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">技能文件夹</text>
+  <path d="M36,68 L36,61 L64,61 L72,68 L224,68 L224,148 L36,148 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M48,94 L48,87 L76,87 L84,94 L236,94 L236,174 L48,174 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60,120 L60,113 L88,113 L96,120 L248,120 L248,200 L60,200 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60,120 L60,113 L88,113 L96,120 L248,120 L248,330 L60,330 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M82,147.1 Q153.7,146.9 226,146.2 Q236.1,146.6 235,157 Q236.9,167.9 236,179 Q236,189.1 226,189.7 Q153.4,188 82,190 Q71.7,188.7 71.9,179 Q71.9,168.4 73,157 Q72.1,146.8 82,147.1 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="154" y="168" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">名字和描述</text>
+  <path d="M82,205.5 Q154.6,205.1 226,205 Q235.9,205.2 236.9,215 Q236,225.5 235.2,237 Q235.9,246.7 226,246 Q153.7,246.4 82,246.1 Q71.7,247.4 72.1,237 Q71.4,226.2 72.1,215 Q72.1,205.1 82,205.5 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="154" y="226" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">SKILL.md 全文</text>
+  <path d="M82,262.7 Q153.9,262.4 226,263.9 Q236.4,263 236.7,273 Q236.4,283.4 236.5,295 Q235.9,305.2 226,304.8 Q153.7,304.7 82,304.6 Q71.9,305.3 71.5,295 Q71,284.1 72,273 Q72.3,263.2 82,262.7 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="154" y="284" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">资源文件（.py、.md）</text>
+  <path d="M402,47.3 Q522.3,48.4 642,47.9 Q653.8,47.7 654.5,60 Q654.6,213 653.9,366 Q653.8,377.9 642,377.1 Q521.4,378.9 402,377.9 Q390.1,378.4 390.9,366 Q389.6,213.3 389.7,60 Q389.8,48.4 402,47.3 Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="522" y="30" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">上下文</text>
+  <text x="522" y="70" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">有限的盒子</text>
+  <path d="M418,92.2 Q522.6,92.9 626,91.4 Q635.9,92 635.9,102 Q635.4,120.6 636.3,140 Q635.9,150.1 626,149.6 Q521.6,151 418,150.4 Q407.9,149.8 407.1,140 Q407.1,121.3 407.4,102 Q407.9,91.8 418,92.2 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="522" y="111.1" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">名字和描述</text><text x="522" y="130.9" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">约 100 个 Token</text>
+  <path d="M418,175.3 Q521.6,176.4 626,176.2 Q635.7,176.2 636.2,186 Q636.2,200.1 635.8,214 Q636.2,224.1 626,223 Q522.2,224 418,224.1 Q408,224 408.8,214 Q407.7,199.7 408.5,186 Q407.8,176 418,175.3 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="522" y="200" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">SKILL.md 全文</text>
+  <path d="M418,251 Q522.3,250.5 626,249.9 Q635.8,249.7 635.4,260 Q636.2,273.5 635.1,288 Q635.7,298 626,297.8 Q522.5,297.2 418,298.8 Q407.7,297.9 407.1,288 Q408.7,273.4 407.4,260 Q408.2,250.2 418,251 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="522" y="274" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">资源文件</text>
+  <text x="522" y="340" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--teal)" font-weight="bold">几百个技能，盒子不满</text>
+  <line x1="248" y1="168" x2="399.4" y2="123.5" stroke="var(--blue)" stroke-width="1.7" stroke-linecap="round"/><path d="M408,121 L398.4,120.1 L400.4,127 Z" fill="var(--blue)"/>
+  <text x="328" y="132" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">启动时只送这些</text>
+  <line x1="248" y1="226" x2="399.1" y2="201.4" stroke="var(--green)" stroke-width="1.7" stroke-linecap="round"/><path d="M408,200 L398.5,197.9 L399.7,205 Z" fill="var(--green)"/>
+  <text x="336" y="218" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--green)">匹配上之后</text>
+  <line x1="248" y1="284" x2="399" y2="274.6" stroke="var(--purple)" stroke-width="1.7" stroke-linecap="round"/><path d="M408,274 L398.8,271 L399.2,278.2 Z" fill="var(--purple)"/>
+  <text x="328" y="262" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--purple)">执行到了才送</text>
+</svg>
+</figure>
+
+
 这样，一个 Agent 可以一次性挂几百个技能而不会把上下文塞满。这就是 Gen 2 里那张「书桌」的一种聪明的管理法：平时只放一个目录，用到哪本再拿哪本。
 
 Skill 很快成了开放标准，OpenAI、VS Code、Copilot 全都采用了它。加上 MCP 和 AGENTS.md，这一时期 Agent 生态的三个基础标准凑齐了——管连接工具的、管封装专长的、管说明项目的。
@@ -64,6 +96,40 @@ OpenClaw 最核心的是四个机制：
 心跳机制值得单独说。
 
 系统做一个定时任务，每隔几分钟把它叫醒一次，读一遍检查清单：发现现在没事，继续睡；过半小时又被唤醒，发现下午两个会议撞了，处理一下，继续睡；十点半注意到显卡降价了，给你发个提醒；没事就继续睡。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-heartbeat" viewBox="0 0 680 420" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>心跳按时间把 Agent 叫醒：读检查清单后，没事继续睡，有事处理完再睡</title>
+  <style>
+    .diag-heartbeat { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-heartbeat { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M130,52.9 Q180.5,51.1 230,51.6 Q240,52.4 239.4,62 Q240.8,79.5 239.3,98 Q239.7,107.9 230,108.7 Q179.5,108.6 130,107.1 Q119.8,108.3 119.9,98 Q120.7,79.9 120.1,62 Q120.2,52.1 130,52.9 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="180" y="80" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">睡</text>
+  <path d="M435,52.9 Q500.3,51.8 565,51.2 Q574.7,51.8 575.8,62 Q575.5,79.5 575.9,98 Q575.3,108.2 565,107.3 Q500.1,107.7 435,108.8 Q425.3,108.4 425.2,98 Q424,80 424.6,62 Q425.3,52.1 435,52.9 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="500" y="80" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">定时唤醒</text>
+  <path d="M420,195.6 Q500.1,194.7 580,195.1 Q589.9,195.1 589.5,205 Q591,230 590.3,255 Q589.6,264.6 580,265.3 Q499.8,265.8 420,265.5 Q410.1,265.4 409.5,255 Q410.2,229.7 409.7,205 Q409.7,195 420,195.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="500" y="230" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">读检查清单</text>
+  <line x1="240" y1="80" x2="416" y2="80" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round"/><path d="M425,80 L416,76.4 L416,83.6 Z" fill="var(--amber)"/>
+  <text x="340" y="62" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">每隔几分钟</text>
+  <line x1="500" y1="108" x2="500" y2="186" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round"/><path d="M500,195 L503.6,186 L496.4,186 Z" fill="var(--blue)"/>
+  <path d="M145,202.6 Q200,201.6 255,202.7 Q264.7,202.3 264.1,212 Q264.8,230.3 265.8,248 Q265.4,257.9 255,257.2 Q199.8,257.4 145,258.5 Q134.7,257.9 135.7,248 Q134.9,230.2 134.4,212 Q135.1,202.4 145,202.6 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="200" y="230" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor">没事</text>
+  <path d="M90,312.6 Q200.5,312.8 310,311.1 Q320.4,311.7 319.3,322 Q320.1,340.2 319.4,358 Q319.7,368.2 310,367.4 Q200.3,368.7 90,368.8 Q79.8,368 80.6,358 Q81,340.3 80.5,322 Q80,312.3 90,312.6 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="200" y="340" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">有事：处理或发提醒</text>
+  <text x="200" y="300" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--green)">会议撞了、显卡降价</text>
+  <path d="M410,230 Q320,230 265,230" fill="none" stroke="var(--gray)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M265,230 L274,233.6 L274,226.4 Z" fill="var(--gray)"/>
+  <text x="340" y="214" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">没事</text>
+  <line x1="200" y1="202" x2="200" y2="117" stroke="var(--purple)" stroke-width="1.7" stroke-linecap="round"/><path d="M200,108 L196.4,117 L203.6,117 Z" fill="var(--purple)"/>
+  <text x="130" y="160" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--purple)">继续睡</text>
+  <path d="M500,265 Q500,340 320,340" fill="none" stroke="var(--green)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M320,340 L329,343.6 L329,336.4 Z" fill="var(--green)"/>
+  <text x="430" y="318" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--green)">有事</text>
+  <path d="M80,340 C30,240 40,120 120,80" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M120,80 L110.3,80.8 L113.6,87.2 Z" fill="var(--purple)"/>
+  <text x="40" y="200" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--purple)">再睡</text>
+  <circle cx="630" cy="297.6" r="11.2" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.7"/><path d="M614.6,314.8 Q630,308.8 645.4,314.8 L640.8,346.6 Q630,349.6 619.2,346.6 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="630" y="368" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">人</text>
+  <line x1="600" y1="318" x2="560" y2="300" stroke="var(--gray)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 5"/>
+  <circle cx="575" cy="292" r="10" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.5"/><line x1="568" y1="285" x2="582" y2="299" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/><line x1="582" y1="285" x2="568" y2="299" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="630" y="392" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">不是等人开口</text>
+  <text x="340" y="408" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">每醒一次就调一次模型</text>
+</svg>
+</figure>
+
 
 所以，心跳让循环能按时间启动，而不是等人类的指令来启动。**这就是第四代和之前所有代的根本差别——Agent 从一个被调用的工具，变成了一个可以持续存在的个体。**
 

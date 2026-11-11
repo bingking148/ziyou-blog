@@ -210,7 +210,40 @@ print(next(gen))          # 跑到函数第三行...  2
 print(next(gen))          # 跑到函数第五行...
 ```
 
-函数里一旦出现 `yield`，这个函数就不再是普通函数了：调用它**不执行函数体**，而是返回一个生成器。每 `next()` 一次，函数才往下跑，跑到下一个 `yield` 就停下来、把 `yield` 后面的值交出去。这就是「惰性求值」——不催就不算，催一次算一点。
+函数里一旦出现 `yield`，这个函数就不再是普通函数了：调用它**不执行函数体**，而是返回一个生成器。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-yield-pause" viewBox="0 0 680 420" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>调用带 yield 的函数不执行函数体；每次 next 才跑到下一个 yield 并交出值</title>
+  <style>
+    .diag-yield-pause { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-yield-pause { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M312,39.8 Q474.7,40.3 638,40.7 Q649.8,39.7 649.9,52 Q650.9,189.8 650.5,328 Q649.9,340.2 638,339.1 Q475.6,339.2 312,340.7 Q300.3,340.2 299.5,328 Q301,189.8 299.2,52 Q299.9,40.1 312,39.8 Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="475" y="66" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">函数体</text>
+  <text x="320" y="110" font-size="15" text-anchor="start" dominant-baseline="central" fill="currentColor">跑到函数第一行了</text>
+  <path d="M530,88.4 Q574.9,87.2 620,87.9 Q630.4,87.6 630.3,98 Q629.4,107.5 629.9,118 Q630,127.7 620,127.5 Q574.5,127.5 530,128.6 Q519.7,127.7 519.6,118 Q519.5,107.6 520.7,98 Q519.8,88.2 530,88.4 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="575" y="108" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">yield 1</text>
+  <text x="320" y="190" font-size="15" text-anchor="start" dominant-baseline="central" fill="currentColor">跑到函数第三行了</text>
+  <path d="M530,168 Q574.9,168.7 620,167.6 Q629.9,167.9 630.1,178 Q630.1,188.5 630.3,198 Q630.1,207.9 620,207.5 Q574.7,208.5 530,208.8 Q520.1,208.1 519.1,198 Q519,188.1 520,178 Q520.1,168.2 530,168 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="575" y="188" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">yield 2</text>
+  <text x="320" y="270" font-size="15" text-anchor="start" dominant-baseline="central" fill="currentColor">跑到函数第五行了</text>
+  <path d="M530,248.1 Q574.8,247.1 620,248.6 Q630.2,248.3 629,258 Q630.2,267.8 631,278 Q630.2,288.2 620,287.4 Q574.5,288 530,288.4 Q519.9,288.3 519.2,278 Q519.5,268.3 519.2,258 Q519.7,248.3 530,248.1 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="575" y="268" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">没有 yield</text>
+  <path d="M40,50.8 Q105,50.1 170,49.9 Q179.7,50.2 180.7,60 Q180.8,77.7 180.5,96 Q180.1,105.7 170,105.5 Q104.8,105.8 40,106.8 Q30.1,106.3 30.9,96 Q29.9,77.4 29.9,60 Q29.9,49.9 40,50.8 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="105" y="78" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">worker()</text>
+  <line x1="180" y1="78" x2="252" y2="78" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="6 5"/><path d="M260,78 L252,74.8 L252,81.2 Z" fill="var(--gray)"/>
+  <circle cx="230" cy="58" r="10" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.5"/><line x1="223" y1="51" x2="237" y2="65" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/><line x1="237" y1="51" x2="223" y2="65" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="105" y="130" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">不执行，只返回生成器</text>
+  <path d="M40,170 Q90.4,170.2 140,169.8 Q149.7,169.7 150.2,180 Q149.3,190.4 150.1,200 Q150.3,210.3 140,209.5 Q89.7,210.7 40,210.8 Q30.1,210.3 29.1,200 Q29.7,190 31,180 Q29.6,169.8 40,170 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="90" y="190" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">next ①</text>
+  <path d="M150,190 Q250,150 300,110" fill="none" stroke="var(--blue)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M300,110 L290.7,112.8 L295.2,118.4 Z" fill="var(--blue)"/>
+  <text x="248" y="148" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">交出 1，停住</text>
+  <path d="M40,230.6 Q90.5,230.9 140,230.6 Q149.8,230.2 149,240 Q149.3,249.6 150.3,260 Q149.6,270.3 140,269.2 Q90.5,269.5 40,270.3 Q29.8,270.1 30,260 Q31,249.7 31,240 Q30,229.9 40,230.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="90" y="250" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">next ②</text>
+  <path d="M150,250 Q240,210 300,190" fill="none" stroke="var(--blue)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M300,190 L290.3,189.4 L292.6,196.3 Z" fill="var(--blue)"/>
+  <text x="200" y="230" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">从上次停下处</text>
+  <text x="200" y="248" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">进到 yield 2</text>
+  <path d="M40,300.8 Q90.6,299.6 140,300.4 Q149.9,300.1 149.5,310 Q150.2,319.8 150,330 Q149.7,339.8 140,340 Q90.6,341 40,340.3 Q29.8,339.6 30.3,330 Q30.9,320 29.6,310 Q29.6,300 40,300.8 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="90" y="320" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">next ③</text>
+  <path d="M150,320 Q240,300 300,270" fill="none" stroke="var(--purple)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M300,270 L290.3,270.8 L293.6,277.2 Z" fill="var(--purple)"/>
+  <text x="200" y="336" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--purple)">跑到第五行，结束</text>
+</svg>
+</figure>
+每 `next()` 一次，函数才往下跑，跑到下一个 `yield` 就停下来、把 `yield` 后面的值交出去。这就是「惰性求值」——不催就不算，催一次算一点。
 
 ## 8. 实战：分批读超大文件
 

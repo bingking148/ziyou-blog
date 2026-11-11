@@ -69,6 +69,33 @@ print(Car.wheels)    # 4  ← 类属性也没变
 
 `c1.wheels = 6` 不是「修改类属性」，而是**在 c1 身上新建了一个同名实例属性，把类属性遮住了**。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-class-attr-shadow" viewBox="0 0 680 460" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>给实例赋值是遮住类属性，不是改掉类上那一份；改类属性要写在类上</title>
+  <style>
+    .diag-class-attr-shadow { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-class-attr-shadow { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M250,24.2 Q340.4,24.3 430,25.9 Q440.2,24.6 441,35 Q440.2,60.6 441,85 Q439.8,94.7 430,95.4 Q340.3,95.2 250,94.5 Q239.8,95.1 239.1,85 Q240.5,59.7 239.6,35 Q240,25.1 250,24.2 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="48.1" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">类 Car</text><text x="340" y="71.9" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">wheels = 4</text>
+  <path d="M70,234 Q150.3,234 230,234.2 Q239.7,234.8 239.1,245 Q240.4,279.7 240.6,315 Q240.1,325 230,324.3 Q149.4,324.4 70,325.8 Q60.1,325.2 59.7,315 Q60.8,280 60.4,245 Q60.2,235.1 70,234 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="150" y="268.8" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">对象 c1</text><text x="150" y="291.2" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">wheels = 6</text>
+  <path d="M450,244.7 Q530.3,244.6 610,245.3 Q619.8,244.9 619.6,255 Q619.4,280.1 620.9,305 Q619.7,314.9 610,315.6 Q530.5,315.2 450,315.4 Q440.2,314.8 440,305 Q440,279.7 441,255 Q440.2,245.2 450,244.7 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="530" y="270.1" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">对象 c2</text><text x="530" y="289.9" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">身上没有 wheels</text>
+  <line x1="530" y1="245" x2="435" y2="102.5" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round"/><path d="M430,95 L432,104.5 L438,100.5 Z" fill="var(--blue)"/>
+  <text x="530" y="160" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">找不到，去类里找</text>
+  <text x="530" y="180" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">读到 4</text>
+  <line x1="150" y1="235" x2="150" y2="218" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round"/><path d="M150,210 L146.8,218 L153.2,218 Z" fill="var(--amber)"/>
+  <text x="150" y="196" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">查找停在对象上，读到 6</text>
+  <line x1="200" y1="235" x2="280" y2="95" stroke="var(--gray)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 5"/>
+  <circle cx="245" cy="160" r="11" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.5"/><line x1="237.3" y1="152.3" x2="252.7" y2="167.7" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/><line x1="252.7" y1="152.3" x2="237.3" y2="167.7" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="260" y="138" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--gray)">类的 4 被挡住但仍在</text>
+  <path d="M250,359.4 Q340.2,359.8 430,360.1 Q439.6,359.7 440.4,370 Q439.7,382.1 440.7,394 Q440.1,403.7 430,403.9 Q340.3,404.4 250,403 Q240,404.4 240.4,394 Q239.9,382.6 241,370 Q240.3,359.9 250,359.4 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="382" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Car.wheels = 6</text>
+  <line x1="340" y1="360" x2="340" y2="104" stroke="var(--green)" stroke-width="1.7" stroke-linecap="round"/><path d="M340,95 L336.4,104 L343.6,104 Z" fill="var(--green)"/>
+  <text x="400" y="330" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--green)">写在类上</text>
+  <text x="400" y="400" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--green)">c2 跟着读到 6</text>
+  <text x="150" y="400" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">c1 仍读自己的 6</text>
+</svg>
+</figure>
+
+
 验证一下：
 
 ```python
@@ -369,6 +396,33 @@ if __name__ == "__main__":
 **第二，通过组合而不是继承来复用。**
 
 `Assistant` **持有**一个 `Memory`（`self.memory = Memory(...)`），而不是继承它。这叫**组合**。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-is-a-vs-has-a" viewBox="0 0 680 340" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>继承表达「是一种」，组合表达「有一个」</title>
+  <style>
+    .diag-is-a-vs-has-a { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-is-a-vs-has-a { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <text x="170" y="36" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">是一种</text>
+  <path d="M100,71.6 Q170.3,71.8 240,72.5 Q249.8,72.4 250.5,82 Q250.8,100.2 249,118 Q250.2,128.4 240,128.2 Q170.5,127.6 100,128.1 Q90.1,128.3 90.8,118 Q89.3,100.5 89,82 Q89.9,71.8 100,71.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="170" y="100" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">ChatBot</text>
+  <line x1="170" y1="200" x2="170" y2="138" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/><path d="M170,128 L166,138 L174,138 Z" fill="var(--blue)"/>
+  <text x="230" y="170" font-size="15" text-anchor="start" dominant-baseline="central" fill="var(--blue)">继承</text>
+  <path d="M100,222.5 Q170.1,222.1 240,222.5 Q250.2,221.7 250.9,232 Q250.2,249.5 250.3,268 Q249.7,277.8 240,277.8 Q169.6,277.9 100,278 Q90.4,278.3 90.6,268 Q89.7,249.4 89.3,232 Q89.8,222.3 100,222.5 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="170" y="250" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">ToolBot</text>
+  <text x="170" y="310" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">ToolBot 是一种 ChatBot</text>
+  <line x1="340" y1="40" x2="340" y2="310" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="6 5" opacity="0.45"/>
+  <text x="510" y="36" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--amber)" font-weight="bold">有一个</text>
+  <path d="M420,120.2 Q510.4,119.8 600,119.1 Q609.9,119.8 610.9,130 Q609,160.1 609,190 Q609.9,200 600,200.5 Q510.3,199.3 420,200.7 Q410.3,199.7 410.5,190 Q410.6,160.6 409.4,130 Q410.3,120 420,120.2 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="510" y="160" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Assistant</text>
+  <path d="M410,79.4 Q460.5,79.1 510,79.9 Q519.7,79.8 520.7,90 Q519.1,104.1 520.7,118 Q519.9,128.1 510,128.6 Q459.6,128 410,128.3 Q400.4,128.2 399.8,118 Q400.4,103.9 400.2,90 Q400.1,80 410,79.4 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="460" y="104" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">Memory</text>
+  <path d="M510,249.5 Q560.1,249.4 610,250.1 Q619.9,250.3 619.5,260 Q619.7,274.4 619.3,288 Q620.3,297.7 610,298.9 Q560.3,298.8 510,297.9 Q499.7,298 500.7,288 Q500,273.4 499.9,260 Q499.6,249.6 510,249.5 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="560" y="274" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">ToolBox</text>
+  <line x1="460" y1="128" x2="473.1" y2="135.9" stroke="var(--purple)" stroke-width="1.7" stroke-linecap="round"/><path d="M480,140 L474.8,133.1 L471.5,138.6 Z" fill="var(--purple)"/>
+  <text x="400" y="140" font-size="14" text-anchor="end" dominant-baseline="central" fill="var(--purple)">有一个</text>
+  <line x1="510" y1="200" x2="535.9" y2="243.1" stroke="var(--green)" stroke-width="1.7" stroke-linecap="round"/><path d="M540,250 L538.6,241.5 L533.1,244.8 Z" fill="var(--green)"/>
+  <text x="590" y="230" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--green)">有一个</text>
+  <text x="510" y="310" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">Assistant 有一个 Memory</text>
+</svg>
+</figure>
+
 
 > [!TIP]
 > **优先用组合，谨慎用继承。** 继承表达「是一种」（ToolBot 是一种 ChatBot），组合表达「有一个」（Assistant 有一个 Memory）。
