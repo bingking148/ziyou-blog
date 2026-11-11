@@ -183,10 +183,11 @@ Harness 有一个通用的演变规律，这是全篇最重要的一条规律，
   <text x="585" y="190" font-size="12" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">2022 年 11 月</text>
   <path d="M547,89.7 Q585.4,89.4 623,90.9 Q633.2,90.1 633.8,100 Q632,108.6 633.3,116 Q633.3,125.7 623,125.5 Q584.9,126.2 547,125.6 Q536.9,126 536.2,116 Q537.7,108 537.4,100 Q536.7,90.4 547,89.7 Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/><text x="585" y="108" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">ChatGPT</text>
   <line x1="585" y1="126" x2="585" y2="160" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-  <circle cx="470" cy="78" r="6" fill="var(--red)" stroke="var(--red)" stroke-width="1"/>
-  <text x="480" y="78" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--red)" font-weight="bold">工具行动</text>
-  <circle cx="470" cy="100" r="6" fill="var(--red)" stroke="var(--red)" stroke-width="1"/>
-  <text x="480" y="100" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--red)" font-weight="bold">循环编排</text>
+  <circle cx="384" cy="36" r="5" fill="var(--red)" stroke="var(--red)" stroke-width="1"/>
+  <text x="394" y="36" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--red)" font-weight="bold">工具行动</text>
+  <circle cx="384" cy="58" r="5" fill="var(--red)" stroke="var(--red)" stroke-width="1"/>
+  <text x="394" y="58" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--red)" font-weight="bold">循环编排</text>
+  <line x1="415" y1="70" x2="415" y2="88" stroke="var(--red)" stroke-width="1.3" stroke-linecap="round"/>
 </svg>
 </figure>
 
