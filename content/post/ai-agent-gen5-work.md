@@ -132,6 +132,39 @@ Harness 里能写成文字的部分——怎么提高缓存命中率、怎么用
 
 所以我的理解是：当时很多资方和项目追逐 CLI，是因为混淆了两件事。第一件是 Agent 自己调工具的接口——在这一层，命令行、API 和 MCP 的优势实实在在；第二件是人监督和验收 Agent 的面板——任务看板、改动对比、成品预览、审批、叫停——在这一层，图形界面的优势也非常明显。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-tool-interface-vs-review-ui" viewBox="0 0 680 460" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>命令行和 MCP 是 Agent 调工具的接口，图形面板才是人监督验收的一层</title>
+  <style>
+    .diag-tool-interface-vs-review-ui { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-tool-interface-vs-review-ui { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M34,36.9 Q340.4,35.5 646,35.8 Q659.9,36.1 660,50 Q660.1,110.5 659.5,172 Q660.1,185.8 646,185.8 Q339.4,186.7 34,185.6 Q19.9,186 20.9,172 Q20.3,111 19.3,50 Q20.4,36.3 34,36.9 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>
+  <text x="340" y="58" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">人监督和验收的面板</text>
+  <circle cx="70" cy="97.6" r="11.2" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7"/><path d="M54.6,114.8 Q70,108.8 85.4,114.8 L80.8,146.6 Q70,149.6 59.2,146.6 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="70" y="168" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">人</text>
+  <path d="M140,84.7 Q178.6,84 216,83.4 Q226.3,83.9 225.8,94 Q225.3,118.6 226.2,144 Q226.2,153.9 216,153.8 Q178.2,153.8 140,153.4 Q130.2,153.8 129.8,144 Q129.4,119.3 129.5,94 Q130.1,83.9 140,84.7 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="178" y="119" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">任务看板</text>
+  <path d="M244,84 Q282.2,84.4 320,84.3 Q330.3,83.7 330.8,94 Q329.3,118.6 330.5,144 Q330,153.9 320,153.9 Q282.6,154.5 244,153.8 Q234.1,153.8 233.9,144 Q233.4,119.1 233.7,94 Q233.7,84.1 244,84 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="282" y="119" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">改动对比</text>
+  <path d="M348,83 Q386.3,83 424,84.8 Q434.2,83.6 434.1,94 Q434.8,119.4 433.5,144 Q433.9,154.4 424,153.6 Q386,153.5 348,154.2 Q338.2,154.1 337.9,144 Q337.9,119.6 337.8,94 Q338.1,84.1 348,83 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="386" y="119" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">成品预览</text>
+  <path d="M452,83.5 Q490.2,83.5 528,83.2 Q538,83.7 538.3,94 Q539,119.2 537.3,144 Q538.2,154.4 528,153.6 Q490.4,154.8 452,153.1 Q441.8,153.9 441.7,144 Q443,119.5 441.2,94 Q442.3,84.2 452,83.5 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="490" y="119" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">审批</text>
+  <path d="M556,84.8 Q593.5,83.2 632,83.4 Q642.4,84.2 642.5,94 Q643,119.2 642.8,144 Q642.1,153.7 632,154.3 Q594,154.1 556,154.4 Q546.3,154 545.3,144 Q546.8,119.4 545,94 Q546.3,84.2 556,84.8 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="594" y="119" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">叫停</text>
+  <line x1="96" y1="120" x2="118" y2="120" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round"/><path d="M126,120 L118,116.8 L118,123.2 Z" fill="var(--amber)"/>
+  <path d="M275,206 Q340.6,206.3 405,205.3 Q414.8,205.8 415.2,216 Q414.1,232.4 415.9,248 Q415,258 405,257.4 Q339.8,258.5 275,257.5 Q264.7,257.8 265.9,248 Q264.6,231.5 265.4,216 Q265.3,206.2 275,206 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="232" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Agent</text>
+  <line x1="340" y1="186" x2="340" y2="197" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round"/><path d="M340,206 L343.6,197 L336.4,197 Z" fill="var(--amber)"/>
+  <text x="400" y="198" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--amber)">监督、验收</text>
+  <path d="M34,279.1 Q339.9,280.9 646,280.2 Q659.9,280.3 660.2,294 Q660.9,344.7 660,396 Q660.2,410 646,410.7 Q340.2,411 34,409.8 Q19.8,409.9 20.6,396 Q20.6,344.4 20.2,294 Q19.9,279.7 34,279.1 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.4"/>
+  <text x="40" y="304" font-size="16" text-anchor="start" dominant-baseline="central" fill="currentColor" font-weight="bold">Agent 自己调工具的接口</text>
+  <path d="M170,326 Q224.8,326.9 280,326.2 Q289.7,325.9 290.5,336 Q289.9,355.4 290.5,374 Q290.2,384 280,384.5 Q224.5,383.9 170,384.2 Q159.9,384.4 161,374 Q159.7,355.2 160.1,336 Q160,326 170,326 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="225" y="355" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor">命令行</text>
+  <line x1="340" y1="258" x2="231.9" y2="321.9" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/><path d="M225,326 L233.5,324.7 L230.3,319.2 Z" fill="var(--blue)"/>
+  <path d="M330,325.1 Q384.9,325.2 440,325.1 Q450.1,325.7 450.8,336 Q450.1,354.8 449,374 Q449.9,384 440,384.7 Q384.8,383.7 330,383.3 Q320.3,383.7 319.5,374 Q319.9,354.5 319,336 Q319.7,326.2 330,325.1 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="385" y="355" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor">API</text>
+  <line x1="340" y1="258" x2="380.6" y2="319.3" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/><path d="M385,326 L383.3,317.6 L377.9,321.1 Z" fill="var(--blue)"/>
+  <path d="M490,327 Q544.6,327 600,326.1 Q609.7,325.8 609.8,336 Q609,354.6 610.6,374 Q610.3,383.9 600,385 Q544.4,383.9 490,384.7 Q479.8,383.9 479.8,374 Q479.2,354.8 479.4,336 Q479.7,326.3 490,327 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="545" y="355" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor">MCP</text>
+  <line x1="340" y1="258" x2="537.4" y2="323.5" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/><path d="M545,326 L538.4,320.4 L536.4,326.5 Z" fill="var(--blue)"/>
+  <text x="340" y="436" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">图形界面的外壳，命令行和工程师用的内核</text>
+</svg>
+</figure>
+
+
 不能用第一层的优势去否认第二层的需要，那样一定会得出错误结论。现在的主流形态就是：图形界面的外壳，命令行和工程师用的内核。
 
 GUI 和 CLI 的争论到现在我觉得已经接近尾声了：两者都需要，不是谁赢了，而是各司其职。

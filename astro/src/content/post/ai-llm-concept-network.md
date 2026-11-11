@@ -16,6 +16,26 @@ toc: true
 
 ## 1. AI、LLM、Agent：三个越缩越小的圈
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-three-circles" viewBox="0 0 680 420" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>AI、LLM、Agent 是三个越缩越小的圈：一层套一层，不是并列关系</title>
+  <style>
+    .diag-three-circles { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-three-circles { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <circle cx="340" cy="210" r="185" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="2.2"/>
+  <text x="340" y="42" font-size="22" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">AI</text>
+  <text x="340" y="66" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">人工智能</text>
+  <circle cx="340" cy="210" r="120" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="2.2"/>
+  <text x="340" y="108" font-size="20" text-anchor="middle" dominant-baseline="central" fill="var(--amber)" font-weight="bold">LLM</text>
+  <text x="340" y="130" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">根据上文预测下一个词</text>
+  <circle cx="340" cy="210" r="62" fill="var(--fill-green)" stroke="var(--green)" stroke-width="2.2"/>
+  <text x="340" y="203.4" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Agent</text><text x="340" y="224.6" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">智能体</text>
+  <text x="340" y="390" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--green)">查资料、调用工具、执行多步任务</text>
+</svg>
+</figure>
+
+
 可以把三者看成三层：
 
 - **AI（人工智能）**：最大的圈，泛指让机器模拟人类智能的技术总称。

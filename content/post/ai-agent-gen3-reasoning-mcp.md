@@ -38,6 +38,68 @@ toc: true
 
 第二个关键基础设施是 MCP——Model Context Protocol，模型上下文协议，2024 年 11 月 25 日由 Anthropic 发布。它要解决的事，是把「乘法题」变成「加法题」。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-mcp-nm-to-n-plus-m" viewBox="0 0 680 560" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>四个 AI 应用接五个工具：两两对接要 20 份接口，经 MCP 变成加法</title>
+  <style>
+    .diag-mcp-nm-to-n-plus-m { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-mcp-nm-to-n-plus-m { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <text x="340" y="28" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="bold">4 × 5 = 20 份接口</text>
+  <line x1="160" y1="82" x2="520" y2="74" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="82" x2="520" y2="118" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="82" x2="520" y2="162" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="82" x2="520" y2="206" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="82" x2="520" y2="250" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="130" x2="520" y2="74" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="130" x2="520" y2="118" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="130" x2="520" y2="162" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="130" x2="520" y2="206" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="130" x2="520" y2="250" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="178" x2="520" y2="74" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="178" x2="520" y2="118" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="178" x2="520" y2="162" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="178" x2="520" y2="206" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="178" x2="520" y2="250" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="226" x2="520" y2="74" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="226" x2="520" y2="118" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="226" x2="520" y2="162" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="226" x2="520" y2="206" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <line x1="160" y1="226" x2="520" y2="250" stroke="var(--red)" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <path d="M50,64 Q100.2,63.5 150,63.5 Q159.9,64.1 159.9,74 Q159.1,81.8 161,90 Q160.1,100.1 150,100.4 Q99.6,100.7 50,99.1 Q40.3,100.4 41,90 Q39.3,82.6 39.6,74 Q40.2,64.3 50,64 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="82" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <path d="M50,111.5 Q99.6,112.7 150,112 Q160.4,112.3 159.4,122 Q160.9,129.9 160.1,138 Q159.6,147.8 150,149 Q100.1,148.3 50,148.5 Q40,148.3 40.2,138 Q41,129.9 39.7,122 Q39.7,112.1 50,111.5 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="130" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <path d="M50,161 Q100.3,160 150,159.1 Q159.7,159.7 160.9,170 Q160.9,177.6 159.8,186 Q159.8,195.8 150,197 Q99.6,195.7 50,195.8 Q40.2,195.9 40.3,186 Q39.8,177.4 39,170 Q40.3,160.3 50,161 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="178" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <path d="M50,208.2 Q99.9,208.4 150,208.8 Q159.9,208 160.9,218 Q160.5,226.3 160,234 Q159.8,243.7 150,244.8 Q99.6,245 50,243 Q40,244.1 40.5,234 Q40.5,225.6 39.5,218 Q39.9,208.1 50,208.2 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="226" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <path d="M530,55.6 Q579.7,56.6 630,56.2 Q639.7,55.8 639.9,66 Q640.8,74.4 639.6,82 Q640.1,92.1 630,92.8 Q579.6,91.8 530,92.3 Q520,92 519.5,82 Q519,74.4 520.6,66 Q520.1,56.1 530,55.6 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="74" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <path d="M530,100 Q580.4,99.6 630,100.1 Q639.9,99.7 639.6,110 Q640,117.8 640.4,126 Q640.2,135.8 630,135.8 Q579.6,136.3 530,135.6 Q519.8,136.4 520.8,126 Q520.3,117.8 520.4,110 Q519.9,100.4 530,100 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="118" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <path d="M530,144.9 Q580.6,143.5 630,143.3 Q639.9,144.1 639.9,154 Q639.7,162 640.8,170 Q639.7,179.8 630,179.3 Q580.6,179.3 530,181 Q519.7,180 519.2,170 Q520,162.3 519.9,154 Q520.1,144.1 530,144.9 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="162" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <path d="M530,187.9 Q580.5,188 630,187.6 Q639.8,188.1 639.1,198 Q639.1,205.6 640.5,214 Q640.4,224.3 630,223.1 Q580.4,224.2 530,224.3 Q520.3,224.2 519.4,214 Q520.8,205.8 520.7,198 Q519.8,188.1 530,187.9 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="206" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <path d="M530,231.9 Q579.9,232.9 630,232.3 Q639.7,232.1 639,242 Q640.4,250.4 641,258 Q639.6,267.7 630,268.6 Q580.4,268.3 530,267.4 Q519.7,267.6 519.3,258 Q519.9,250.3 520.8,242 Q520.1,231.8 530,231.9 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="250" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <line x1="40" y1="286" x2="640" y2="286" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="6 5" opacity="0.55"/>
+  <text x="340" y="314" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--green)" font-weight="bold">4 + 5</text>
+  <path d="M295,398.9 Q339.9,397.2 385,397.6 Q395,397.7 396,408 Q395.4,430.1 394.3,452 Q394.6,461.9 385,462.5 Q339.8,461.8 295,461.8 Q285.4,461.6 284.1,452 Q284.5,430.4 284.6,408 Q285,398.2 295,398.9 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="430" font-size="22" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">MCP</text>
+  <path d="M50,347.6 Q99.4,349 150,348.3 Q159.7,347.9 160.7,358 Q159.5,365.6 161,374 Q159.6,384.1 150,383.1 Q99.4,384.4 50,383.4 Q39.8,383.7 39.7,374 Q40.5,365.8 40.7,358 Q40.3,347.9 50,347.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="366" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <line x1="160" y1="366" x2="278.8" y2="426.8" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M285,430 L280,424.3 L277.5,429.3 Z" fill="var(--green)"/>
+  <path d="M50,399.1 Q100.6,399.7 150,400.2 Q160.2,400 160.1,410 Q160.5,418.2 159.7,426 Q160.2,435.7 150,436.2 Q100.3,435.7 50,437 Q39.9,435.6 39.7,426 Q40.4,417.6 40.3,410 Q39.9,399.8 50,399.1 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="418" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <line x1="160" y1="418" x2="278" y2="429.3" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M285,430 L278.3,426.5 L277.8,432.1 Z" fill="var(--green)"/>
+  <path d="M50,451.5 Q100.1,451.9 150,452 Q160.3,452.3 160.2,462 Q160,469.6 160,478 Q160.1,487.8 150,487.2 Q100.4,487 50,487.5 Q40.3,488.3 39.7,478 Q40.1,469.9 39.8,462 Q40,452.2 50,451.5 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="470" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <line x1="160" y1="470" x2="278.3" y2="432.1" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M285,430 L277.5,429.5 L279.2,434.8 Z" fill="var(--green)"/>
+  <path d="M50,504.8 Q99.5,503.2 150,504 Q159.7,504.3 159.6,514 Q160.9,521.8 160.8,530 Q160,540.4 150,539.9 Q100.5,539.9 50,539.9 Q39.9,539.8 39.6,530 Q39,522 40,514 Q40.4,504.3 50,504.8 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="100" y="522" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">AI 应用</text>
+  <line x1="160" y1="522" x2="279.4" y2="434.1" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M285,430 L277.7,431.9 L281,436.4 Z" fill="var(--green)"/>
+  <path d="M530,340 Q580.1,339.8 630,339.9 Q639.8,340.1 640.7,350 Q639.9,358.3 639.3,366 Q640.4,376.4 630,376.2 Q579.7,375.7 530,376.9 Q520.2,375.9 519.6,366 Q519.1,358 519.2,350 Q519.9,340.3 530,340 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="358" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <line x1="395" y1="430" x2="513.9" y2="361.5" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M520,358 L512.5,359.1 L515.3,363.9 Z" fill="var(--green)"/>
+  <path d="M530,387.3 Q580,389 630,388 Q639.9,387.9 640.7,398 Q640.4,405.6 640.6,414 Q640,424 630,424.9 Q580.1,423.2 530,423.9 Q519.7,423.6 519.6,414 Q519.2,405.5 520.7,398 Q519.9,387.8 530,387.3 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="406" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <line x1="395" y1="430" x2="513.1" y2="407.3" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M520,406 L512.6,404.6 L513.7,410.1 Z" fill="var(--green)"/>
+  <path d="M530,436 Q579.5,435.7 630,436.7 Q639.8,436 639.1,446 Q639.3,453.8 640.3,462 Q639.7,472.2 630,472.7 Q579.6,471.6 530,471.1 Q519.6,472.2 520.7,462 Q520.3,454.5 519.9,446 Q519.9,436.1 530,436 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="454" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <line x1="395" y1="430" x2="513.1" y2="452.7" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M520,454 L513.7,449.9 L512.6,455.4 Z" fill="var(--green)"/>
+  <path d="M530,484.5 Q579.4,483 630,484.9 Q640.2,484.1 641,494 Q639.4,502 639.6,510 Q639.7,520.4 630,520.1 Q580.1,520.1 530,520.5 Q519.6,520.2 520.5,510 Q519.9,502.5 519.5,494 Q519.7,484 530,484.5 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="502" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <line x1="395" y1="430" x2="513.9" y2="498.5" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M520,502 L515.3,496.1 L512.5,500.9 Z" fill="var(--green)"/>
+  <path d="M530,527.4 Q579.5,528.9 630,528.2 Q639.9,527.6 639.4,538 Q640.6,546.5 639.9,554 Q640,563.9 630,564.2 Q580,564.7 530,564.4 Q520.1,564 519.4,554 Q520.2,546 520.4,538 Q520.3,528.1 530,527.4 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="580" y="546" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">工具</text>
+  <line x1="395" y1="430" x2="514.9" y2="541.2" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/><path d="M520,546 L516.8,539.2 L513,543.3 Z" fill="var(--green)"/>
+</svg>
+</figure>
+
+
 比如 4 个 AI 应用要接 5 个工具，每一对都得单独写接口，加起来就是 20 份。MCP 规定了一个统一接口——工具协议只需要对接一次，彼此就能互相调用。
 
 这件事最能说明问题的，是各家跟进的速度：Anthropic 发布之后，OpenAI 宣布支持，Google 宣布跟进，微软说 Windows 要原生支持。一家公司提的协议，被竞争对手在几个月内全部跟进。为什么？原因很简单：每家都在重复写同样的对接，每个人都想省掉。既然有了协议，大家就都来遵守。
@@ -49,6 +111,30 @@ toc: true
 第三样关键能力是 Computer Use，2024 年 10 月由 Anthropic 推出。
 
 设想一个场景：一个非常老旧、没有任何 API 的报销系统，怎么让大模型操作它？Anthropic 给出的做法是：截图，把图喂给模型，让模型判断该点哪里、移动鼠标、点击；然后再截图看结果，再决定下一步。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-computer-use-loop" viewBox="0 0 680 420" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Computer Use 是截图、判断该点哪里、点击，再截图看结果的循环</title>
+  <style>
+    .diag-computer-use-loop { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-computer-use-loop { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M290,33.8 Q339.9,33.4 390,33.6 Q400.3,33.3 400.3,43 Q400.5,59.6 401,77 Q400,87 390,87.2 Q340.6,87 290,87.4 Q280,87.1 279.4,77 Q279.6,59.9 280.5,43 Q279.9,33.2 290,33.8 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="60" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">截图</text>
+  <path d="M460,165.8 Q539.8,164.5 620,165.2 Q629.9,165.3 631,175 Q629.9,199.6 629.6,225 Q630,234.7 620,234.9 Q540.3,235.3 460,234.4 Q449.6,234.9 450.7,225 Q450.9,200.3 450.5,175 Q449.8,165 460,165.8 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="540" y="188.8" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">模型判断</text><text x="540" y="211.2" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">该点哪里</text>
+  <path d="M260,305.8 Q339.4,306 420,304.3 Q429.7,304.8 429.2,315 Q429.9,339.6 431,365 Q429.7,375 420,374.6 Q339.5,374.3 260,375.5 Q250.3,375 249.3,365 Q249.8,340.1 249.6,315 Q249.7,305.2 260,305.8 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="340" y="328.8" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">移动鼠标</text><text x="340" y="351.2" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">点击</text>
+  <path d="M400,70 Q500,80 540,165" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M540,165 L539.4,155.3 L532.9,158.4 Z" fill="currentColor"/>
+  <text x="520" y="110" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">喂给模型</text>
+  <path d="M540,235 Q500,300 430,330" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M430,330 L439.7,329.8 L436.9,323.1 Z" fill="currentColor"/>
+  <path d="M250,340 Q160,200 280,80" fill="none" stroke="var(--blue)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M280,80 L271.1,83.8 L276.2,88.9 Z" fill="var(--blue)"/>
+  <text x="160" y="200" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">再截图</text>
+  <path d="M30,69.2 Q90.3,70.2 150,69.7 Q159.9,70.2 159.8,80 Q160.2,119.9 159.2,160 Q160.3,170.4 150,170.4 Q90.6,169.4 30,170.6 Q20,169.8 19.6,160 Q19.7,120.3 19.6,80 Q20.1,70 30,69.2 Z" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="90" y="98.8" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">老旧报销系统</text><text x="90" y="117.2" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">没有任何 API</text>
+  <rect x="50" y="140" width="80" height="20" rx="3" fill="none" stroke="var(--gray)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M130,90 Q200,50 280,60" fill="none" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5"/><path d="M280,60 L271.5,55.3 L270.6,62.5 Z" fill="var(--gray)"/>
+  <text x="200" y="44" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">只有屏幕</text>
+</svg>
+</figure>
+
 
 本质上还是「一边想、一边做、一边看」的循环，只是「做」变成了操作屏幕。
 

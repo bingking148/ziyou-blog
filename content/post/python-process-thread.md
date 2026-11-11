@@ -56,7 +56,42 @@ p2.join()
 
 ## 2. 进程：独立的小房间
 
-进程可以理解成一个独立的小房间，每个房间有自己的内存。用 `multiprocessing.Process` 开一个：
+进程可以理解成一个独立的小房间，每个房间有自己的内存。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-process-vs-thread-memory" viewBox="0 0 680 420" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>进程各有一份内存，线程住在同一间房里共享同一份列表</title>
+  <style>
+    .diag-process-vs-thread-memory { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-process-vs-thread-memory { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <text x="180" y="28" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">进程：独立的小房间</text>
+  <path d="M32,47.6 Q105.5,48.3 178,48.3 Q190.3,48.1 189.5,60 Q190.1,128.3 190.1,196 Q190,207.9 178,208 Q105.6,208.3 32,208.3 Q19.8,207.8 20.5,196 Q20.3,128.5 19.9,60 Q20,47.6 32,47.6 Z" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="105" y="70" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="bold">子进程</text>
+  <path d="M50,95 Q104.9,96.9 160,95.5 Q169.6,96 170.6,106 Q169,131.1 170.5,156 Q169.9,166 160,165.5 Q104.5,165 50,165.3 Q40.3,166.1 40.5,156 Q40.6,130.9 39.2,106 Q39.8,96.1 50,95 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="105" y="121.8" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">global_list</text><text x="105" y="140.2" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">[1, 2, 3, 4]</text>
+  <path d="M222,48.4 Q295,48.8 368,48.9 Q380.2,47.7 380.4,60 Q379.3,127.4 381,196 Q380.2,208.2 368,207.6 Q295.4,208.3 222,208 Q209.9,207.9 209.9,196 Q210.2,127.5 210.3,60 Q209.8,47.9 222,48.4 Z" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="295" y="70" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--teal)" font-weight="bold">主进程</text>
+  <path d="M240,96.5 Q295,95.5 350,95.2 Q359.9,96 360.7,106 Q360.3,130.9 361,156 Q359.8,165.9 350,166.4 Q295.6,165.4 240,165.3 Q229.8,165.9 230.5,156 Q229.3,131.5 230.1,106 Q230.4,95.8 240,96.5 Z" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="295" y="121.8" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">global_list</text><text x="295" y="140.2" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">[]</text>
+  <path d="M90,229 Q199.5,229.9 310,229.5 Q330.3,230.3 330.7,250 Q329.9,254.6 330.7,260 Q329.9,280.2 310,279.6 Q199.4,280.3 90,280.7 Q70.2,280 69.4,260 Q70,254.7 70.4,250 Q70.3,230.3 90,229 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="200" y="255" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Queue</text>
+  <text x="90" y="255" font-size="14" text-anchor="start" dominant-baseline="central" fill="var(--amber)">put</text>
+  <text x="310" y="255" font-size="14" text-anchor="end" dominant-baseline="central" fill="var(--amber)">get</text>
+  <line x1="105" y1="208" x2="105" y2="223" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/><path d="M105,230 L107.8,223 L102.2,223 Z" fill="var(--amber)"/>
+  <line x1="295" y1="230" x2="295" y2="215" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/><path d="M295,208 L292.2,215 L297.8,215 Z" fill="var(--amber)"/>
+  <text x="200" y="300" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">两边各一份列表，要通信得另走管道</text>
+  <text x="530" y="28" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">线程：同一间房里的人</text>
+  <path d="M414,48.2 Q530.1,47.1 646,47.8 Q660.2,48.3 659.7,62 Q659.1,198 660.8,334 Q660.2,348.2 646,347.3 Q530.2,347.5 414,348.3 Q399.8,348.4 400.8,334 Q400.5,198 399.2,62 Q399.9,48.2 414,48.2 Z" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M450,200 Q529.5,200.4 610,199.6 Q620.1,200.2 619.8,210 Q620.1,239.8 620.8,270 Q620.3,279.7 610,280.5 Q529.5,281 450,280.3 Q439.6,280.1 441,270 Q439.3,239.7 439.2,210 Q439.6,199.6 450,200 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="530" y="229.4" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">global_list</text><text x="530" y="250.6" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">[1, 2, 3, 4, 5]</text>
+  <circle cx="470" cy="97.6" r="11.2" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7"/><path d="M454.6,114.8 Q470,108.8 485.4,114.8 L480.8,146.6 Q470,149.6 459.2,146.6 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="470" y="168" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">写线程</text>
+  <circle cx="590" cy="97.6" r="11.2" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.7"/><path d="M574.6,114.8 Q590,108.8 605.4,114.8 L600.8,146.6 Q590,149.6 579.2,146.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="590" y="168" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">主线程</text>
+  <line x1="470" y1="176" x2="494.5" y2="195.6" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round"/><path d="M500,200 L496.3,193.4 L492.8,197.8 Z" fill="var(--amber)"/>
+  <line x1="590" y1="176" x2="565.5" y2="195.6" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/><path d="M560,200 L567.2,197.8 L563.7,193.4 Z" fill="var(--blue)"/>
+  <text x="530" y="320" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--purple)">共享同一份内存</text>
+</svg>
+</figure>
+用 `multiprocessing.Process` 开一个：
 
 ```python
 import multiprocessing
@@ -314,7 +349,34 @@ t1.start(); t2.start()
 t1.join(); t2.join()
 ```
 
-`task1` 先拿 `lock_a`、再等 `lock_b`；`task2` 先拿 `lock_b`、再等 `lock_a`。两边各拿一把、各等对方那把，就僵住了——程序不报错，但永远停在那里不退出。避免死锁的通用办法：**所有线程按同样的顺序拿锁**。上面把 `task2` 也改成先 `lock_a` 后 `lock_b`，死锁就解开了。
+`task1` 先拿 `lock_a`、再等 `lock_b`；`task2` 先拿 `lock_b`、再等 `lock_a`。
+
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-deadlock-two-locks" viewBox="0 0 680 400" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>两个任务各拿一把锁、再等对方那把，就形成死锁</title>
+  <style>
+    .diag-deadlock-two-locks { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-deadlock-two-locks { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <path d="M50,80.1 Q105,79 160,79.7 Q169.8,80.3 169.5,90 Q169.2,114.5 170.2,140 Q170.1,150.1 160,150.4 Q105.1,149.8 50,150.3 Q40.3,149.8 39.9,140 Q39.2,115 39,90 Q39.8,79.8 50,80.1 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="105" y="115" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">task1</text>
+  <path d="M520,80.3 Q575.6,80.7 630,80.5 Q639.7,80.3 639.8,90 Q640,115.3 640.3,140 Q640.3,150.4 630,149.5 Q574.7,150.9 520,150.6 Q509.8,150.2 510.8,140 Q509.5,114.9 510.4,90 Q509.9,80.4 520,80.3 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="575" y="115" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">task2</text>
+  <path d="M90,200.6 Q139.6,200.7 190,200.6 Q199.7,200.1 199.4,210 Q200.2,227.8 200.9,246 Q200,255.7 190,256.7 Q139.9,256.3 90,256.9 Q80.4,256.1 79.2,246 Q80.1,228 80.2,210 Q79.8,199.9 90,200.6 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="140" y="228" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">lock_a</text>
+  <text x="140" y="270" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--blue)">task1 握着</text>
+  <line x1="105" y1="150" x2="120" y2="200" stroke="var(--blue)" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="M490,200 Q540,199.8 590,199.2 Q600.2,199.7 599.9,210 Q600.6,228.3 600.2,246 Q599.9,255.8 590,255.4 Q539.6,256 490,256.6 Q479.9,256.3 480.3,246 Q480,227.4 480.4,210 Q480.2,200.4 490,200 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="540" y="228" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">lock_b</text>
+  <text x="540" y="270" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">task2 握着</text>
+  <line x1="575" y1="150" x2="560" y2="200" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="M200,220 Q340,180 480,220" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M480,220 L471.5,213.4 L469.3,221.1 Z" fill="var(--red)"/>
+  <text x="340" y="168" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="bold">等</text>
+  <path d="M480,240 Q340,300 200,240" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M200,240 L207.6,247.6 L210.8,240.3 Z" fill="var(--red)"/>
+  <text x="340" y="318" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="bold">等</text>
+  <text x="340" y="40" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="bold">两边各拿一把、各等对方那把</text>
+  <line x1="30" y1="345" x2="650" y2="345" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="6 5" opacity="0.5"/>
+  <text x="340" y="364" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">解开的办法：所有线程按同样的顺序拿锁</text>
+  <text x="340" y="386" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--green)">task1、task2 都是先 lock_a，后 lock_b</text>
+</svg>
+</figure>
+两边各拿一把、各等对方那把，就僵住了——程序不报错，但永远停在那里不退出。避免死锁的通用办法：**所有线程按同样的顺序拿锁**。上面把 `task2` 也改成先 `lock_a` 后 `lock_b`，死锁就解开了。
 
 ## 7. 进程还是线程？
 

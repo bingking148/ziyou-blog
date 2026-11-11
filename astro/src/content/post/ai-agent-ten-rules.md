@@ -55,6 +55,33 @@ toc: true
 2. **动作在哪执行**？Claude Code 是纯本地，Cowork 是本地加虚拟机，DOS 是放在云端
 3. **数据凭证在哪**？Claude Code 在本地，Cowork 也在本地，DOS 是平台托管
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-three-local-cloud-questions" viewBox="0 0 680 400" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>本地还是云端其实是三层：模型推理、动作执行、数据凭证</title>
+  <style>
+    .diag-three-local-cloud-questions { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#b3522e; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f3d8ce; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-three-local-cloud-questions { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#e08a6a; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c1a1a; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+  <text x="235" y="44" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Claude Code</text>
+  <text x="401" y="44" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">Cowork</text>
+  <text x="567" y="44" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">DOS</text>
+  <text x="80" y="106" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">模型推理</text>
+  <path d="M170,69.2 Q234.6,70.2 300,69.7 Q310,70.3 310.4,80 Q310.1,106.4 310,132 Q310.2,142.4 300,142.5 Q234.7,141.2 170,141.9 Q160.4,142.1 159,132 Q159.8,106 159.1,80 Q159.6,70.1 170,69.2 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="235" y="106" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">云端</text>
+  <path d="M336,70 Q400.7,70.8 466,70.1 Q476.2,70.3 476.3,80 Q476.5,106.3 476,132 Q476.3,142.2 466,142.8 Q400.4,142.4 336,142 Q326,142.4 326,132 Q325.1,106 326.3,80 Q326.3,70.3 336,70 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="401" y="106" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">云端</text>
+  <path d="M502,69.1 Q566.6,69.4 632,70.8 Q642.2,69.8 642,80 Q643,105.7 642.2,132 Q641.7,142 632,141.9 Q566.9,141.6 502,141.3 Q492.4,142.3 492.9,132 Q492.2,106.2 491.1,80 Q492.3,70.4 502,69.1 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="567" y="106" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">云端</text>
+  <text x="80" y="194" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">动作执行</text>
+  <path d="M170,158.1 Q235.1,158 300,157.9 Q309.7,158 310.8,168 Q309.7,193.8 309.5,220 Q310.1,229.8 300,229.2 Q234.4,229.1 170,229.3 Q159.7,230 159.3,220 Q160.5,194.4 161,168 Q160.1,157.7 170,158.1 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="235" y="194" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">纯本地</text>
+  <path d="M336,157.2 Q401.6,157.9 466,157.6 Q476.3,157.7 476.2,168 Q475.8,193.4 475.2,220 Q475.7,229.9 466,230.8 Q401.4,229.6 336,229.3 Q326.2,229.8 325.2,220 Q326.9,194.3 325.9,168 Q325.6,157.9 336,157.2 Z" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="401" y="194" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">本地 + 虚拟机</text>
+  <path d="M502,157 Q567.5,157.1 632,159 Q642.4,157.6 641.4,168 Q642.8,194.2 641.3,220 Q641.9,230 632,229.6 Q567.4,229.4 502,230 Q492.1,229.7 492.4,220 Q491.2,194.4 492.6,168 Q492.1,158.3 502,157 Z" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="567" y="194" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">云端</text>
+  <text x="80" y="282" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">数据凭证</text>
+  <path d="M170,245.3 Q234.9,245.6 300,246.2 Q309.7,246.1 309,256 Q310.9,281.7 310.5,308 Q309.8,318.1 300,318.6 Q235.3,318 170,318.9 Q159.7,318 159.2,308 Q159.8,281.4 160.7,256 Q159.8,246 170,245.3 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="235" y="282" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">本地</text>
+  <path d="M336,245.4 Q400.9,247 466,245.1 Q476.2,245.6 476.6,256 Q476.7,282 476.5,308 Q476,317.8 466,318.9 Q401,318.9 336,318.2 Q325.7,318.3 325.1,308 Q325.1,281.8 326.4,256 Q325.6,246 336,245.4 Z" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="401" y="282" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">本地</text>
+  <path d="M502,246.5 Q566.8,245.4 632,246 Q642.4,245.9 641.3,256 Q642,282.3 642.8,308 Q642.4,318.4 632,318.2 Q567.2,317.2 502,318.8 Q491.8,317.6 492.8,308 Q491.7,281.8 491.8,256 Q491.8,246.1 502,246.5 Z" fill="var(--fill-purple)" stroke="var(--purple)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><text x="567" y="282" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">平台托管</text>
+  <text x="340" y="370" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">说本地 Agent 或云端 Agent 时，要问是哪一层。</text>
+</svg>
+</figure>
+
+
 主要的争论其实发生在执行这一层。推理在云端，数据凭证很可能主要在本地。所以下次再有人跟你说「我们在做一个本地 Agent」或「云端 Agent」，你有必要问一句：你的「本地」和「云端」，指的是哪一层、哪个步骤。
 
 ## 我的倾向
