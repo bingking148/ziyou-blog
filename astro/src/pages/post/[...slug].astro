@@ -561,10 +561,6 @@ const fmt = (d: Date) =>
   .post-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(280px, .85fr); min-height: 0; height: auto; overflow: hidden; color: var(--color-text-strong); background: var(--color-bg); border-bottom: 3px solid var(--color-text-strong); }
   .post-hero::after { content: none; }
   .post-hero-media { position: relative; inset: auto; min-height: 420px; order: 2; }
-  .post-hero-media::after {
-    content: ""; position: absolute; z-index: 2; left: 8%; bottom: 14%; width: 42%; height: 10px;
-    background: #c41e3a; pointer-events: none; transform: rotate(-14deg);
-  }
   .post-cover { width: 100%; height: 100%; min-height: 420px; object-fit: cover; object-position: center; animation: cover-enter 1.8s cubic-bezier(.2,.7,.2,1) both; }
   @keyframes cover-enter { from { opacity: .2; transform: scale(1.07); } to { opacity: 1; transform: scale(1); } }
   .post-hero-shade { display: none; }
