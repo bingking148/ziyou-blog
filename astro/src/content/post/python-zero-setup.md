@@ -170,6 +170,40 @@ python hello.py
 
 或者在 VS Code 里直接右键文件，选 `在集成终端中运行 Python 文件`。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-setup-flow" viewBox="0 0 680 700" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>从打开 python.org，到终端里跑出 hello.py</title>
+  <style>
+    .diag-py-setup-flow { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f8d6d8; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-setup-flow { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c2428; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+<rect x="80" y="16" width="520" height="76" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" />
+  <text x="340" y="41.0" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">打开 python.org</text>
+  <text x="340" y="67.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">点 Download Python 3.x.x</text>
+  <line x1="340" y1="96" x2="340" y2="113" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,120 L335,112 L345,112 Z" fill="var(--gray)"/>
+  <rect x="80" y="124" width="520" height="88" rx="14" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.8" />
+  <text x="340" y="155.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">勾 Add python.exe to PATH</text>
+  <text x="340" y="181.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">然后点 Install Now</text>
+  <line x1="340" y1="216" x2="340" y2="233" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,240 L335,232 L345,232 Z" fill="var(--gray)"/>
+  <rect x="80" y="244" width="520" height="80" rx="14" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.8" />
+  <text x="340" y="271.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">命令行输入 python --version</text>
+  <text x="340" y="297.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">看到版本号，说明装好了</text>
+  <line x1="340" y1="328" x2="340" y2="345" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,352 L335,344 L345,344 Z" fill="var(--gray)"/>
+  <rect x="80" y="356" width="520" height="88" rx="14" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" />
+  <text x="340" y="387.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">输入 python，提示符变成 >>></text>
+  <text x="340" y="413.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">print 一行，再 exit() 退出</text>
+  <line x1="340" y1="448" x2="340" y2="465" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,472 L335,464 L345,464 Z" fill="var(--gray)"/>
+  <rect x="80" y="476" width="520" height="80" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="340" y="503.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">VS Code 里新建 hello.py</text>
+  <text x="340" y="529.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">写完按 Ctrl + S 保存</text>
+  <line x1="340" y1="560" x2="340" y2="577" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,584 L335,576 L345,576 Z" fill="var(--gray)"/>
+  <rect x="80" y="588" width="520" height="88" rx="14" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" />
+  <text x="340" y="619.0" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">终端输入 python hello.py</text>
+  <text x="340" y="645.0" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">跑出第一个程序</text>
+</svg>
+</figure>
+
+
 ## 5. 程序是怎么被执行的：一个够用的心智模型
 
 现在回头看刚才那三行，建立第一个正确的直觉：

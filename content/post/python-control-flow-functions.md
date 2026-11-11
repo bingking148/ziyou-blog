@@ -98,6 +98,32 @@ elif score >= 90:
 
 这就是条件顺序的重要性。**范围窄的条件要写在前面**。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-guess-branch" viewBox="0 0 680 410" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>猜数字：从上往下，命中一个分支后面就跳过</title>
+  <style>
+    .diag-py-guess-branch { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f8d6d8; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-guess-branch { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c2428; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+<rect x="150" y="16" width="380" height="64" rx="14" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.8" />
+  <text x="340" y="38" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">guess = 50，answer = 63</text>
+  <text x="340" y="62" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)" font-weight="normal">从上往下，命中一个就停</text>
+  <line x1="190" y1="84" x2="190" y2="99" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M190,106 L185,98 L195,98 Z" fill="var(--gray)"/>
+  <line x1="190" y1="178" x2="190" y2="203" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M190,210 L185,202 L195,202 Z" fill="var(--gray)"/>
+  <line x1="190" y1="282" x2="190" y2="307" stroke="var(--red)" stroke-width="1.6" stroke-linecap="round"/><path d="M190,314 L185,306 L195,306 Z" fill="var(--red)"/>
+  <rect x="40" y="110" width="300" height="64" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" />
+  <text x="190" y="142" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">guess == answer ?</text>
+  <text x="370" y="142" font-size="16" text-anchor="start" dominant-baseline="central" fill="currentColor" font-weight="normal">否，跳过「猜对了」</text>
+  <rect x="40" y="214" width="300" height="64" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" />
+  <text x="190" y="246" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">guess > answer ?</text>
+  <text x="370" y="246" font-size="16" text-anchor="start" dominant-baseline="central" fill="currentColor" font-weight="normal">否，跳过「大了」</text>
+  <rect x="40" y="318" width="300" height="64" rx="14" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.8" />
+  <text x="190" y="350" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">else：小了</text>
+  <text x="370" y="350" font-size="16" text-anchor="start" dominant-baseline="central" fill="var(--red)" font-weight="normal">命中，后面不再看</text>
+</svg>
+</figure>
+
+
 ### 2.3 真值判断：Python 的偷懒写法
 
 Python 里几乎所有东西都能当条件用。空的东西算假，非空的东西算真：

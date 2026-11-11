@@ -312,6 +312,29 @@ print(x)                # 10  ← 没变
 
 **函数内部创建的变量，出了函数就消失。** 这叫局部变量。函数外部的叫全局变量。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-scope" viewBox="0 0 680 330" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>函数里的 x 出了函数就消失，外面的 x 还在</title>
+  <style>
+    .diag-py-scope { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f8d6d8; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-scope { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c2428; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+<text x="170" y="28" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--amber)" font-weight="normal">函数 show 里面</text>
+  <text x="510" y="28" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--green)" font-weight="normal">函数外面</text>
+  <rect x="40" y="52" width="260" height="250" rx="14" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" stroke-dasharray="7 5"/>
+  <rect x="380" y="52" width="260" height="250" rx="14" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" />
+  <text x="170" y="96" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--amber)" font-weight="normal">局部变量</text>
+  <text x="170" y="140" font-size="28" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">x = 20</text>
+  <text x="170" y="184" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">print(x) → 20</text>
+  <text x="170" y="248" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="bold">出了函数就消失</text>
+  <text x="510" y="96" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--green)" font-weight="normal">全局变量</text>
+  <text x="510" y="140" font-size="28" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">x = 10</text>
+  <text x="510" y="184" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">print(x) → 10</text>
+  <text x="510" y="248" font-size="18" text-anchor="middle" dominant-baseline="central" fill="var(--green)" font-weight="bold">结束后还在</text>
+</svg>
+</figure>
+
+
 ### 5.1 函数能读全局，不能改
 
 ```python

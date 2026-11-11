@@ -128,6 +128,36 @@ biyadi = Car("BYD", "秦", 300000.0)     # self 指向 biyadi
 
 所以 `self.brand = brand` 的意思是「**把收到的 brand 参数存到我自己身上**」。两个对象的属性各自独立、互不干扰。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-self" viewBox="0 0 680 430" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>self 指向当前这个对象，两份属性互不干扰</title>
+  <style>
+    .diag-py-self { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f8d6d8; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-self { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c2428; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+<rect x="190" y="16" width="300" height="56" rx="14" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.8" />
+  <text x="340" y="44" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">类 Car · __init__</text>
+  <line x1="340" y1="72" x2="340" y2="96" stroke="var(--gray)" stroke-width="1.5"/>
+  <line x1="176" y1="96" x2="504" y2="96" stroke="var(--gray)" stroke-width="1.5"/>
+  <line x1="176" y1="96" x2="176" y2="117" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M176,124 L171,116 L181,116 Z" fill="var(--gray)"/>
+  <line x1="504" y1="96" x2="504" y2="117" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M504,124 L499,116 L509,116 Z" fill="var(--gray)"/>
+  <rect x="36" y="128" width="280" height="250" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" />
+  <text x="176" y="160" font-size="22" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">baoma</text>
+  <text x="176" y="192" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="normal">self 指向这一份</text>
+  <text x="176" y="232" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">brand = BMW</text>
+  <text x="176" y="272" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">name = X5</text>
+  <text x="176" y="312" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">price = 500000.0</text>
+  <rect x="364" y="128" width="280" height="250" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" />
+  <text x="504" y="160" font-size="22" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">biyadi</text>
+  <text x="504" y="192" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="normal">self 指向这一份</text>
+  <text x="504" y="232" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">brand = BYD</text>
+  <text x="504" y="272" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">name = 秦</text>
+  <text x="504" y="312" font-size="17" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">price = 300000.0</text>
+  <text x="340" y="404" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)" font-weight="normal">两个对象各自独立，互不干扰</text>
+</svg>
+</figure>
+
+
 这就是为什么 `__init__` 里每个属性都要写 `self.`：
 
 ```python
