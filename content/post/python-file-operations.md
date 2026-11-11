@@ -42,6 +42,30 @@ f.close()
 
 `open()` 返回一个文件对象，起名叫 `f`，后面的 `f.write()`、`f.close()` 都是在操作它。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-open-close" viewBox="0 0 680 440" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>写文件三步：打开、写入、关闭</title>
+  <style>
+    .diag-py-open-close { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f8d6d8; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-open-close { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c2428; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+<rect x="80" y="20" width="520" height="108" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8" />
+  <text x="340" y="48" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">打开</text>
+  <text x="340" y="78" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">f = open('python.txt', 'w', ...)</text>
+  <text x="340" y="104" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--red)" font-weight="normal">w 会清空已有内容 · r 读 · a 追加</text>
+  <line x1="340" y1="132" x2="340" y2="157" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,164 L335,156 L345,156 Z" fill="var(--gray)"/>
+  <rect x="80" y="168" width="520" height="88" rx="14" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8" />
+  <text x="340" y="196" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">写入</text>
+  <text x="340" y="226" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">f.write('人生苦短，我用Python!')</text>
+  <line x1="340" y1="260" x2="340" y2="285" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,292 L335,284 L345,284 Z" fill="var(--gray)"/>
+  <rect x="80" y="296" width="520" height="80" rx="14" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8" />
+  <text x="340" y="324" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">关闭</text>
+  <text x="340" y="352" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">f.close()</text>
+  <text x="340" y="408" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)" font-weight="normal">f 就是这个文件对象</text>
+</svg>
+</figure>
+
+
 ## 2. 路径
 
 `open()` 的第一个参数是路径，分两种。

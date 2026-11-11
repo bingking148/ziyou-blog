@@ -177,6 +177,58 @@ for i in range(1, 4):          # 外层：i = 1, 2, 3
 
 一共执行 3 × 3 = 9 次内层循环。**总次数是外层次数乘内层次数**，这一点在做大数据量处理时要留意——两层各 1000 次就是一百万次。
 
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-nested-grid" viewBox="0 0 680 460" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>range(1, 4) 取不到 4；外层每转一圈，内层先走完</title>
+  <style>
+    .diag-py-nested-grid { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --purple:#6d5b9a; --teal:#2a7a6d; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-red:#f8d6d8; --fill-purple:#e6dff3; --fill-teal:#d4eeea; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-nested-grid { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --purple:#b7a7e0; --teal:#7ec9bc; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-red:#5c2428; --fill-purple:#2d1b69; --fill-teal:#1a4d4d; --fill-gray:#2a2d33; }
+  </style>
+<text x="300" y="32" font-size="18" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">range(1, 4)</text>
+  <circle cx="150" cy="78" r="16" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
+  <text x="150" y="78" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">1</text>
+  <line x1="168" y1="78" x2="202" y2="78" stroke="var(--blue)" stroke-width="1.4"/>
+  <circle cx="220" cy="78" r="16" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
+  <text x="220" y="78" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">2</text>
+  <line x1="238" y1="78" x2="272" y2="78" stroke="var(--blue)" stroke-width="1.4"/>
+  <circle cx="290" cy="78" r="16" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
+  <text x="290" y="78" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">3</text>
+  <line x1="308" y1="78" x2="368" y2="78" stroke="var(--gray)" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <circle cx="390" cy="78" r="16" fill="none" stroke="var(--gray)" stroke-width="1.4"/>
+  <text x="390" y="78" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)" font-weight="normal">4</text>
+  <line x1="376" y1="70" x2="404" y2="86" stroke="var(--red)" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="418" y="78" font-size="16" text-anchor="start" dominant-baseline="central" fill="var(--red)" font-weight="normal">取不到</text>
+  <text x="340" y="130" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)" font-weight="normal">外层管行，内层管列</text>
+  <text x="230" y="158" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="normal">j = 1</text>
+  <text x="360" y="158" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="normal">j = 2</text>
+  <text x="490" y="158" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--blue)" font-weight="normal">j = 3</text>
+  <text x="150" y="200" font-size="15" text-anchor="end" dominant-baseline="central" fill="var(--amber)" font-weight="normal">i = 1</text>
+  <rect x="182" y="176" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="230" y="200" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(1,1)</text>
+  <rect x="312" y="176" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="360" y="200" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(1,2)</text>
+  <rect x="442" y="176" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="490" y="200" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(1,3)</text>
+  <text x="150" y="272" font-size="15" text-anchor="end" dominant-baseline="central" fill="var(--amber)" font-weight="normal">i = 2</text>
+  <rect x="182" y="248" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="230" y="272" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(2,1)</text>
+  <rect x="312" y="248" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="360" y="272" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(2,2)</text>
+  <rect x="442" y="248" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="490" y="272" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(2,3)</text>
+  <text x="150" y="344" font-size="15" text-anchor="end" dominant-baseline="central" fill="var(--amber)" font-weight="normal">i = 3</text>
+  <rect x="182" y="320" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="230" y="344" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(3,1)</text>
+  <rect x="312" y="320" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="360" y="344" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(3,2)</text>
+  <rect x="442" y="320" width="96" height="48" rx="14" fill="var(--fill-teal)" stroke="var(--teal)" stroke-width="1.8" />
+  <text x="490" y="344" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">(3,3)</text>
+  <text x="340" y="400" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="normal">外层每转一圈，内层要完整转完</text>
+  <text x="340" y="428" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)" font-weight="normal">这里一共 3 × 3 = 9 次</text>
+</svg>
+</figure>
+
+
 `print(..., end=" ")` 的作用是「打印后不换行，用空格结尾」。默认 `print` 打完会换行，加了 `end` 就能在同一行连续打。
 
 ### 3.1 经典练习：打印三角形
