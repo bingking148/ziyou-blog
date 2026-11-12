@@ -264,4 +264,4 @@ uvicorn main:app --reload
 
 FastAPI 用装饰器把函数挂到路径上。`uvicorn main:app --reload` 启动，`/docs` 能直接试。路径参数写在花括号里，查询参数是函数里带默认值的参数，POST 的 JSON 用 `BaseModel` 接。返回字典就是 JSON。
 
-接口要部署到一台没有桌面的机器上时，下一步就是命令行：[第 21 篇：Linux 基础命令](/post/python-linux-commands/)。
+接口要放到一台 Linux 上时，先把虚拟机装好：[第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。

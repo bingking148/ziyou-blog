@@ -1,81 +1,23 @@
 ---
-title: 'Python 第 21 篇：Linux 基础命令，先连上虚拟机再敲'
-weight: 21
+title: 'Python 第 22 篇：Linux 基础命令'
+weight: 22
 cover: /images/covers/python-linux-commands-cover.jpg
 date: 2026-11-12T09:00:00+08:00
 updatedDate: 2026-11-12T09:00:00+08:00
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', 'Linux', '命令行']
-description: '同一套课的命令行一讲：用 VMware 里的 CentOS 连上 192.168.88.100，再把 ls、cd、权限、tar、ps 这些每天会碰到的命令敲熟。删除只在 /tmp 里练。'
+description: '连上 CentOS 之后，把 ls、cd、路径、权限、tar、ps 这些每天会碰到的命令敲熟。删除只在 /tmp 里练。'
 math: false
 mermaid: false
 comments: true
 toc: true
 ---
 
-脚本在 Windows 上能跑，拷到 Linux 上却连解释器都找不到；文件 `ls` 看得见，一执行就 `Permission denied`；虚拟机明明开着，宿主机 `ping` 不通。这三件事和算法无关，全是操作系统的事。
+脚本在 Windows 上能跑，拷到 Linux 上却 `Permission denied`；文件 `ls` 看得见，一执行就没权限。这和算法无关，是命令和权限的事。
 
-这一篇不装新的 Python 语法。它把课堂那台 CentOS 7 虚拟机连上，再把当天要敲的命令走一遍：看目录、建文件、看内容、改权限、打包、看进程和网络。删除只在 `/tmp` 里做，不碰系统目录。
+虚拟机怎么打开、SSH 怎么连，在 [第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。这一篇假设你已经用 `root` 登进 `192.168.88.100`，只把当天要敲的命令走一遍：看目录、建文件、看内容、改权限、打包、看进程和网络。删除只在 `/tmp` 里做，不碰系统目录。
 
-## 1. 三层：电脑、VMware、虚拟机
-
-课堂的机器是一台联想电脑，上面是 Windows 10 或 11。VMware 是装在 Windows 里的虚拟化软件，里面再开虚拟机。一台装 CentOS，一台可以装 Ubuntu，旁边还能开腾讯会议和浏览器。虚拟机不是「一个文件夹」，它是一台用软件造出来的电脑，有自己的系统。
-
-连上去用 SSH：IP 地址、端口号 22、用户名和密码。课堂这台是 `192.168.88.100`，用户 `root`，端口 22。Windows 只负责开窗口，命令都在虚拟机里敲。
-
-<figure style="text-align:center;margin:2.5rem 0 2rem;">
-<svg class="diag-py-linux-stack" viewBox="0 0 680 420" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>Windows 上的 VMware 里跑 CentOS，SSH 用 IP、22 端口和用户名连进去</title>
-  <style>
-    .diag-py-linux-stack { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
-    [data-theme="dark"] .diag-py-linux-stack { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-gray:#2a2d33; }
-  </style>
-  <rect x="40" y="300" width="600" height="72" rx="12" fill="var(--fill-gray)" stroke="currentColor" stroke-width="1.6"/>
-  <text x="340" y="328" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">联想电脑</text>
-  <text x="340" y="352" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">Disk · Memory · CPU</text>
-  <rect x="40" y="228" width="600" height="56" rx="12" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
-  <text x="340" y="256" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">操作系统 Windows</text>
-  <rect x="40" y="36" width="360" height="176" rx="14" fill="none" stroke="var(--amber)" stroke-width="1.8"/>
-  <text x="220" y="62" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--amber)">VMware</text>
-  <rect x="60" y="84" width="140" height="104" rx="10" fill="var(--fill-red)" stroke="var(--red)" stroke-width="1.6"/>
-  <text x="130" y="118" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">CentOS</text>
-  <text x="130" y="146" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">VM-1</text>
-  <rect x="216" y="84" width="160" height="104" rx="10" fill="none" stroke="var(--gray)" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="296" y="124" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">Ubuntu</text>
-  <text x="296" y="150" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">VM-2</text>
-  <rect x="424" y="48" width="216" height="150" rx="12" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.6"/>
-  <text x="532" y="82" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">SSH</text>
-  <text x="532" y="112" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">192.168.88.100</text>
-  <text x="532" y="136" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">端口 22</text>
-  <text x="532" y="160" font-size="14" text-anchor="middle" dominant-baseline="central" fill="currentColor">用户名 root</text>
-</svg>
-</figure>
-
-导入虚拟机的顺序，按课件来，不要跳：
-
-1. 把 `ai_node1.zip` 解压。压缩包旁边会有一份说明文档，那是完整文档，不是安装包。
-2. 用 VMware 打开解压出来的 `ai_node1.vmx`。
-3. 网卡保持 NAT。课堂要的是：主机能上网，虚拟机就能上网，IP 固定成 `192.168.88.100`。
-4. 用 `root` 登录。登录后敲 `ifconfig`，看有没有 `inet 192.168.88.100`。网卡名可能是 `ens33`，也可能是别的，以 `ifconfig` 里看到的为准。
-
-Windows 上用 MobaXterm 或同类工具建会话：Remote host 填 `192.168.88.100`，username 填 `root`，端口 `22`。也可以直接：
-
-```bash
-ssh root@192.168.88.100
-```
-
-> [!WARNING]
-> IP 不是 `.100`，多半是镜像里留着旧配置，得改网卡配置再启用，不是 SSH 软件坏了。`ping` 不加次数会一直刷，用 `ping -c 3`，或者 `Ctrl + C` 停下。
-
-通不通，从近到远看，不要一上来就怀疑百度：
-
-1. `ping 127.0.0.1`：自己都 ping 不通，先重启虚拟机。
-2. `ifconfig`：没有 `inet`，配置没生效。
-3. `ping 192.168.88.2`：这是课堂 NAT 的网关。不通，就是子网或网关写错。
-4. `ping 8.8.8.8`：IP 通、域名不通，才是 DNS。
-5. `ping www.baidu.com`：这一下通了，说明虚拟机出去了。
-
-## 2. 一条命令的三段
+## 1. 一条命令的三段
 
 每条命令都是这三段：命令、选项、参数。中间必须有空格。
 
@@ -103,7 +45,7 @@ ssh root@192.168.88.100
 
 目录树先认两个地方就够：`/bin` 放普通用户也能用的命令，`ls`、`cp`、`mv`、`cat` 的本体是这里的文件；`/sbin` 放管理员命令，名字里的 s 是 super。发行版换了，这些命令还在；变的是装包那一条，CentOS 用 `yum`，Debian 系才换成 `apt`。
 
-## 3. 建、看、走、删
+## 2. 建、看、走、删
 
 六个命令覆盖大部分日常：`ls`、`cd`、`pwd`、`mkdir`、`touch`、`rm`。
 
@@ -139,7 +81,7 @@ rm -r sandbox           # 删目录
 > [!WARNING]
 > `rm -rf` 不会问你。课堂约定：今天所有删除都在 `/tmp` 里做，不碰 `/`、`/etc`、`/root` 里不是你刚建的东西。命令敲错可以重来，系统目录删了就不好看了。
 
-## 4. 权限：文件在，但不让你执行
+## 3. 权限：文件在，但不让你执行
 
 `ls -l` 最左边一串像 `-rwxr-xr--`。第一个符号是类型，`-` 是文件，`d` 是目录。后面九位分成三组：本人、同组、其他人。每组都是 `rwx`：读、写、执行。没有那一项，就是 `-`。
 
@@ -168,7 +110,7 @@ rm -r sandbox           # 删目录
 </svg>
 </figure>
 
-## 5. 打包，以及服务卡死了怎么办
+## 4. 打包，以及服务卡死了怎么办
 
 传代码用 `tar`。四个字母可以记成口诀：`z` 走 gzip，`x` 是解开，`v` 是列出过程，`f` 后面跟文件名。打包是 `c` 不是 `x`。
 
@@ -189,9 +131,9 @@ df                    # 磁盘还剩多少
 
 `kill -9` 不给程序收拾的机会。能正常停的服务，先找它自己的停止方式。只有卡死、普通信号没用时，再用 `-9`。
 
-## 6. 小项目：在 /tmp 里做一次自检
+## 5. 小项目：在 /tmp 里做一次自检
 
-SSH 连上虚拟机之后，把下面存成 `/tmp/check.sh`。它只用这一篇出现过的命令。
+SSH 已经连上的话，把下面存成 `/tmp/check.sh`。它只用这一篇出现过的命令。还没连上，先回到第 21 篇。
 
 ```bash
 cd /tmp
@@ -207,7 +149,7 @@ chmod 764 check.sh
 ./check.sh
 ```
 
-`764` 让你能执行它。`ping` 的目标是课堂网关。网关不通，就回到第 1 节那张从近到远的表，不要先改脚本。
+`764` 让你能执行它。`ping` 的目标是课堂网关。网关不通，就回到第 21 篇那张从近到远的表，不要先改脚本。
 
 跑完可以删掉练习文件：
 
@@ -215,7 +157,7 @@ chmod 764 check.sh
 rm /tmp/check.sh
 ```
 
-## 7. 课后小项目
+## 6. 课后小项目
 
 **练习一：绝对路径和相对路径（必做）**
 
@@ -229,8 +171,8 @@ rm /tmp/check.sh
 
 建一个目录，里面放两个文件，用 `rm -r` 删掉整个目录。删之前先 `pwd`，确认自己在 `/tmp` 下面。
 
-## 8. 小结
+## 7. 小结
 
-虚拟机跑在 VMware 里，SSH 靠 IP、22 端口和用户名。命令是「命令 + 选项 + 参数」。`ls cd pwd mkdir touch rm` 管目录和文件，`cat more tail` 管看内容，`chmod` 管能不能执行，`tar zxvf` 管解开压缩包，`ps` 和 `kill` 管进程，`ifconfig`、`ping` 管网络。报错先读红字，删除只在 `/tmp`。
+命令是「命令 + 选项 + 参数」。`ls cd pwd mkdir touch rm` 管目录和文件，`cat more tail` 管看内容，`chmod` 管能不能执行，`tar zxvf` 管解开压缩包，`ps` 和 `kill` 管进程，`ifconfig`、`ping` 管网络。报错先读红字，删除只在 `/tmp`。
 
 命令行能用了，前面 FastAPI 那个接口就可以放到这种机器上跑。系列写到这里，Python 从第一篇的 `print` 走到了「别人能调用的服务」和「服务所在的那台 Linux」。
