@@ -6,9 +6,25 @@ import { postUrl } from '../utils/columns.ts';
 interface Props {
   posts: CollectionEntry<'post'>[];
   total: number;
+  /** 段标题。不传时仍是整栏的「阅读路线」。 */
+  label?: string;
+  kicker?: string;
+  note?: string;
+  /** 同一页多段时，SVG marker id 必须唯一。 */
+  markerId?: string;
+  /** 段锚点，同时用作标题 id。 */
+  headingId?: string;
 }
 
-const { posts, total } = Astro.props;
+const {
+  posts,
+  total,
+  label = '阅读路线',
+  kicker = 'READING PATH',
+  note = '沿着这条线，一篇一篇读下去。',
+  markerId = 'column-journey-arrow',
+  headingId = 'journey-heading',
+} = Astro.props;
 const fmt = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const num = (w?: number) => String(w ?? 0).padStart(2, '0');
@@ -33,11 +49,11 @@ const outlines = [
 ];
 ---
 
-<section class="journey" aria-labelledby="journey-heading" data-journey>
+<section class="journey" aria-labelledby={headingId} data-journey data-marker={markerId}>
   <header class="journey-heading">
-    <h2 id="journey-heading">阅读路线</h2>
-    <span>READING PATH</span>
-    <p>沿着这条线，一篇一篇读下去。</p>
+    <h2 id={headingId}>{label}</h2>
+    <span>{kicker}</span>
+    <p>{note}</p>
     <span class="journey-total">{String(total).padStart(2, '0')} 篇</span>
   </header>
 
@@ -47,7 +63,7 @@ const outlines = [
     <div class="journey-track" data-journey-track>
     <svg class="journey-lines" data-journey-lines aria-hidden="true" focusable="false">
       <defs>
-        <marker id="column-journey-arrow" viewBox="-2 -2 18 18" refX="12" refY="7" markerWidth="20" markerHeight="20" orient="auto" markerUnits="userSpaceOnUse">
+        <marker id={markerId} viewBox="-2 -2 18 18" refX="12" refY="7" markerWidth="20" markerHeight="20" orient="auto" markerUnits="userSpaceOnUse">
           <path d="M 1 1 Q 7 4 13 7 Q 7 10 1 14" fill="none" stroke="currentColor" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" />
           <path d="M 2 0 Q 8 4 13 7 M 2 13 Q 7 10 12 7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity=".45" />
         </marker>
@@ -55,7 +71,7 @@ const outlines = [
       {posts.slice(1).map((_, i) => (
         <g class="journey-connector">
           <path class="journey-line journey-line-echo" data-journey-echo={i} pathLength="1" transform="translate(1.8 -1.2)" />
-          <path class="journey-line journey-line-crayon" data-journey-line pathLength="1" marker-end="url(#column-journey-arrow)" />
+          <path class="journey-line journey-line-crayon" data-journey-line pathLength="1" marker-end={`url(#${markerId})`} />
           <path class="journey-line journey-line-grain" data-journey-grain={i} pathLength="1" transform="translate(-.7 .6)" />
         </g>
       ))}
@@ -101,8 +117,9 @@ const outlines = [
 <script>
   (function () {
     'use strict';
-    var root = document.querySelector('[data-journey]');
+    document.querySelectorAll('[data-journey]').forEach(function (root) {
     if (!(root instanceof HTMLElement)) return;
+    var markerId = root.getAttribute('data-marker') || 'column-journey-arrow';
     var track = root.querySelector('[data-journey-track]');
     var svg = root.querySelector('[data-journey-lines]');
     var items = Array.from(root.querySelectorAll('[data-journey-item]'));
@@ -162,7 +179,7 @@ const outlines = [
         path.style.strokeDashoffset = String(1 - rounded);
         echoes[i].style.strokeDashoffset = String(1 - rounded);
         grains[i].style.strokeDashoffset = String(1 - rounded);
-        if (rounded >= 0.98) path.setAttribute('marker-end', 'url(#column-journey-arrow)');
+        if (rounded >= 0.98) path.setAttribute('marker-end', 'url(#' + markerId + ')');
         else path.removeAttribute('marker-end');
       });
     }
@@ -209,11 +226,12 @@ const outlines = [
     if ('ResizeObserver' in window) new ResizeObserver(scheduleMeasure).observe(track);
     if (document.fonts) document.fonts.ready.then(scheduleMeasure);
     reduced.addEventListener('change', applyMotionPreference);
+    });
   })();
 
   // 封面浮层独立于卡片 transform，确保 fixed 始终相对视口定位。
   (function () {
-    var root = document.querySelector('[data-journey]');
+    document.querySelectorAll('[data-journey]').forEach(function (root) {
     if (!(root instanceof HTMLElement)) return;
     var previews = Array.from(root.querySelectorAll('[data-journey-preview]'));
     if (!previews.length) return;
@@ -275,6 +293,7 @@ const outlines = [
     window.addEventListener('resize', hidePreview);
     window.addEventListener('blur', hidePreview);
     reduced.addEventListener('change', hidePreview);
+    });
   })();
 </script>
 
@@ -297,7 +316,7 @@ const outlines = [
   }
   .journey-heading { position: relative; padding-bottom: 26px; border-bottom: 1px solid color-mix(in srgb, var(--red-2) 28%, transparent); transform: rotate(-.15deg); }
   .journey-heading::after { content: ''; position: absolute; left: 2px; right: 5px; bottom: -3px; border-bottom: .7px solid color-mix(in srgb, var(--red-2) 15%, transparent); transform: rotate(.18deg); }
-  .journey-heading h2 { display: inline; margin: 0 18px 0 0; font-size: clamp(24px, 3vw, 34px); font-weight: 500; letter-spacing: .08em; }
+  .journey-heading h2 { display: inline; margin: 0 18px 0 0; font-size: clamp(24px, 3vw, 34px); font-weight: 500; letter-spacing: .08em; scroll-margin-top: 88px; }
   .journey-heading > span:not(.journey-total) { font-size: 9px; letter-spacing: .24em; color: var(--red-2); }
   .journey-heading p { display: inline; margin: 0 0 0 20px; font-size: 12px; color: var(--color-text-muted); }
   .journey-total { float: right; margin-top: 9px; font-family: var(--font-serif); font-size: 13px; color: var(--color-text-muted); }

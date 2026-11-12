@@ -8,11 +8,40 @@ export function columnOf(post: Post, columns: Column[]): Column | undefined {
   return columns.find((c) => post.data.categories.includes(c.data.category));
 }
 
-/** 专栏内文章按 weight（篇号）升序 */
+export type ColumnSection = {
+  title: string;
+  category: string;
+  description?: string;
+  posts: Post[];
+};
+
+function byWeight(a: Post, b: Post): number {
+  return (a.data.weight ?? 0) - (b.data.weight ?? 0);
+}
+
+/** 专栏内部分段。没有 sections 的专栏返回 null，仍走整栏一篇列表。 */
+export function columnSectionGroups(column: Column, posts: Post[]): ColumnSection[] | null {
+  const sections = column.data.sections;
+  if (!sections?.length) return null;
+  return sections.map((section) => ({
+    title: section.title,
+    category: section.category,
+    description: section.description,
+    posts: posts
+      .filter(
+        (p) =>
+          p.data.categories.includes(column.data.category) &&
+          p.data.categories.includes(section.category),
+      )
+      .sort(byWeight),
+  }));
+}
+
+/** 专栏内文章。有分段时按段序、段内按 weight；否则整栏按 weight。 */
 export function columnPosts(column: Column, posts: Post[]): Post[] {
-  return posts
-    .filter((p) => p.data.categories.includes(column.data.category))
-    .sort((a, b) => (a.data.weight ?? 0) - (b.data.weight ?? 0));
+  const groups = columnSectionGroups(column, posts);
+  if (groups) return groups.flatMap((group) => group.posts);
+  return posts.filter((p) => p.data.categories.includes(column.data.category)).sort(byWeight);
 }
 
 /** 与 Hugo 的 URLize 对齐：ASCII 小写化、空白转连字符，CJK 保留 */

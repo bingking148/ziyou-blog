@@ -4,7 +4,7 @@ weight: 3
 cover: /images/covers/python-shallow-deep-copy-cover.jpg
 date: 2026-11-02T11:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python文件与数据']
+categories: ['人工智能', 'Python', 'Python文件与数据']
 tags: ['Python', '编程基础', '深浅拷贝', '可变对象']
 description: '`b = a` 之后改 b，a 为什么也跟着变？`id()`、`is` 和 `==` 有什么区别？切片、copy、deepcopy 各自的边界在哪？两个真实 bug——函数默认参数 box=[]、类属性 tags=[]——都从这里长出来。'
 math: false

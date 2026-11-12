@@ -4,7 +4,7 @@ weight: 1
 cover: /images/covers/python-closures-decorators-cover.jpg
 date: 2026-11-01T15:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python函数进阶']
+categories: ['人工智能', 'Python', 'Python函数进阶']
 tags: ['Python', '编程基础', '闭包', '装饰器']
 description: '函数调用完，变量就没了？闭包能把变量「关」进函数里带走；装饰器更进一步——不改一行原代码，给函数加上登录检查、日志、计时。从嵌套函数一路写到 @ 装饰器。'
 math: false

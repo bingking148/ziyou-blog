@@ -29,6 +29,16 @@ const columns = defineCollection({
     order: z.number(),
     cover: z.string(),
     description: z.string(),
+    // 专栏内再分段。文章同时带专栏 category 与某一段的 category。
+    sections: z
+      .array(
+        z.object({
+          title: z.string(),
+          category: z.string(),
+          description: z.string().optional(),
+        }),
+      )
+      .optional(),
   }),
 });
 

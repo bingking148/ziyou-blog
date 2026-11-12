@@ -4,7 +4,7 @@ weight: 3
 cover: /images/covers/python-asyncio-coroutine-cover.jpg
 date: 2026-11-09T09:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python网络与并发']
+categories: ['人工智能', 'Python', 'Python网络与并发']
 tags: ['Python', '编程基础', '协程', 'asyncio']
 description: '同时看百度、必应和示例页开没开。一个一个等，时间会加起来；一起等，只接近最慢的那一页。'
 math: false

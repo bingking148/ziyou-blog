@@ -4,7 +4,7 @@ weight: 5
 date: 2026-10-20T09:30:00+08:00
 updatedDate: 2026-10-30T10:00:00+08:00
 cover: /images/covers/python-data-containers-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python', 'Python基础']
 tags: ['Python', '数据容器', '列表', '字典', '入门教程']
 description: '列表、字符串、元组、集合、字典该怎么选？用做一个记账本的方式，在真实需求里依次引入五类容器，附切片、推导式、嵌套字典与选择决策表。'
 math: false

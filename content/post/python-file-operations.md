@@ -4,7 +4,7 @@ weight: 1
 cover: /images/covers/python-file-operations-cover.jpg
 date: 2026-11-01T09:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python文件与数据']
+categories: ['人工智能', 'Python', 'Python文件与数据']
 tags: ['Python', '编程基础', '文件操作', 'os模块']
 description: '程序一关，数据全没？这篇让程序学会把数据写进文件、再读回来：open 的三种打开方式、读文件的几种姿势、用 os 和 shutil 管文件管目录，最后拼一个文件备份工具。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-[Python 面向对象专栏](/categories/python面向对象/)写到助手家族就结束了。那些程序有个共同的毛病：一关，数据全没。
+[Python 面向对象](/categories/python/#python-面向对象)写到助手家族就结束了。那些程序有个共同的毛病：一关，数据全没。
 
 BMI 算完就忘，猜数字不留记录，助手家族的对话历史只活在内存里。变量住在内存里，程序一结束，操作系统就把这块内存收回去。想让程序「记得住事」，只能把数据写到文件里——聊天记录、训练日志、模型配置，落到磁盘上的都是文件。
 

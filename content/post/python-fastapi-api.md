@@ -4,7 +4,7 @@ weight: 4
 cover: /images/covers/python-fastapi-api-cover.jpg
 date: 2026-11-10T09:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python网络与并发']
+categories: ['人工智能', 'Python', 'Python网络与并发']
 tags: ['Python', '编程基础', 'FastAPI', 'API']
 description: '做一本三张便条的笔记接口：浏览器打开 /notes/1 看到「协程」那条，用 ?short=true 只看标题，再 POST 加一张「快照」。'
 math: false
@@ -247,4 +247,4 @@ def add_note(note: NewNote):
 
 这一个服务、这一本三张便条：`/` 先证明它活着，`/notes/1` 用路径挑第 1 条，`?short=true` 只要标题，`POST /notes` 再加一张「快照」。试来试去都在 `http://127.0.0.1:8000/docs`。
 
-本专栏到这里。想把这个接口放到一台 Linux 上，去看 [Linux 基础专栏](/categories/linux基础/)。
+Python 网络与并发这一段到这里，Python 专栏也到这里。想把这个接口放到一台 Linux 上，去看 [Linux 基础专栏](/categories/linux基础/)。

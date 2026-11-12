@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import ChapterRule from '../../components/ChapterRule.astro';
 import ResponsiveImage from '../../components/ResponsiveImage.astro';
 import ColumnJourney from '../../components/ColumnJourney.astro';
-import { columnOf, columnPosts, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
+import { columnPosts, columnSectionGroups, postUrl, slugifyTaxonomy } from '../../utils/columns.ts';
 
 type Post = CollectionEntry<'post'>;
 
@@ -29,7 +29,14 @@ const inCategory = posts
 
 const column = columns.find((c) => c.data.category === name);
 const columnList = column ? columnPosts(column, posts) : [];
+const sectionGroups = column ? columnSectionGroups(column, posts) : null;
 const ColumnContent = column ? (await render(column)).Content : null;
+const folded = columns.flatMap((c) =>
+  (c.data.sections ?? [])
+    .filter((section) => section.category === name)
+    .map((section) => ({ column: c, section })),
+)[0];
+const part = (i: number) => String(i + 1).padStart(2, '0');
 
 const fmt = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -37,8 +44,8 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
 ---
 
 <Base
-  title={column ? column.data.title : `分类：${name}`}
-  description={column?.data.description ?? `分类「${name}」下的文章`}
+  title={column ? column.data.title : folded ? folded.section.title : `分类：${name}`}
+  description={column?.data.description ?? (folded ? `「${folded.column.data.title}」专栏中的${folded.section.title}` : `分类「${name}」下的文章`)}
   cover={column?.data.cover}
   pageClass={column ? 'is-column-journey' : ''}
 >
@@ -64,11 +71,39 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
       <div class="prose column-intro" data-reveal>
         <ColumnContent />
       </div>
-      <ColumnJourney posts={columnList} total={columnList.length} />
+      {sectionGroups ? (
+        sectionGroups.map((group, i) => (
+          <ColumnJourney
+            posts={group.posts}
+            total={group.posts.length}
+            label={group.title}
+            kicker={`PART ${part(i)}`}
+            note={group.description}
+            markerId={`journey-arrow-${i}`}
+            headingId={slugifyTaxonomy(group.title)}
+          />
+        ))
+      ) : (
+        <ColumnJourney posts={columnList} total={columnList.length} />
+      )}
     </div>
   ) : (
     <div class="ed-wrap ed-wrap--wide">
-      <ChapterRule no="06" label="分类" en="CATEGORY" value={`${inCategory.length} 篇`} title={name} />
+      <ChapterRule
+        no="06"
+        label="分类"
+        en="CATEGORY"
+        value={`${inCategory.length} 篇`}
+        title={folded ? folded.section.title : name}
+        lede={folded ? `收在「${folded.column.data.title}」专栏里的一段。` : undefined}
+      />
+      {folded && (
+        <p class="cat-fold">
+          <a href={`/categories/${slugifyTaxonomy(folded.column.data.category)}/#${slugifyTaxonomy(folded.section.title)}`}>
+            打开「{folded.column.data.title}」专栏里的这一段
+          </a>
+        </p>
+      )}
       <ol class="ed-list wide-list-grid" data-reveal>
         {inCategory.map((p, i) => (
           <li>
@@ -112,6 +147,9 @@ const num = (w?: number) => String(w ?? 0).padStart(2, '0');
   .column-intro :global(p:first-child > a:only-child) { color: var(--red-2); font-size: 12px; letter-spacing: .08em; }
   .column-intro :global(p:first-child) { margin: 0 0 26px; }
   .column-intro :global(p:first-child::first-letter) { all: unset; }
+  .cat-fold { margin: -8px 0 28px; font-size: 13px; letter-spacing: .06em; }
+  .cat-fold a { color: var(--red-2); }
+  .cat-fold a:hover { color: var(--red-1); }
   .column-intro :global(h2) { margin-top: 32px; font-size: 20px; }
   .column-intro :global(h2 + p) { margin-top: 12px; }
   .column-list .row-title { font-size: 16px; }

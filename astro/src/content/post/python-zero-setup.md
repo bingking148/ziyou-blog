@@ -4,7 +4,7 @@ weight: 1
 date: 2026-10-30T10:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-zero-setup-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python', 'Python基础']
 tags: ['Python', '入门教程', '环境配置', '零基础']
 description: '写给完全没写过代码的人：Python 是什么、怎么装、怎么在编辑器里写出第一行代码并跑起来，以及新手第一天会遇到的五个报错。'
 math: false
@@ -42,7 +42,7 @@ print("你好，世界")
 一行，还是英文单词加引号，接近人话。这就是为什么全世界的入门课、数据分析、人工智能，都首选 Python——它把「表达想法」和「写代码」之间的距离压到了最短。
 
 > [!NOTE]
-> 「人工智能」「大模型」这类听起来高大上的东西，底层大量用 Python 写成。这也是本专栏最后要走向的方向：先用 Python 打好基础，再去看 AI 是怎么跑起来的。
+> 「人工智能」「大模型」这类听起来高大上的东西，底层大量用 Python 写成。这也是后面要走向的方向：先用 Python 打好基础，再去看 AI 是怎么跑起来的。
 
 ## 2. 安装 Python：只点三下鼠标
 
@@ -260,7 +260,7 @@ Python 用缩进（行首的空格）表示「这几行属于一起」。如果�
 
 ## 7. 装好之后，怎么用这个专栏
 
-这个专栏一共七篇，按顺序读：
+Python 专栏分五段。你正在读的是第一段「Python 基础」，一共七篇，按顺序读：
 
 | 篇目 | 你会得到什么 |
 |---|---|
@@ -272,13 +272,14 @@ Python 用缩进（行首的空格）表示「这几行属于一起」。如果�
 | 第 6 篇 | 函数彻底讲透：参数、作用域、递归 |
 | 第 7 篇 | lambda 与模块：把代码拆成文件 |
 
-这七篇把语法的底子铺完。后面五个专栏按你要做的事来选：
+这七篇把语法的底子铺完。后面四段还在 [Python 专栏](/categories/python/) 里，按你要做的事接着读：
 
-- [Python 面向对象专栏](/categories/python面向对象/)：把数据和动作包成对象
-- [Python 文件与数据专栏](/categories/python文件与数据/)：把数据写进文件，看清拷贝
-- [Python 函数进阶专栏](/categories/python函数进阶/)：闭包和装饰器
-- [Python 网络与并发专栏](/categories/python网络与并发/)：让程序上网、同时干活
-- [Linux 基础专栏](/categories/linux基础/)：从零装一台 Linux，再敲常用命令
+- [Python 面向对象](/categories/python/#python-面向对象)：把数据和动作包成对象
+- [Python 文件与数据](/categories/python/#python-文件与数据)：把数据写进文件，看清拷贝
+- [Python 函数进阶](/categories/python/#python-函数进阶)：闭包和装饰器
+- [Python 网络与并发](/categories/python/#python-网络与并发)：让程序上网、同时干活
+
+环境要换到 Linux 上时，去看 [Linux 基础专栏](/categories/linux基础/)。
 
 **怎么读效率最高**：每一篇的代码都亲手敲一遍，不要复制粘贴。复制粘贴省下的那点时间，会在你「看着好像懂、一写就错」的时候加倍还回来。敲错了、报错了、改对了，这个过程本身就是在学。
 

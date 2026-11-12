@@ -112,7 +112,7 @@ test('宽屏页面多栏完整、无横向溢出且导航胶囊不错位', async
   const paths = [
     '/', '/archives/', '/categories/', '/categories/建站/', '/tags/', '/tags/python/',
     '/columns/', '/about/', '/friend/', '/search/?q=Python',
-    '/categories/python基础/', '/post/blog-launch-from-zero/', '/404.html',
+    '/categories/python/', '/categories/python基础/', '/post/blog-launch-from-zero/', '/404.html',
   ];
   for (const width of [1440, 1920, 2000]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -134,7 +134,7 @@ test('宽屏页面多栏完整、无横向溢出且导航胶囊不错位', async
   await expect(page.locator('.result-row').first()).toBeVisible();
   await expect(page.locator('.search-results')).toHaveCSS('grid-template-columns', /.+ .+/);
   await page.goto('/columns/');
-  await expect(page.locator('.column-block')).toHaveCount(4);
+  await expect(page.locator('.column-block')).toHaveCount(5);
   await expect(page.locator('.column-grid')).toHaveCSS('grid-template-columns', /.+ .+/);
   const covers = await page.locator('.column-cover').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width));
   expect(covers.every((width) => width <= 160), '专栏封面应保持小画幅').toBe(true);
@@ -164,7 +164,7 @@ test('专栏合集卡片在桌面双列、手机单列且保持小封面', async
   for (const width of [1920, 1440, 1080, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/columns/');
-    await expect(page.locator('.column-block')).toHaveCount(4);
+    await expect(page.locator('.column-block')).toHaveCount(5);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${width} 宽横向溢出`).toBe(true);
     const columns = await page.locator('.column-grid').evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length);
     expect(columns, `${width} 宽栏数`).toBe(width > 1080 ? 2 : 1);
@@ -181,8 +181,11 @@ test('专栏合集卡片在桌面双列、手机单列且保持小封面', async
 test('专栏序章紧凑无重复目录，归档封面支持鼠标与键盘预览', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.goto('/categories/python基础/');
+  await page.goto('/categories/python/');
   await expect(page.locator('.column-masthead h1')).toHaveCount(1);
+  await expect(page.locator('.journey h2')).toHaveText([
+    'Python 基础', 'Python 面向对象', 'Python 文件与数据', 'Python 函数进阶', 'Python 网络与并发',
+  ]);
   await expect(page.locator('.column-intro table')).toHaveCount(0);
   await expect(page.locator('.column-visual')).toBeVisible();
   const boxes = await page.evaluate(() => Object.fromEntries(['.column-masthead', '.column-intro', '.journey'].map((selector) => {
@@ -221,16 +224,17 @@ test('专栏序章紧凑无重复目录，归档封面支持鼠标与键盘预�
 test('专栏按篇号排列，曲线随滚动绘制且响应窗口变化', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/categories/python基础/');
+  await page.goto('/categories/python/');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await expect(page.locator('[data-journey]')).toHaveClass(/is-enhanced/);
-  const items = page.locator('[data-journey-item]');
+  const journey = page.locator('[data-journey]').first();
+  await expect(journey).toHaveClass(/is-enhanced/);
+  const items = journey.locator('[data-journey-item]');
   // 数量从页面动态推导，内容增删不再需要改测试
   const n = await items.count();
   expect(n).toBeGreaterThan(0);
-  await expect(page.locator('.journey-number')).toHaveCount(n);
-  await expect(page.locator('.journey-number')).toHaveText(Array.from({ length: n }, (_, i) => String(i + 1).padStart(2, '0')));
-  await expect(page.locator('[data-journey-line]')).toHaveCount(n - 1);
+  await expect(journey.locator('.journey-number')).toHaveCount(n);
+  await expect(journey.locator('.journey-number')).toHaveText(Array.from({ length: n }, (_, i) => String(i + 1).padStart(2, '0')));
+  await expect(journey.locator('[data-journey-line]')).toHaveCount(n - 1);
   await expect(items.first().locator('a')).toHaveAttribute('href', '/post/python-zero-setup/');
   await items.first().scrollIntoViewIfNeeded();
   await expect(items.first()).toHaveClass(/is-reached/);
@@ -269,11 +273,15 @@ test('专栏按篇号排列，曲线随滚动绘制且响应窗口变化', async
   await page.goto('/categories/数学笔记/');
   await expect(page.locator('.ed-list')).toBeVisible();
   await expect(page.locator('[data-journey]')).toHaveCount(0);
+  await page.goto('/categories/python基础/');
+  await expect(page.locator('.ed-row')).toHaveCount(7);
+  await expect(page.locator('[data-journey]')).toHaveCount(0);
+  await expect(page.locator('.cat-fold a')).toHaveAttribute('href', '/categories/python/#python-基础');
 });
 
 test('专栏手绘散落保持稳定，封面预览支持指针与键盘且不越界', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/categories/python基础/');
+  await page.goto('/categories/python/');
   const first = page.locator('.journey-card').first();
   await first.scrollIntoViewIfNeeded();
   await expect(first).toHaveCSS('opacity', '1');
@@ -284,7 +292,9 @@ test('专栏手绘散落保持稳定，封面预览支持指针与键盘且不�
   expect(new Set(desktop.map((r) => Math.round(r.left))).size).toBeGreaterThan(2);
   expect(desktop.every((r, i) => i === 0 || r.top > desktop[i - 1].top)).toBe(true);
   expect(desktop.every((r) => r.left >= 0 && r.right <= 1440)).toBe(true);
-  await expect(page.locator('.journey-board')).toHaveCount(1);
+  const journeys = await page.locator('[data-journey]').count();
+  await expect(page.locator('.journey-board')).toHaveCount(journeys);
+  expect(journeys).toBe(5);
   const n = await page.locator('[data-journey-item]').count();
   await expect(page.locator('.journey-card-outline')).toHaveCount(n);
   await expect(page.locator('.journey-card-pencil')).toHaveCount(n);
@@ -292,10 +302,10 @@ test('专栏手绘散落保持稳定，封面预览支持指针与键盘且不�
   await expect(page.locator('[data-journey-in]')).toHaveCount(n);
   await expect(page.locator('[data-journey-out]')).toHaveCount(n);
   await expect(page.locator('.journey-paper-back')).toHaveCount(n);
-  await expect(page.locator('[data-journey-line]')).toHaveCount(n - 1);
-  await expect(page.locator('[data-journey-echo]')).toHaveCount(n - 1);
-  await expect(page.locator('[data-journey-grain]')).toHaveCount(n - 1);
-  const preview = page.locator('[data-journey-preview="0"]');
+  await expect(page.locator('[data-journey-line]')).toHaveCount(n - journeys);
+  await expect(page.locator('[data-journey-echo]')).toHaveCount(n - journeys);
+  await expect(page.locator('[data-journey-grain]')).toHaveCount(n - journeys);
+  const preview = page.locator('[data-journey]').first().locator('[data-journey-preview="0"]');
   await first.hover({ position: { x: 120, y: 100 } });
   await expect(preview).toBeVisible();
   await expect(preview.locator('img')).toHaveAttribute('alt', '');
@@ -340,7 +350,7 @@ test('专栏手绘散落保持稳定，封面预览支持指针与键盘且不�
 test('专栏触屏点击直接打开文章，不经过封面预览', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const page = await context.newPage();
-  await page.goto('/categories/python基础/');
+  await page.goto('/categories/python/');
   await expect(page.locator('[data-journey-preview]').first()).toBeHidden();
   await page.locator('.journey-card').first().tap();
   await expect(page).toHaveURL(/\/post\/python-zero-setup\/$/);
@@ -350,7 +360,7 @@ test('专栏触屏点击直接打开文章，不经过封面预览', async ({ br
 
 test('专栏在减少动态效果与无 JavaScript 时完整可读', async ({ page, browser }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/categories/python基础/');
+  await page.goto('/categories/python/');
   await expect(page.locator('[data-journey-item]').first()).toBeVisible();
   expect(await page.locator('[data-journey-item]').evaluateAll((els) => els.every((el) => getComputedStyle(el).opacity === '1'))).toBe(true);
   expect(await page.locator('[data-journey-line]').evaluateAll((els) => els.every((el) => getComputedStyle(el).strokeDashoffset === '0px'))).toBe(true);
@@ -362,7 +372,7 @@ test('专栏在减少动态效果与无 JavaScript 时完整可读', async ({ pa
 
   const context = await browser.newContext({ javaScriptEnabled: false });
   const staticPage = await context.newPage();
-  await staticPage.goto('/categories/python基础/');
+  await staticPage.goto('/categories/python/');
   await expect(staticPage.locator('.journey-card').first()).toBeVisible();
   await expect(staticPage.locator('.journey-card').last()).toBeVisible();
   await expect(staticPage.locator('.chapter-rule .cr-title')).toBeVisible();

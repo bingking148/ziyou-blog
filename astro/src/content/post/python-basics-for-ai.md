@@ -4,7 +4,7 @@ weight: 2
 date: 2026-10-16T09:02:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-basics-for-ai-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python', 'Python基础']
 tags: ['Python', '编程基础', '变量', '入门教程']
 description: '零基础也能跟上的 Python 第一篇：从一个能用的 BMI 计算器出发，讲清字面量、变量、类型、输入输出和运算符，全部围绕"写出这个程序"展开。'
 math: false

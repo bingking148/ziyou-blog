@@ -4,7 +4,7 @@ weight: 3
 date: 2026-10-19T10:05:00+08:00
 lastmod: 2026-10-30T10:00:00+08:00
 cover: /images/covers/python-control-flow-functions-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python', 'Python基础']
 tags: ['Python', '编程基础', '函数', '循环']
 description: '用做一个猜数字游戏的方式学会 if 判断、while/for 循环和函数封装：每一步都因为需求才引入语法，最后得到能反复玩的完整程序。'
 math: false
