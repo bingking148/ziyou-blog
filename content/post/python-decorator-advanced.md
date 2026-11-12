@@ -1,19 +1,19 @@
 ---
-title: 'Python 第 15 篇：多装饰器与带参数的装饰器'
-weight: 15
+title: '函数进阶 第 2 篇：多装饰器与带参数的装饰器'
+weight: 2
 cover: /images/covers/python-decorator-advanced-cover.jpg
 date: 2026-11-02T13:00:00+08:00
-lastmod: 2026-11-04T09:00:00+08:00
-categories: ['人工智能', 'Python基础']
+lastmod: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Python函数进阶']
 tags: ['Python', '编程基础', '装饰器', '闭包']
-description: '第 12 篇的装饰器只能一层、只接函数。这一篇补上最后两课：多个装饰器叠在一层怎么执行、装饰器自己怎么带参数，外加两个实战——统一调用日志、把模型调用器用闭包封好。'
+description: '上一篇的装饰器只能一层、只接函数。这一篇补上最后两课：多个装饰器叠在一层怎么执行、装饰器自己怎么带参数，外加两个实战——统一调用日志、把模型调用器用闭包封好。'
 math: false
 mermaid: false
 comments: true
 toc: true
 ---
 
-第 12 篇学会了「给函数加外挂」。但真到了项目里，有两个需求它还接不住：
+上一篇学会了「给函数加外挂」。但真到了项目里，有两个需求它还接不住：
 
 1. **一个函数要挂多个外挂**——发表评论前，既要检查登录、又要校验验证码，两个装饰器怎么一起用？
 2. **装饰器自己也要参数**——`@logging('+')` 加法和 `@logging('-')` 减法想打印不同的提示，装饰器怎么收这个参数？
@@ -22,7 +22,7 @@ toc: true
 
 ## 1. 温习：一个装饰器的结构
 
-先快速过一遍第 12 篇的「无参装饰器」，它是后面一切的地基：
+先快速过一遍第 1 篇的「无参装饰器」，它是后面一切的地基：
 
 ```python
 def check_login(fn):
@@ -180,7 +180,7 @@ print(minus_operator(99, 1))    # 正在努力进行减法运算----------  98
 plus_operator = logging('+')(plus_operator)
 ```
 
-先 `logging('+')`——最外层跑一次，`flag` 被记住（这就是第 12 篇的闭包），返回 `decorator`；再 `decorator(plus_operator)`——和普通装饰器一样，把函数包起来。
+先 `logging('+')`——最外层跑一次，`flag` 被记住（这就是第 1 篇的闭包），返回 `decorator`；再 `decorator(plus_operator)`——和普通装饰器一样，把函数包起来。
 
 <figure style="text-align:center;margin:2.5rem 0 2rem;">
 <svg class="diag-three-layer-param" viewBox="0 0 680 440" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
@@ -232,7 +232,7 @@ def 装饰器名(装饰器参数):
 
 ## 4. 实战一：调用日志装饰器（叠加文件操作）
 
-现在把装饰器和第 11 篇的文件操作、本篇前两节串起来，做一个真实需求：
+现在把装饰器和[《Python 文件与数据》第 1 篇](/post/python-file-operations/)的文件操作、本篇前两节串起来，做一个真实需求：
 
 > 知识库里有「文档入库」和「向量检索」两个函数，统一记录调用情况：每次调用把「函数名 + 参数」追加写进 `calls.log`，长期累积、不能覆盖。
 
@@ -263,11 +263,11 @@ search(query='大模型智能体', top_k=3)
 
 三个要点：
 
-1. **`open(..., 'a')` 追加写**——第 11 篇说过 `'a'` 不会清空旧内容，日志一行行攒着，正好；
+1. **`open(..., 'a')` 追加写**——[《Python 文件与数据》第 1 篇](/post/python-file-operations/)说过 `'a'` 不会清空旧内容，日志一行行攒着，正好；
 2. **`func.__name__` 拿函数名**——不用硬编码「add_doc」「search」，换别的函数自动跟着变；
 3. **`result = func(...)` 再 `return result`**——原函数的返回值原样传回，装饰器不能把它「吃掉」。
 
-这个例子覆盖了三篇的内容：装饰器（第 12/15 篇）+ 文件追加写（第 11 篇）+ 可变参数 `*args, **kwargs`（第 6 篇）。
+这个例子覆盖了三篇的内容：装饰器（第 1 篇和本篇）+ 文件追加写（[《Python 文件与数据》第 1 篇](/post/python-file-operations/)）+ 可变参数 `*args, **kwargs`（[《Python 基础》第 6 篇](/post/python-functions-in-depth/)）。
 
 ## 5. 实战二：用闭包封一个模型调用器
 
@@ -304,11 +304,11 @@ print(qwen('你是谁？'))
 
 三点值得注意：
 
-1. **`make_caller('deepseek', 0.8)` 造出一个「专用调用器」**——模型名和温度被闭包记住，之后只管传提示词。这和第 12 篇线性回归的 `linear(k, b)` 是同一个结构：**闭包记住的变量就是配置**；
-2. **`nonlocal counter`**——`counter += 1` 是「改」外层变量，必须声明，否则 `UnboundLocalError`（第 12 篇讲过）；
+1. **`make_caller('deepseek', 0.8)` 造出一个「专用调用器」**——模型名和温度被闭包记住，之后只管传提示词。这和第 1 篇线性回归的 `linear(k, b)` 是同一个结构：**闭包记住的变量就是配置**；
+2. **`nonlocal counter`**——`counter += 1` 是「改」外层变量，必须声明，否则 `UnboundLocalError`（第 1 篇讲过）；
 3. **两个调用器各记各的次数**——`deepseek` 数到 2，`qwen` 从头数到 1。每次调外层函数，都开一块独立的记忆。
 
-真实项目里，`call` 里面那行 `f'[...]'` 换成真的 `client.chat.completions.create(...)`，就是第 5 篇那个模型调用函数的前身。
+真实项目里，`call` 里面那行 `f'[...]'` 换成真的 `client.chat.completions.create(...)`，就是[《Python 基础》第 5 篇](/post/python-data-containers/)那个模型调用函数的前身。
 
 ## 6. 常见坑清单
 
@@ -316,7 +316,7 @@ print(qwen('你是谁？'))
 2. **带参装饰器少写一层 return**——三层结构三个 `return`，漏最外层的 `return decorator`，`@logging('+')` 拿到 `None`，一调用就崩；
 3. **带参装饰器里 `flag` 和 `fn` 放错层**——装饰器参数在外层、函数在中层。想在内层用 `flag`？可以，闭包让内层能看到所有外层变量；
 4. **日志用 `'w'` 写**——每次调用都清空重写，日志只剩最后一条。长期累积用 `'a'` 追加；
-5. **装饰器里忘了 `return result`**——原函数返回值被吞，所有被装饰的函数都返回 `None`（第 12 篇的坑，这里再犯一次）；
+5. **装饰器里忘了 `return result`**——原函数返回值被吞，所有被装饰的函数都返回 `None`（第 1 篇的坑，这里再犯一次）；
 6. **`func.__name__` 被包层后变 `inner`**——本阶段知道即可，真实项目用 `functools.wraps` 保住原名。
 
 ## 7. 课后小项目
@@ -331,10 +331,10 @@ print(qwen('你是谁？'))
 
 **练习三：调用计数器（综合）**
 
-写 `@count_calls`：装饰任意函数，每次调用让计数器加一，并提供一个查询当前次数的方法（提示：把计数列表挂在函数属性上，比如 `func.calls`，或用一个 `nonlocal` 变量配合闭包返回）。拿去量一量第 6 篇成绩分析工具箱里「找最高分」被调了几次。
+写 `@count_calls`：装饰任意函数，每次调用让计数器加一，并提供一个查询当前次数的方法（提示：把计数列表挂在函数属性上，比如 `func.calls`，或用一个 `nonlocal` 变量配合闭包返回）。拿去量一量[《Python 基础》第 6 篇](/post/python-functions-in-depth/)成绩分析工具箱里「找最高分」被调了几次。
 
 ## 8. 本篇小结
 
 装饰器最后两课补齐了：多装饰器叠用时从下往上包裹、从上往下执行；带参数装饰器三层嵌套，外层闭包记住参数、返回真正的装饰器。加上「用闭包封模型调用器」这个实战，装饰器到这里算毕业了。
 
-但前面所有程序都还在一台电脑里自说自话。下一篇把程序连上网，让它能跟别的程序隔着网络收发数据——[第 16 篇：网络编程](/post/python-socket-network/)。
+本专栏到这里。想让程序上网，或同时干几件事，去看 [Python 网络与并发专栏](/categories/python网络与并发/)。

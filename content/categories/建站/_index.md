@@ -2,7 +2,7 @@
 title: '建站专栏'
 description: '记录这个博客自己的建站过程与后续教程：不租服务器、不写代码，把一个属于你的博客免费挂上互联网。'
 column: true
-column_order: 3
+column_order: 8
 cover: /images/covers/how-this-blog-is-built-cover.jpg
 ---
 

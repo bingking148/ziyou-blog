@@ -2,7 +2,7 @@
 title: 'Python 第 6 篇：函数详解，写一个成绩分析工具箱'
 weight: 6
 date: 2026-10-24T10:00:00+08:00
-lastmod: 2026-10-30T10:00:00+08:00
+lastmod: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-functions-in-depth-cover.jpg
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '函数', '递归']
@@ -362,7 +362,7 @@ print(count)      # 1
 ```
 
 > [!IMPORTANT]
-> **`global` 能不用就不用。** 它让函数的输入输出变得不可预测——你调用一个函数，不知道它还偷偷改了哪些全局状态。第 9 篇讲面向对象时你会看到，更好的办法是把状态放进对象里。
+> **`global` 能不用就不用。** 它让函数的输入输出变得不可预测——你调用一个函数，不知道它还偷偷改了哪些全局状态。[《Python 面向对象》第 2 篇](/post/python-oop-advanced-exceptions/)讲类的时候你会看到，更好的办法是把状态放进对象里。
 >
 > 什么时候真需要？模块级的计数器、配置开关。其余情况，用参数传进去、用 `return` 传出来。
 
@@ -588,7 +588,7 @@ def group_by_level(scores, levels=("优秀", "良好", "及格", "不及格")):
 - 及格线通过参数传进 `level_of`：`def level_of(score, pass_line=60)`；
 - 然后 `group_by_level` 也要把这个参数往下传。
 
-改完你会发现一件事：**参数要一层层往下传**。这是函数式编程的一个痛点，第 8 篇的面向对象会给出另一种解法。
+改完你会发现一件事：**参数要一层层往下传**。这是函数式编程的一个痛点，[《Python 面向对象》第 1 篇](/post/python-oop-basics/)会给出另一种解法。
 
 ## 8. 常见坑清单
 
@@ -618,7 +618,7 @@ def stats(numbers, precision=2):
 def safe_divide(a, b, default=0.0):
 ```
 
-`b` 是 0 时返回 `default` 而不是崩溃。**不许用 try/except**（那是第 9 篇的内容），用 `if` 判断。
+`b` 是 0 时返回 `default` 而不是崩溃。**不许用 try/except**（那是[《Python 面向对象》第 2 篇](/post/python-oop-advanced-exceptions/)的内容），用 `if` 判断。
 
 **练习三：给工具箱加递归功能**
 

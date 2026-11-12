@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 19 篇：协程，等网络的时候别干站着'
-weight: 19
+title: '网络与并发 第 3 篇：协程，等网络的时候别干站着'
+weight: 3
 cover: /images/covers/python-asyncio-coroutine-cover.jpg
 date: 2026-11-09T09:00:00+08:00
-updatedDate: 2026-11-12T19:00:00+08:00
-categories: ['人工智能', 'Python基础']
+updatedDate: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Python网络与并发']
 tags: ['Python', '编程基础', '协程', 'asyncio']
 description: '同时看百度、必应和示例页开没开。一个一个等，时间会加起来；一起等，只接近最慢的那一页。'
 math: false
@@ -13,7 +13,9 @@ comments: true
 toc: true
 ---
 
-你要先确认三个网页打得开，再开始干活：百度、必应，还有一个专门用来测试的示例页 `example.com`。三页都看一眼状态码就行，不用把页面读完。
+上一篇用线程让程序同时干几件事。等网页的时候，那个线程会一直占着。这一篇换个办法。
+
+你要先确认三个网页打得开：百度、必应，还有一个专门用来测试的示例页 `example.com`。三页都看一眼状态码就行，不用把页面读完。
 
 一个打开完再开下一个，等待是加起来的。网页在转圈的时候程序没事可干，它可以先把下一页也发出去。这一篇就做这一件事。
 
@@ -249,4 +251,4 @@ python check_pages.py
 
 三页一个一个 `await`，时间相加。三页先 `create_task` 再 `gather`，时间接近最慢的那页。没 `await` 就退出，点了的单会被取消。`time.sleep` 和 `requests` 会把三页一起卡住。
 
-下一篇给一个浏览器打得开的地址，把笔记放上去：[第 20 篇：FastAPI](/post/python-fastapi-api/)。
+下一篇给一个浏览器打得开的地址，把笔记放上去：[网络与并发 第 4 篇：FastAPI](/post/python-fastapi-api/)。

@@ -1,12 +1,12 @@
 ---
-title: 'Python 第 9 篇：类属性、多类协作与异常处理'
-weight: 9
+title: '面向对象 第 2 篇：类属性、多类协作与异常处理'
+weight: 2
 date: 2026-10-28T08:00:00+08:00
-lastmod: 2026-11-01T20:00:00+08:00
+lastmod: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-oop-advanced-exceptions-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python面向对象']
 tags: ['Python', '编程基础', '面向对象', '异常处理']
-description: '类属性与实例属性的归属之争、继承入门与多类协作、try/except 完整用法与自定义异常，最后把整个系列的成果拼成一个智能助手——面向对象的主体在这篇齐活。'
+description: '类属性与实例属性的归属之争、继承入门与多类协作、try/except 完整用法与自定义异常，最后把聊天机器人补成一个会协作、会接住异常的智能助手。'
 math: false
 mermaid: false
 comments: true
@@ -153,7 +153,7 @@ b1.send("A")
 print(b2.history)         # ['A']  ← 两个机器人共用一个列表！
 ```
 
-这和第 6 篇 `def f(x=[])` 那个坑**本质上是同一个问题**：可变对象被共享了。
+这和[《Python 基础》第 6 篇](/post/python-functions-in-depth/) `def f(x=[])` 那个坑**本质上是同一个问题**：可变对象被共享了。
 
 > [!IMPORTANT]
 > **规则：可变对象（列表、字典、集合）永远放在 `__init__` 里用 `self.xxx = []` 创建。**
@@ -292,7 +292,7 @@ class ToolBox:
         return [f"{n}（{t['desc']}）" for n, t in self.tools.items()]
 ```
 
-注意 `register` 接收一个**函数**作为参数，存进字典——这就是第 7 篇讲的高阶函数的实际用法。
+注意 `register` 接收一个**函数**作为参数，存进字典——这就是[《Python 基础》第 7 篇](/post/python-lambda-modules/)讲的高阶函数的实际用法。
 
 ### 3.3 Assistant：协调两个部件
 
@@ -699,4 +699,4 @@ age = read_int("请输入年龄：", minimum=0, maximum=150)
 4. **异常处理四段结构**——`try` 包住可能出错的、`except` 精准捕获、`else` 放成功后的处理、`finally` 放清理；
 5. **处理不了就 `raise`**——函数没能力决定的错误，抛给调用方；自定义异常继承 `Exception`。
 
-OOP 还剩最后几个知识点：**方法重写与 super 的完整用法、封装、多态、抽象类**。下一篇把它们补完，组一个助手家族——[第 10 篇：继承、封装与多态](/post/python-inheritance-polymorphism/)。
+OOP 还剩最后几个知识点：**方法重写与 super 的完整用法、封装、多态、抽象类**。下一篇把它们补完，组一个助手家族——[面向对象 第 3 篇：继承、封装与多态](/post/python-inheritance-polymorphism/)。

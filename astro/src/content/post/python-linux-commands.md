@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 22 篇：Linux 基础命令'
-weight: 22
+title: 'Linux 第 2 篇：Linux 基础命令'
+weight: 2
 cover: /images/covers/python-linux-commands-cover.jpg
 date: 2026-11-12T09:00:00+08:00
-updatedDate: 2026-11-12T19:00:00+08:00
-categories: ['人工智能', 'Python基础']
+updatedDate: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Linux基础']
 tags: ['Python', '编程基础', 'Linux', '命令行']
 description: '登录自己装的 Ubuntu 之后，在家目录的「练习」文件夹里写便条、找字、给脚本执行权、打包，再用 apt 装上 tree。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-虚拟机已经能登录的话，打开终端。还没装好，先看 [第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。
+上一篇把虚拟机装好了的话，打开终端。还没装好，先看 [Linux 第 1 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。
 
 这一篇只做一件事：在家目录里建一个叫 `练习` 的文件夹，把一张便条和一个小脚本放进去，再打包。人是你安装时建的那个用户，要动系统时再 `sudo`。
 
@@ -274,4 +274,4 @@ rm -r ~/练习
 
 这一次都在 `~/练习` 里：`ls -alh` 看它，`>` 和 `>>` 写便条，`grep` 找出「快照」，`chmod 764 hi.sh` 让 `./hi.sh` 说得出「你好」，`tar` 把两个文件收成包，`sudo apt install tree` 把目录画出来。命令是「命令、选项、参数」。记不住就 `--help` 或 `man`。
 
-删除先看路径，只在 `~/练习` 或 `/tmp` 里练。命令行会用了，前面那本笔记的接口，也可以放到这台 Linux 上跑。
+删除先看路径，只在 `~/练习` 或 `/tmp` 里练。本专栏到这里。命令行会用了，前面那本笔记的接口，也可以放到这台 Linux 上跑。

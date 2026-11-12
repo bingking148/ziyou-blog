@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 20 篇：FastAPI，把函数变成别人能调用的接口'
-weight: 20
+title: '网络与并发 第 4 篇：FastAPI，把函数变成别人能调用的接口'
+weight: 4
 cover: /images/covers/python-fastapi-api-cover.jpg
 date: 2026-11-10T09:00:00+08:00
-updatedDate: 2026-11-12T19:00:00+08:00
-categories: ['人工智能', 'Python基础']
+updatedDate: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Python网络与并发']
 tags: ['Python', '编程基础', 'FastAPI', 'API']
 description: '做一本三张便条的笔记接口：浏览器打开 /notes/1 看到「协程」那条，用 ?short=true 只看标题，再 POST 加一张「快照」。'
 math: false
@@ -247,4 +247,4 @@ def add_note(note: NewNote):
 
 这一个服务、这一本三张便条：`/` 先证明它活着，`/notes/1` 用路径挑第 1 条，`?short=true` 只要标题，`POST /notes` 再加一张「快照」。试来试去都在 `http://127.0.0.1:8000/docs`。
 
-笔记现在跑在你的 Windows 上。想把它放到一台 Linux 上，下一篇先从零装一台虚拟机：[第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。
+本专栏到这里。想把这个接口放到一台 Linux 上，去看 [Linux 基础专栏](/categories/linux基础/)。

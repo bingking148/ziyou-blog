@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 21 篇：用 VMware 装好 Linux 虚拟机'
-weight: 21
+title: 'Linux 第 1 篇：用 VMware 装好 Linux 虚拟机'
+weight: 1
 cover: /images/covers/python-linux-vm-cover.jpg
 date: 2026-11-11T09:00:00+08:00
-lastmod: 2026-11-12T19:00:00+08:00
-categories: ['人工智能', 'Python基础']
+lastmod: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Linux基础']
 tags: ['Python', '编程基础', 'Linux', 'VMware']
 description: '在 Windows 上从官网下载 VMware 和 Ubuntu，新建一台虚拟机，把 Linux 装进虚拟磁盘。卸掉 ISO，用自己的用户登录，再打一张快照。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-上一篇的笔记跑在你这台 Windows 上。想把它放到 Linux 上，先得有一台 Linux。不必另买电脑：在这台 Windows 里装 VMware，新建一台虚拟机，把 Ubuntu 装进一块虚拟磁盘。
+如果要把前面写的接口放到一台 Linux 上，先得有那台机器。不必另买电脑：在这台 Windows 里装 VMware，新建一台虚拟机，把 Ubuntu 装进一块虚拟磁盘。
 
 弄坏的是这块虚拟磁盘，不是 Windows 里的文件。装好后拍一张快照，改乱了可以回到这一张。
 
@@ -198,4 +198,4 @@ touch snapshot-test.txt
 
 Windows 上跑 VMware，VMware 里是一台新建的 Linux。安装盘是 Ubuntu 官网当前的长期支持版。虚拟机用 2 核、4GB 内存、40GB 磁盘、NAT。登录用你自己的用户。装完卸掉 ISO，打一张「刚装好」。要远程，再用 `ip addr` 看到的地址、端口 22 和这个用户名。
 
-下一篇就在这台机器里敲命令：[第 22 篇：Linux 基础命令](/post/python-linux-commands/)。
+下一篇就在这台机器里敲命令：[Linux 第 2 篇：Linux 基础命令](/post/python-linux-commands/)。

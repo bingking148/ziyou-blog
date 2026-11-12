@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 8 篇：面向对象入门，写一个聊天机器人'
-weight: 8
+title: '面向对象 第 1 篇：面向对象入门，写一个聊天机器人'
+weight: 1
 date: 2026-10-26T11:00:00+08:00
-lastmod: 2026-10-31T15:30:00+08:00
+lastmod: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-oop-basics-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python面向对象']
 tags: ['Python', '编程基础', '面向对象', '类']
 description: '从函数式写法走不通的地方出发，讲清类与对象、__init__、self、实例方法和魔法方法，用它们实现一个记住上下文的聊天机器人，看懂 client.chat.completions.create。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-上一篇你把工具箱拆成了模块，代码已经相当整洁了。
+[Python 基础专栏](/categories/python基础/)第 7 篇把工具箱拆成了模块。这里换一个问题。
 
 但现在有个新问题：**做一个聊天机器人。**
 
@@ -400,7 +400,7 @@ def __init__(self, ...):
     self.history = []        # 每个对象一份，独立的列表
 ```
 
-如果写成类属性（下一节讲），所有机器人会共用同一个列表——和第 6 篇那个 `def f(x=[])` 的坑一模一样。
+如果写成类属性（下一节讲），所有机器人会共用同一个列表——和[《Python 基础》第 6 篇](/post/python-functions-in-depth/)那个 `def f(x=[])` 的坑一模一样。
 
 **第二，`_generate_reply` 前面有下划线。**
 
@@ -454,7 +454,7 @@ print(response.choices[0].message.content)
 | `.create(...)` | 调用实例方法，方法内部用 `self` 拿到当初存的 api_key |
 | `response.choices[0].message.content` | 一层层剥属性取值 |
 
-**这就是「对象.属性.方法」链式调用的本质。**`response.choices[0].message.content` 这一长串，就是一路「剥」下去：`response` 是对象 → `choices` 是列表 → `[0]` 取第一个 → `message` 又是对象 → `content` 是它的属性。`messages` 那个「列表套字典」的结构，正是第 5 篇练过的容器组合。
+**这就是「对象.属性.方法」链式调用的本质。**`response.choices[0].message.content` 这一长串，就是一路「剥」下去：`response` 是对象 → `choices` 是列表 → `[0]` 取第一个 → `message` 又是对象 → `content` 是它的属性。`messages` 那个「列表套字典」的结构，正是[《Python 基础》第 5 篇](/post/python-data-containers/)练过的容器组合。
 
 本地跑模型用的是另一套库 `ollama`，写法几乎一模一样：
 
@@ -527,4 +527,4 @@ print(response.message.content)    # 照样一层层剥到正文
 5. **对象把状态和方法绑在一起**，多个实例互不干扰——这是它最大的价值；
 6. **`client.chat.completions.create(...)` 就是链式的「对象.属性.方法」**。
 
-下一篇 [第 9 篇：类属性、多类协作与异常处理](/post/python-oop-advanced-exceptions/) 是这个系列的重头戏。会讲清「类属性和实例属性到底怎么区分」（这是面试高频题，也是真 bug 高发区），然后做一个多类协作的完整项目，最后给程序套上异常处理这张安全网。
+下一篇 [面向对象 第 2 篇：类属性、多类协作与异常处理](/post/python-oop-advanced-exceptions/) 接着讲类属性和异常。会讲清「类属性和实例属性到底怎么区分」（这是面试高频题，也是真 bug 高发区），然后做一个多类协作的完整项目，最后给程序套上异常处理这张安全网。

@@ -2,7 +2,7 @@
 title: 'Python 第 7 篇：lambda 与模块，把代码拆成文件'
 weight: 7
 date: 2026-10-26T10:00:00+08:00
-updatedDate: 2026-10-30T10:00:00+08:00
+updatedDate: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-lambda-modules-cover.jpg
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', 'lambda', '模块']
@@ -582,4 +582,4 @@ return sorted(scores, key=keys[by])
 6. **包是带 `__init__.py` 的文件夹**，`__init__.py` 决定对外暴露什么；
 7. **别用标准库的名字命名自己的文件**。
 
-下一篇 [第 8 篇：面向对象入门](/post/python-oop-basics/) 会换一种组织代码的方式——把「数据」和「操作数据的函数」打包在一起，变成一个「对象」。你会第一次看懂 `client.chat.completions.create(...)` 这串东西到底在干什么。
+本专栏到这里。接下来可以看 [Python 面向对象专栏](/categories/python面向对象/)，把「数据」和「操作数据的函数」打包成对象。你会第一次看懂 `client.chat.completions.create(...)` 这串东西到底在干什么。
