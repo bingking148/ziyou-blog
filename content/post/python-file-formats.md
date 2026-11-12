@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 13 篇：CSV、TSV 与 JSON，给数据立个固定格式'
-weight: 13
+title: '文件与数据 第 2 篇：CSV、TSV 与 JSON，给数据立个固定格式'
+weight: 2
 cover: /images/covers/python-file-formats-cover.jpg
 date: 2026-11-02T09:00:00+08:00
-lastmod: 2026-11-02T09:00:00+08:00
-categories: ['人工智能', 'Python基础']
+lastmod: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Python文件与数据']
 tags: ['Python', '编程基础', '文件操作', 'CSV', 'JSON']
 description: '纯文本读写都会了，可数据一多就成了乱麻。这一篇给数据立规矩：CSV/TSV 一行一条、逗号分隔，JSON 直接存字典——csv 模块的 reader/writer、json 的 load/dump，最后让一份学生成绩在三种格式之间流转。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-第 11 篇让程序「记得住事」了，但回想一下当时存的东西：`python.txt` 里是随手拼的一行字，日记本里是「日期 + 内容」的一段话。能记住，可记得**没个规矩**。
+第 1 篇让程序「记得住事」了，但回想一下当时存的东西：`python.txt` 里是随手拼的一行字，日记本里是「日期 + 内容」的一段话。能记住，可记得**没个规矩**。
 
 真实世界的数据不是这样的。Excel 里的表格一行一个人、一列一个字段；大模型接口返回的是一串 JSON；训练词表是一行一个词。**有格式的数据才能和别人交换**——你读得懂别人给的，你写出去的别人也读得懂。
 
@@ -64,7 +64,7 @@ name	chinese	math	english
 
 ## 2. csv 模块：reader 读、writer 写
 
-第 11 篇读文件，读到的是**一整行字符串**，想拆字段得自己 `split(',')`。csv 模块替你把这件事做了。
+第 1 篇读文件，读到的是**一整行字符串**，想拆字段得自己 `split(',')`。csv 模块替你把这件事做了。
 
 ### 2.1 读 CSV
 
@@ -108,7 +108,7 @@ with open('new_students.csv', 'w', encoding='utf-8', newline='') as f:
 两个容易漏的点：
 
 1. **`newline=''` 必须写**——Windows 上不写它，每行之间会多出一个空行。这是 csv 写文件的头号事故，先记住结论，原因在文末坑清单里；
-2. `writerow`（单行）和 `writerows`（多行）就差一个 s，和第 11 篇 `readline` / `readlines` 一个套路。
+2. `writerow`（单行）和 `writerows`（多行）就差一个 s，和第 1 篇 `readline` / `readlines` 一个套路。
 
 ### 2.3 换成 TSV，只改一个参数
 
@@ -174,7 +174,7 @@ with open('config.json', 'w', encoding='utf-8') as f:
 
 ## 4. 综合案例：一份成绩，三种格式流转
 
-把这一篇和第 11 篇串起来，做一个真实小任务：
+把这一篇和第 1 篇串起来，做一个真实小任务：
 
 > 教务系统把学生成绩存成了 CSV，读进来算平均分，再把结果导出成 JSON 存盘。
 
@@ -209,8 +209,8 @@ with open('students_result.json', 'w', encoding='utf-8') as f:
 几个值得留意的细节：
 
 1. **`next(reader)` 跳过表头**——表头不是数据，读进来得先跳过去，不然 `int('chinese')` 直接崩；
-2. **字符串转数字**——CSV 读出来全是字符串，`int(chinese)` 在第 2 篇就学过，这里终于用上了；
-3. **「读 → 算 → 写」三段**——和第 11 篇的备份工具同款节奏，只是这次读写的是**有格式**的数据。
+2. **字符串转数字**——CSV 读出来全是字符串，`int(chinese)` 在[《Python 基础》第 2 篇](/post/python-basics-for-ai/)就学过，这里终于用上了；
+3. **「读 → 算 → 写」三段**——和第 1 篇的备份工具同款节奏，只是这次读写的是**有格式**的数据。
 
 这个流程再长一步，就是你在 exam 里见过的「教务管理系统把学生成绩存进 `stus.json`」——本质一模一样：内存里的对象 `json.dump` 落盘，下次启动 `json.load` 读回来。
 
@@ -221,23 +221,23 @@ with open('students_result.json', 'w', encoding='utf-8') as f:
 | 表格，每行一条记录，字段简单 | CSV | `csv` |
 | 表格，字段里含逗号 | TSV | `csv` + `delimiter='\t'` |
 | 嵌套结构（字典套列表）、要发给别人 / 发给模型 | JSON | `json` |
-| 就是随手记几句、没有固定字段 | 纯文本 | 第 11 篇的 `open` |
+| 就是随手记几句、没有固定字段 | 纯文本 | 第 1 篇的 `open` |
 
-选哪个一句话就能定：**有表头、有行列，用 CSV/TSV；要表达「结构」，用 JSON；啥也没有，回第 11 篇。**
+选哪个一句话就能定：**有表头、有行列，用 CSV/TSV；要表达「结构」，用 JSON；啥也没有，回第 1 篇。**
 
 ## 6. 常见坑清单
 
 1. **写 CSV 忘了 `newline=''`**——Windows 上会每行之间多一个空行。原因：`open` 默认把 `\n` 转成 `\r\n`，而 `csv.writer` 自己也会加换行，两拨换行叠一起就空了。加上 `newline=''` 告诉 Python「换行我自己管」；
 2. **`ensure_ascii=False` 忘了写**——中文存进去变 `\uXXXX`，文件打开一片码。写了它才存原样的中文；
 3. **读 CSV 出来的数字当数字用**——`row[1]` 是字符串 `'90'`，不 `int()` 直接算分，要么拼接出错要么排序全乱；
-4. **`json.load` 读空文件**——空文件不是合法 JSON，直接 `JSONDecodeError`。第一次运行文件还没生成时，先用第 9 篇的 `try/except` 接住，或第 11 篇的 `os.path.exists` 先判断；
+4. **`json.load` 读空文件**——空文件不是合法 JSON，直接 `JSONDecodeError`。第一次运行文件还没生成时，先用[《Python 面向对象》第 2 篇](/post/python-oop-advanced-exceptions/)的 `try/except` 接住，或第 1 篇的 `os.path.exists` 先判断；
 5. **`dump` 和 `dumps` 分不清**——带 s 的是跟字符串打交道（`json.dumps(obj)` 返回字符串），碰文件用不带 s 的（`json.dump(obj, f)`）。
 
 ## 7. 课后小项目
 
 **练习一：词表生成器（必做）**
 
-分词器训练前要从语料整理一份词表。写 `build_vocab(words)`：先把 `vocab` 目录建好（不存在就建），再把每个词占一行写进 `vocab/vocab.txt`，写完后重新打开数一数有多少行，打印出来。目录操作用第 11 篇的 `os.makedirs`。
+分词器训练前要从语料整理一份词表。写 `build_vocab(words)`：先把 `vocab` 目录建好（不存在就建），再把每个词占一行写进 `vocab/vocab.txt`，写完后重新打开数一数有多少行，打印出来。目录操作用第 1 篇的 `os.makedirs`。
 
 **练习二：学生名单筛选**
 
@@ -255,4 +255,4 @@ with open('students_result.json', 'w', encoding='utf-8') as f:
 4. **读进来要 `int()` 转换**——CSV 里的数字是字符串，别直接算；
 5. **有格式的数据才能流转**——读 CSV、算分、写 JSON，一条流水线就这么搭起来了。
 
-到这里，数据「怎么存、怎么读、怎么交换」就全通了。但这一篇埋了个雷还没拆：上面案例里 `rows.append(...)` 这种操作，如果哪天写 `b = a` 再改 `b`，`a` 也会跟着变——为什么？下一篇把「变量到底指什么」这件事讲到底——[第 14 篇：赋值、浅拷贝与深拷贝](/post/python-shallow-deep-copy/)。
+到这里，数据「怎么存、怎么读、怎么交换」就全通了。但这一篇埋了个雷还没拆：上面案例里 `rows.append(...)` 这种操作，如果哪天写 `b = a` 再改 `b`，`a` 也会跟着变——为什么？下一篇把「变量到底指什么」这件事讲到底——[文件与数据 第 3 篇：赋值、浅拷贝与深拷贝](/post/python-shallow-deep-copy/)。

@@ -1,7 +1,7 @@
 ---
 title: '带你看懂AI Agent 发展史'
 category: 'AI Agent 发展史'
-order: 4
+order: 9
 cover: /images/covers/ai-agent-history-cover.jpg
 description: 'AI Agent 从 2022 年到 2026 年这四年是怎么一步步长成今天这个样子的：以「世代」划分，用「模型 + Harness」两分法拆开七个部件，讲清每个部件的演进与贯穿始终的沉淀规律。'
 ---

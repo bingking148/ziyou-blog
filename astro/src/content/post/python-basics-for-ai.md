@@ -2,7 +2,7 @@
 title: 'Python 第 2 篇：变量、类型与运算，写一个 BMI 计算器'
 weight: 2
 date: 2026-10-16T09:02:00+08:00
-updatedDate: 2026-10-30T10:00:00+08:00
+updatedDate: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-basics-for-ai-cover.jpg
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', '变量', '入门教程']
@@ -238,7 +238,7 @@ print(age + 1)              # 19
 ValueError: invalid literal for int() with base 10: 'abc'
 ```
 
-意思是「`abc` 没法变成整数」。这个报错你以后会见到无数次，通常是用户输错了东西——第 9 篇会教你用 `try/except` 优雅地接住它。
+意思是「`abc` 没法变成整数」。这个报错你以后会见到无数次，通常是用户输错了东西——[《Python 面向对象》第 2 篇](/post/python-oop-advanced-exceptions/)会教你用 `try/except` 接住它。
 
 ### 4.4 字符串格式化：f-string
 
@@ -421,7 +421,7 @@ else:
 ValueError: could not convert string to float: 'abc'
 ```
 
-程序直接死了。这就是「用户不按套路输入」的后果。第 9 篇会用 `try/except` 给它套上安全网，现在先记住这个报错长什么样。
+程序直接死了。这就是「用户不按套路输入」的后果。[《Python 面向对象》第 2 篇](/post/python-oop-advanced-exceptions/)会用 `try/except` 给它套上安全网，现在先记住这个报错长什么样。
 
 ## 8. 新手最常踩的 8 个坑
 

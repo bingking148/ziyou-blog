@@ -1,10 +1,10 @@
 ---
-title: 'Python 第 11 篇：文件操作，写一个文件备份工具'
-weight: 11
+title: '文件与数据 第 1 篇：文件操作，写一个文件备份工具'
+weight: 1
 cover: /images/covers/python-file-operations-cover.jpg
 date: 2026-11-01T09:00:00+08:00
-lastmod: 2026-11-06T10:00:00+08:00
-categories: ['人工智能', 'Python基础']
+lastmod: 2026-11-12T20:30:00+08:00
+categories: ['人工智能', 'Python文件与数据']
 tags: ['Python', '编程基础', '文件操作', 'os模块']
 description: '程序一关，数据全没？这篇让程序学会把数据写进文件、再读回来：open 的三种打开方式、读文件的几种姿势、用 os 和 shutil 管文件管目录，最后拼一个文件备份工具。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-上一篇组出了助手家族，OOP 讲完了。但这十几篇写的程序都有个共同的毛病：程序一关，数据全没。
+[Python 面向对象专栏](/categories/python面向对象/)写到助手家族就结束了。那些程序有个共同的毛病：一关，数据全没。
 
 BMI 算完就忘，猜数字不留记录，助手家族的对话历史只活在内存里。变量住在内存里，程序一结束，操作系统就把这块内存收回去。想让程序「记得住事」，只能把数据写到文件里——聊天记录、训练日志、模型配置，落到磁盘上的都是文件。
 
@@ -243,7 +243,7 @@ f.close()
 FileNotFoundError: [Errno 2] No such file or directory: './hello.txt'
 ```
 
-第 9 篇学的异常处理，这里派上用场了。文件操作是整个系列里最容易出意外的代码：文件可能不存在、可能被占用、可能没权限，这些都不是你代码写错了，是「世界不配合」。所以文件操作天生该包在 `try` 里：
+[《Python 面向对象》第 2 篇](/post/python-oop-advanced-exceptions/)学的异常处理，这里派上用场了。文件操作是写程序时最容易出意外的代码：文件可能不存在、可能被占用、可能没权限，这些都不是你代码写错了，是「世界不配合」。所以文件操作天生该包在 `try` 里：
 
 ```python
 f = None
@@ -315,7 +315,7 @@ with open('./datas/b.txt', 'w', encoding='utf-8') as dst_file:
     dst_file.writelines(reversed_lines)
 ```
 
-`rstrip` 是第 5 篇的字符串方法，`[::-1]` 是切片步长，`writelines` 接一个列表一次写完，正好是 `readlines` 的反操作。
+`rstrip` 是[《Python 基础》第 5 篇](/post/python-data-containers/)的字符串方法，`[::-1]` 是切片步长，`writelines` 接一个列表一次写完，正好是 `readlines` 的反操作。
 
 ### 9.2 文件备份器
 
@@ -374,10 +374,10 @@ with open(source_file, 'r', encoding='utf-8') as src_file, \
 
 **练习四：语料统计器**
 
-把一段对话语料存进 `corpus.txt`，统计每个词出现的次数，按次数从高到低写进 `result.txt`——读文件用第 4 节，统计用第 5 篇的字典，排序用 `sorted` + `lambda`，写文件用 `with`。四样旧知识加一个新知识。
+把一段对话语料存进 `corpus.txt`，统计每个词出现的次数，按次数从高到低写进 `result.txt`——读文件用第 4 节，统计用[《Python 基础》第 5 篇](/post/python-data-containers/)的字典，排序用 `sorted` + `lambda`，写文件用 `with`。四样旧知识加一个新知识。
 
 ## 12. 小结
 
 程序终于能「记得住事」了。文件操作拢共三件事：打开用 `with`、写用 `a` 追加别乱覆盖、读用 `readline()` 逐行处理大文件。路径优先用相对路径，编码每次都写 `utf-8`。
 
-程序能存数据了，但第 6 篇留过一个尾巴：有些功能——日志、计时、登录检查——想加给一堆函数，总不能复制十遍。下一篇的闭包和装饰器就是答案——[第 12 篇：闭包与装饰器](/post/python-closures-decorators/)。
+程序能存数据了。下一篇给这些文件立个固定格式——[文件与数据 第 2 篇：CSV、TSV 与 JSON](/post/python-file-formats/)。
