@@ -3,265 +3,248 @@ title: 'Python 第 20 篇：FastAPI，把函数变成别人能调用的接口'
 weight: 20
 cover: /images/covers/python-fastapi-api-cover.jpg
 date: 2026-11-10T09:00:00+08:00
-lastmod: 2026-11-10T09:00:00+08:00
+lastmod: 2026-11-12T19:00:00+08:00
 categories: ['人工智能', 'Python基础']
 tags: ['Python', '编程基础', 'FastAPI', 'API']
-description: '用 FastAPI 把一个 Python 函数挂到 HTTP 上：路径参数、查询参数、POST 的 JSON 请求体，以及自动生成的 /docs。最后做一个能跑的问答接口。'
+description: '做一本三张便条的笔记接口：浏览器打开 /notes/1 看到「协程」那条，用 ?short=true 只看标题，再 POST 加一张「快照」。'
 math: false
 mermaid: false
 comments: true
 toc: true
 ---
 
-上一篇的协程还是你自己在脚本里 `asyncio.run()`。真要给别人用，就得有一个地址：对方发来 HTTP 请求，你的函数跑完，再把 JSON 送回去。
+上一篇的三页是你自己在脚本里打开的。这一篇换一件事：把三张学习便条放进一个小服务，让浏览器能按地址翻到。
 
-FastAPI 就是干这个的。它是一个做 API 的 Web 框架，站在 Starlette 和 Pydantic 上面，吃 Python 的类型标注，也吃上一篇的 `async`。文档在 <https://fastapi.tiangolo.com> 。
+三张便条从一开始就定好，后面只加不换：
 
-这一篇的小项目是一个能问一句、答一句的接口。中间把路径、查询参数、请求体各走一遍，不堆很多互不相干的文件。
+| 编号 | 标题 | 正文 |
+|---|---|---|
+| 1 | 协程 | 网页在转圈时，先去看下一页 |
+| 2 | 接口 | 给函数一个浏览器打得开的地址 |
+| 3 | 虚拟机 | Linux 装在一块虚拟磁盘上 |
 
-## 1. 一次调用长什么样
-
-对方要告诉你三件事：去哪个地址、请求头里带什么、正文是什么。FastAPI 收到之后，按你写的路径和方法（GET 还是 POST）找到函数，把结果再送回去。
-
-<figure style="text-align:center;margin:2.5rem 0 2rem;">
-<svg class="diag-py-fastapi-request" viewBox="0 0 680 360" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>请求地址、header、body 进 FastAPI，再按 GET 或 POST 给出响应</title>
-  <style>
-    .diag-py-fastapi-request { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
-    [data-theme="dark"] .diag-py-fastapi-request { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-gray:#2a2d33; }
-  </style>
-  <rect x="28" y="36" width="250" height="250" rx="16" fill="var(--fill-gray)" stroke="var(--gray)" stroke-width="1.6"/>
-  <text x="153" y="64" font-size="16" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">调用方</text>
-  <rect x="48" y="88" width="210" height="44" rx="10" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
-  <text x="153" y="110" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">请求地址 URL</text>
-  <rect x="48" y="144" width="210" height="44" rx="10" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.6"/>
-  <text x="153" y="166" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">header</text>
-  <rect x="48" y="200" width="210" height="56" rx="10" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.6"/>
-  <text x="153" y="220" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">body</text>
-  <text x="153" y="240" font-size="13" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">JSON 正文</text>
-  <line x1="278" y1="168" x2="348" y2="168" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M356,168 L346,163 L346,173 Z" fill="var(--red)"/>
-  <text x="316" y="148" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--red)">HTTP</text>
-  <rect x="364" y="70" width="280" height="180" rx="16" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8"/>
-  <text x="504" y="108" font-size="22" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">FastAPI</text>
-  <text x="504" y="146" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">GET 请求</text>
-  <text x="504" y="176" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">POST 请求</text>
-  <text x="504" y="214" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">按路径找到函数</text>
-  <text x="504" y="286" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">返回 JSON</text>
-</svg>
-</figure>
-
-请求地址像 `https://api.deepseek.com/chat/completions`。header 里常见两行：`Content-Type: application/json`，以及 `Authorization: Bearer ...` 这种凭证。body 才是真正要处理的 JSON，比如模型名和 messages。GET 多半把条件放在地址里；POST 把要提交的数据放在 body 里。
-
-浏览器或别的程序，就是靠这两种方法来调用你的接口。
-
-## 2. 最小的一个接口
-
-装两个包。FastAPI 是框架，Uvicorn 是把它跑起来的 ASGI 服务器。
+先装两个包，存成 `main.py` 的还是这一个文件：
 
 ```bash
 pip install fastapi uvicorn
 ```
 
-新建 `main.py`：
+## 1. 浏览器先打开一句 JSON
+
+文件先写成这样：
 
 ```python
 from fastapi import FastAPI
 
-app = FastAPI(title="第一个服务接口 API")
+app = FastAPI()
 
+notes = {
+    1: {"title": "协程", "text": "网页在转圈时，先去看下一页"},
+    2: {"title": "接口", "text": "给函数一个浏览器打得开的地址"},
+    3: {"title": "虚拟机", "text": "Linux 装在一块虚拟磁盘上"},
+}
 
 @app.get("/")
-def read_root():
-    return {"message": "Hello World"}
+def home():
+    return {"ok": True, "hint": "打开 /notes/1"}
 ```
 
-`@app.get("/")` 是装饰器：有人用 GET 访问根路径时，就调用这个函数。返回字典，FastAPI 会把它变成 JSON。
+`@app.get("/")` 的意思是：有人用浏览器访问这个服务的首页，就去跑 `home`。`return` 的字典会被收成 JSON。
 
-在 `main.py` 所在目录启动：
+在 `main.py` 所在的目录启动：
 
 ```bash
 uvicorn main:app --reload
 ```
 
-这行拆开是：`main` 是 `main.py` 这个模块，`app` 是里面的 `app = FastAPI()`，`--reload` 表示你改了代码就自动重启，只在开发时用。
+`main` 是文件名，`app` 是上面那个变量。`--reload` 是你一保存，服务自己重启。
 
 浏览器打开：
 
-- <http://127.0.0.1:8000/> 看到 `{"message":"Hello World"}`
-- <http://127.0.0.1:8000/docs> 是自动生成的交互式文档，可以直接在页面上试接口
+<http://127.0.0.1:8000/>
 
-停服务用 `Ctrl + C`。
+你会看到 `{"ok":true,"hint":"打开 /notes/1"}`。`127.0.0.1` 就是你这台电脑，`8000` 是 uvicorn 听的端口。这一下通了，函数已经变成一个地址。
 
-> [!NOTE]
-> 函数写成普通 `def` 也可以。里面没有 `await` 时，FastAPI 会把它丢进线程池，避免一个慢函数堵住所有请求。要等网络、等数据库，就写成 `async def`，和上一篇一样。
+同一个服务还有一页现成的试接口页面：
 
-## 3. 路径参数：地址里的一段
+<http://127.0.0.1:8000/docs>
 
-`/items/1001` 这种，`1001` 是路径的一部分，不是问号后面的附加条件。
+后面加路径、加参数，都在这一页里点。不要另找一个别的网站来试。
 
-```python
-@app.get("/items/{item_id}")
-async def read_item(item_id: int):
-    return {"item_id": item_id}
-```
+## 2. 打开第 1 条：/notes/1
 
-类型写成 `int`，对方要是传来 `abc`，FastAPI 直接回 422，不会进你的函数。这是类型标注在干活，不是你手写的 if。
-
-顺序有讲究。固定路径要写在带参数的路径前面，不然 `me` 会被当成某个 `user_id`：
+首页那句 JSON 只说明服务活着。便条在 `/notes/1`。在刚才的文件里接着写：
 
 ```python
-@app.get("/users/me")
-async def read_user_me():
-    return {"user_id": "the current user"}
-
-
-@app.get("/users/{user_id}")
-async def read_user(user_id: str):
-    return {"user_id": user_id}
+@app.get("/notes/{note_id}")
+def read_note(note_id: int, short: bool = False):
+    note = notes.get(note_id)
+    if note is None:
+        return {"error": "没有这条笔记"}
+    if short:
+        return {"title": note["title"]}
+    return note
 ```
 
-## 4. 查询参数：问号后面的条件
+`{note_id}` 是路径里的空位。地址写成 `/notes/1`，`note_id` 就是整数 `1`，函数去三张便条里拿第 1 条。
 
-`/items/1001?q=苹果` 里，`q` 是查询参数。函数里多写一个带默认值的参数即可。
+保存后浏览器打开：
 
-```python
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
-```
+<http://127.0.0.1:8000/notes/1>
 
-不传 `q`，就是 `None`。传了，就出现在返回的 JSON 里。
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-note-call" viewBox="0 0 680 400" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>浏览器打开 /notes/1，read_note 返回协程那条笔记</title>
+  <style>
+    .diag-py-note-call { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-note-call { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; }
+  </style>
+  <rect x="70" y="16" width="540" height="84" rx="14" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.8"/>
+  <text x="340" y="44" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">浏览器打开</text>
+  <text x="340" y="72" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">http://127.0.0.1:8000/notes/1</text>
+  <line x1="340" y1="100" x2="340" y2="124" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,132 L335,124 L345,124 Z" fill="var(--gray)"/>
+  <rect x="70" y="136" width="540" height="84" rx="14" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.8"/>
+  <text x="340" y="164" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">跑 read_note(1)</text>
+  <text x="340" y="192" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">在三张便条里拿第 1 条</text>
+  <line x1="340" y1="220" x2="340" y2="244" stroke="var(--gray)" stroke-width="1.6" stroke-linecap="round"/><path d="M340,252 L335,244 L345,244 Z" fill="var(--gray)"/>
+  <rect x="70" y="256" width="540" height="112" rx="14" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8"/>
+  <text x="340" y="288" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">浏览器收到</text>
+  <text x="340" y="318" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">"title": "协程"</text>
+  <text x="340" y="346" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">"text": "网页在转圈时，先去看下一页"</text>
+</svg>
+</figure>
 
-再看一个「从第几个开始、要几条」的切法。数据先放在内存里，真项目里这里会去问数据库：
+按图从上往下：浏览器请求的地址是 `http://127.0.0.1:8000/notes/1`。末尾的 `1` 进了 `read_note`，函数在那三张便条里找到编号 1。返回的 JSON 就是标题「协程」和那句正文。把地址末尾改成 `2` 或 `3`，换的是同一本里的另一条，不是另一个服务。
 
-```python
-users = {
-    "u1": "Foo",
-    "u2": "Bar",
-    "u3": "Baz",
-    "u4": "Qux",
-}
+`/notes/9` 不在表里，你会看到 `{"error":"没有这条笔记"}`。
 
+## 3. 只要标题：?short=true
 
-@app.get("/users")
-async def read_users(start: int = 0, limit: int = 2):
-    keys = list(users)[start:start + limit]
-    return [{"user_id": key, "user_name": users[key]} for key in keys]
-```
+同一条地址，问号后面再加一个开关。浏览器打开：
 
-访问 `/users?start=1&limit=2`，拿到的是从第二条开始的两条。
+<http://127.0.0.1:8000/notes/1?short=true>
 
-## 5. POST：把 JSON 交进来
+<figure style="text-align:center;margin:2.5rem 0 2rem;">
+<svg class="diag-py-note-short" viewBox="0 0 680 340" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>/notes/1 是第 1 条，问号后的 short=true 表示只要标题</title>
+  <style>
+    .diag-py-note-short { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; --fill-gray:#e8e6e1; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
+    [data-theme="dark"] .diag-py-note-short { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; --fill-gray:#2a2d33; }
+  </style>
+  <rect x="50" y="20" width="580" height="88" rx="14" fill="var(--fill-gray)" stroke="currentColor" stroke-width="1.5"/>
+  <text x="340" y="50" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">http://127.0.0.1:8000</text>
+  <text x="340" y="78" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">/notes/1?short=true</text>
+  <rect x="50" y="124" width="270" height="100" rx="12" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
+  <text x="185" y="158" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">路径 /notes/1</text>
+  <text x="185" y="188" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">第 1 条，标题是协程</text>
+  <rect x="360" y="124" width="270" height="100" rx="12" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.6"/>
+  <text x="495" y="158" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">?short=true</text>
+  <text x="495" y="188" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">只要标题，不要正文</text>
+  <rect x="150" y="252" width="380" height="64" rx="12" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.6"/>
+  <text x="340" y="284" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor">得到 {"title": "协程"}</text>
+</svg>
+</figure>
 
-创建一条记录，用 POST，数据在 body 里。用 Pydantic 的 `BaseModel` 声明字段，FastAPI 会按这个形状检查对方传来的 JSON。
+斜杠后面的 `1` 负责「哪一条」，问号后面的 `short=true` 负责「要不要正文」。两个都在，函数走 `if short`，只返回 `{"title":"协程"}`。去掉问号，正文又回来了。
+
+`short` 之所以不用写在路径里，是因为函数参数给了默认值 `False`。地址里不写它，就当不要缩短。
+
+到 `/docs`，打开 `GET /notes/{note_id}`，`note_id` 填 `1`，`short` 点成 true，再点 Execute。看到的 JSON 和浏览器那次一样。
+
+## 4. 再加一张「快照」
+
+前三张写在代码里。新的一张从浏览器发一段 JSON 进来。文件末尾加上：
 
 ```python
 from pydantic import BaseModel
 
+class NewNote(BaseModel):
+    title: str
+    text: str
 
-class Item(BaseModel):
-    name: str
-    price: float
-    description: str | None = None
-
-
-items: list[dict] = []
-
-
-@app.post("/items")
-async def create_item(item: Item):
-    data = item.model_dump()
-    items.append(data)
-    return data
+@app.post("/notes")
+def add_note(note: NewNote):
+    note_id = max(notes) + 1
+    notes[note_id] = {"title": note.title, "text": note.text}
+    return {"id": note_id, "title": note.title, "text": note.text}
 ```
 
-缺 `name`、或者 `price` 不是数，请求会被拒绝。`description` 可以不传。
+`NewNote` 就是在说：发来的 JSON 里要有 `title` 和 `text`，两个都是字符串。对得上，才会进 `add_note`。
 
-在 `/docs` 里选这个接口，填 JSON，就能看到返回。也可以用 curl：
+打开 `/docs`，找到 `POST /notes`，点 Try it out，请求体换成：
 
-```bash
-curl -X POST http://127.0.0.1:8000/items \
-  -H "Content-Type: application/json" \
-  -d '{"name":"笔记本","price":19.9}'
+```json
+{"title": "快照", "text": "装好就拍一张"}
 ```
 
-## 6. 小项目：一个能问一句的接口
+点 Execute。返回里的 `id` 应该是 `4`。再在浏览器打开 <http://127.0.0.1:8000/notes/4>，标题就是「快照」。还是这一本笔记，不是另一个接口。
 
-把上面三块串成一个文件，仍然叫 `main.py`。根路径打个招呼；用路径看一条笔记；用 POST 提一个问题。这里不接真模型，函数把问题原样组织成一句回复，保证你没配 API Key 也能跑通。以后把 `answer()` 换成真正的调用即可，路径不用改。
+> [!WARNING]
+> 这四张便条待在这次运行的内存里。服务一关，你 POST 的「快照」就没了。前三张还在，是因为它们写在 `notes = {...}` 里，下次启动会重新放回去。
+
+## 5. 小项目：把这一本跑通
+
+`main.py` 到这里是完整的。三张老便条、首页、按编号读、`short`、再加一张，都在这一个文件里：
 
 ```python
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-app = FastAPI(title="学习助手接口", version="0.1.0")
+app = FastAPI()
 
 notes = {
-    1: "协程遇到 await 就让出控制权",
-    2: "create_task 之后要 gather，不然主协程一走任务就没了",
+    1: {"title": "协程", "text": "网页在转圈时，先去看下一页"},
+    2: {"title": "接口", "text": "给函数一个浏览器打得开的地址"},
+    3: {"title": "虚拟机", "text": "Linux 装在一块虚拟磁盘上"},
 }
 
-
-class Question(BaseModel):
+class NewNote(BaseModel):
+    title: str
     text: str
 
-
 @app.get("/")
-async def root():
-    return {"message": "欢迎使用学习助手"}
-
+def home():
+    return {"ok": True, "hint": "打开 /notes/1"}
 
 @app.get("/notes/{note_id}")
-async def read_note(note_id: int, short: bool = False):
-    text = notes.get(note_id)
-    if text is None:
-        return {"note_id": note_id, "text": None}
+def read_note(note_id: int, short: bool = False):
+    note = notes.get(note_id)
+    if note is None:
+        return {"error": "没有这条笔记"}
     if short:
-        return {"note_id": note_id, "text": text[:8]}
-    return {"note_id": note_id, "text": text}
+        return {"title": note["title"]}
+    return note
 
-
-@app.post("/ask")
-async def ask(question: Question):
-    reply = f"收到问题：{question.text}。先查笔记，再决定要不要调用模型。"
-    return {"content": reply}
+@app.post("/notes")
+def add_note(note: NewNote):
+    note_id = max(notes) + 1
+    notes[note_id] = {"title": note.title, "text": note.text}
+    return {"id": note_id, "title": note.title, "text": note.text}
 ```
 
-启动：
+按这个顺序点一遍：
 
-```bash
-uvicorn main:app --reload
-```
+1. <http://127.0.0.1:8000/> 看到那句提示
+2. <http://127.0.0.1:8000/notes/1> 看到「协程」和正文
+3. <http://127.0.0.1:8000/notes/1?short=true> 只剩标题
+4. `/docs` 里 POST 一张「快照」，再打开 `/notes/4`
 
-然后试三条：
+## 6. 课后小项目
 
-- <http://127.0.0.1:8000/>
-- <http://127.0.0.1:8000/notes/1?short=true>
-- <http://127.0.0.1:8000/docs> 里调用 `/ask`，body 写 `{"text":"协程和线程差在哪"}`
+**练习一：把第 2 条也看短（必做）**
 
-`short` 是查询参数。`note_id` 是路径参数。`text` 在 POST 的 body 里。三种位置，这一份代码都碰到了。
+浏览器打开 `/notes/2` 和 `/notes/2?short=true`。确认标题都是「接口」，只有不加问号的那次带着正文。
 
-> [!WARNING]
-> 这个 `items` / `notes` 存在进程内存里。服务一关，数据就没了。它只用来把接口跑通，不是数据库。
+**练习二：加一条自己的**
 
-路由变多以后，课程里的做法是按资源拆文件：用户、商品各自一个 `APIRouter`，再在主文件里 `app.include_router(...)`。前缀写成 `/users`，这个文件里的路径就都挂在 `/users` 下面。一篇先把一个文件跑通，拆分留到接口真的挤不下再做。
+在 `/docs` 里再 POST 一条，标题用今天的日期，正文写一句你自己的话。用返回的 `id` 在浏览器里打开它。
 
-## 7. 课后小项目
+**练习三：要一条不存在的**
 
-**练习一：加上「列出全部笔记」（必做）**
+打开 `/notes/9`。应该是 `{"error":"没有这条笔记"}`，而不是第 1 条的内容。
 
-写一个 `GET /notes`，把 `notes` 里每一条变成 `{"note_id": ..., "text": ...}` 放进列表返回。在 `/docs` 里点一次。
+## 7. 小结
 
-**练习二：价格必须是正数**
+这一个服务、这一本三张便条：`/` 先证明它活着，`/notes/1` 用路径挑第 1 条，`?short=true` 只要标题，`POST /notes` 再加一张「快照」。试来试去都在 `http://127.0.0.1:8000/docs`。
 
-给第 5 节的 `Item` 加一条：`price` 小于 0 时，不要append，返回 `{"error": "价格不能为负"}`。用 `/docs` 或 curl 各打一次合法和非法的 JSON。
-
-**练习三：问句太短就拒绝**
-
-`/ask` 里如果 `question.text` 去掉空格后不足 2 个字，返回 `{"content": "问题太短"}`，不要装成已经回答了。
-
-## 8. 小结
-
-FastAPI 用装饰器把函数挂到路径上。`uvicorn main:app --reload` 启动，`/docs` 能直接试。路径参数写在花括号里，查询参数是函数里带默认值的参数，POST 的 JSON 用 `BaseModel` 接。返回字典就是 JSON。
-
-接口要放到一台 Linux 上时，先把虚拟机装好：[第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。
+笔记现在跑在你的 Windows 上。想把它放到一台 Linux 上，下一篇先从零装一台虚拟机：[第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/)。

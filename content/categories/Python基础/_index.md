@@ -32,9 +32,9 @@ cover: /images/covers/python-basics-for-ai-cover.jpg
 | [第 16 篇：网络编程](/post/python-socket-network/) | 让程序隔空说话 |
 | [第 17 篇：进程与线程](/post/python-process-thread/) | 让程序同时干活 |
 | [第 18 篇：正则与生成器](/post/python-regex-generator/) | 挖数据、扛大数据 |
-| [第 19 篇：协程](/post/python-asyncio-coroutine/) | 同时请求几个网址 |
-| [第 20 篇：FastAPI](/post/python-fastapi-api/) | 一个能问一句的接口 |
-| [第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/) | 连上 192.168.88.100 |
-| [第 22 篇：Linux 基础命令](/post/python-linux-commands/) | 在 /tmp 里做一次自检 |
+| [第 19 篇：协程](/post/python-asyncio-coroutine/) | 同时看三个网页开没开 |
+| [第 20 篇：FastAPI](/post/python-fastapi-api/) | 用浏览器打开同一本笔记 |
+| [第 21 篇：用 VMware 装好 Linux 虚拟机](/post/python-linux-vm/) | 从零装好虚拟机和 Linux |
+| [第 22 篇：Linux 基础命令](/post/python-linux-commands/) | 在练习目录里把命令走一遍 |
 
 学完想转向大模型，接着看 [人工智能学习专栏](/categories/人工智能学习/)。
