@@ -1,6 +1,6 @@
 ---
 title: 'Python 基础专栏'
-description: '写给完全没写过代码的人：从装环境、跑出第一个程序开始，一路做到 BMI 计算器、猜数字、记账本、聊天机器人、智能助手家族、文件工具、函数外挂、网络编程、并发、正则与生成器，每篇一个能跑的小项目，按学习顺序排列。'
+description: '写给完全没写过代码的人：从装环境、跑出第一个程序开始，一路做到 BMI 计算器、猜数字、记账本、聊天机器人、智能助手家族、文件工具、函数外挂、网络编程、并发、正则与生成器、协程、FastAPI 和 Linux 命令，每篇一个能跑的小项目，按学习顺序排列。'
 column: true
 column_order: 2
 cover: /images/covers/python-basics-for-ai-cover.jpg
@@ -10,7 +10,7 @@ cover: /images/covers/python-basics-for-ai-cover.jpg
 
 这套教程按**零基础**写：不需要你学过任何编程语言，不需要数学很好，只需要一台电脑。每一篇都从一个具体的小项目出发，缺什么语法就补什么语法——你不会读到「本节讲变量，下节讲常量」这种脱离用处的排列。
 
-十八篇走完，你会亲手做出十八个能运行的程序：
+二十一篇走完，你会亲手做出二十一个能运行的程序：
 
 | 篇目 | 项目 |
 |---|---|
@@ -32,5 +32,8 @@ cover: /images/covers/python-basics-for-ai-cover.jpg
 | [第 16 篇：网络编程](/post/python-socket-network/) | 让程序隔空说话 |
 | [第 17 篇：进程与线程](/post/python-process-thread/) | 让程序同时干活 |
 | [第 18 篇：正则与生成器](/post/python-regex-generator/) | 挖数据、扛大数据 |
+| [第 19 篇：协程](/post/python-asyncio-coroutine/) | 同时请求几个网址 |
+| [第 20 篇：FastAPI](/post/python-fastapi-api/) | 一个能问一句的接口 |
+| [第 21 篇：Linux 基础命令](/post/python-linux-commands/) | 连上虚拟机并做一次自检 |
 
 学完想转向大模型，接着看 [人工智能学习专栏](/categories/人工智能学习/)。

@@ -304,4 +304,4 @@ for data_list in batch_loader('./nlp_data.txt', 4):
 - [Streamlit 聊天应用](/post/streamlit-ai-chat/)——做出能给别人用的界面；
 - [Agent 开发](/post/ai-agent-tool-memory-rag/)——工具、记忆、RAG。
 
-十八篇里你写了十八个能跑的程序。它们都很小，但每一个都是完整的。语法早晚会忘，「从空文件到能跑起来」这段路你已经走了十八遍——这才是真正带走的东西。
+这十八个能跑的程序都很小，但每一个都是完整的。语法早晚会忘，「从空文件到能跑起来」这段路你已经走了十八遍——这才是真正带走的东西。协程、FastAPI 和 Linux 命令三篇还在后面。
