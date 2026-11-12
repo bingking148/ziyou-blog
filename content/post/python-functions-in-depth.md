@@ -4,7 +4,7 @@ weight: 6
 date: 2026-10-24T10:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-functions-in-depth-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python', 'Python基础']
 tags: ['Python', '编程基础', '函数', '递归']
 description: '把函数讲到能放心用的程度：参数的五种形态与默认参数陷阱、全局与局部变量、return 与 print 的本质区别、递归，最后组装成一个成绩分析工具箱。'
 math: false

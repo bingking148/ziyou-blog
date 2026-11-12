@@ -1,7 +1,7 @@
 ---
 title: 'Linux 基础专栏'
 category: 'Linux基础'
-order: 7
+order: 3
 cover: /images/covers/python-linux-vm-cover.jpg
 description: '在 Windows 上从零装一台 Linux 虚拟机，然后在练习目录里把常用命令走一遍。'
 ---

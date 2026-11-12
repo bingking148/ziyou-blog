@@ -4,7 +4,7 @@ weight: 1
 date: 2026-10-26T11:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-oop-basics-cover.jpg
-categories: ['人工智能', 'Python面向对象']
+categories: ['人工智能', 'Python', 'Python面向对象']
 tags: ['Python', '编程基础', '面向对象', '类']
 description: '从函数式写法走不通的地方出发，讲清类与对象、__init__、self、实例方法和魔法方法，用它们实现一个记住上下文的聊天机器人，看懂 client.chat.completions.create。'
 math: false
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-[Python 基础专栏](/categories/python基础/)第 7 篇把工具箱拆成了模块。这里换一个问题。
+[Python 基础](/categories/python/#python-基础)第 7 篇把工具箱拆成了模块。这里换一个问题。
 
 但现在有个新问题：**做一个聊天机器人。**
 

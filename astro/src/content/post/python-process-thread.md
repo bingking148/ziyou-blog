@@ -4,7 +4,7 @@ weight: 2
 cover: /images/covers/python-process-thread-cover.jpg
 date: 2026-11-03T15:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python网络与并发']
+categories: ['人工智能', 'Python', 'Python网络与并发']
 tags: ['Python', '编程基础', '多线程', '多进程']
 description: '程序还在一件一件做事？这篇让它同时干好几件：进程怎么开、线程怎么开、它们共享不共享变量、多线程抢数据会出什么乱子、怎么用锁守住数据，最后看清死锁是怎么来的。'
 math: false

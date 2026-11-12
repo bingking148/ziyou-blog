@@ -4,7 +4,7 @@ weight: 2
 cover: /images/covers/python-file-formats-cover.jpg
 date: 2026-11-02T09:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python文件与数据']
+categories: ['人工智能', 'Python', 'Python文件与数据']
 tags: ['Python', '编程基础', '文件操作', 'CSV', 'JSON']
 description: '纯文本读写都会了，可数据一多就成了乱麻。这一篇给数据立规矩：CSV/TSV 一行一条、逗号分隔，JSON 直接存字典——csv 模块的 reader/writer、json 的 load/dump，最后让一份学生成绩在三种格式之间流转。'
 math: false

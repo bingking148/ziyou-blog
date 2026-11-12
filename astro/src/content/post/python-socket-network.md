@@ -4,7 +4,7 @@ weight: 1
 cover: /images/covers/python-socket-network-cover.jpg
 date: 2026-11-03T09:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python网络与并发']
+categories: ['人工智能', 'Python', 'Python网络与并发']
 tags: ['Python', '编程基础', '网络编程', 'socket']
 description: '让程序隔着网络收发：socket 是什么、服务器怎么等连接、客户端怎么把消息送过去，最后跑通一个能对话的收发程序。'
 math: false

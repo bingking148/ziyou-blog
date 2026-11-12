@@ -14,7 +14,7 @@ description: '从 AI 七十年与大模型概念网络讲起，经 Transformer �
 
 第 1 到第 3 篇不涉及写代码。
 
-从第 4 篇起需要 Python 基础：变量、函数、字典、`for` 循环、类。不熟的话先看 [Python 基础专栏](/categories/python基础/)。
+从第 4 篇起需要 Python 基础：变量、函数、字典、`for` 循环、类。不熟的话先看 [Python 专栏](/categories/python/#python-基础) 里的「Python 基础」。
 
 ## 也可以不按顺序
 

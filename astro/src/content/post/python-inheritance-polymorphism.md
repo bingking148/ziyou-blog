@@ -4,7 +4,7 @@ weight: 3
 cover: /images/covers/python-inheritance-polymorphism-cover.jpg
 date: 2026-10-31T08:00:00+08:00
 updatedDate: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python面向对象']
+categories: ['人工智能', 'Python', 'Python面向对象']
 tags: ['Python', '编程基础', '面向对象', '继承', '多态']
 description: '方法重写与 super 的完整用法、多继承的就近原则、私有属性与公共接口、多态三前提、抽象类定规范，最后把 OOP 的最后几个知识点串成一个助手家族。'
 math: false
@@ -549,4 +549,4 @@ if __name__ == "__main__":
 4. **抽象类只定规范**——子类不实现抽象方法就报错，规范写在代码里比写在文档里可靠；
 5. **扩展时加子类，不改老代码**——助手家族的每个入口都对新品种开放。
 
-本专栏到这里。程序一关，对话和配置就没了。要让数据留下来，去看 [Python 文件与数据专栏](/categories/python文件与数据/)。
+Python 面向对象这一段到这里。程序一关，对话和配置就没了。下一段是 Python 文件与数据，让数据留下来——[文件与数据 第 1 篇](/post/python-file-operations/)。

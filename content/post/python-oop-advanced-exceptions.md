@@ -4,7 +4,7 @@ weight: 2
 date: 2026-10-28T08:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
 cover: /images/covers/python-oop-advanced-exceptions-cover.jpg
-categories: ['人工智能', 'Python面向对象']
+categories: ['人工智能', 'Python', 'Python面向对象']
 tags: ['Python', '编程基础', '面向对象', '异常处理']
 description: '类属性与实例属性的归属之争、继承入门与多类协作、try/except 完整用法与自定义异常，最后把聊天机器人补成一个会协作、会接住异常的智能助手。'
 math: false

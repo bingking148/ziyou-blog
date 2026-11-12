@@ -4,7 +4,7 @@ weight: 4
 date: 2026-10-20T09:00:00+08:00
 updatedDate: 2026-10-30T10:00:00+08:00
 cover: /images/covers/python-loop-control-cover.jpg
-categories: ['人工智能', 'Python基础']
+categories: ['人工智能', 'Python', 'Python基础']
 tags: ['Python', '编程基础', '循环', '流程控制']
 description: '把循环讲透：range 的三种形式与五个易错点、嵌套循环怎么控制行列、累加与计数两类经典循环模式，最后用它们写出石头剪刀布游戏。'
 math: false

@@ -4,7 +4,7 @@ weight: 2
 cover: /images/covers/python-decorator-advanced-cover.jpg
 date: 2026-11-02T13:00:00+08:00
 lastmod: 2026-11-12T20:30:00+08:00
-categories: ['人工智能', 'Python函数进阶']
+categories: ['人工智能', 'Python', 'Python函数进阶']
 tags: ['Python', '编程基础', '装饰器', '闭包']
 description: '上一篇的装饰器只能一层、只接函数。这一篇补上最后两课：多个装饰器叠在一层怎么执行、装饰器自己怎么带参数，外加两个实战——统一调用日志、把模型调用器用闭包封好。'
 math: false
@@ -337,4 +337,4 @@ print(qwen('你是谁？'))
 
 装饰器最后两课补齐了：多装饰器叠用时从下往上包裹、从上往下执行；带参数装饰器三层嵌套，外层闭包记住参数、返回真正的装饰器。加上「用闭包封模型调用器」这个实战，装饰器到这里算毕业了。
 
-本专栏到这里。想让程序上网，或同时干几件事，去看 [Python 网络与并发专栏](/categories/python网络与并发/)。
+Python 函数进阶这一段到这里。下一段是 Python 网络与并发，让程序上网，或同时干几件事——[网络与并发 第 1 篇](/post/python-socket-network/)。
