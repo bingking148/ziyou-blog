@@ -450,8 +450,8 @@ test('首页开屏只播一次，减少动效与键盘不受影响', async ({ pa
   await expect(splash).toBeVisible();
   await expect(page.locator('html')).toHaveClass(/splash-pending/);
   await expect(splash).toHaveAttribute('aria-hidden', 'true');
-  await expect(splash).toHaveAttribute('data-splash-ms', '2900');
-  await expect(page.locator('#yz-splash-canvas')).toHaveCount(1);
+  await expect(splash).toHaveAttribute('data-splash-ms', '2700');
+  await expect(page.locator('.yz-lock')).toHaveCount(1);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: '跳到正文' })).toBeFocused();
   await page.keyboard.press('Enter');
@@ -488,7 +488,7 @@ test('首页开屏只播一次，减少动效与键盘不受影响', async ({ pa
     await page.goto('/?splash=1');
     await expect(page.locator('#home-splash')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${size.width} 开屏溢出`).toBe(true);
-    await expect(page.locator('#yz-splash-canvas')).toHaveCount(1);
+    await expect(page.locator('.yz-lock')).toHaveCount(1);
   }
 
   await page.addInitScript(() => localStorage.setItem('theme', 'dark'));

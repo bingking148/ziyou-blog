@@ -1,6 +1,25 @@
-<div id="home-splash" class="yz-splash" aria-hidden="true" inert data-splash-ms="2900">
+<div id="home-splash" class="yz-splash" aria-hidden="true" inert data-splash-ms="2700">
   <div class="yz-splash-paper"></div>
-  <canvas id="yz-splash-canvas" width="760" height="420"></canvas>
+  <div class="yz-splash-plate">
+    <i class="yz-c yz-c-tl"></i>
+    <i class="yz-c yz-c-tr"></i>
+    <i class="yz-c yz-c-bl"></i>
+    <i class="yz-c yz-c-br"></i>
+    <div class="yz-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="yz-chip">N°01</span>
+    <i class="yz-rule"></i>
+    <div class="yz-lock">
+      <svg class="yz-mark" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M14 2v24M2 14h24M5.5 5.5l17 17M5.5 22.5l17-17" stroke="currentColor" stroke-width="1.2" />
+        <circle cx="14" cy="14" r="4" stroke="currentColor" stroke-width="1.2" />
+      </svg>
+      <div class="yz-word">
+        <span class="yz-ghost" aria-hidden="true">ZIYOU</span>
+        <span class="yz-set">ZIYOU</span>
+        <i class="yz-bar"></i>
+      </div>
+    </div>
+  </div>
 </div>
 <script is:inline>
   (function () {
@@ -14,259 +33,213 @@
       return;
     }
     var paper = root.querySelector('.yz-splash-paper');
-    var canvas = document.getElementById('yz-splash-canvas');
-    var ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) { finish(); return; }
-    var DATA = {"w":760,"h":420,"letters":[[[52.9,244.0,52.4,256.8,60.7,266.6,72.9,271.0,85.6,274.1,98.6,273.3,111.6,271.7,124.5,269.7,137.2,266.6,149.8,263.0,162.4,259.6,175.1,256.8,188.2,256.9,201.0,259.0,208.2,251.5,201.3,241.1,189.1,237.4,176.0,238.3,163.2,240.7,150.3,243.1,137.7,246.5,125.2,250.4,112.7,253.9,99.6,254.0,86.5,254.0,83.6,246.5,94.4,239.2,105.2,231.7,115.8,224.2,126.5,216.5,137.0,208.9,147.4,200.9,157.8,193.0,168.2,185.1,178.4,176.9,188.6,168.7,193.6,157.3,186.7,147.8,173.6,147.9,160.7,146.7,147.7,146.6,134.6,145.7,121.6,144.4,108.6,143.2,95.5,143.2,82.9,141.2,72.0,145.6,72.8,158.3,84.3,162.0,97.4,162.0,110.4,162.3,123.5,163.5,136.5,164.4,149.5,165.2,159.5,169.0,150.0,178.1,139.6,186.0,129.3,194.0,118.9,201.9,108.2,209.5,97.5,217.0,87.0,224.7,75.9,231.6,64.5,238.0]],[[220.1,247.2,218.4,255.6,222.4,262.5,230.3,264.6,238.7,263.0,247.1,262.3,255.5,263.4,263.0,260.0,271.3,258.1,279.8,257.0,288.2,255.6,296.5,253.9,304.8,251.8,310.5,246.5,307.2,239.4,298.9,237.3,290.4,237.2,281.9,237.9,273.5,238.7,265.2,238.4,263.6,230.5,264.4,222.1,265.5,213.6,267.0,205.2,268.3,196.8,269.5,188.3,270.7,179.9,272.0,171.5,273.4,163.1,275.6,154.9,283.8,153.2,292.4,152.8,300.9,152.3,309.0,149.9,314.0,144.7,310.4,137.2,303.4,132.8,294.9,132.5,286.5,134.0,278.0,134.4,270.3,131.7,263.3,135.7,255.4,138.2,246.9,138.2,239.0,135.9,231.1,137.2,224.9,143.0,223.5,151.0,228.5,157.4,236.9,157.7,245.3,156.5,253.7,157.0,254.9,164.7,254.5,173.2,253.8,181.7,252.9,190.2,251.6,198.6,250.6,207.1,249.8,215.6,248.8,224.1,247.5,232.5,244.7,240.4,236.6,243.1,228.4,245.1]],[[352.7,253.8,353.6,261.1,356.8,267.7,362.5,271.3,367.2,265.9,369.5,258.8,371.1,251.6,372.6,244.3,374.4,237.2,375.8,229.9,376.6,222.5,376.9,215.1,376.9,207.7,376.7,200.3,379.5,194.1,385.0,189.1,390.8,184.5,396.5,179.8,401.7,174.5,407.0,169.2,412.2,164.0,417.4,158.7,422.6,153.5,427.9,148.2,429.9,141.3,426.4,135.0,420.0,131.7,412.8,132.0,408.1,137.6,404.3,144.0,400.1,150.1,395.5,155.9,390.6,161.4,385.2,166.4,379.6,171.3,374.0,176.2,368.0,180.6,360.9,182.0,355.1,178.5,351.8,171.9,350.3,164.6,349.1,157.3,348.0,150.0,346.3,142.8,343.4,136.0,338.3,131.1,330.9,131.3,326.2,136.4,327.1,143.7,328.9,150.9,329.8,158.2,330.7,165.6,332.3,172.8,334.3,179.9,337.1,186.8,340.3,193.5,344.8,199.3,350.7,203.7,354.3,210.0,356.3,217.2,356.7,224.5,356.6,231.9,355.3,239.2,353.6,246.5]],[[434.9,180.2,432.5,186.2,431.1,192.6,430.5,199.0,430.6,205.5,431.3,212.0,432.6,218.4,434.2,224.7,436.3,230.8,439.4,236.5,443.4,241.6,448.1,246.1,453.4,250.0,458.9,253.3,464.9,255.8,471.2,257.5,477.6,258.5,484.1,259.0,490.6,258.8,497.1,258.1,503.4,256.9,509.7,255.3,515.9,253.2,521.6,250.1,527.1,246.6,532.4,243.0,537.6,239.0,542.5,234.8,547.1,230.2,551.3,225.2,555.0,219.9,558.4,214.3,561.2,208.5,563.5,202.4,565.2,196.1,565.7,189.6,567.0,183.3,567.1,177.0,564.8,170.9,561.4,165.4,557.5,160.2,553.4,155.2,549.1,150.3,544.3,146.0,539.1,142.1,533.5,138.8,527.8,135.7,521.6,133.6,515.3,131.9,509.1,130.1,502.7,129.9,496.3,131.0,490.0,132.6,483.7,134.0,477.2,134.4,470.9,135.2,465.6,138.9,460.6,143.1,455.9,147.6,451.6,152.5,447.7,157.6,444.0,163.0,440.6,168.5,437.6,174.3],[448.9,203.4,449.3,196.1,451.4,189.0,454.4,182.3,458.6,176.2,463.4,170.5,469.5,166.4,476.4,163.8,482.6,160.5,487.1,154.7,493.4,150.8,500.5,148.8,507.9,148.8,515.2,150.1,522.0,152.9,528.2,156.9,534.0,161.5,539.2,166.8,543.7,172.6,547.2,179.1,548.1,186.4,547.1,193.8,544.9,200.8,541.8,207.5,537.8,213.7,532.9,219.3,527.4,224.2,521.4,228.5,515.1,232.4,508.5,235.8,501.5,238.1,494.4,240.1,487.1,241.1,479.7,240.5,472.9,237.8,466.5,234.0,460.5,229.7,455.4,224.4,451.9,217.9,450.1,210.7]],[[583.3,178.0,581.9,187.3,581.2,196.7,581.0,206.1,581.4,215.5,583.5,224.7,586.8,233.5,591.3,241.8,597.2,249.1,604.7,254.9,613.2,258.8,622.4,260.5,631.8,260.8,641.1,259.8,650.3,257.5,659.2,254.5,667.6,250.2,674.8,244.1,681.6,237.7,688.0,230.8,693.5,223.1,697.6,214.7,700.8,205.8,703.4,196.8,705.3,187.5,706.3,178.2,707.6,168.9,707.0,159.5,706.6,150.1,702.9,141.5,695.1,136.9,686.8,139.9,685.5,148.7,687.8,157.7,687.0,167.1,686.7,176.5,684.8,185.7,682.1,194.7,679.5,203.8,676.2,212.6,671.1,220.5,664.8,227.4,657.9,233.9,649.4,237.9,640.7,241.4,631.3,242.4,622.0,241.1,613.4,237.4,606.7,230.9,601.8,222.8,599.0,213.9,598.2,204.5,598.9,195.1,600.2,185.8,601.7,176.5,604.6,167.6,608.0,158.8,611.5,150.0,609.4,141.2,601.7,137.0,593.9,142.0,591.8,151.1,589.1,160.1,586.1,169.0]]],"word":{"x":52.4,"y":129.9,"w":655.2,"h":144.2},"center":[380.0,202.0],"idot":[270.6,136.6]};
-    var letters = DATA.letters.map(function (contours, li) {
-      var flat = contours[0];
-      var n = flat.length / 2, x = 0, y = 0, i;
-      for (i = 0; i < n; i++) { x += flat[i * 2]; y += flat[i * 2 + 1]; }
-      return { contours: contours, cx: x / n, cy: y / n, seed: li * 1.7 + 0.4 };
-    });
-    var ink = parseHex(cssVar('--splash-ink', '#1e1e1e'));
-    var red = parseHex(cssVar('--splash-red', '#c41e3a'));
-    var blush = parseHex(cssVar('--splash-blush', '#f6d7d3'));
-    var cx0 = DATA.center[0], cy0 = DATA.center[1];
-    var raf = 0, done = false, flight = null, t0 = 0, fitted = false;
-    var backup = setTimeout(finish, 3400);
+    var plate = root.querySelector('.yz-splash-plate');
+    var lock = root.querySelector('.yz-lock');
+    var done = false;
+    var backup = setTimeout(finish, 3200);
+    var flyTimer = setTimeout(fly, 2000);
+    var endTimer = setTimeout(finish, 2700);
 
-    function cssVar(name, fallback) {
-      var v = getComputedStyle(root).getPropertyValue(name).trim();
-      return v || fallback;
-    }
-    function parseHex(h) {
-      h = String(h).replace('#', '').trim();
-      if (h.indexOf('rgb') === 0) {
-        var m = h.match(/\d+/g);
-        return m ? [+m[0], +m[1], +m[2]] : [30, 30, 30];
-      }
-      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
-      var n = parseInt(h, 16);
-      if (!isFinite(n)) return [30, 30, 30];
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-    }
-    function mix(a, b, k) {
-      k = k < 0 ? 0 : k > 1 ? 1 : k;
-      return 'rgb(' + ((a[0] + (b[0] - a[0]) * k) | 0) + ',' + ((a[1] + (b[1] - a[1]) * k) | 0) + ',' + ((a[2] + (b[2] - a[2]) * k) | 0) + ')';
-    }
-    function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-    function easeOutBack(t) {
-      var c1 = 1.70158, c3 = c1 + 1;
-      return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-    }
-    function morphEase(t) {
-      if (t <= 0) return 0;
-      if (t >= 1) return 1;
-      if (t < 0.5) return 0.16 * (1 - Math.pow(1 - t / 0.5, 2));
-      if (t < 0.74) {
-        var k = (t - 0.5) / 0.24;
-        return 0.16 + (1.18 - 0.16) * (1 - Math.pow(1 - k, 3));
-      }
-      var k2 = (t - 0.74) / 0.26;
-      return 1 + 0.18 * Math.pow(2, -8 * k2) * Math.cos(k2 * Math.PI * 2.15);
-    }
-    function ring(n, r, seed) {
-      var pts = [];
-      for (var i = 0; i < n; i++) {
-        var a = (i / n) * Math.PI * 2;
-        var wob = 0.76 + 0.26 * Math.sin(a * 3 + seed);
-        pts.push([Math.cos(a) * r * wob, Math.sin(a) * r * 0.86 * wob]);
-      }
-      return pts;
-    }
-    function fit() {
-      var dpr = Math.min(2, window.devicePixelRatio || 1);
-      var w = canvas.clientWidth || 680;
-      var h = canvas.clientHeight || (w * DATA.h / DATA.w);
-      canvas.width = Math.max(1, Math.round(w * dpr));
-      canvas.height = Math.max(1, Math.round(h * dpr));
-      ctx.setTransform(canvas.width / DATA.w, 0, 0, canvas.height / DATA.h, 0, 0);
-    }
-    function blob(x, y, r, seed, color) {
-      ctx.beginPath();
-      var n = 16;
-      for (var i = 0; i <= n; i++) {
-        var a = (i / n) * Math.PI * 2;
-        var wob = 0.74 + 0.28 * Math.sin(a * 3 + seed) + 0.08 * Math.sin(a * 5 + seed * 2);
-        var px = x + Math.cos(a) * r * wob;
-        var py = y + Math.sin(a) * r * wob * 0.84;
-        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-    function drawLetter(L, gx, gy, u, color) {
-      ctx.beginPath();
-      for (var ci = 0; ci < L.contours.length; ci++) {
-        if (ci > 0 && u < 0.52) continue;
-        var flat = L.contours[ci];
-        var n = flat.length / 2;
-        var b = ring(n, ci ? 3.2 : 17, L.seed + ci * 2.2);
-        for (var i = 0; i < n; i++) {
-          var sx = gx + b[i][0], sy = gy + b[i][1];
-          var tx = flat[i * 2], ty = flat[i * 2 + 1];
-          var x = sx + (tx - sx) * u;
-          var y = sy + (ty - sy) * u;
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-      }
-      ctx.fillStyle = color;
-      ctx.fill('evenodd');
-    }
-    function drawKicker(k) {
-      var len = 64 * Math.min(k, 1.16);
-      var x0 = DATA.center[0] - 30;
-      var y = DATA.word.y + DATA.word.h + 18;
-      ctx.beginPath();
-      ctx.moveTo(x0, y + 1);
-      ctx.quadraticCurveTo(x0 + len * 0.45, y - 3.5, x0 + len, y + 0.5);
-      ctx.strokeStyle = mix(red, red, 1);
-      ctx.lineWidth = 5;
-      ctx.lineCap = 'round';
-      ctx.stroke();
-    }
-    function drawDot(pop) {
-      var x = DATA.idot[0], y = DATA.idot[1];
-      blob(x, y, 9.4 * pop, 1.2, mix(red, red, 1));
-    }
-    function draw(t) {
-      ctx.clearRect(0, 0, DATA.w, DATA.h);
-      if (t < 400) {
-        var k = clamp(t / 260, 0, 1);
-        var pop = Math.max(0, easeOutBack(k));
-        blob(cx0, cy0, 22 * pop, 0.6, mix(red, red, 1));
-        return;
-      }
-      var split = easeOutCubic(clamp((t - 400) / 460, 0, 1));
-      var morphT = clamp((t - 900) / 680, 0, 1);
-      var u = t < 900 ? 0 : morphEase(morphT);
-      var inkK = clamp((u - 0.45) / 0.4, 0, 1);
-      var color = mix(red, ink, inkK);
-      var hop = Math.sin(split * Math.PI) * -16;
-      for (var li = 0; li < letters.length; li++) {
-        var L = letters[li];
-        var gx = cx0 + (L.cx - cx0) * split;
-        var gy = cy0 + (L.cy - cy0) * split + hop * (0.65 + li * 0.08);
-        if (u <= 0.02) blob(gx, gy, 16.5, L.seed, mix(red, red, 1));
-        else drawLetter(L, gx, gy, u, color);
-      }
-      if (t > 430 && t < 1080) {
-        var fk = easeOutCubic(clamp((t - 430) / 420, 0, 1));
-        var fade = 1 - clamp((t - 820) / 260, 0, 1);
-        var angs = [0.5, 1.8, 2.7, 4.1, 5.4];
-        for (var fi = 0; fi < angs.length; fi++) {
-          var dist = (28 + fi * 16) * fk;
-          var fx = cx0 + Math.cos(angs[fi]) * dist;
-          var fy = cy0 + Math.sin(angs[fi]) * dist * 0.62;
-          ctx.globalAlpha = 0.85 * fade;
-          blob(fx, fy, 6.5 * (1 - fk * 0.35), fi, fi % 2 ? mix(blush, blush, 1) : mix(red, red, 1));
-          ctx.globalAlpha = 1;
-        }
-      }
-      if (t > 1560) {
-        var pk = clamp((t - 1560) / 180, 0, 1);
-        drawDot(Math.max(0, easeOutBack(pk)));
-      }
-      if (t > 1600) {
-        var kk = clamp((t - 1600) / 170, 0, 1);
-        var over = kk < 1 ? kk + 0.16 * Math.sin(kk * Math.PI) : 1;
-        drawKicker(over);
-      }
-    }
-    function beginFlight() {
-      var rect = canvas.getBoundingClientRect();
-      var brand = document.querySelector('.site-brand span');
-      var word = DATA.word;
-      var wordW = rect.width * (word.w / DATA.w);
-      var wordCx = rect.left + rect.width * ((word.x + word.w / 2) / DATA.w);
-      var wordCy = rect.top + rect.height * ((word.y + word.h / 2) / DATA.h);
-      var br = brand ? brand.getBoundingClientRect() : null;
-      if (!br || wordW < 8) {
-        flight = { dx: 0, dy: -28, s: 0.9 };
-        return;
-      }
-      flight = {
-        dx: (br.left + br.width / 2) - wordCx,
-        dy: (br.top + br.height / 2) - wordCy,
-        s: clamp(br.width / wordW, 0.06, 0.6)
-      };
-    }
-    function applyFlight(p) {
-      if (!flight) beginFlight();
-      var e = easeOutCubic(clamp(p, 0, 1));
-      var shrink = easeOutCubic(clamp(p * 1.45, 0, 1));
-      var s = 1 + (flight.s - 1) * shrink;
-      canvas.style.transform = 'translate(-50%, -50%) translate(' + (flight.dx * e).toFixed(1) + 'px,' + (flight.dy * e).toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
-      paper.style.opacity = String(1 - Math.min(1, p * 1.2));
-      var fade = p < 0.58 ? 1 : 1 - (p - 0.58) / 0.42;
-      canvas.style.opacity = String(Math.max(0, fade));
-    }
-    function frame(now) {
-      if (done) return;
-      if (!fitted && canvas.clientWidth) { fit(); fitted = true; }
-      var t = now - t0;
-      if (t >= 2900) { finish(); return; }
-      draw(t);
-      if (t >= 2200) applyFlight((t - 2200) / 700);
-      raf = requestAnimationFrame(frame);
+    function fly() {
+      var brand = document.querySelector('.site-brand');
+      if (!brand || !lock) return;
+      var lr = lock.getBoundingClientRect();
+      var br = brand.getBoundingClientRect();
+      if (!lr.width || !br.width) return;
+      var dx = (br.left + br.width / 2) - (lr.left + lr.width / 2);
+      var dy = (br.top + br.height / 2) - (lr.top + lr.height / 2);
+      var s = Math.max(0.12, Math.min(0.85, br.width / lr.width));
+      lock.style.transition = 'transform .68s cubic-bezier(.62, 0, .2, 1)';
+      paper.style.transition = 'opacity .62s linear';
+      plate.classList.add('is-leaving');
+      requestAnimationFrame(function () {
+        lock.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(' + s.toFixed(3) + ')';
+        paper.style.opacity = '0';
+      });
     }
     function onKey(e) { if (e.key === 'Escape') finish(); }
     function finish() {
       if (done) return;
       done = true;
       clearTimeout(backup);
-      if (raf) cancelAnimationFrame(raf);
+      clearTimeout(flyTimer);
+      clearTimeout(endTimer);
       window.removeEventListener('keydown', onKey);
       html.classList.remove('splash-pending');
       root.remove();
     }
     window.addEventListener('keydown', onKey);
-    fit();
-    t0 = performance.now();
-    raf = requestAnimationFrame(frame);
   })();
 </script>
 <style is:global>
   html.splash-pending,
   html.splash-pending body { overflow: hidden; }
   .yz-splash {
-    --splash-ink: #1e1e1e;
     --splash-red: #c41e3a;
-    --splash-blush: #f6d7d3;
     position: fixed;
     inset: 0;
     z-index: 620;
-    pointer-events: auto;
+    overflow: hidden;
     background: transparent;
+    color: var(--color-text-strong);
   }
   html:not(.splash-pending) .yz-splash { display: none; }
-  [data-theme="dark"] .yz-splash {
-    --splash-ink: #f4f1ea;
-    --splash-blush: #5c2e36;
-    --splash-red: #c41e3a;
-  }
   .yz-splash-paper {
     position: absolute;
     inset: 0;
     background: var(--color-bg);
   }
-  #yz-splash-canvas {
+  .yz-splash-plate {
     position: absolute;
     left: 50%;
     top: 46%;
-    width: min(92vw, 680px);
-    height: auto;
-    aspect-ratio: 760 / 420;
+    width: min(88vw, 520px);
+    height: min(48vh, 300px);
     transform: translate(-50%, -50%);
-    transform-origin: 50% 48%;
+  }
+  .yz-c {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 0 solid var(--color-text-strong);
+    opacity: 0;
+  }
+  .yz-c-tl { left: 0; top: 0; border-top-width: 3px; border-left-width: 3px; animation: yz-in-tl .38s cubic-bezier(.2, .8, .2, 1) .35s forwards; }
+  .yz-c-tr { right: 0; top: 0; border-top-width: 3px; border-right-width: 3px; animation: yz-in-tr .38s cubic-bezier(.2, .8, .2, 1) .42s forwards; }
+  .yz-c-bl { left: 0; bottom: 0; border-bottom-width: 3px; border-left-width: 3px; animation: yz-in-bl .38s cubic-bezier(.2, .8, .2, 1) .48s forwards; }
+  .yz-c-br { right: 0; bottom: 0; border-bottom-width: 3px; border-right-width: 3px; border-color: #c41e3a; animation: yz-in-br .38s cubic-bezier(.2, .8, .2, 1) .54s forwards; }
+  @keyframes yz-in-tl { from { opacity: 0; transform: translate(-16px, -16px); } to { opacity: 1; transform: none; } }
+  @keyframes yz-in-tr { from { opacity: 0; transform: translate(16px, -16px); } to { opacity: 1; transform: none; } }
+  @keyframes yz-in-bl { from { opacity: 0; transform: translate(-16px, 16px); } to { opacity: 1; transform: none; } }
+  @keyframes yz-in-br { from { opacity: 0; transform: translate(16px, 16px); } to { opacity: 1; transform: none; } }
+  .yz-ticks {
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    top: 18px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 10px;
+    opacity: 0;
+    animation: yz-fade .3s ease .55s forwards;
+  }
+  .yz-ticks span { flex: 1; height: 3px; background: var(--color-text-strong); }
+  .yz-ticks span:nth-child(3n) { height: 8px; background: #c41e3a; }
+  .yz-chip {
+    position: absolute;
+    left: 22px;
+    top: 42px;
+    padding: 4px 8px;
+    border: 2px solid #c41e3a;
+    background: #c41e3a;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    line-height: 1;
+    opacity: 0;
+    animation: yz-chip .26s cubic-bezier(.2, 1.15, .35, 1) .72s forwards;
+  }
+  @keyframes yz-chip { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+  .yz-rule {
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 28px;
+    height: 2px;
+    background: var(--color-text-strong);
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: yz-rule .32s cubic-bezier(.2, .8, .2, 1) .62s forwards;
+  }
+  @keyframes yz-rule { to { transform: scaleX(1); } }
+  @keyframes yz-fade { to { opacity: 1; } }
+  .yz-lock {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+  }
+  .yz-mark {
+    width: 64px;
+    height: 64px;
+    flex: none;
+    color: var(--color-text-strong);
+    transform: scale(.15);
+    opacity: 0;
+    animation: yz-mark .34s cubic-bezier(.2, 1.35, .35, 1) both;
+  }
+  @keyframes yz-mark { to { transform: none; opacity: 1; } }
+  .yz-word { position: relative; min-width: 0; }
+  .yz-ghost {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    z-index: 1;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    font-size: clamp(64px, 14vw, 128px);
+    line-height: .78;
+    letter-spacing: -.08em;
+    color: transparent;
+    -webkit-text-stroke: 2px #c41e3a;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    animation: yz-ghost .52s ease 1s forwards;
+  }
+  @keyframes yz-ghost {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(1.14); }
+    28% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    68% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -58%) scale(.86); }
+  }
+  .yz-set {
+    display: block;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 44px);
+    line-height: 1;
+    letter-spacing: .2em;
+    color: var(--color-text-strong);
+    white-space: nowrap;
+    padding-right: .15em;
+    animation: yz-set .32s cubic-bezier(.2, .8, .2, 1) 1.18s forwards;
+  }
+  @keyframes yz-set { to { max-width: 9em; opacity: 1; } }
+  .yz-bar {
+    display: block;
+    width: 64px;
+    height: 8px;
+    margin-top: 12px;
+    background: #c41e3a;
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: yz-bar .22s cubic-bezier(.2, .9, .3, 1.15) 1.46s forwards;
+  }
+  @keyframes yz-bar { to { transform: scaleX(1); } }
+  .yz-splash-plate.is-leaving .yz-c,
+  .yz-splash-plate.is-leaving .yz-ticks,
+  .yz-splash-plate.is-leaving .yz-chip,
+  .yz-splash-plate.is-leaving .yz-rule,
+  .yz-splash-plate.is-leaving .yz-ghost {
+    animation: none;
+    opacity: 0;
   }
   @media (prefers-reduced-motion: reduce) {
     html.splash-pending,
     html.splash-pending body { overflow: visible; }
     .yz-splash { display: none !important; }
+    .yz-mark, .yz-set, .yz-ghost, .yz-bar, .yz-c, .yz-ticks, .yz-chip, .yz-rule { animation: none !important; }
   }
 </style>
