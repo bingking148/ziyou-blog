@@ -452,6 +452,26 @@ test('首页开屏只播一次，减少动效与键盘不受影响', async ({ pa
   await expect(splash).toHaveAttribute('aria-hidden', 'true');
   await expect(splash).toHaveAttribute('data-splash-ms', '2700');
   await expect(page.locator('.yz-lock')).toHaveCount(1);
+  const handoff = await page.evaluate(async () => {
+    const samples = [];
+    const t0 = performance.now();
+    while (performance.now() - t0 < 1700) {
+      const g = document.querySelector('.yz-ghost');
+      const m = document.querySelector('.yz-mark');
+      const s = document.querySelector('.yz-set');
+      if (!g || !m || !s) break;
+      samples.push([
+        Number(getComputedStyle(g).opacity),
+        Number(getComputedStyle(m).opacity),
+        Number(getComputedStyle(s).opacity),
+      ]);
+      await new Promise((r) => setTimeout(r, 30));
+    }
+    return samples;
+  });
+  // 描边打满时小准星和实心字都不在字母中间；描边退去时实心字已经接上，中间不空一拍。
+  expect(handoff.some(([g, m, s]) => g > 0.85 && m < 0.2 && s < 0.2)).toBe(true);
+  expect(handoff.some((row, i) => handoff.slice(0, i).some(([g]) => g > 0.8) && row[0] < 0.08 && row[2] < 0.15)).toBe(false);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: '跳到正文' })).toBeFocused();
   await page.keyboard.press('Enter');

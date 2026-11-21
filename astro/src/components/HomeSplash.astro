@@ -8,13 +8,13 @@
     <div class="yz-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
     <span class="yz-chip">N°01</span>
     <i class="yz-rule"></i>
+    <span class="yz-ghost" aria-hidden="true">ZIYOU</span>
     <div class="yz-lock">
       <svg class="yz-mark" viewBox="0 0 28 28" fill="none" aria-hidden="true">
         <path d="M14 2v24M2 14h24M5.5 5.5l17 17M5.5 22.5l17-17" stroke="currentColor" stroke-width="1.2" />
         <circle cx="14" cy="14" r="4" stroke="currentColor" stroke-width="1.2" />
       </svg>
       <div class="yz-word">
-        <span class="yz-ghost" aria-hidden="true">ZIYOU</span>
         <span class="yz-set">ZIYOU</span>
         <i class="yz-bar"></i>
       </div>
@@ -175,17 +175,25 @@
     height: 64px;
     flex: none;
     color: var(--color-text-strong);
-    transform: scale(.15);
     opacity: 0;
-    animation: yz-mark .34s cubic-bezier(.2, 1.35, .35, 1) both;
+    transform: scale(.15);
+    animation: yz-mark 1.62s linear forwards;
   }
-  @keyframes yz-mark { to { transform: none; opacity: 1; } }
+  @keyframes yz-mark {
+    0% { opacity: 0; transform: scale(.15); }
+    12% { opacity: 1; transform: none; }
+    66% { opacity: 1; transform: none; }
+    73% { opacity: 0; transform: none; }
+    84% { opacity: 0; transform: none; }
+    93% { opacity: 1; transform: none; }
+    100% { opacity: 1; transform: none; }
+  }
   .yz-word { position: relative; min-width: 0; }
   .yz-ghost {
     position: absolute;
     left: 50%;
-    top: 46%;
-    z-index: 0;
+    top: 50%;
+    z-index: 3;
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 900;
@@ -198,13 +206,13 @@
     pointer-events: none;
     opacity: 0;
     visibility: hidden;
-    animation: yz-ghost .32s cubic-bezier(.2, .7, .2, 1) .9s forwards;
+    animation: yz-ghost .3s linear 1.16s forwards;
   }
   @keyframes yz-ghost {
-    0% { opacity: 0; visibility: hidden; -webkit-text-stroke-width: 2px; transform: translate(-50%, -50%) scale(1.12); }
-    18% { opacity: 1; visibility: visible; -webkit-text-stroke-width: 2px; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; visibility: visible; -webkit-text-stroke-width: 2px; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; visibility: hidden; -webkit-text-stroke-width: 0; transform: translate(-50%, -50%) scale(.92); }
+    0% { opacity: 0; visibility: hidden; -webkit-text-stroke-width: 2px; transform: translate(-50%, -50%) scale(1.06); }
+    24% { opacity: 1; visibility: visible; -webkit-text-stroke-width: 2px; transform: translate(-50%, -50%) scale(1); }
+    42% { opacity: 1; visibility: visible; -webkit-text-stroke-width: 2px; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; visibility: hidden; -webkit-text-stroke-width: 0; transform: translate(-50%, -50%) scale(1); }
   }
   .yz-set {
     position: relative;
@@ -221,9 +229,13 @@
     color: var(--color-text-strong);
     white-space: nowrap;
     padding-right: .15em;
-    animation: yz-set .28s cubic-bezier(.2, .8, .2, 1) 1.26s forwards;
+    animation: yz-set .2s linear 1.32s forwards;
   }
-  @keyframes yz-set { to { max-width: 9em; opacity: 1; } }
+  @keyframes yz-set {
+    0% { max-width: 0; opacity: 0; }
+    40% { max-width: 9em; opacity: .2; }
+    100% { max-width: 9em; opacity: 1; }
+  }
   .yz-bar {
     display: block;
     width: 64px;
@@ -232,7 +244,7 @@
     background: #c41e3a;
     transform: scaleX(0);
     transform-origin: left center;
-    animation: yz-bar .2s cubic-bezier(.2, .9, .3, 1.15) 1.5s forwards;
+    animation: yz-bar .16s cubic-bezier(.2, .9, .3, 1.15) 1.48s forwards;
   }
   @keyframes yz-bar { to { transform: scaleX(1); } }
   .yz-splash-plate.is-leaving .yz-c,
