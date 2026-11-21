@@ -450,12 +450,12 @@ test('首页开屏只播一次，减少动效与键盘不受影响', async ({ pa
   await expect(splash).toBeVisible();
   await expect(page.locator('html')).toHaveClass(/splash-pending/);
   await expect(splash).toHaveAttribute('aria-hidden', 'true');
-  await expect(splash).toHaveAttribute('data-splash-ms', '2700');
+  await expect(splash).toHaveAttribute('data-splash-ms', '2900');
   await expect(page.locator('.yz-lock')).toHaveCount(1);
   const handoff = await page.evaluate(async () => {
     const samples = [];
     const t0 = performance.now();
-    while (performance.now() - t0 < 1700) {
+    while (performance.now() - t0 < 2000) {
       const g = document.querySelector('.yz-ghost');
       const m = document.querySelector('.yz-mark');
       const s = document.querySelector('.yz-set');
