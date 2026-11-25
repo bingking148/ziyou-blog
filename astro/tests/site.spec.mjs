@@ -2,6 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   // 不蒜子与第三方统计不可控，站点本就允许其失败隐藏；测试不等待这些外部请求。
+  // 默认视为本会话已看过开屏，避免 2 秒遮罩挡住既有点击。开屏用例会自行清掉标记。
+  await page.addInitScript(() => {
+    try { sessionStorage.setItem('ziyou-home-splash', '1'); } catch (e) {}
+  });
   await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, (route) => route.abort());
   page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
   page.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE', m.text()); });
@@ -435,4 +439,84 @@ test('内页三装置：目录卡、档案卷宗与名片灯', async ({ page }) 
   await expect(page.locator('.bizcard')).toHaveCount(friends + 2);
   await expect(page.locator('.lamp.on')).toHaveCount(friends + 1);
   await expect(page.locator('.lamp.off')).toHaveCount(1);
+});
+
+test('首页开屏只播一次，减少动效与键盘不受影响', async ({ page }) => {
+  test.setTimeout(40000);
+  await page.addInitScript(() => sessionStorage.removeItem('ziyou-home-splash'));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const splash = page.locator('#home-splash');
+  await expect(splash).toBeVisible();
+  await expect(page.locator('html')).toHaveClass(/splash-pending/);
+  await expect(splash).toHaveAttribute('aria-hidden', 'true');
+  await expect(splash).toHaveAttribute('data-splash-ms', '2900');
+  await expect(page.locator('.yz-lock')).toHaveCount(1);
+  const handoff = await page.evaluate(async () => {
+    const samples = [];
+    const t0 = performance.now();
+    while (performance.now() - t0 < 2000) {
+      const g = document.querySelector('.yz-ghost');
+      const m = document.querySelector('.yz-mark');
+      const s = document.querySelector('.yz-set');
+      if (!g || !m || !s) break;
+      samples.push([
+        Number(getComputedStyle(g).opacity),
+        Number(getComputedStyle(m).opacity),
+        Number(getComputedStyle(s).opacity),
+      ]);
+      await new Promise((r) => setTimeout(r, 30));
+    }
+    return samples;
+  });
+  // 描边打满时小准星和实心字都不在字母中间；描边退去时实心字已经接上，中间不空一拍。
+  expect(handoff.some(([g, m, s]) => g > 0.85 && m < 0.2 && s < 0.2)).toBe(true);
+  expect(handoff.some((row, i) => handoff.slice(0, i).some(([g]) => g > 0.8) && row[0] < 0.08 && row[2] < 0.15)).toBe(false);
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: '跳到正文' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#main')).toBeFocused();
+  await expect(splash).toHaveCount(0, { timeout: 5500 });
+  await expect(page.locator('html')).not.toHaveClass(/splash-pending/);
+  expect(await page.evaluate(() => sessionStorage.getItem('ziyou-home-splash'))).toBe('1');
+  await expect(page.locator('.scene-title')).toBeVisible();
+  await page.evaluate(() => scrollTo(0, 480));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(100);
+
+  await page.addInitScript(() => sessionStorage.setItem('ziyou-home-splash', '1'));
+  await page.reload();
+  await expect(page.locator('#home-splash')).toHaveCount(0);
+  await expect(page.locator('.scene-title')).toBeVisible();
+
+  await page.goto('/?splash=1');
+  await expect(page.locator('#home-splash')).toBeVisible();
+  await expect(page.locator('#home-splash')).toHaveCount(0, { timeout: 5500 });
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript(() => sessionStorage.removeItem('ziyou-home-splash'));
+  await page.goto('/');
+  await expect(page.locator('#home-splash')).toHaveCount(0);
+  await expect(page.locator('html')).not.toHaveClass(/splash-pending/);
+  await expect(page.locator('.scene-title')).toBeVisible();
+
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/about/');
+  await expect(page.locator('#home-splash')).toHaveCount(0);
+
+  for (const size of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(size);
+    await page.goto('/?splash=1');
+    await expect(page.locator('#home-splash')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${size.width} 开屏溢出`).toBe(true);
+    await expect(page.locator('.yz-lock')).toHaveCount(1);
+  }
+
+  await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/?splash=1');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  const bg = await page.locator('.yz-splash-paper').evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(bg).toBe('rgb(12, 12, 12)');
+  const red = await page.locator('#home-splash').evaluate((el) => getComputedStyle(el).getPropertyValue('--splash-red').trim());
+  expect(red).toBe('#c41e3a');
 });

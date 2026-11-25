@@ -7,6 +7,7 @@ import { responsive } from '../utils/images.ts';
 import { columnPosts, postUrl, slugifyTaxonomy } from '../utils/columns.ts';
 import { UDL_CHAPTERS, UDL_META } from '../data/udl/index.ts';
 import { TYPING_STRINGS, SOCIAL, AUTHOR } from '../consts.ts';
+import HomeSplash from '../components/HomeSplash.astro';
 
 const posts = (await getCollection('post')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
@@ -24,6 +25,18 @@ const shortTitle = (t: string) => t.split('——')[0];
 
 <Base pageClass="is-home">
   <link slot="head" rel="stylesheet" href="/resources/act2-display/display.css" />
+  <script slot="head" is:inline>
+    (function () {
+      try {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var force = new URLSearchParams(location.search).get('splash') === '1';
+        if (!force && sessionStorage.getItem('ziyou-home-splash') === '1') return;
+        sessionStorage.setItem('ziyou-home-splash', '1');
+        document.documentElement.classList.add('splash-pending');
+      } catch (e) {}
+    })();
+  </script>
+  <HomeSplash />
   <div class="page-exit" aria-hidden="true"></div>
   <!-- 开场：封面 → 胶片切片 → 最新作品卡，三幕共用一个滚动轨道 -->
   <section id="header" class="scene" aria-label="站点封面">
