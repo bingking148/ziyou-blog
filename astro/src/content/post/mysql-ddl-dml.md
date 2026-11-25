@@ -3,7 +3,7 @@ title: 'MySQL 第 1 篇：建库建表，把便条搬进数据库'
 weight: 1
 cover: /images/covers/mysql-ddl-dml-cover.jpg
 date: 2026-11-14T09:00:00+08:00
-updatedDate: 2026-11-25T14:35:00+08:00
+updatedDate: 2026-11-25T15:36:00+08:00
 categories: ['人工智能', '数据库']
 tags: ['Python', '编程基础', 'MySQL', 'SQL']
 description: '便条接口一重启就丢数据。这一篇建一个 db_note 库和一张 note 表，把那四张便条搬进 MySQL：建库、建表、插入、更新、删除。'
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-[FastAPI 那一篇](/post/python-fastapi-api/)结尾留了一句警告：四张便条待在内存里，服务一关，POST 进去的「快照」就没了。这一篇把这句话解决掉——给便条找一个关机也还在的地方。
+四张便条待在内存里，服务一关，POST 进去的「快照」就没了——[FastAPI 那一篇](/post/python-fastapi-api/)结尾留的这句警告，这一篇把它解决掉：给便条找一个关机也还在的地方。
 
 这个地方就是数据库。你之前用字典存便条，字典活在 Python 进程里，进程结束它就结束。数据库是另一个一直跑着的程序，专门替你看管表格，数据落在它自己的磁盘文件里。你的 Python 脚本、命令行、以后的接口，都隔着网络跟它说话，说的话叫 SQL。
 

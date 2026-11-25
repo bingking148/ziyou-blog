@@ -3,7 +3,7 @@ title: 'SQLAlchemy 第 2 篇：接上 FastAPI，便条这次真的存住了'
 weight: 5
 cover: /images/covers/fastapi-sqlalchemy-cover.jpg
 date: 2026-11-19T09:00:00+08:00
-updatedDate: 2026-11-25T14:35:00+08:00
+updatedDate: 2026-11-25T15:36:00+08:00
 categories: ['人工智能', '数据库']
 tags: ['Python', '编程基础', 'FastAPI', 'SQLAlchemy', 'MySQL']
 description: '把三张便条的接口改造成从 MySQL 读写：get_db 按请求发会话，Depends 送进接口，POST 进去的便条重启之后还在。'
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-[FastAPI 那一篇](/post/python-fastapi-api/)的警告还挂在那儿：POST 进去的便条待在内存里，服务一关就没了。中间隔了四篇，库建好了、表拆好了、类写好了，这一篇把接口接上去，让那句话作废。
+那句警告还挂在那儿：POST 进去的便条待在内存里，服务一关就没了，这是 [FastAPI 那一篇](/post/python-fastapi-api/)结尾留下的。中间隔了四篇，库建好了、表拆好了、类写好了，这一篇把接口接上去，让它作废。
 
 改造后的服务还是那几个地址：按编号读一张、按本子列一批、POST 加一张。区别只有一处：数据不再来自代码里的字典，来自 MySQL。
 

@@ -3,32 +3,47 @@ title: 'SQLAlchemy 第 2 篇：接上 FastAPI，便条这次真的存住了'
 weight: 5
 cover: /images/covers/fastapi-sqlalchemy-cover.jpg
 date: 2026-11-19T09:00:00+08:00
-lastmod: 2026-11-25T14:35:00+08:00
+lastmod: 2026-11-25T15:30:21+08:00
 categories: ['人工智能', '数据库']
 tags: ['Python', '编程基础', 'FastAPI', 'SQLAlchemy', 'MySQL']
-description: '把三张便条的接口改造成从 MySQL 读写：get_db 按请求发会话，Depends 送进接口，POST 进去的便条重启之后还在。'
+description: '用 Depends 按请求提供 Session，以 Pydantic 分隔输入输出模型，完成查询、新增、删除，并重启服务验证数据仍在。'
 math: false
 mermaid: false
 comments: true
 toc: true
 ---
 
-[FastAPI 那一篇](/post/python-fastapi-api/)的警告还挂在那儿：POST 进去的便条待在内存里，服务一关就没了。中间隔了四篇，库建好了、表拆好了、类写好了，这一篇把接口接上去，让那句话作废。
+[FastAPI 那一篇](/post/python-fastapi-api/)留下的问题，现在终于有条件解决：MySQL 表已经稳定，SQLAlchemy 模型也已跑通。这一篇把接口里的字典全部撤掉，让每次请求都真正读写数据库。
 
-改造后的服务还是那几个地址：按编号读一张、按本子列一批、POST 加一张。区别只有一处：数据不再来自代码里的字典，来自 MySQL。
+改造后会有四个接口：查询列表、按编号查询、新增、删除。最后用一次“新增后重启服务”的测试，确认数据不再依赖 Python 进程。
 
-目录里四个文件，各管一件事：
+## 1. 目录和各文件的职责
 
-| 文件 | 管什么 |
-|---|---|
-| database.py | 怎么连库，怎么按请求发会话 |
-| models.py | 表写成类，上一篇原样拿来 |
-| schema.py | 请求和响应该长什么形状 |
-| main.py | 地址和函数 |
+继续上一篇的 `E:\notes-service`：
 
-## 1. 会话按请求发：get_db
+```text
+E:\notes-service\
+├── database.py    # 连接池、Session 工厂、按请求提供 Session
+├── models.py      # Book 和 Note：数据库表结构
+├── schema.py      # NoteIn 和 NoteOut：网络输入输出结构
+└── main.py        # FastAPI 路由
+```
 
-上一篇的会话是脚本开头建一个、结尾关一个。服务不一样：服务一直跑，请求一个个来，每个请求该用自己的一本草稿本，用完就还。在 `database.py` 末尾加：
+`database.py` 和 `models.py` 保留上一篇的内容。`schema.py` 是新增文件，`main.py` 则改写成接口入口。
+
+确认依赖齐全：
+
+```powershell
+python -m pip install fastapi "uvicorn[standard]" sqlalchemy pymysql cryptography
+```
+
+如果激活过虚拟环境，先确认 `python -m pip show fastapi` 能找到版本，避免把依赖装进另一个 Python。
+
+## 2. 给每个请求一条独立 Session
+
+上一篇的脚本只处理一次任务，用一个 Session 就够了。Web 服务会同时接待多个请求，不能让所有人共用同一条事务。
+
+在 `database.py` 末尾追加：
 
 ```python
 from sqlalchemy.orm import Session
@@ -42,23 +57,24 @@ def get_db():
         session.close()
 ```
 
-这是个生成器函数，[生成器那一篇](/post/python-regex-generator/)见过 `yield`：函数跑到 `yield` 把会话交出去，暂停；等外面用完了再回来走 `finally`。FastAPI 正是这么用它的——每个请求进来调一次 `get_db`，拿到交出来的会话塞进接口参数，响应发完再回到 `finally` 关会话。请求之间互不共用草稿本，一个请求失败也不会把别人的事务带脏。
+`yield session` 把 Session 交给路由使用；请求处理结束后，FastAPI 会回到这个生成器，执行 `finally` 中的 `close()`。
 
-## 2. 请求和响应的形状：schema.py
+因此，每次请求遵循同一条路径：创建 Session → 路由读写 → 请求结束 → 关闭 Session。某个请求失败时，也不会把未提交的数据留给下一个请求。
 
-接口收的 JSON 和返回的 JSON，用 Pydantic 类定形状，和模型类分开：模型类对着表，schema 对着网络。
+## 3. schema.py：网络数据和数据库模型分开
+
+新建 `schema.py`：
 
 ```python
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class NoteIn(BaseModel):
-    title: str
-    text: Optional[str] = None
-    book_id: int = 1
+    title: str = Field(min_length=1, max_length=50)
+    text: str | None = Field(default=None, max_length=255)
+    book_id: int
 
 
 class NoteOut(BaseModel):
@@ -66,87 +82,139 @@ class NoteOut(BaseModel):
 
     id: int
     title: str
-    text: Optional[str]
-    book_id: Optional[int]
+    text: str | None
+    book_id: int | None
     created_at: datetime
 ```
 
-`NoteIn` 是 POST 进来的形状：标题必填，正文可省，本子不给就进 1 号。编号和创建时间不收——那是数据库发的，客户端说了不算。
+`NoteIn` 只接受客户端有权提供的字段：标题、正文和本子编号。`id` 由 MySQL 自增，`created_at` 由数据库生成，因此都不能从请求体传入。
 
-`NoteOut` 是返回的形状。`from_attributes=True` 是关键一句：ORM 对象不是字典，`note.title` 是属性不是键，开了这个开关 Pydantic 才肯从属性上读值。没有它，把 `Note` 对象直接返回会序列化失败。
+`Field(min_length=1, max_length=50)` 在进入路由前检查标题长度。请求不符合规则时，FastAPI 自动返回 422，不必在路由里写一串 `if`。
 
-## 3. 三个地址
+`NoteOut` 规定响应结构。`from_attributes=True` 让 Pydantic 能读取 `note.id`、`note.title` 这样的 ORM 属性；没有它，直接返回 `Note` 对象时会因为无法按普通字典解析而报错。
 
-`main.py`：
+输入输出分开还有一个实际好处：以后表里增加内部字段，不会因为返回 ORM 对象就不小心暴露给客户端。
+
+## 4. main.py：完成四个接口
+
+把 `main.py` 改成：
 
 ```python
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Book, Note
 from schema import NoteIn, NoteOut
 
+
 app = FastAPI(title='便条接口')
+
+
+@app.get('/notes', response_model=list[NoteOut])
+def list_notes(
+    book_id: int | None = None,
+    session: Session = Depends(get_db),
+):
+    statement = select(Note)
+    if book_id is not None:
+        statement = statement.where(Note.book_id == book_id)
+
+    statement = statement.order_by(Note.id)
+    return session.scalars(statement).all()
 
 
 @app.get('/notes/{note_id}', response_model=NoteOut)
 def read_note(note_id: int, session: Session = Depends(get_db)):
     note = session.get(Note, note_id)
     if note is None:
-        raise HTTPException(status_code=404, detail='没有这条笔记')
+        raise HTTPException(status_code=404, detail='便条不存在')
     return note
 
 
-@app.get('/notes', response_model=list[NoteOut])
-def list_notes(book_id: int | None = None, session: Session = Depends(get_db)):
-    query = session.query(Note)
-    if book_id is not None:
-        query = query.filter(Note.book_id == book_id)
-    return query.order_by(Note.id).all()
-
-
-@app.post('/notes', response_model=NoteOut)
+@app.post('/notes', response_model=NoteOut, status_code=201)
 def add_note(note: NoteIn, session: Session = Depends(get_db)):
-    new_note = Note(title=note.title, text=note.text, book_id=note.book_id)
+    if session.get(Book, note.book_id) is None:
+        raise HTTPException(status_code=400, detail='本子不存在')
+
+    new_note = Note(
+        title=note.title,
+        text=note.text,
+        book_id=note.book_id,
+    )
     session.add(new_note)
     session.commit()
     session.refresh(new_note)
     return new_note
+
+
+@app.delete('/notes/{note_id}', status_code=204)
+def delete_note(note_id: int, session: Session = Depends(get_db)):
+    note = session.get(Note, note_id)
+    if note is None:
+        raise HTTPException(status_code=404, detail='便条不存在')
+
+    session.delete(note)
+    session.commit()
+    return Response(status_code=204)
 ```
 
-`Depends(get_db)` 是「这个参数由 FastAPI 替我准备」：它去调 `get_db`，把交出来的会话填进 `session`。接口函数里不再出现任何连接代码。
+逐个看数据库动作：
 
-三个地址和第一篇的对应关系：`/notes/{note_id}` 还是按编号读，只是 `notes.get(...)` 换成了 `session.get(Note, ...)`；找不到时抛 `HTTPException` 404，比返回一个错误字典更合接口的规矩。`/notes` 带一个可选的 `book_id` 查询参数，就是第二篇的 `WHERE book_id = ...`，不传就全列。`POST /notes` 收 `NoteIn`、造 `Note`、add、commit、refresh，返回时数据库填的编号和时间已经在对象上。
+- `GET /notes` 构造 `SELECT`。传入 `/notes?book_id=2` 时增加 `WHERE book_id = 2`，不传则查询全部。
+- `GET /notes/{note_id}` 用 `session.get()` 按主键查询。查不到时返回 404，而不是 `null` 加 200。
+- `POST /notes` 先检查本子是否存在，再 `add → commit → refresh`。状态码 201 表示资源创建成功，返回体包含数据库生成的编号和时间。
+- `DELETE /notes/{note_id}` 删除后提交，204 表示成功且响应无正文。再次查询同一编号应得到 404。
 
-启动：
+`Depends(get_db)` 是这些路由共享的关键。它表示“`session` 参数不由客户端传递，而由 FastAPI 调用 `get_db` 提供”，所以路由不需要重复写连接和关闭代码。
 
-```bash
+启动服务：
+
+```powershell
 uvicorn main:app --reload
 ```
 
-## 4. 重启验证：警告作废
+看到 `Uvicorn running on http://127.0.0.1:8000` 后，终端保持打开。若 SQLAlchemy 的 `echo=True` 仍开着，访问接口时还能在这里看到每次请求对应的 SQL。
 
-打开 <http://127.0.0.1:8000/docs>，按顺序点：
+## 5. 在 /docs 里按顺序验收
 
-1. `GET /notes` 执行，返回库里的便条，编号到 12。
-2. `GET /notes?book_id=2` 执行，只有随手本那几张。
-3. `POST /notes` 执行，请求体：
+打开 <http://127.0.0.1:8000/docs>，不要只确认页面能打开，按下面顺序实际操作。
+
+### 第一步：确认能读到已有数据
+
+展开 `GET /notes`，点击 **Try it out → Execute**。应得到 200 和便条数组。
+
+再测试筛选：在 `book_id` 中填 `2`，重新执行。返回项的 `book_id` 应全部为 2；如果当前没有“随手”便条，空数组也是合法的 200 响应。
+
+### 第二步：新增一张便条
+
+展开 `POST /notes`，请求体使用：
 
 ```json
-{"title": "快照二", "text": "重启也在", "book_id": 2}
+{
+  "title": "重启验证",
+  "text": "这条数据应该保存在 MySQL，而不是 Python 内存里",
+  "book_id": 1
+}
 ```
 
-返回里 `id` 是 13，`created_at` 有值。
+执行后应返回 201，并带有 `id`、`created_at`。**记下返回的 `id`，后面以它为准。**不要假定一定是 13 或其他固定值；之前的新增、删除和失败插入都可能影响自增编号。
 
-4. 回终端 `Ctrl + C` 停掉服务，再 `uvicorn main:app --reload` 起回来。
-5. 浏览器打开 <http://127.0.0.1:8000/notes/13>。
+把 `book_id` 改成 99 再执行一次，应得到 400 和“本子不存在”。这条请求由接口提前拦截，没有向数据库写入无效数据。
 
-「快照二」还在。第一篇里字典做不到这件事，因为字典跟着进程死；现在便条在 MySQL 的磁盘文件里，进程只是每次来读它。
+### 第三步：重启服务，再查同一张便条
+
+1. 回终端按 `Ctrl + C` 停掉 Uvicorn。
+2. 再运行 `uvicorn main:app --reload`。
+3. 在 `GET /notes/{note_id}` 中填入刚才记下的 `id`，执行。
+4. 应返回同一张“重启验证”便条。
+
+这次启动创建了新的 Python 进程，原来的字典和变量都已经消失。数据仍能查到，说明它确实来自 MySQL。
 
 <figure style="text-align:center;margin:2.5rem 0 2rem;">
 <svg class="diag-fastapi-db" viewBox="0 0 680 380" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>一次 POST 的路线：会话用完就关，数据留在磁盘</title>
+  <title>一次 POST 的路线：会话用完就关，数据留在数据库</title>
   <style>
     .diag-fastapi-db { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
     [data-theme="dark"] .diag-fastapi-db { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; }
@@ -155,39 +223,28 @@ uvicorn main:app --reload
   <text x="340" y="46" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">浏览器 POST /notes：标题、正文、book_id</text>
   <line x1="340" y1="78" x2="340" y2="92" stroke="var(--gray)" stroke-width="1.6"/><path d="M340,100 L335,92 L345,92 Z" fill="var(--gray)"/>
   <rect x="70" y="102" width="540" height="64" rx="12" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.6"/>
-  <text x="340" y="134" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">add_note：Depends 送来一本新会话</text>
+  <text x="340" y="134" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">Depends(get_db)：本次请求取得独立 Session</text>
   <line x1="340" y1="166" x2="340" y2="180" stroke="var(--gray)" stroke-width="1.6"/><path d="M340,188 L335,180 L345,180 Z" fill="var(--gray)"/>
   <rect x="70" y="190" width="540" height="64" rx="12" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.6"/>
-  <text x="340" y="222" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">add → commit → refresh：INSERT 落库，编号时间补回</text>
+  <text x="340" y="222" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">add → commit → refresh：写入后回读编号和时间</text>
   <line x1="340" y1="254" x2="340" y2="268" stroke="var(--gray)" stroke-width="1.6"/><path d="M340,276 L335,268 L345,268 Z" fill="var(--gray)"/>
   <rect x="70" y="278" width="540" height="80" rx="12" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8"/>
-  <text x="340" y="306" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">MySQL 磁盘：13 号便条住下</text>
-  <text x="340" y="336" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">响应发完会话关闭；服务重启，数据不动</text>
+  <text x="340" y="306" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">MySQL：新便条持久保存</text>
+  <text x="340" y="336" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">请求结束后 Session 关闭；服务重启不影响表中数据</text>
 </svg>
 </figure>
 
-会话是短命的，一个请求一本；数据是长命的，住在库里。把这两件事的寿命分开，就是这一篇全部的设计。
+### 第四步：删除测试便条，清理现场
 
-## 5. 小项目：四个文件跑通
+在 `DELETE /notes/{note_id}` 中填入同一编号，执行后应得到 204。再用 `GET /notes/{note_id}` 查一次，应得到 404。
 
-`models.py` 从上一篇复制，其余三个文件照上面写。启动后把第 4 节五步点完，再补一刀：命令行里 `UPDATE book SET name = '功课' WHERE id = 1;`，回浏览器 `GET /notes/1`——返回的 `book_id` 还是 1，但去 `GET /notes?book_id=1` 列出来的便条一张没少。本子改名，便条不用动，第三篇拆表的红利在这里兑现。
+这样既能验证删除接口，也不会在后续 Docker 示例里混入多张同名测试数据。
 
-## 6. 课后小项目
+## 6. 状态码能帮你快速定位问题
 
-**练习一：自己留一张（必做）**
+- **422**：请求形状不符合 `NoteIn`，检查 JSON 是否缺标题、字段名是否写错、`book_id` 是否为整数。
+- **404**：路由存在，但指定编号的便条不存在；先 `GET /notes` 查看当前真实编号。
+- **400**：这里用于本子不存在等可理解的业务错误。
+- **500**：服务端异常。回 Uvicorn 终端看异常最底部的错误行，常见原因是 MySQL 没启动、密码错误或模型与表结构不一致。
 
-POST 一张标题是今天日期的便条，重启服务，按返回的编号打开它。确认还在。
-
-**练习二：补一个删除地址**
-
-写 `DELETE /notes/{note_id}`：`session.get` 拿到对象，没有就 404，有就 `session.delete` 加 `commit`，返回 `{"ok": True}`。在 `/docs` 里删掉练习一那张，再 GET 确认 404。
-
-**练习三：拦下野本子**
-
-POST 一张 `book_id` 为 99 的便条，看服务报什么错。然后在 `add_note` 开头加一句检查：`session.get(Book, note.book_id)` 是 `None` 就抛 400。外键在数据库层拦了一次，接口层再拦一次，报错才说得清人话。
-
-## 7. 小结
-
-`get_db` 用生成器按请求发会话、用完关闭，`Depends` 把它送进接口；schema 管网络上的形状，模型管表里的形状，`from_attributes` 让两者接得上。POST 的便条落进 MySQL，重启还在，第一篇的警告到此作废。
-
-数据库专栏到这里。接下来换一个问题：这套东西——MySQL 加这个接口——怎么搬到另一台电脑上也一样能跑？[Docker 与 Git 专栏](/categories/docker与git/)从把 MySQL 装进容器开始。
+到此，便条项目完成了从内存字典到数据库的迁移。不过 MySQL 和 Python 依赖仍安装在当前电脑上，换一台机器还得重复配置。下一步先用 Docker 把 MySQL 跑起来：[Docker 第 1 篇：把 MySQL 装进容器](/post/docker-basics/)。

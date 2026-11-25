@@ -204,7 +204,7 @@ img { max-width: 100%; height: auto; }
 .prose th { background: var(--red-5); color: var(--color-text-strong); }
 .prose img { border-radius: 0; border: 1px solid var(--color-card-border); }
 
-/* 首字下沉（编辑排版） */
+/* 首字下沉（编辑排版）。首段一律以中文起句，避免下沉取到链接里的英文字母。 */
 .prose > p:first-of-type::first-letter {
   float: left;
   font-size: 3em;
