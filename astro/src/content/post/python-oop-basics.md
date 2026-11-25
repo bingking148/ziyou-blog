@@ -2,7 +2,7 @@
 title: '面向对象 第 1 篇：面向对象入门，写一个聊天机器人'
 weight: 1
 date: 2026-10-26T11:00:00+08:00
-updatedDate: 2026-11-17T18:00:00+08:00
+updatedDate: 2026-11-25T15:36:00+08:00
 cover: /images/covers/python-oop-basics-cover.jpg
 categories: ['人工智能', 'Python', 'Python面向对象']
 tags: ['Python', '编程基础', '面向对象', '类']
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-[Python 基础](/categories/python/#python-基础)第 7 篇把工具箱拆成了模块。这里换一个问题。
+工具箱在 [Python 基础第 7 篇](/categories/python/#python-基础)里拆成了模块。这里换一个问题。
 
 但现在有个新问题：**做一个聊天机器人。**
 

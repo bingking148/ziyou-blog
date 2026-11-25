@@ -31,7 +31,6 @@ const MAX_VISIBLE = 5;
         const list = columnPosts(c, posts);
         const visible = list.slice(0, MAX_VISIBLE);
         const rest = list.length - visible.length;
-        const blanks = Math.max(0, MAX_VISIBLE - visible.length);
         const url = `/categories/${slugifyTaxonomy(c.data.category)}/`;
         return (
           <section class="column-block" data-reveal>
@@ -59,9 +58,6 @@ const MAX_VISIBLE = 5;
                     <span class="row-arrow" aria-hidden="true">↗</span>
                   </a>
                 </li>
-              ))}
-              {Array.from({ length: blanks }).map(() => (
-                <li class="row-blank" aria-hidden="true"></li>
               ))}
             </ol>
             <a class="column-more" href={url}>
@@ -270,7 +266,6 @@ const MAX_VISIBLE = 5;
   .column-row:hover { color: var(--red-1); }
   .column-row:hover .row-no { color: var(--color-accent); }
   .column-row:hover .row-arrow { opacity: 1; transform: translate(0, 0); }
-  .row-blank { height: 48px; border-bottom: 1px dotted color-mix(in srgb, var(--red-3) 60%, transparent); }
   .column-more {
     position: relative;
     display: flex;
@@ -326,7 +321,6 @@ const MAX_VISIBLE = 5;
     .column-list { margin: 0 18px 0 29px; }
     .column-row { grid-template-columns: 20px minmax(0, 1fr) 12px; gap: 8px; min-height: 46px; }
     .row-title { font-size: 12px; }
-    .row-blank { height: 46px; }
     .column-more { margin: 4px 18px 0 29px; padding: 15px 0 17px; font-size: 11px; }
     .more-arrow { width: 25px; height: 25px; }
   }

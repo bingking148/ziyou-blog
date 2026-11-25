@@ -3,7 +3,7 @@ title: '函数进阶 第 1 篇：闭包与装饰器，给函数装上外挂'
 weight: 1
 cover: /images/covers/python-closures-decorators-cover.jpg
 date: 2026-11-01T15:00:00+08:00
-updatedDate: 2026-11-17T18:00:00+08:00
+updatedDate: 2026-11-25T15:36:00+08:00
 categories: ['人工智能', 'Python', 'Python函数进阶']
 tags: ['Python', '编程基础', '闭包', '装饰器']
 description: '函数调用完，变量就没了？闭包能把变量「关」进函数里带走；装饰器更进一步——不改一行原代码，给函数加上登录检查、日志、计时。从嵌套函数一路写到 @ 装饰器。'
@@ -13,7 +13,7 @@ comments: true
 toc: true
 ---
 
-[《Python 基础》第 6 篇](/post/python-functions-in-depth/)讲函数时留下两个别扭的地方，一直没解决：
+函数那一篇（[《Python 基础》第 6 篇](/post/python-functions-in-depth/)）留下两个别扭的地方，一直没解决：
 
 1. 函数调用完，里面的变量就销毁了。有时你就是想让一个变量跟着函数一起活下去——比如一个只属于某个函数的计数器、一组模型参数。return 只能把值交出去，变量本身留不住；
 2. 同一个功能想加给一堆函数。十个函数都要加「先检查登录」、都要打印日志，难道把同样的代码复制十遍？以后改一处就得改十处。

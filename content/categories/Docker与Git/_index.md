@@ -13,7 +13,7 @@ cover: /images/covers/docker-basics-cover.jpg
 | 篇目 | 内容 |
 |---|---|
 | [第 1 篇：把 MySQL 装进容器](/post/docker-basics/) | 镜像、容器、卷、端口映射，一条 run 起 MySQL |
-| [第 2 篇：一条命令，接口和数据库一起起来](/post/docker-compose-deploy/) | Dockerfile、compose、容器名当地址、健康检查 |
+| [第 2 篇：一条命令，接口和数据库一起起来](/post/docker-compose-deploy/) | Dockerfile、Compose、服务名寻址、健康检查、复用数据卷 |
 | [第 3 篇：给每次改动留一个能回去的版本](/post/git-basics/) | 三个区、提交与差异、分支与合并、.gitignore 与远程 |
 
 ## 前置要求
