@@ -134,7 +134,7 @@ test('宽屏页面多栏完整、无横向溢出且导航胶囊不错位', async
   await expect(page.locator('.result-row').first()).toBeVisible();
   await expect(page.locator('.search-results')).toHaveCSS('grid-template-columns', /.+ .+/);
   await page.goto('/columns/');
-  await expect(page.locator('.column-block')).toHaveCount(5);
+  await expect(page.locator('.column-block')).toHaveCount(7);
   await expect(page.locator('.column-grid')).toHaveCSS('grid-template-columns', /.+ .+/);
   const covers = await page.locator('.column-cover').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width));
   expect(covers.every((width) => width <= 160), '专栏封面应保持小画幅').toBe(true);
@@ -164,7 +164,7 @@ test('专栏合集卡片在桌面双列、手机单列且保持小封面', async
   for (const width of [1920, 1440, 1080, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/columns/');
-    await expect(page.locator('.column-block')).toHaveCount(5);
+    await expect(page.locator('.column-block')).toHaveCount(7);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${width} 宽横向溢出`).toBe(true);
     const columns = await page.locator('.column-grid').evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length);
     expect(columns, `${width} 宽栏数`).toBe(width > 1080 ? 2 : 1);
@@ -435,4 +435,46 @@ test('内页三装置：目录卡、档案卷宗与名片灯', async ({ page }) 
   await expect(page.locator('.bizcard')).toHaveCount(friends + 2);
   await expect(page.locator('.lamp.on')).toHaveCount(friends + 1);
   await expect(page.locator('.lamp.off')).toHaveCount(1);
+});
+
+test('数据库与 Docker/Git 专栏前后篇不跨栏，示意图用手绘 SVG', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(encodeURI('/categories/数据库/'));
+  await expect(page.locator('.column-masthead h1')).toHaveText('数据库专栏');
+  await expect(page.locator('[data-journey-item]')).toHaveCount(5);
+  await expect(page.locator('[data-journey-item]').first().locator('a')).toHaveAttribute('href', '/post/mysql-ddl-dml/');
+  await expect(page.locator('[data-journey-item]').last().locator('a')).toHaveAttribute('href', '/post/fastapi-sqlalchemy/');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+
+  await page.goto(encodeURI('/categories/docker与git/'));
+  await expect(page.locator('.column-masthead h1')).toHaveText('Docker 与 Git 专栏');
+  await expect(page.locator('[data-journey-item]')).toHaveCount(3);
+  await expect(page.locator('[data-journey-item]').first().locator('a')).toHaveAttribute('href', '/post/docker-basics/');
+  await expect(page.locator('[data-journey-item]').last().locator('a')).toHaveAttribute('href', '/post/git-basics/');
+
+  await page.goto('/post/mysql-ddl-dml/');
+  await expect(page.locator('figure svg[data-rough="1"]')).toHaveCount(1);
+  await expect(page.locator('a.post-nav-link.prev')).toHaveCount(0);
+  await expect(page.locator('a.post-nav-link.next')).toHaveAttribute('href', '/post/mysql-dql/');
+  const fitted = await page.evaluate(() => {
+    const svg = document.querySelector('figure svg[data-rough="1"]').getBoundingClientRect();
+    const main = document.querySelector('.post-main').getBoundingClientRect();
+    return svg.left >= main.left - 1 && svg.right <= main.right + 1 && svg.width > 200;
+  });
+  expect(fitted).toBe(true);
+
+  await page.goto('/post/fastapi-sqlalchemy/');
+  await expect(page.locator('a.post-nav-link.next')).toHaveCount(0);
+  await expect(page.locator('a.post-nav-link.prev')).toHaveAttribute('href', '/post/sqlalchemy-orm/');
+
+  await page.goto('/post/docker-basics/');
+  await expect(page.locator('a.post-nav-link.prev')).toHaveCount(0);
+  await expect(page.locator('a.post-nav-link.next')).toHaveAttribute('href', '/post/docker-compose-deploy/');
+
+  await page.goto('/post/git-basics/');
+  await expect(page.locator('a.post-nav-link.next')).toHaveCount(0);
+  await expect(page.locator('a.post-nav-link.prev')).toHaveAttribute('href', '/post/docker-compose-deploy/');
+  await page.getByRole('button', { name: '切换到深色模式' }).press('Enter');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('figure svg[data-rough="1"]')).toBeVisible();
 });
