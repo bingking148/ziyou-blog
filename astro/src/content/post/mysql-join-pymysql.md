@@ -3,220 +3,239 @@ title: 'MySQL 第 3 篇：两张表连起来查，再让 Python 接手'
 weight: 3
 cover: /images/covers/mysql-join-pymysql-cover.jpg
 date: 2026-11-17T09:00:00+08:00
-updatedDate: 2026-11-25T14:35:00+08:00
+updatedDate: 2026-11-25T16:09:02+08:00
 categories: ['人工智能', '数据库']
 tags: ['Python', '编程基础', 'MySQL', 'SQL', 'PyMySQL']
-description: '本子名单独成一张 book 表，便条只留一个 book_id：内连接、左连接、右连接各留下哪些行，再用 PyMySQL 让 Python 脚本连上数据库读写。'
+description: '把本子拆成 book 表，用 JOIN 查清关联结果，再用一份完整 PyMySQL 脚本查询和新增，最后让数据库自己守住外键约束。'
 math: false
 mermaid: false
 comments: true
 toc: true
 ---
 
-上一篇结尾留了个问题：「学习」这个本子名写在每张便条上，改一次名要改八行。这一篇把本子名单独放一张表，便条上只留一个编号指着它。两张表各管各的，查的时候再连起来。
+现在每张便条都把本子名存了一遍。“学习”出现八次，想改成“功课”就得更新八行；哪次少改一行，统计时还会被当成两个本子。
 
-连起来查叫关联查询。查完再把命令行换成 Python：以后接口里的数据，就是脚本这样读出来的。
+这次把本子名单独拿出来。改完后，`book` 表保存“学习、随手、工作”，`note` 表只保存一个 `book_id`。随后用 Python 读写这两张表，不再一直待在 MySQL 客户端里。
 
-## 1. 建本子表，给便条搬家
-
-先建 `book` 表，三个本子，其中「工作」先空着，后面看连接时有用：
+开始前先确认：
 
 ```sql
 USE db_note;
-CREATE TABLE IF NOT EXISTS book (
-    id INT PRIMARY KEY COMMENT '本子编号',
-    name VARCHAR(20) NOT NULL UNIQUE COMMENT '本子名'
-) COMMENT '本子表';
-INSERT INTO book (id, name) VALUES (1, '学习'), (2, '随手'), (3, '工作');
+SELECT COUNT(*) FROM note;
 ```
 
-`UNIQUE` 是另一种约束：这一列不许重复，但和主键不同，一张表只能有一个主键，`UNIQUE` 可以加在别的列上。本子名不该重名，加它合适。
+结果应为 10。
 
-再给 `note` 表加一列 `book_id`，把字符串翻译编号：
+## 1. 拆表时，先搬数据，再删旧列
+
+新建 `E:\notes-service\sql\03_add_books.sql`：
 
 ```sql
-ALTER TABLE note ADD book_id INT COMMENT '属于哪本，指 book.id';
+USE db_note;
+
+CREATE TABLE book (
+  id INT PRIMARY KEY COMMENT '本子编号',
+  name VARCHAR(20) NOT NULL UNIQUE COMMENT '本子名称'
+) COMMENT '本子表';
+
+INSERT INTO book (id, name) VALUES
+  (1, '学习'),
+  (2, '随手'),
+  (3, '工作');
+
+ALTER TABLE note
+  ADD COLUMN book_id INT NULL COMMENT '对应 book.id';
+
 UPDATE note SET book_id = 1 WHERE book = '学习';
 UPDATE note SET book_id = 2 WHERE book = '随手';
+
+SELECT id, title, book, book_id
+FROM note
+ORDER BY id;
 ```
 
-故意留一张没本子的散页，编号 11，`book_id` 给 4——`book` 表里没有 4 号：
+执行：
 
 ```sql
-INSERT INTO note (id, title, text, book_id) VALUES (11, '散页', '本子还没想好', 4);
+SOURCE E:/notes-service/sql/03_add_books.sql;
 ```
 
-搬家完成，旧列可以拆了：
+最后的查询很关键：旧 `book` 和新 `book_id` 必须对应，学习是 1，随手是 2，而且十行都要有值。这里先别偷懒删旧列，数据没核对完就删，出了问题连对照都没有。
+
+确认无误后再执行：
+
+```sql
+SELECT n.id, n.title, n.book_id
+FROM note AS n
+LEFT JOIN book AS b ON n.book_id = b.id
+WHERE n.book_id IS NOT NULL AND b.id IS NULL;
+```
+
+这条是在找“便条写了本子编号，但本子表里根本没有这个编号”的脏数据。结果必须为空，才能加外键：
 
 ```sql
 ALTER TABLE note DROP COLUMN book;
+
+ALTER TABLE note
+  ADD CONSTRAINT fk_note_book
+  FOREIGN KEY (book_id) REFERENCES book(id);
+
+SHOW CREATE TABLE note;
 ```
 
-从现在起，便条上只有 `book_id` 这个整数。本子改名只改 `book` 表一行，十一张便条一张都不用动。**这就是拆表的全部理由：一个事实只存一处。**
+最后一段输出里应出现 `CONSTRAINT fk_note_book FOREIGN KEY`。有了这个约束，不管从 MySQL 客户端还是 Python 插入数据，`book_id = 99` 都会被拒绝。规则放在数据库里，就不必指望每个入口都记得检查。
 
-## 2. 内连接：两边都有的才留下
+`book.name` 上的 `UNIQUE` 也有用：它防止创建两个同名本子。主键负责标识一行，`UNIQUE` 负责表达业务上的“不许重名”。
 
-想知道每张便条属于哪个本子，把两张表按 `book_id = id` 拼起来：
+## 2. JOIN：按 book_id 把名字接回来
+
+旧列删掉后，单查 `note` 只能看到 `book_id`，看不到“学习”两个字。用 `INNER JOIN` 把本子名接回来：
 
 ```sql
-SELECT n.id, n.title, b.name AS book_name
+SELECT n.id, n.title, n.text, b.name AS book_name
 FROM note AS n
-    JOIN book AS b ON n.book_id = b.id;
+INNER JOIN book AS b ON n.book_id = b.id
+ORDER BY n.id;
 ```
 
-`JOIN`（写全了是 `INNER JOIN`）是内连接，`ON` 后面是拼接条件：便条的 `book_id` 等于本子的 `id`，这两行就拼成一行返回。`AS n`、`AS b` 是给表起的短名，后面列名前缀用它。
+`n` 和 `b` 是表别名。两张表都有 `id`，所以写 `n.id`、`b.id`，不要让 MySQL 替你猜。`ON n.book_id = b.id` 是两张表的配对条件。
 
-结果是 10 行。11 号散页不在里面：它的 `book_id` 是 4，`book` 表里找不到 4 号，拼不上，内连接直接不要它。
+现在十张便条都有有效本子，所以结果是十行。`INNER JOIN` 只保留两边能配上的数据；如果便条指向一个不存在的本子，它就不会出现在结果里。
 
-## 3. 左连接、右连接：有一边要全留
-
-换个问法：每个本子各有几张便条，**一张都没有的本子也要列出来**。这时以 `book` 表为准，它每一行都留，拼不上的便条位置填 `NULL`：
+再看另一个需求：列出所有本子，包括一张便条都没有的“工作”。
 
 ```sql
-SELECT b.name AS book_name, n.id, n.title
+SELECT b.name, COUNT(n.id) AS total
 FROM book AS b
-    LEFT JOIN note AS n ON b.id = n.book_id;
+LEFT JOIN note AS n ON b.id = n.book_id
+GROUP BY b.id, b.name
+ORDER BY b.id;
 ```
 
-`LEFT JOIN` 左外连接：左表（`FROM` 后面那张）全留。结果 11 行，「工作」那一行的 `id` 和 `title` 都是 `NULL`。
+结果应是：
 
-再换问法：每张便条都要列出来，**包括没本子的散页**。这时以 `note` 表为准：
-
-```sql
-SELECT b.name AS book_name, n.id, n.title
-FROM book AS b
-    RIGHT JOIN note AS n ON b.id = n.book_id;
+```text
+学习    8
+随手    2
+工作    0
 ```
 
-`RIGHT JOIN` 右外连接：右表全留。也是 11 行，但多出来的是 11 号散页，它的 `book_name` 是 `NULL`。
+`LEFT JOIN` 会保住左边的 `book`。工作没有对应便条，连接结果里仍有一行，只是 `n.id` 为 `NULL`。
 
-<figure style="text-align:center;margin:2.5rem 0 2rem;">
-<svg class="diag-mysql-join" viewBox="0 0 680 360" style="max-width:100%;height:auto;" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>三种连接各留下哪些行</title>
-  <style>
-    .diag-mysql-join { color:#3a4656; --blue:#3d6fb4; --amber:#c07a2e; --green:#3f8f6b; --red:#c41e3a; --gray:#6b7380; --fill-blue:#d7e6f7; --fill-amber:#f3e3cc; --fill-green:#d7eee3; font-family: "LXGW WenKai Screen", "LXGW WenKai", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif; }
-    [data-theme="dark"] .diag-mysql-join { color:#aeb9c8; --blue:#8ab2e8; --amber:#e0a862; --green:#7cc3a0; --red:#ff6a5c; --gray:#9aa3b0; --fill-blue:#1e3a5f; --fill-amber:#5c3d1a; --fill-green:#1a4d2e; }
-  </style>
-  <rect x="40" y="16" width="600" height="76" rx="12" fill="var(--fill-blue)" stroke="var(--blue)" stroke-width="1.6"/>
-  <text x="340" y="42" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">JOIN 内连接：10 行</text>
-  <text x="340" y="70" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">拼得上的才要：散页出局，空本子不出现在结果里</text>
-  <rect x="40" y="112" width="600" height="76" rx="12" fill="var(--fill-amber)" stroke="var(--amber)" stroke-width="1.6"/>
-  <text x="340" y="138" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">LEFT JOIN：11 行，本子全留</text>
-  <text x="340" y="166" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">「工作」没有便条，也占一行，便条那几列是 NULL</text>
-  <rect x="40" y="208" width="600" height="76" rx="12" fill="var(--fill-green)" stroke="var(--green)" stroke-width="1.8"/>
-  <text x="340" y="234" font-size="16" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="bold">RIGHT JOIN：11 行，便条全留</text>
-  <text x="340" y="262" font-size="15" text-anchor="middle" dominant-baseline="central" fill="currentColor">11 号散页没有本子，也占一行，本子名是 NULL</text>
-  <text x="340" y="322" font-size="15" text-anchor="middle" dominant-baseline="central" fill="var(--gray)">左右是相对 FROM 和 JOIN 的位置说的，换位置就换名字</text>
-</svg>
-</figure>
+所以这里必须写 `COUNT(n.id)`，不能写 `COUNT(*)`。后者会把“工作”那行连接结果也数进去，得到 1；前者遇到 `NULL` 不计数，才是正确的 0。
 
-记法只有一句：外连接里，`LEFT` 保左表、`RIGHT` 保右表，保的那边一行不丢，另一边拼不上就填 `NULL`。
+日常查询用 `INNER JOIN` 和 `LEFT JOIN` 就够。`RIGHT JOIN` 只是换一边保留数据，把表顺序换一下也能写出来，没必要让项目里同时存在两种阅读习惯。
 
-想要「两边都全留」的全外连接，MySQL 没有 `FULL JOIN` 这个词，用 `UNION` 把左连接和右连接的结果合起来、去掉重复行：
+## 3. 安装 PyMySQL，让 Python 连上来
 
-```sql
-(SELECT b.name AS book_name, n.id, n.title
- FROM book AS b LEFT JOIN note AS n ON b.id = n.book_id)
-UNION
-(SELECT b.name AS book_name, n.id, n.title
- FROM book AS b RIGHT JOIN note AS n ON b.id = n.book_id);
+打开之前使用的 Python 虚拟环境，安装：
+
+```powershell
+python -m pip install pymysql cryptography
 ```
 
-12 行：10 行拼得上的，加「工作」空行，加散页行。
+`PyMySQL` 是数据库驱动，`cryptography` 用来处理 MySQL 8 常见的认证加密。一起装上，免得换一台机器后才遇到认证报错。
 
-## 4. Python 接手：连接和游标
-
-命令行里能查了，脚本里也要能。装一个库：
-
-```bash
-pip install pymysql
-```
-
-连接就是上一篇登录时那几样信息：地址、端口、用户、密码、库名。存成 `note_db.py`：
+在 `E:\notes-service` 新建 `note_db.py`：
 
 ```python
 import pymysql
+from pymysql.cursors import DictCursor
 
 
-def get_conn():
-    return pymysql.connect(
-        host='127.0.0.1',
-        port=3306,
-        user='root',
-        password='123456',   # 换成你自己设的密码
-        database='db_note',
-        charset='utf8mb4',
-    )
+DB_CONFIG = {
+    'host': '127.0.0.1',
+    'port': 3306,
+    'user': 'root',
+    'password': '123456',  # 改成你的 MySQL 密码
+    'database': 'db_note',
+    'charset': 'utf8mb4',
+    'cursorclass': DictCursor,
+    'autocommit': False,
+}
+
+
+def get_connection():
+    return pymysql.connect(**DB_CONFIG)
 
 
 def list_notes(conn):
-    cur = conn.cursor()
-    cur.execute('''
-        SELECT n.id, n.title, b.name
-        FROM note AS n JOIN book AS b ON n.book_id = b.id
-    ''')
-    rows = cur.fetchall()
-    cur.close()
-    return rows
+    sql = '''
+        SELECT n.id, n.title, n.text, b.name AS book_name
+        FROM note AS n
+        INNER JOIN book AS b ON n.book_id = b.id
+        ORDER BY n.id
+    '''
+    with conn.cursor() as cursor:
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+
+def find_note(conn, note_id):
+    sql = '''
+        SELECT n.id, n.title, n.text, b.name AS book_name
+        FROM note AS n
+        INNER JOIN book AS b ON n.book_id = b.id
+        WHERE n.id = %s
+    '''
+    with conn.cursor() as cursor:
+        cursor.execute(sql, (note_id,))
+        return cursor.fetchone()
+
+
+def add_note(conn, title, text, book_id):
+    sql = 'INSERT INTO note (title, text, book_id) VALUES (%s, %s, %s)'
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(sql, (title, text, book_id))
+            new_id = cursor.lastrowid
+        conn.commit()
+        return new_id
+    except Exception:
+        conn.rollback()
+        raise
 
 
 if __name__ == '__main__':
-    conn = get_conn()
+    conn = get_connection()
     try:
-        for row in list_notes(conn):
-            print(row)
+        notes = list_notes(conn)
+        print(f'当前有 {len(notes)} 张便条')
+        for note in notes:
+            print(note)
+
+        new_id = add_note(conn, '连接数据库', '值通过占位符传入', 1)
+        print('刚新增的便条：', find_note(conn, new_id))
     finally:
         conn.close()
 ```
 
-三个角色认一下：`connect` 返回的连接 `conn` 是那根电话线；`conn.cursor()` 拿到的游标 `cur` 是话筒，SQL 从它嘴里说出去；`fetchall()` 把结果全部收回来，是一个元组的列表，一行一个元组。
+运行：
 
-跑一下，打出 10 行 `(1, '协程', '学习')` 这样的元组。`finally` 保证不管中途报什么错，连接都会关掉——连接是资源，借了要还。
-
-## 5. 写入要 commit
-
-查不用提交，改要。加一个插入函数，接在同一个文件里：
-
-```python
-def add_note(conn, title, text, book_id):
-    cur = conn.cursor()
-    cur.execute(
-        'INSERT INTO note (title, text, book_id) VALUES (%s, %s, %s)',
-        (title, text, book_id),
-    )
-    conn.commit()
-    cur.close()
+```powershell
+Set-Location E:\notes-service
+python note_db.py
 ```
 
-两个细节：
+第一次运行会先打印十张便条，再插入“连接数据库”。`DictCursor` 让每行以字典返回，`note['title']` 就能取标题，不用记元组里第几个位置是什么。
 
-- `%s` 是占位符，值从第二个参数按顺序填进去。**不要自己用 f-string 把值拼进 SQL**：值里带一个引号就能把语句拼坏，被人故意拼坏就是 SQL 注入。占位符交给 PyMySQL 去转义。
-- `conn.commit()` 是提交。PyMySQL 默认开了事务：你执行的插入先记在本次会话里，`commit` 之后别的连接才看得见。不提交就关连接，这次插入等于没发生。
+代码里有几个地方不要随手改掉：
 
-在主程序里 `add_note(conn, '连接', '借了要还', 1)`，再跑 `list_notes`，12 号在里面。去命令行 `SELECT` 也能看到——同一个库，谁连上都一样。
+- `execute(sql, (title, text, book_id))` 是参数化查询。`%s` 由驱动处理，不是 Python 的字符串格式化。
+- 新增后调用 `commit()`，事务才真正落库；异常时 `rollback()`，避免留下半次写入。
+- `lastrowid` 能拿到刚生成的自增编号，再用 `find_note()` 查回来，不必猜编号。
+- 连接最后要 `close()`，所以放在 `finally` 里。查询中途报错也会执行。
 
-收结果还有两个小口：`fetchone()` 只拿下一行，`fetchmany(3)` 拿接下来三行。结果很大、不想一次全收进内存时用它们。
+> [!WARNING]
+> 不要把标题写成 `f"INSERT INTO note VALUES ('{title}')"`。用户输入里有引号时会直接破坏 SQL，恶意输入还可能改变语句含义。值一律走 `execute()` 的第二个参数。
 
-## 6. 小项目：一个能读能写的脚本
+这个脚本每运行一次都会新增一行，这是它的功能，不是重复执行出错。自增编号也不要求连续；删除数据和失败插入都可能留下空号。
 
-把上面三段合成完整的 `note_db.py` 跑一遍：连接、列出 10 行、插入 12 号、再列出 11 行、关闭。然后去命令行确认 12 号也在。两边看到的是同一份数据，这就是数据库和字典的根本区别。
+## 4. 连接失败时，先分清是哪一层
 
-## 7. 课后小项目
+- **`Access denied`**：用户名或密码不对，先回 MySQL 客户端用同一组账号验证。
+- **`Unknown database 'db_note'`**：库不存在，检查是否执行了前两篇的初始化脚本。
+- **`Cannot connect to MySQL server`**：服务没启动、端口不对，或者本机防火墙拦了连接。
+- **`foreign key constraint fails`**：传入的 `book_id` 在 `book` 表里不存在，先查 `SELECT * FROM book;`。
 
-**练习一：散页现形（必做）**
-
-用右连接查全部便条和本子名，找出 `book_name` 为 `NULL` 的那行。再把它 `UPDATE` 到 3 号「工作」本下，重跑内连接，看它回来没有。
-
-**练习二：空本子计数**
-
-左连接之后按 `b.name` 分组 `COUNT(n.id)`。注意数的是 `n.id` 不是 `*`：「工作」那一行 `n.id` 是 `NULL`，`COUNT(n.id)` 给它 0，`COUNT(*)` 会给它 1。两个都跑一次看差别。
-
-**练习三：不提交的插入**
-
-把 `add_note` 里的 `conn.commit()` 注释掉，插入 13 号，脚本里 `fetchall` 能看到吗？命令行里能看到吗？想清楚再恢复那行。
-
-## 8. 小结
-
-一个事实存一处：本子名进 `book` 表，便条留 `book_id`。内连接只留拼得上的，左连接保左表、右连接保右表，全外连接用 `UNION` 拼。Python 侧三步：`connect` 拿连接、`cursor` 执行 SQL、`fetchall` 收结果；写入多一步 `commit`，值走 `%s` 占位符。
-
-脚本里现在还是手写 SQL 字符串。表一多，这些字符串会越长越难维护。下一篇换一种写法：把表写成 Python 类，增删改查变成操作对象：[SQLAlchemy 第 1 篇：把表写成类](/post/sqlalchemy-orm/)。
+到这里，SQL 和 Python 已经各自跑通。不过列表查询、参数和结果字典仍要手写，表一多就会重复。下一篇用 SQLAlchemy 把表映射成类，保留数据库能力，少写这些样板代码：[ORM 模型与 Session](/post/sqlalchemy-orm/)。

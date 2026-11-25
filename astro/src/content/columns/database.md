@@ -15,7 +15,7 @@ description: '把便条从内存搬进 MySQL：建库建表、查询、两张表
 | [第 1 篇：建库建表，把便条搬进数据库](/post/mysql-ddl-dml/) | 库、表、类型与约束，INSERT / UPDATE / DELETE |
 | [第 2 篇：查询，从一堆便条里挑出要的那张](/post/mysql-dql/) | WHERE、LIKE、排序分页、聚合分组、执行顺序 |
 | [第 3 篇：两张表连起来查，再让 Python 接手](/post/mysql-join-pymysql/) | 内连接与外连接，PyMySQL 连接、游标、commit |
-| [第 4 篇：把表写成类，增删改查不再拼 SQL](/post/sqlalchemy-orm/) | 模型、会话、relationship，sqlacodegen 反向生成 |
+| [第 4 篇：把表写成类，用对象完成增删改查](/post/sqlalchemy-orm/) | SQLAlchemy 2.x 模型、Session、relationship，从日志核对真实 SQL |
 | [第 5 篇：接上 FastAPI，便条这次真的存住了](/post/fastapi-sqlalchemy/) | get_db 按请求发会话，重启验证数据还在 |
 
 ## 前置要求
